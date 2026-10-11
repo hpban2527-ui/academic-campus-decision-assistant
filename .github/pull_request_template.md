@@ -12,5 +12,3 @@
 
 ## Checklist
 - [ ] Tôi đã kiểm tra phần mình push
-- [ ] Không có secret/password/token trong commit
-- [ ] PR này không thay đổi ngoài scope của task
