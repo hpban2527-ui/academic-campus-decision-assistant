@@ -1,0 +1,94 @@
+{
+  "courses": {
+    "CSC10012": { 
+      "name": "Introduction to Programming", 
+      "credits": 4, 
+      "prereq": [], 
+      "coreq": [] 
+    },
+    "CSC10003": { 
+      "name": "Object-Oriented Programming", 
+      "credits": 4, 
+      "prereq": ["CSC10012"], 
+      "coreq": [] 
+    },
+    "CSC10004": { 
+      "name": "Data Structures and Algorithms", 
+      "credits": 4, 
+      "prereq": ["CSC10012"], 
+      "coreq": [] 
+    },
+    "CSC10006": { 
+      "name": "Database Systems", 
+      "credits": 4, 
+      "prereq": ["CSC10004"], 
+      "coreq": [] 
+    },
+    "CSC10007": { 
+      "name": "Operating Systems", 
+      "credits": 4, 
+      "prereq": ["CSC10009"], 
+      "coreq": [] 
+    },
+    "CSC10008": { 
+      "name": "Computer Networks", 
+      "credits": 4, 
+      "prereq": ["CSC10012"], 
+      "coreq": [] 
+    },
+    "CSC10009": { 
+      "name": "Computer Systems", 
+      "credits": 4, 
+      "prereq": ["CSC10012"], 
+      "coreq": [] 
+    },
+    "CSC13002": { 
+      "name": "Introduction to Software Engineering", 
+      "credits": 4, 
+      "prereq": ["CSC10012", "CSC10006"], 
+      "coreq": [] 
+    },
+    "CSC14003": { 
+      "name": "Introduction to Artificial Intelligence", 
+      "credits": 4, 
+      "prereq": ["CSC10004"], 
+      "coreq": [] 
+    },
+    "CSC14005": { 
+      "name": "Introduction to Machine Learning", 
+      "credits": 4, 
+      "prereq": ["CSC14003"], 
+      "coreq": [] 
+    },
+    "CSC18001": { 
+      "name": "Introduction to Deep Learning", 
+      "credits": 4, 
+      "prereq": ["CSC14005"], 
+      "coreq": [] 
+    },
+    "CSC12003": { 
+      "name": "Database Management Systems", 
+      "credits": 4, 
+      "prereq": ["CSC10006"], 
+      "coreq": [] 
+    },
+    "CSC12004": { 
+      "name": "Information Systems Analysis and Design", 
+      "credits": 4, 
+      "prereq": ["CSC10006"], 
+      "coreq": [] 
+    },
+    "CSC12105": { 
+      "name": "E-Commerce", 
+      "credits": 4, 
+      "prereq": ["CSC12003"], 
+      "coreq": ["CSC12004"] 
+    },
+    "CSC15001": { 
+      "name": "Computer Security", 
+      "credits": 4, 
+      "prereq": ["CSC10004", "CSC10006"], 
+      "coreq": [] 
+    }
+  }
+}
