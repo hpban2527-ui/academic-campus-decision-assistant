@@ -1,0 +1,354 @@
+[
+  {
+    "course_id": "BAA00004",
+    "course_name": "Pháp luật đại cương",
+    "credits": 3,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "BAA00004_01",
+        "semester": "2/25-26",
+        "class": "25C09, 25C08",
+        "timetable": "T4 07:30-11:10 (Hội trường I)",
+        "lab_timetable": ""
+      },
+      {
+        "section_id": "BAA00004_02",
+        "semester": "2/25-26",
+        "class": "25C04, 25C03",
+        "timetable": "T2 07:30-11:10 (GD 1)",
+        "lab_timetable": ""
+      }
+    ]
+  },
+  {
+    "course_id": "BAA00005",
+    "course_name": "Kinh tế đại cương",
+    "credits": 2,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "BAA00005_01",
+        "semester": "1/26-27",
+        "class": "25C09, 25C08",
+        "timetable": "T4 07:30-11:10 (GD 1)",
+        "lab_timetable": ""
+      },
+      {
+        "section_id": "BAA00005_02",
+        "semester": "1/26-27",
+        "class": "25C04, 25C03",
+        "timetable": "T3 07:30-11:10 (E.402)",
+        "lab_timetable": ""
+      }
+    ]
+  },
+  {
+    "course_id": "MTH00005",
+    "course_name": "Vi tích phân 1",
+    "credits": 4,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "MTH00005_01",
+        "semester": "3/25-26",
+        "class": "25C09, 25C08",
+        "timetable": "T5 07:30-11:10 (I.23)",
+        "lab_timetable": "T6 15:30-17:30 (E.307)"
+      },
+      {
+        "section_id": "MTH00005_02",
+        "semester": "3/25-26",
+        "class": "25C04, 25C03",
+        "timetable": "T3 07:30-11:10 (C.33)",
+        "lab_timetable": "T3 15:30-17:30 (E.307)"
+      }
+    ]
+  },
+  {
+    "course_id": "MTH00006",
+    "course_name": "Vi tích phân 2",
+    "credits": 4,
+    "prerequisites": "MTH00005",
+    "sections": [
+      {
+        "section_id": "MTH00006_01",
+        "semester": "1/26-27",
+        "class": "25C09, 25C08",
+        "timetable": "T5 13:30-17:10 (E.404)",
+        "lab_timetable": "T2 15:30-17:30 (C.24)"
+      },
+      {
+        "section_id": "MTH00006_02",
+        "semester": "1/26-27",
+        "class": "25C04, 25C03",
+        "timetable": "T5 07:30-11:10 (E.306)",
+        "lab_timetable": "T5 13:30-15:30 (E.307)"
+      }
+    ]
+  },
+  {
+    "course_id": "MTH00008",
+    "course_name": "Đại số tuyến tính",
+    "credits": 4,
+    "prerequisites": "MTH00009",
+    "sections": [
+      {
+        "section_id": "MTH00008_01",
+        "semester": "3/25-26",
+        "class": "25C09, 25C08",
+        "timetable": "T3 13:30-17:10 (I.23)",
+        "lab_timetable": "T2 09:30-11:30 (E.306)"
+      },
+      {
+        "section_id": "MTH00008_02",
+        "semester": "3/25-26",
+        "class": "25C04, 25C03",
+        "timetable": "T2 13:30-17:10 (C.24)",
+        "lab_timetable": "T4 09:30-11:30 (E.306)"
+      }
+    ]
+  },
+  {
+    "course_id": "MTH00009",
+    "course_name": "Toán rời rạc",
+    "credits": 4,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "MTH00009_01",
+        "semester": "1/25-26",
+        "class": "25C09, 25C08",
+        "timetable": "T3 13:30-17:10 (C.22)",
+        "lab_timetable": "T2 07:30-09:30 (E.403)"
+      },
+      {
+        "section_id": "MTH00009_02",
+        "semester": "1/25-26",
+        "class": "25C04, 25C03",
+        "timetable": "T4 13:30-17:10 (C.33)",
+        "lab_timetable": "T6 09:30-11:30 (C.33)"
+      }
+    ]
+  },
+  {
+    "course_id": "MTH00058",
+    "course_name": "Toán học tổ hợp",
+    "credits": 4,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "MTH00058_01",
+        "semester": "2/25-26",
+        "class": "25C09, 25C08",
+        "timetable": "T6 13:30-17:10 (E.302)",
+        "lab_timetable": "T3 13:30-15:30 (E.404)"
+      },
+      {
+        "section_id": "MTH00058_02",
+        "semester": "2/25-26",
+        "class": "25C04, 25C03",
+        "timetable": "T3 13:30-17:10 (E.402)",
+        "lab_timetable": "T4 09:30-11:30 (E.302)"
+      }
+    ]
+  },
+  {
+    "course_id": "PHY00005",
+    "course_name": "Vật lý đại cương 1",
+    "credits": 4,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "PHY00005_01",
+        "semester": "2/25-26",
+        "class": "25C09, 25C08",
+        "timetable": "T5 13:30-17:10 (E.302)",
+        "lab_timetable": "T6 09:30-11:30 (E.302)"
+      },
+      {
+        "section_id": "PHY00005_02",
+        "semester": "2/25-26",
+        "class": "25C04, 25C03",
+        "timetable": "T5 07:30-11:10 (E.301)",
+        "lab_timetable": "T4 13:30-15:30 (E.301)"
+      }
+    ]
+  },
+  {
+    "course_id": "CSC00004",
+    "course_name": "Nhập môn Công nghệ thông tin",
+    "credits": 4,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "CSC00004_01",
+        "semester": "1/25-26",
+        "class": "25C09",
+        "timetable": "T3 07:30-11:10 (B.11A)",
+        "lab_timetable": "T2 09:30-11:30 (I.62)"
+      },
+      {
+        "section_id": "CSC00004_02",
+        "semester": "1/25-26",
+        "class": "25C04",
+        "timetable": "T6 13:30-17:10 (C.43B)",
+        "lab_timetable": "T4 07:30-09:30 (I.52)"
+      }
+    ]
+  },
+  {
+    "course_id": "CSC10003",
+    "course_name": "Phương pháp lập trình hướng đối tượng",
+    "credits": 4,
+    "prerequisites": "CSC10004",
+    "sections": [
+      {
+        "section_id": "CSC10003_01",
+        "semester": "3/25-26",
+        "class": "25C09",
+        "timetable": "T3 09:30-11:10 (I.91)\nT6 09:30-11:10 (I.41)",
+        "lab_timetable": "T5 13:30-15:30 (I.61)"
+      },
+      {
+        "section_id": "CSC10003_02",
+        "semester": "3/25-26",
+        "class": "25C04",
+        "timetable": "T2 07:30-11:10 (I.41)",
+        "lab_timetable": "T4 07:30-09:30 (I.52)"
+      }
+    ]
+  },
+  {
+    "course_id": "CSC10004",
+    "course_name": "Cấu trúc dữ liệu và giải thuật",
+    "credits": 4,
+    "prerequisites": "CSC10012",
+    "sections": [
+      {
+        "section_id": "CSC10004_01",
+        "semester": "2/25-26",
+        "class": "25C09",
+        "timetable": "T3 07:30-09:10 (F.301)\nT6 07:30-09:10 (E.302)",
+        "lab_timetable": "T4 13:30-15:30 (I.52)"
+      },
+      {
+        "section_id": "CSC10004_02",
+        "semester": "2/25-26",
+        "class": "25C04",
+        "timetable": "T2 13:30-17:10 (I.42)",
+        "lab_timetable": "T6 13:30-15:30 (I.52)"
+      }
+    ]
+  },
+  {
+    "course_id": "CSC10008",
+    "course_name": "Mạng máy tính",
+    "credits": 4,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "CSC10008_01",
+        "semester": "3/25-26",
+        "class": "25C09",
+        "timetable": "T3 07:30-09:10 (I.91)\nT6 07:30-09:10 (I.41)",
+        "lab_timetable": ""
+      },
+      {
+        "section_id": "CSC10008_02",
+        "semester": "1/26-27",
+        "class": "25C04",
+        "timetable": "T3 13:30-17:10 (I.11E)",
+        "lab_timetable": ""
+      }
+    ]
+  },
+  {
+    "course_id": "CSC10009",
+    "course_name": "Hệ thống máy tính",
+    "credits": 2,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "CSC10009_01",
+        "semester": "1/26-27",
+        "class": "25C09",
+        "timetable": "T7 07:30-11:10 (E.405)",
+        "lab_timetable": ""
+      },
+      {
+        "section_id": "CSC10009_02",
+        "semester": "3/25-26",
+        "class": "25C04",
+        "timetable": "T4 13:30-17:10 (I.91)",
+        "lab_timetable": ""
+      }
+    ]
+  },
+  {
+    "course_id": "CSC10012",
+    "course_name": "Cơ sở lập trình",
+    "credits": 4,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "CSC10012_01",
+        "semester": "1/25-26",
+        "class": "25C09",
+        "timetable": "T2 13:30-17:10 (F.203)",
+        "lab_timetable": "T5 09:30-11:30 (I.52)"
+      },
+      {
+        "section_id": "CSC10012_02",
+        "semester": "1/25-26",
+        "class": "25C04",
+        "timetable": "T3 07:30-11:10 (I.44)",
+        "lab_timetable": "T3 13:30-15:30 (I.52)"
+      }
+    ]
+  },
+  {
+    "course_id": "CSC10014",
+    "course_name": "Tư duy tính toán",
+    "credits": 4,
+    "prerequisites": "CSC10003",
+    "sections": [
+      {
+        "section_id": "CSC10014_01",
+        "semester": "1/26-27",
+        "class": "25C09",
+        "timetable": "T2 07:30-11:10 (F.203)",
+        "lab_timetable": "T3 13:30-15:30 (I.62)"
+      },
+      {
+        "section_id": "CSC10014_02",
+        "semester": "1/26-27",
+        "class": "25C04",
+        "timetable": "T2 13:30-17:10 (C.36)",
+        "lab_timetable": "T6 07:30-09:30 (I.52)"
+      }
+    ]
+  },
+  {
+    "course_id": "CSC10121",
+    "course_name": "Kỹ năng mềm",
+    "credits": 3,
+    "prerequisites": "",
+    "sections": [
+      {
+        "section_id": "CSC10121_01",
+        "semester": "1/25-26",
+        "class": "25C09",
+        "timetable": "T4 07:30-11:10 (I.32)",
+        "lab_timetable": "T5 13:30-15:30 (I.42)"
+      },
+      {
+        "section_id": "CSC10121_02",
+        "semester": "1/26-27",
+        "class": "25C04",
+        "timetable": "T2 13:30-17:10 (I.42)",
+        "lab_timetable": "T7 13:30-15:30 (I.41)"
+      }
+    ]
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "course_id": "BAA00004",
+    "course_name": "Pháp luật đại cương",
+    "credits": 3,
+    "prerequisites": ""
+  },
+  {
+    "course_id": "BAA00005",
+    "course_name": "Kinh tế đại cương",
+    "credits": 2,
+    "prerequisites": ""
+  },
+  {
+    "course_id": "MTH00005",
+    "course_name": "Vi tích phân 1",
+    "credits": 4,
+    "prerequisites": ""
+  },
+  {
+    "course_id": "MTH00006",
+    "course_name": "Vi tích phân 2",
+    "credits": 4,
+    "prerequisites": "MTH00005"
+  },
+  {
+    "course_id": "MTH00008",
+    "course_name": "Đại số tuyến tính",
+    "credits": 4,
+    "prerequisites": "MTH00009"
+  },
+  {
+    "course_id": "MTH00009",
+    "course_name": "Toán rời rạc",
+    "credits": 4,
+    "prerequisites": ""
+  },
+  {
+    "course_id": "MTH00058",
+    "course_name": "Toán học tổ hợp",
+    "credits": 4,
+    "prerequisites": ""
+  },
+  {
+    "course_id": "PHY00005",
+    "course_name": "Vật lý đại cương 1",
+    "credits": 4,
+    "prerequisites": ""
+  },
+  {
+    "course_id": "CSC00004",
+    "course_name": "Nhập môn Công nghệ thông tin",
+    "credits": 4,
+    "prerequisites": ""
+  },
+  {
+    "course_id": "CSC10003",
+    "course_name": "Phương pháp lập trình hướng đối tượng",
+    "credits": 4,
+    "prerequisites": "CSC10004"
+  },
+  {
+    "course_id": "CSC10004",
+    "course_name": "Cấu trúc dữ liệu và giải thuật",
+    "credits": 4,
+    "prerequisites": "CSC10012"
+  },
+  {
+    "course_id": "CSC10008",
+    "course_name": "Mạng máy tính",
+    "credits": 4,
+    "prerequisites": ""
+  },
+  {
+    "course_id": "CSC10009",
+    "course_name": "Hệ thống máy tính",
+    "credits": 2,
+    "prerequisites": ""
+  },
+  {
+    "course_id": "CSC10012",
+    "course_name": "Cơ sở lập trình",
+    "credits": 4,
+    "prerequisites": ""
+  },
+  {
+    "course_id": "CSC10014",
+    "course_name": "Tư duy tính toán",
+    "credits": 4,
+    "prerequisites": "CSC10003"
+  },
+  {
+    "course_id": "CSC10121",
+    "course_name": "Kỹ năng mềm",
+    "credits": 3,
+    "prerequisites": ""
+  }
+]
