@@ -1,0 +1,670 @@
+[
+    {
+        "activity_id": "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl",
+        "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl",
+            "URL_registration": "https://forms.cloud.microsoft/r/qHiUsQc7WA"
+        },
+        "title": "CHUYÊN ĐỀ \"TẬP HUẤN KIẾN THỨC, KỸ NĂNG VÀ THỰC TẬP PHƯƠNG ÁN PHÒNG CHÁY CHỮA CHÁY, CỨU NẠN, CỨU HỘ\" NĂM 2026",
+        "domain": "skills",
+        "start": "2026-10-30T14:00:00+07:00",
+        "end": null,
+        "registration_deadline": "2026-10-28T23:59:00+07:00",
+        "mode": "offline",
+        "location": "Giảng đường 1, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (227 Nguyễn Văn Cừ, phường Chợ Quán, TP. Hồ Chí Minh)",
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Tất cả sinh viên Trường Đại học Khoa học tự nhiên"
+        ],
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài không đề cập bắt buộc/tự nguyện, lệ phí, yêu cầu hoàn thành cụ thể"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid02EJmkk2oaZJuBw5VqRhEUeSUNqVW6dav9qSV4AZsK661vLikur7U4PPBqJcPDBYHzl",
+        "source": {
+            "publisher": "Đoàn khoa - Liên chi Hội CNTT KHTN",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/DoanKhoaLienChiHoi.CNTT.KHTN/posts/pfbid02EJmkk2oaZJuBw5VqRhEUeSUNqVW6dav9qSV4AZsK661vLikur7U4PPBqJcPDBYHzl",
+            "URL_registration": null
+        },
+        "title": "[BẢN LĨNH IT 2026] - KEY ƠI, ĐỪNG QUÊN CÓ HẸN VỚI VÒNG 4 - ALT!",
+        "domain": "skills",
+        "start": "2026-10-17T12:30:00+07:00",
+        "end": "2026-10-18T11:00:00+07:00",
+        "registration_deadline": null,
+        "mode": "offline",
+        "location": "Vườn điều, Cơ sở phường Đông Hòa, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+        "points": null,
+        "mandatory": null,
+        "audience": null,
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài là thông báo vòng 4 cho thí sinh đã đăng ký, không có form đăng ký mới; audience không nêu rõ đối tượng ngoài 'các KEY'"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l",
+        "source": {
+            "publisher": "SAB in HCMUS",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/sab.ctda/posts/pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l",
+            "URL_registration": "https://go.sabies.vn/lis26_dangky"
+        },
+        "title": "LET IT SHINE 2026 - KHÚC KHẢI HOÀN MÙA ĐÔNG",
+        "domain": "culture_sports",
+        "start": "2026-11-01T00:00:00+07:00",
+        "end": "2026-11-22T20:30:00+07:00",
+        "registration_deadline": "2026-10-30T23:59:00+07:00",
+        "mode": "offline",
+        "location": "Vòng Sơ khảo: cơ sở phường Chợ Quán; Vòng Chung kết: Giảng đường 1, cơ sở phường Chợ Quán",
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Tất cả sinh viên đang theo học tại Khoa Công nghệ thông tin, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM"
+        ],
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "start",
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "start = ngày sơ khảo 01/11/2026 nhưng bài không ghi giờ (đặt 00:00:00 + cần xác minh); end = chung kết 22/11/2026 20:30"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid0dmRU1XavPQ3rzXsGMSTaL69GEcdsmKnXeVaWA4LYybFFgsJDfg3qtMetBGfn7zKkl",
+        "source": {
+            "publisher": "Google Developer Group on Campus - HCMUS",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/gdgoc.hcmus/posts/pfbid0dmRU1XavPQ3rzXsGMSTaL69GEcdsmKnXeVaWA4LYybFFgsJDfg3qtMetBGfn7zKkl",
+            "URL_registration": "https://forms.gle/cQTpHUTMsaboQXYJ7"
+        },
+        "title": "[GDGoC-HCMUS TIPS & TRICKS]",
+        "domain": "career",
+        "start": "2026-10-03T00:00:00+07:00",
+        "end": "2026-10-25T23:59:00+07:00",
+        "registration_deadline": "2026-10-10T23:59:00+07:00",
+        "mode": null,
+        "location": null,
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Tất cả sinh viên của trường Đại học Khoa học tự nhiên, ĐHQG-HCM, và sinh viên trong TP.HCM"
+        ],
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mode",
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài chia sẻ tips CV nhưng có phần tuyển quân GDGoC (Application 3-10/10, Interview 12-18/10, Intern 20-25/10); mode không nêu rõ online/offline"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid02o8CK5Ziex6z2ZjnEhnv49RyHkZwMxEcLkpF49QmVymQp3N2hghbSAcrvzFram89Pl",
+        "source": {
+            "publisher": "Google Developer Group on Campus - HCMUS",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/gdgoc.hcmus/posts/pfbid02o8CK5Ziex6z2ZjnEhnv49RyHkZwMxEcLkpF49QmVymQp3N2hghbSAcrvzFram89Pl",
+            "URL_registration": "https://forms.gle/cQTpHUTMsaboQXYJ7"
+        },
+        "title": "[GDGoC-HCMUS RECRUITMENT 2026]",
+        "domain": "career",
+        "start": "2026-10-03T00:00:00+07:00",
+        "end": "2026-10-25T23:59:00+07:00",
+        "registration_deadline": "2026-10-10T23:59:00+07:00",
+        "mode": null,
+        "location": null,
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Tất cả sinh viên của trường Đại học Khoa học tự nhiên, ĐHQG-HCM, và sinh viên trong TP.HCM"
+        ],
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mode",
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Cùng hoạt động tuyển quân với record pfbid0dmRU1X... (bài TIPS) — cùng form, cùng timeline; đây là ứng viên dedup"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl",
+        "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl",
+            "URL_registration": null
+        },
+        "title": "THÔNG BÁO V/V ĐĂNG KÝ LỊCH KHÁM SỨC KHỎE ĐỊNH KỲ CHO SINH VIÊN ĐỢT 2 NĂM 2026",
+        "domain": "other",
+        "start": null,
+        "end": null,
+        "registration_deadline": null,
+        "mode": null,
+        "location": null,
+        "points": null,
+        "mandatory": null,
+        "audience": null,
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mode",
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài chỉ dẫn link thông báo chi tiết (ctsv.hcmus.edu.vn), không chứa thời gian/địa điểm/form đăng ký; domain 'other' do là hoạt động y tế, không khớp enum"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l",
+        "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l",
+            "URL_registration": "https://team1vn.xyz"
+        },
+        "title": "Avalanche Team1 UniHack HCMC 2026",
+        "domain": "skills",
+        "start": "2026-11-02T00:00:00+07:00",
+        "end": "2026-11-30T23:59:00+07:00",
+        "registration_deadline": null,
+        "mode": "hybrid",
+        "location": "Online; Vòng Pitching trực tiếp tại TP.HCM",
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Sinh viên trên toàn quốc"
+        ],
+        "fee": 0,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài ghi rõ 'Chương trình diễn ra online' + 'Top 10 pitching trực tiếp tại TP.HCM' → hybrid; 'Chi phí tham gia: Miễn phí' → fee=0; deadline đăng ký không ghi rõ"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid02fsjfr4MEtTjN9TpVw3DvfWumQm7Wx2GGE56n7J51Y8sh4brg3p4k1uwhX41h26FFl",
+        "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid02fsjfr4MEtTjN9TpVw3DvfWumQm7Wx2GGE56n7J51Y8sh4brg3p4k1uwhX41h26FFl",
+            "URL_registration": null
+        },
+        "title": "KHÁM SỨC KHỎE ĐỊNH KỲ CHO SINH VIÊN ĐỢT 1 NĂM 2026: 2 NGÀY ĐẦU TIÊN",
+        "domain": "other",
+        "start": null,
+        "end": null,
+        "registration_deadline": null,
+        "mode": "offline",
+        "location": "Hội trường B và Phòng tự học (bên cạnh Hội trường B), cơ sở Khu đô thị ĐHQG-HCM",
+        "points": null,
+        "mandatory": null,
+        "audience": null,
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài là follow-up của hoạt động khám sức khỏe đợt 1 (nhắc giấy tờ, khung giờ); không ghi ngày cụ thể của các ngày tiếp theo"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl",
+        "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl",
+            "URL_registration": "https://courses.hcmus.edu.vn/course/view.php?id=25541"
+        },
+        "title": "KHTN ZERO+ 2026 | SINH VIÊN KHTN ƠI, CÙNG THAM GIA THI TRỰC TUYẾN!",
+        "domain": "other",
+        "start": "2026-10-19T08:00:00+07:00",
+        "end": "2026-10-23T23:59:00+07:00",
+        "registration_deadline": null,
+        "mode": "online",
+        "location": null,
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Toàn thể sinh viên Trường Đại học Khoa học tự nhiên"
+        ],
+        "fee": null,
+        "completion_requirements": "Hoàn thành 70% bài thi",
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "fee"
+            ],
+            "notes": [
+                "URL_registration là đường dẫn dự thi trên Moodle, không phải form đăng ký; completion_requirements rõ từ 'hoàn thành 70% bài thi'"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl",
+        "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl",
+            "URL_registration": "https://forms.cloud.microsoft/r/PfCU6uHVRa"
+        },
+        "title": "Chuyên đề \"Sinh viên với kỹ năng tham gia giao thông và đảm bảo trật tự, an toàn giao thông đường bộ\"",
+        "domain": "skills",
+        "start": "2026-10-17T08:00:00+07:00",
+        "end": null,
+        "registration_deadline": null,
+        "mode": "offline",
+        "location": "Hội trường B, Trường ĐH Khoa học tự nhiên, ĐHQG-HCM (cơ sở Khu đô thị ĐHQG-HCM)",
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Sinh viên Trường ĐH Khoa học tự nhiên"
+        ],
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài chỉ ghi thời gian BẮT ĐẦU đăng ký (11g00 ngày 13/10/2026), không ghi hạn đóng"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl",
+        "source": {
+            "publisher": "Đội Sinh Viên Tình Nguyện - Khoa Toán Tin Học",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/doisvtnkhoatoantin/posts/pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl",
+            "URL_registration": "https://forms.gle/8fTaa1qxYzU2BCR47"
+        },
+        "title": "VƯƠN BƯỚC ĐÊM RẰM - MỞ ĐƠN ĐĂNG KÝ",
+        "domain": "volunteer",
+        "start": "2026-09-27T07:30:00+07:00",
+        "end": "2026-09-27T19:00:00+07:00",
+        "registration_deadline": "2026-09-24T23:59:00+07:00",
+        "mode": "offline",
+        "location": "Lớp học tình thương (Miếu cây gõ, 87 Đ Bình Thung, Đông Hòa, thành phố Hồ Chí Minh)",
+        "points": null,
+        "mandatory": null,
+        "audience": null,
+        "fee": 50000,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài ghi 'Đối tượng: 40 sinh viên' là giới hạn số lượng, không phải đối tượng cụ thể → audience=null"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
+        "source": {
+            "publisher": "Đội Sinh Viên Tình Nguyện - Khoa Toán Tin Học",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/doisvtnkhoatoantin/posts/pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
+            "URL_registration": "https://forms.gle/2MpDsrvqSFTcGH3W8"
+        },
+        "title": "HOA MÙA HÈ - VÌ TRẺ EM NGOẠI THÀNH 2026 - MỞ FORM ĐĂNG KÍ",
+        "domain": "volunteer",
+        "start": "2026-05-16T06:00:00+07:00",
+        "end": "2026-05-17T12:30:00+07:00",
+        "registration_deadline": "2026-05-12T20:00:00+07:00",
+        "mode": "offline",
+        "location": "Trường Tiểu học Sông Thao (xã Bàu Hàm, tỉnh Đồng Nai)",
+        "points": null,
+        "mandatory": null,
+        "audience": null,
+        "fee": 140000,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài không ghi đối tượng (chỉ 'Đội SVTN Khoa Toán Tin') → audience=null"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl",
+        "source": {
+            "publisher": "Đội Sinh Viên Tình Nguyện - Khoa Toán Tin Học",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/doisvtnkhoatoantin/posts/pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl",
+            "URL_registration": "https://tinyurl.com/hatnangdem"
+        },
+        "title": "HẠT NẮNG ĐÊM - MỞ FORM",
+        "domain": "volunteer",
+        "start": "2026-04-12T15:00:00+07:00",
+        "end": "2026-04-12T21:00:00+07:00",
+        "registration_deadline": "2026-04-10T23:00:00+07:00",
+        "mode": "offline",
+        "location": "Địa điểm phát: Các tuyến đường tại Quận 10; Địa điểm nấu: 14/1 Ngô Quyền, Phường 5, Quận 10, TP.HCM (Quán cơm từ thiện 2000 đ – SG)",
+        "points": null,
+        "mandatory": null,
+        "audience": null,
+        "fee": 40000,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài ghi 'Đối tượng: 30 - 35 sinh viên' là giới hạn số lượng → audience=null"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l",
+        "source": {
+            "publisher": "SAB in HCMUS",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/sab.ctda/posts/pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l",
+            "URL_registration": "https://t.sab.edu.vn/fsl26_form"
+        },
+        "title": "FIT SUPER LEAGUE 2026 - CHÍNH THỨC MỞ ĐƠN",
+        "domain": "culture_sports",
+        "start": "2026-03-14T18:00:00+07:00",
+        "end": "2026-04-04T21:00:00+07:00",
+        "registration_deadline": "2026-03-08T23:59:00+07:00",
+        "mode": "offline",
+        "location": "Sân bóng đá Phạm Hùng, Hẻm C7D/17e24, Đ. Phạm Hùng, Bình Hưng, Bình Chánh, TP Hồ Chí Minh",
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Sinh viên khoa Công nghệ Thông tin"
+        ],
+        "fee": 500000,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "completion_requirements"
+            ],
+            "notes": [
+                "fee = 500.000đ/đội (lệ phí theo đội, không phải cá nhân); start = trận đầu tiên 14/03 18:00, end = trận cuối 04/04 21:00"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid026SJmz8cRXUkDwHvJrZyZv4bsikCC1t4pdDBt46gTuwxaTkBKtSHvCPvwJH1KJ47l",
+        "source": {
+            "publisher": "FIT HCMUS Kênh Hoạt động",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/fit.hcmus.hoatdong/posts/pfbid026SJmz8cRXUkDwHvJrZyZv4bsikCC1t4pdDBt46gTuwxaTkBKtSHvCPvwJH1KJ47l",
+            "URL_registration": "https://bit.ly/BLIT2026_DangKy"
+        },
+        "title": "[BẢN LĨNH IT 2026] - MỞ FORM ĐĂNG KÝ",
+        "domain": "skills",
+        "start": null,
+        "end": null,
+        "registration_deadline": "2026-09-24T23:59:00+07:00",
+        "mode": null,
+        "location": null,
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Các bạn Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+        ],
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mode",
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài chỉ mở form, chưa có thời gian/địa điểm thi; có bản mirror từ Design ITUS (record pfbid02ATDhaQW...) ghi lệ phí 20.000đ — cần đối chiếu"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl",
+        "source": {
+            "publisher": "FIT HCMUS Kênh Hoạt động",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/fit.hcmus.hoatdong/posts/pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl",
+            "URL_registration": "https://link.hcmus.edu.vn/OLP-AI-HCMUS26"
+        },
+        "title": "Đăng ký đội thi Olympic AI HCMUS 2026",
+        "domain": "academic",
+        "start": "2026-10-11T12:00:00+07:00",
+        "end": null,
+        "registration_deadline": "2026-10-08T23:59:00+07:00",
+        "mode": "offline",
+        "location": "Cơ sở Nguyễn Văn Cừ, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Sinh viên trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+        ],
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "start",
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài ghi 'Trưa Chủ nhật 11/10/2026' — giờ không chính xác, đặt 12:00 + cần xác minh; 'hoặc đóng sớm nếu đủ 30 đội'"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl",
+        "source": {
+            "publisher": "FIT HCMUS Kênh Hoạt động",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/fit.hcmus.hoatdong/posts/pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl",
+            "URL_registration": "https://link.hcmus.edu.vn/OLP-HCMUS26"
+        },
+        "title": "Thông báo v/v đăng ký tham dự Kỳ thi Olympic tin học sinh viên trường Đại học Khoa học tự nhiên năm 2026",
+        "domain": "academic",
+        "start": "2026-10-25T07:30:00+07:00",
+        "end": null,
+        "registration_deadline": "2026-10-04T23:59:00+07:00",
+        "mode": "offline",
+        "location": "Một trong hai cơ sở của Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (thí sinh được thông báo qua email)",
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Sinh viên Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+        ],
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Địa điểm cụ thể chưa xác định trong bài ('một trong hai cơ sở', thông báo qua email)"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid02buju6UWyad8k9Z4xH1tR5eNwpWsuaZtnwfesY2o8UQzdFh3p7cHemVx24dkaHSdFl",
+        "source": {
+            "publisher": "Đoàn khoa - Liên chi Hội CNTT KHTN",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/DoanKhoaLienChiHoi.CNTT.KHTN/posts/pfbid02buju6UWyad8k9Z4xH1tR5eNwpWsuaZtnwfesY2o8UQzdFh3p7cHemVx24dkaHSdFl",
+            "URL_registration": "https://bit.ly/ITogether_2026"
+        },
+        "title": "[ITogether] - \"+1 MÁY\" LÊN KÈO, VÈO VÈO CHẠY TRẠM",
+        "domain": "skills",
+        "start": null,
+        "end": null,
+        "registration_deadline": null,
+        "mode": null,
+        "location": null,
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Tân sinh viên khoa Công nghệ thông tin"
+        ],
+        "fee": null,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mode",
+                "mandatory",
+                "fee",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Bài chỉ giới thiệu 7 trạm và mở link đăng ký, không nêu thời gian/địa điểm; audience suy ra từ 'tân binh' + context CNTT"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
+        "source": {
+            "publisher": "Đoàn khoa - Liên chi Hội CNTT KHTN",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/DoanKhoaLienChiHoi.CNTT.KHTN/posts/pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
+            "URL_registration": null
+        },
+        "title": "CUỘC THI TRẮC NGHIỆM TRỰC TUYẾN \"THEO DẤU CHÂN NGƯỜI\"",
+        "domain": "other",
+        "start": "2026-06-05T20:00:00+07:00",
+        "end": "2026-06-12T23:59:00+07:00",
+        "registration_deadline": null,
+        "mode": "online",
+        "location": null,
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Toàn thể sinh viên Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+        ],
+        "fee": null,
+        "completion_requirements": "Đạt từ 23/30 câu đúng trở lên",
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mandatory",
+                "fee"
+            ],
+            "notes": [
+                "Thi trực tiếp trên MyAloha, không có form đăng ký → URL_registration=null; completion_requirements rõ từ 'đạt từ 23/30 câu đúng'"
+            ]
+        }
+    },
+    {
+        "activity_id": "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al",
+        "source": {
+            "publisher": "Design ITUS",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/design.itus/posts/pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al",
+            "URL_registration": "https://bit.ly/BLIT2026_DangKy"
+        },
+        "title": "[BẢN LĨNH IT 2026] - MỞ FORM ĐĂNG KÝ",
+        "domain": "skills",
+        "start": null,
+        "end": null,
+        "registration_deadline": "2026-09-25T23:59:00+07:00",
+        "mode": null,
+        "location": null,
+        "points": null,
+        "mandatory": null,
+        "audience": [
+            "Các bạn Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+        ],
+        "fee": 20000,
+        "completion_requirements": null,
+        "_review": {
+            "needs_review": true,
+            "flags": [
+                "mode",
+                "mandatory",
+                "completion_requirements"
+            ],
+            "notes": [
+                "Đây là bài MIRROR của BLIT 2026 từ Design ITUS (bài gốc: record pfbid026SJmz8cRXU...); deadline lệch 1 ngày (25/09 vs 24/09), có phí 20.000đ trong khi bài gốc không ghi phí — CẦN dedup/đối chiếu"
+            ]
+        }
+    }
+]
