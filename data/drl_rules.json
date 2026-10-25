@@ -1,0 +1,1580 @@
+{
+  "regulation": {
+    "regulation_id": "1028/QD-KHTN-CTSV",
+    "title": "Quy chế Đánh giá kết quả rèn luyện sinh viên hệ chính quy",
+    "issued_date": "2020-09-04",
+    "effective_from": "HK1/2020-2021",
+    "source": "https://hcmus.edu.vn/wp-content/uploads/2024/03/QD-1028-QC-DRL-2020_20231.pdf",
+    "status": "verified"
+  },
+  "scoring_model": {
+    "assessment_period": "official_semester",
+    "semester_score_min": 0,
+    "semester_score_max": 100,
+    "category_caps": [
+      {
+        "category_id": "C1",
+        "name": "Tham gia học tập và nghiên cứu khoa học",
+        "max_score": 30
+      },
+      {
+        "category_id": "C2",
+        "name": "Chấp hành nội quy, quy chế và các quy định được áp dụng trong Nhà trường",
+        "max_score": 20
+      },
+      {
+        "category_id": "C3",
+        "name": "Tham gia các hoạt động chính trị - xã hội, văn hóa - văn nghệ, thể dục - thể thao; phòng chống tội phạm và tệ nạn xã hội",
+        "max_score": 25
+      },
+      {
+        "category_id": "C4",
+        "name": "Hành động hướng đến xây dựng và phát triển cộng đồng",
+        "max_score": 25
+      },
+      {
+        "category_id": "C5",
+        "name": "Các nội dung khuyến khích cộng thêm",
+        "max_score": 30,
+        "note": "Điểm cộng khuyến khích vẫn chịu giới hạn tổng điểm rèn luyện là 100."
+      }
+    ],
+    "deduction_unlimited": true,
+    "max_total_score": 100,
+    "annual_calc": "Trung bình cộng điểm rèn luyện các học kỳ chính trong năm học",
+    "overall_calc": "Trung bình cộng điểm rèn luyện các học kỳ chính đến khi hoàn tất chương trình",
+    "grade_levels": [
+      {
+        "min_score": 90,
+        "max_score": 100,
+        "label": "Xuất sắc"
+      },
+      {
+        "min_score": 80,
+        "max_score": 89,
+        "label": "Tốt"
+      },
+      {
+        "min_score": 65,
+        "max_score": 79,
+        "label": "Khá"
+      },
+      {
+        "min_score": 50,
+        "max_score": 64,
+        "label": "Trung bình"
+      },
+      {
+        "min_score": 35,
+        "max_score": 49,
+        "label": "Yếu"
+      },
+      {
+        "min_score": 0,
+        "max_score": 34,
+        "label": "Kém"
+      }
+    ],
+    "status": "verified"
+  },
+  "rules": [
+    {
+      "rule_id": "R11",
+      "criterion_id": "1.1",
+      "category_id": "C1",
+      "name": "Không vi phạm Quy chế học vụ, Quy định khảo thí",
+      "condition": {
+        "field": "academic_exam_violations",
+        "operator": "equals",
+        "value": 0
+      },
+      "points": 15,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R1201",
+      "criterion_id": "1.2",
+      "category_id": "C1",
+      "name": "Điểm trung bình tích lũy trong học kỳ từ 5,0 đến dưới 6,5",
+      "condition": {
+        "field": "semester_gpa",
+        "operator": "range",
+        "min_inclusive": 5.0,
+        "max_exclusive": 6.5
+      },
+      "points": 5,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "RR1202",
+      "criterion_id": "1.2",
+      "category_id": "C1",
+      "name": "Điểm trung bình tích lũy trong học kỳ từ 6,5 đến dưới 8,0",
+      "condition": {
+        "field": "semester_gpa",
+        "operator": "range",
+        "min_inclusive": 6.5,
+        "max_exclusive": 8.0
+      },
+      "points": 7,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R1203",
+      "criterion_id": "1.2",
+      "category_id": "C1",
+      "name": "Điểm trung bình tích lũy trong học kỳ từ 8,0 đến dưới 9,0",
+      "condition": {
+        "field": "semester_gpa",
+        "operator": "range",
+        "min_inclusive": 8.0,
+        "max_exclusive": 9.0
+      },
+      "points": 10,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R1204",
+      "criterion_id": "1.2",
+      "category_id": "C1",
+      "name": "Điểm trung bình tích lũy trong học kỳ từ 9,0 đến 10",
+      "condition": {
+        "field": "semester_gpa",
+        "operator": "range",
+        "min_inclusive": 9.0,
+        "max_inclusive": 10.0
+      },
+      "points": 15,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R13",
+      "criterion_id": "1.3",
+      "category_id": "C1",
+      "name": "Giữ xếp loại Xuất sắc so với học kỳ trước đó",
+      "condition": {
+        "field": "maintains_excellent_academic_classification",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 5,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.3"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R1401",
+      "criterion_id": "1.4",
+      "category_id": "C1",
+      "name": "Tăng điểm trung bình tích lũy từ 0,1 đến dưới 0,2",
+      "condition": {
+        "field": "semester_gpa_increase",
+        "operator": "range",
+        "min_inclusive": 0.1,
+        "max_exclusive": 0.2
+      },
+      "points": 2,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R1402",
+      "criterion_id": "1.4",
+      "category_id": "C1",
+      "name": "Tăng điểm trung bình tích lũy từ 0,2 đến dưới 0,4",
+      "condition": {
+        "field": "semester_gpa_increase",
+        "operator": "range",
+        "min_inclusive": 0.2,
+        "max_exclusive": 0.4
+      },
+      "points": 4,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R1403",
+      "criterion_id": "1.4",
+      "category_id": "C1",
+      "name": "Tăng điểm trung bình tích lũy từ 0,4 đến dưới 0,6",
+      "condition": {
+        "field": "semester_gpa_increase",
+        "operator": "range",
+        "min_inclusive": 0.4,
+        "max_exclusive": 0.6
+      },
+      "points": 6,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R1404",
+      "criterion_id": "1.4",
+      "category_id": "C1",
+      "name": "Tăng điểm trung bình tích lũy từ 0,6 đến dưới 0,8",
+      "condition": {
+        "field": "semester_gpa_increase",
+        "operator": "range",
+        "min_inclusive": 0.6,
+        "max_exclusive": 0.8
+      },
+      "points": 8,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R1405",
+      "criterion_id": "1.4",
+      "category_id": "C1",
+      "name": "Tăng điểm trung bình tích lũy từ 0,8 trở lên",
+      "condition": {
+        "field": "semester_gpa_increase",
+        "operator": "greater_than_or_equal",
+        "value": 0.8
+      },
+      "points": 10,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R15",
+      "criterion_id": "1.5",
+      "category_id": "C1",
+      "name": "Là tác giả đề tài nghiên cứu khoa học, khóa luận/tiểu luận tốt nghiệp hoặc tham gia chương trình/cuộc thi nghiên cứu khoa học từ cấp Khoa trở lên",
+      "condition": {
+        "field": "research_projects_eligible",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 15,
+      "unit": "per_project",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.5"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R16",
+      "criterion_id": "1.6",
+      "category_id": "C1",
+      "name": "Tham gia cuộc thi học thuật từ cấp Khoa trở lên (hoàn tất vòng đầu tiên)",
+      "condition": {
+        "field": "academic_competitions_completed_first_round",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 5,
+      "unit": "per_competition",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.6"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R1701",
+      "criterion_id": "1.7",
+      "category_id": "C1",
+      "name": "Là thành viên trong Ban tổ chức (có xác nhận của Thường trực Ban tổ chức) của một cuộc thi học thuật từ cấp Khoa trở lên - BTC",
+      "condition": {
+        "field": "academic_event_role",
+        "operator": "equals",
+        "value": "organizer"
+      },
+      "points": 10,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.7"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R1702",
+      "criterion_id": "1.7",
+      "category_id": "C1",
+      "name": "Là thành viên trong Ban tổ chức (có xác nhận của Thường trực Ban tổ chức) của một cuộc thi học thuật từ cấp Khoa trở lên - CTV",
+      "condition": {
+        "field": "academic_event_role",
+        "operator": "equals",
+        "value": "collaborator"
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.7"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R18",
+      "criterion_id": "1.8",
+      "category_id": "C1",
+      "name": "Sinh viên tham gia sinh hoạt thường xuyên tại câu lạc bộ học thuật, phòng thí nghiệm hoặc thư viện (ít nhất 3 lần/tháng, có xác nhận của các đơn vị)",
+      "condition": {
+        "field": "academic_club_monthly_attendance",
+        "operator": "greater_than_or_equal",
+        "value": 3
+      },
+      "points": 5,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.8"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R19",
+      "criterion_id": "1.9",
+      "category_id": "C1",
+      "name": "Tham gia hoặc tổ chức buổi sinh hoạt, hội thảo chuyên đề học thuật, kỹ năng, nghiên cứu khoa học hoặc tư vấn hướng nghiệp",
+      "condition": {
+        "field": "eligible_academic_seminars",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 1.9"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R21",
+      "criterion_id": "2.1",
+      "category_id": "C2",
+      "name": "Không vi phạm nội quy, quy chế, quy định của Nhà trường (không bao gồm các nội dung tại mục 1.1)",
+      "condition": {
+        "field": "school_rule_violations_excluding_academic_exam",
+        "operator": "equals",
+        "value": 0
+      },
+      "points": 15,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 2.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R22",
+      "criterion_id": "2.2",
+      "category_id": "C2",
+      "name": "Tham gia đánh giá trên 50% số môn đã đăng ký trong học kỳ được đánh giá (đối với tất cả các sinh viên) và đánh giá khóa học (đối với sinh viên năm cuối)",
+      "condition": {
+        "field": "course_evaluation_completion_rate",
+        "operator": "greater_than",
+        "value": 0.5
+      },
+      "points": 5,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 2.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R23",
+      "criterion_id": "2.2",
+      "category_id": "C2",
+      "name": "Tham gia các đợt khảo sát, điều tra xã hội",
+      "condition": {
+        "field": "course_evaluation_completion_rate",
+        "operator": "greater_than",
+        "value": 0.5
+      },
+      "points": 5,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 2.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R3101",
+      "criterion_id": "3.1",
+      "category_id": "C3",
+      "name": "Tham gia cuộc thi về khoa học chính trị, Mác-Lênin, tư tưởng Hồ Chí Minh, lịch sử, văn hóa-văn nghệ, thể dục-thể thao (hoàn tất vòng đầu tiên của cuộc thi) - cấp Trường",
+      "condition": {
+        "field": "eligible_civic_cultural_sports_competition_level",
+        "operator": "in",
+        "value": [
+          "school",
+          "higher"
+        ]
+      },
+      "points": 10,
+      "unit": "per_competition",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R3102",
+      "criterion_id": "3.1",
+      "category_id": "C3",
+      "name": "Tham gia cuộc thi về khoa học chính trị, Mác-Lênin, tư tưởng Hồ Chí Minh, lịch sử, văn hóa-văn nghệ, thể dục-thể thao (hoàn tất vòng đầu tiên của cuộc thi) - cấp Khoa",
+      "condition": {
+        "field": "eligible_civic_cultural_sports_competition_level",
+        "operator": "equals",
+        "value": "faculty"
+      },
+      "points": 5,
+      "unit": "per_competition",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R32",
+      "criterion_id": "3.2",
+      "category_id": "C3",
+      "name": "Nhận được giấy chứng nhận danh hiệu về sức khỏe thể chất trong ngày hội thể dục thể thao (các giải chạy bộ, thử thách sức khỏa, danh hiệu Thanh niên khỏe,...)",
+      "condition": {
+        "field": "has_physical_health_award_certificate",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 5,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R33",
+      "criterion_id": "3.3",
+      "category_id": "C3",
+      "name": "Tham gia các đợt huy động lực lượng cấp Trường, cấp Khoa",
+      "condition": {
+        "field": "school_faculty_mobilization_activities",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.3"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R34",
+      "criterion_id": "3.4",
+      "category_id": "C3",
+      "name": "Là thành viên tích cực, sinh hoạt thường xuyên của một CLB sở thích cấp Khoa trở lên; thành viên đội, nhóm được phân công chức năng tham giá giữ gìn an ninh, trật tự, nâng cao ý thức chấp hành các nội quy, quy chế trong nhà trường (có xác nhận của cấp quản lý CLB, đội, nhóm)",
+      "condition": {
+        "field": "eligible_club_or_team_membership",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 5,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R35",
+      "criterion_id": "3.5",
+      "category_id": "C3",
+      "name": "Tham gia các hoạt động cấp lớp (có xác nhận của Ban cán sự lớp hoặc BCH Chi đoàn/Chi hội)",
+      "condition": {
+        "field": "class_activities_confirmed",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.5"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R36",
+      "criterion_id": "3.6",
+      "category_id": "C3",
+      "name": "Thành viên đội tuyển cấp Trường hoặc cao hơn của cuộc thi/chương trình có quy mô từ 4 đội tuyển trở lên",
+      "condition": {
+        "field": "eligible_school_team_membership",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 15,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.6"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R37",
+      "criterion_id": "3.7",
+      "category_id": "C3",
+      "name": "Không có hành vi vi phạm hoặc che giấu tệ nạn xã hội",
+      "condition": {
+        "field": "social_evil_violations_or_coverups",
+        "operator": "equals",
+        "value": 0
+      },
+      "points": 10,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.7"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R38",
+      "criterion_id": "3.8",
+      "category_id": "C3",
+      "name": "Tham gia hoạt động tư vấn tuyển sinh hoặc hội thảo việc làm từ cấp Khoa trở lên",
+      "condition": {
+        "field": "admissions_or_career_events",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 5,
+      "unit": "per_activity_period",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.8"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R39",
+      "criterion_id": "3.9",
+      "category_id": "C3",
+      "name": "Tham gia cuộc thi, chương trình tìm hiểu lịch sử phát triển Nhà trường, các tổ chức đoàn thể trong Nhà trường và ĐHQG-HCM",
+      "condition": {
+        "field": "university_history_activities",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.9"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R310",
+      "criterion_id": "3.10",
+      "category_id": "C3",
+      "name": "Tham gia đóng góp cho đợt lấy ý kiến về văn bản quy phạm pháp luật các cấp, các văn bản nội bộ, các chương trình đối thoại với lãnh đạo nhằm xây dựng, phát triển Nhà trường và ĐHQG-HCM",
+      "condition": {
+        "field": "university_policy_feedback_activities",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 5,
+      "unit": "per_period",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.10"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R311",
+      "criterion_id": "3.11",
+      "category_id": "C3",
+      "name": "Là tác giả, đồng tác giả sản phẩm/dự án truyền thông nhằm giới thiệu, quảng bá hình ảnh về Trường Đại học Khoa học Tự nhiên hay ĐHQG-HCM được đăng tải, chia sẻ trên các kênh thông tin chính thống của Nhà trường",
+      "condition": {
+        "field": "official_university_promotion_projects",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 15,
+      "unit": "per_project",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.11"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R312",
+      "criterion_id": "3.12",
+      "category_id": "C3",
+      "name": "Được Nhà trường hoặc ĐHQG-HCM tuyển chọn làm đại biểu chính thức tham gia giao lưu/trao đổi văn hóa, học thuật khu vực hoặc quốc tế",
+      "condition": {
+        "field": "officially_selected_international_exchange_delegate",
+        "operator": "count_greater_than",
+        "value": 0 
+      },
+      "points": 15,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.12"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R313",
+      "criterion_id": "3.13",
+      "category_id": "C3",
+      "name": "Tự ứng tuyển làm đại biểu tham gia giao lưu/trao đổi văn hóa, học thuật hoặc hội thảo khoa học quốc tế",
+      "condition": {
+        "field": "self_applied_international_academic_activity",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 10,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.13"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R31401",
+      "criterion_id": "3.14",
+      "category_id": "C3",
+      "name": "Là thành viên trong BTC (có xác nhận của Thường trục BTC) của các hoạt động nêu ở toàn bộ các mục từ 3.1 đến 3.13 - cấp Trường trở lên",
+      "condition": {
+        "field": "activity_organizer_role_and_level",
+        "operator": "equals",
+        "value": "school_or_higher_organizer"
+      },
+      "points": 10,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.14"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R31402",
+      "criterion_id": "3.14",
+      "category_id": "C3",
+      "name": "Là thành viên trong BTC (có xác nhận của Thường trục BTC) của các hoạt động nêu ở toàn bộ các mục từ 3.1 đến 3.13 - CTV cấp trường trở lên",
+      "condition": {
+        "field": "activity_organizer_role_and_level",
+        "operator": "equals",
+        "value": "school_or_higher_collaborator"
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.14"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R31403",
+      "criterion_id": "3.14",
+      "category_id": "C3",
+      "name": "Là thành viên trong BTC (có xác nhận của Thường trục BTC) của các hoạt động nêu ở toàn bộ các mục từ 3.1 đến 3.13 - BTC cấp lớp, khoa",
+      "condition": {
+        "field": "activity_organizer_role_and_level",
+        "operator": "equals",
+        "value": "class_faculty_organizer"
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.14"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R31404",
+      "criterion_id": "3.14",
+      "category_id": "C3",
+      "name": "Là thành viên trong BTC (có xác nhận của Thường trục BTC) của các hoạt động nêu ở toàn bộ các mục từ 3.1 đến 3.13 - CTV cấp khoa",
+      "condition": {
+        "field": "activity_organizer_role_and_level",
+        "operator": "equals",
+        "value": "faculty_collaborator"
+      },
+      "points": 3,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 3.14"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R41",
+      "criterion_id": "4.1",
+      "category_id": "C4",
+      "name": "Không vi phạm pháp luật",
+      "condition": {
+        "field": "legal_violations",
+        "operator": "equals",
+        "value": 0
+      },
+      "points": 10,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R42",
+      "criterion_id": "4.2",
+      "category_id": "C4",
+      "name": "Tham gia hiến máu tình nguyện (có giấy chứng nhận)",
+      "condition": {
+        "field": "blood_donation_certificates",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 10,
+      "unit": "per_certificate_or_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R4301",
+      "criterion_id": "4.3",
+      "category_id": "C4",
+      "name": "Tình nguyện viên hoạt động cộng đồng ngắn hạn, dưới 24 giờ",
+      "condition": {
+        "field": "volunteer_hours_per_activity",
+        "operator": "less_than",
+        "value": 24
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.3"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R4302",
+      "criterion_id": "4.3",
+      "category_id": "C4",
+      "name": "Tình nguyện viên hoạt động cộng đồng trung hạn, từ 24 giờ đến dưới 1 tuần",
+      "condition": {
+        "field": "volunteer_hours_per_activity",
+        "operator": "range",
+        "min_inclusive": 24,
+        "max_exclusive": "one_week"
+      },
+      "points": 10,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.3"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R4303",
+      "criterion_id": "4.3",
+      "category_id": "C4",
+      "name": "Tình nguyện viên hoạt động cộng đồng dài hạn, từ 1 tuần trở lên",
+      "condition": {
+        "field": "volunteer_duration",
+        "operator": "greater_than_or_equal",
+        "value": "one_week"
+      },
+      "points": 15,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.3"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R4401",
+      "criterion_id": "4.4",
+      "category_id": "C4",
+      "name": "Là thành viên BTC của các hoạt động tình nguyện -  BTC cấp trường trở lên",
+      "condition": {
+        "field": "volunteer_activity_role_and_level",
+        "operator": "equals",
+        "value": "school_or_higher_organizer"
+      },
+      "points": 10,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R4402",
+      "criterion_id": "4.4",
+      "category_id": "C4",
+      "name": "Là thành viên BTC của các hoạt động tình nguyện - CTV cấp trường trở lên",
+      "condition": {
+        "field": "volunteer_activity_role_and_level",
+        "operator": "equals",
+        "value": "school_or_higher_collaborator"
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R4403",
+      "criterion_id": "4.4",
+      "category_id": "C4",
+      "name": "Là thành viên BTC của các hoạt động tình nguyện - BTC cấp lớp, khoa",
+      "condition": {
+        "field": "volunteer_activity_role_and_level",
+        "operator": "equals",
+        "value": "class_faculty_organizer"
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R4404",
+      "criterion_id": "4.4",
+      "category_id": "C4",
+      "name": "Là thành viên BTC của các hoạt động tình nguyện - CTV cấp khoa",
+      "condition": {
+        "field": "volunteer_activity_role_and_level",
+        "operator": "equals",
+        "value": "faculty_collaborator"
+      },
+      "points": 3,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R45",
+      "criterion_id": "4.5",
+      "category_id": "C4",
+      "name": "Tham gia các hoạt động quyên góp do tổ chức, đơn vị trong Nhà trường hoặc ngoài trường phát động",
+      "condition": {
+        "field": "school_fundraising_activities",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 3,
+      "unit": "per_activity_period",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.5"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R46",
+      "criterion_id": "4.6",
+      "category_id": "C4",
+      "name": "Tham gia cuộc thi/chương trình tuyên truyền về Hiến pháp, pháp luật, phòng chống tệ nạn/dịch bệnh",
+      "condition": {
+        "field": "legal_health_communication_activities",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 10,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.6"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R47",
+      "criterion_id": "4.7",
+      "category_id": "C4",
+      "name": "Được đánh giá hoàn thành tốt nhiệm vụ trở lên với vai trò thành viên Ban cán sự lớp trong năm học",
+      "condition": {
+        "field": "class_officer_rating",
+        "operator": "in",
+        "value": [
+          "hoàn thành tốt",
+          "hoàn thành xuất sắc"
+        ]
+      },
+      "points": 10,
+      "unit": "per_assessed_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.7"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R48",
+      "criterion_id": "4.8",
+      "category_id": "C4",
+      "name": "Được xếp danh hiệu Đoàn viên hoàn thành xuất sắc nhiệm vụ hoặc Đảng viên hoàn thành tốt nhiệm vụ",
+      "condition": {
+        "field": "union_or_party_member_rating",
+        "operator": "in",
+        "value": [
+          "Đoàn viên hoàn thành xuất sắc nhiệm vụ",
+          "Đảng viên hoàn thành tốt nhiệm vụ"
+        ]
+      },
+      "points": 10,
+      "unit": "per_assessed_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 4.8"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R5101",
+      "criterion_id": "5.1",
+      "category_id": "C5",
+      "name": "Huy chương vàng/bạc/đồng Olympic, học thuật hoặc nghiên cứu cấp quốc tế",
+      "condition": {
+        "field": "highest_recognized_award_level",
+        "operator": "equals",
+        "value": "international_medal"
+      },
+      "points": 20,
+      "unit": "per_award",
+      "max_awards_per_same_content": 1,
+      "note": "Chỉ tính hình thức khen thưởng cao nhất với cùng một nội dung khen thưởng.",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R5102",
+      "criterion_id": "5.1",
+      "category_id": "C5",
+      "name": "Huy chương vàng/bạc/đồng Olympic, học thuật hoặc nghiên cứu cấp quốc gia",
+      "condition": {
+        "field": "highest_recognized_award_level",
+        "operator": "equals",
+        "value": "national_medal"
+      },
+      "points": 15,
+      "unit": "per_award",
+      "max_awards_per_same_content": 1,
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R5103",
+      "criterion_id": "5.1",
+      "category_id": "C5",
+      "name": "Bằng khen của Chủ tịch UBND cấp tỉnh/thành phố trực thuộc Trung ương",
+      "condition": {
+        "field": "highest_recognized_award_type",
+        "operator": "equals",
+        "value": "provincial_chairperson_certificate"
+      },
+      "points": 15,
+      "unit": "per_award",
+      "max_awards_per_same_content": 1,
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R5104",
+      "criterion_id": "5.1",
+      "category_id": "C5",
+      "name": "Bằng khen của tổ chức đoàn thể",
+      "condition": {
+        "field": "highest_recognized_award_type",
+        "operator": "equals",
+        "value": "organization_certificate"
+      },
+      "points": 10,
+      "unit": "per_award",
+      "max_awards_per_same_content": 1,
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R5105",
+      "criterion_id": "5.1",
+      "category_id": "C5",
+      "name": "Giấy khen của Hiệu trưởng Nhà trường",
+      "condition": {
+        "field": "highest_recognized_award_type",
+        "operator": "equals",
+        "value": "rector_certificate"
+      },
+      "points": 10,
+      "unit": "per_award",
+      "max_awards_per_same_content": 1,
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R5106",
+      "criterion_id": "5.1",
+      "category_id": "C5",
+      "name": "Giấy khen của tổ chức đoàn thể/chính quyền địa phương từ cấp xã trở lên",
+      "condition": {
+        "field": "highest_recognized_award_type",
+        "operator": "equals",
+        "value": "local_or_union_certificate"
+      },
+      "points": 5,
+      "unit": "per_award",
+      "max_awards_per_same_content": 1,
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R5201",
+      "criterion_id": "5.2",
+      "category_id": "C5",
+      "name": "Đạt giải Vô địch, Đặc biệt hoặc Nhất trong cuộc thi/sân chơi từ cấp Khoa trở lên",
+      "condition": {
+        "field": "competition_award_rank",
+        "operator": "in",
+        "value": [
+          "Vô địch",
+          "Đặc biệt",
+          "Nhất"
+        ]
+      },
+      "points": 5,
+      "unit": "per_award",
+      "max_awards_per_competition": 1,
+      "note": "Chỉ tính giải thưởng cao nhất; không áp dụng trường hợp tại mục 5.1.",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R5202",
+      "criterion_id": "5.2",
+      "category_id": "C5",
+      "name": "Đạt giải Nhì, Ba, Khuyến khích hoặc giải phụ trong cuộc thi/sân chơi từ cấp Khoa trở lên",
+      "condition": {
+        "field": "competition_award_rank",
+        "operator": "in",
+        "value": [
+          "Nhì",
+          "Ba",
+          "Khuyến khích",
+          "Giải phụ"
+        ]
+      },
+      "points": 3,
+      "unit": "per_award",
+      "max_awards_per_competition": 1,
+      "note": "Chỉ tính giải thưởng cao nhất; không áp dụng trường hợp tại mục 5.1.",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R53",
+      "criterion_id": "5.3",
+      "category_id": "C5",
+      "name": "Thành viên đội tuyển dự Olympic/kỳ thi học thuật cấp thành phố trở lên hoặc thành viên nhóm/cá nhân đạt giải học thuật, nghiên cứu, sáng tạo, ứng dụng, khởi nghiệp từ cấp thành phố trở lên",
+      "condition": {
+        "field": "eligible_city_or_higher_academic_team_or_award",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 15,
+      "unit": "per_eligible_achievement",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.3"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R54",
+      "criterion_id": "5.4",
+      "category_id": "C5",
+      "name": "Tác giả/đồng tác giả bài báo khoa học đăng trên tạp chí quốc tế uy tín hoặc hội thảo khoa học cấp quốc tế",
+      "condition": {
+        "field": "reputable_international_journal_articles",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 25,
+      "unit": "per_published_article",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R55",
+      "criterion_id": "5.5",
+      "category_id": "C5",
+      "name": "Tác giả/đồng tác giả bài báo trên tạp chí khoa học trong nước uy tín hoặc hội thảo khoa học cấp quốc gia",
+      "condition": {
+        "field": "reputable_domestic_journal_or_national_conference_articles",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 15,
+      "unit": "per_published_article",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.5"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R56",
+      "criterion_id": "5.6",
+      "category_id": "C5",
+      "name": "Nhận giải thưởng do cơ quan Chính phủ/tổ chức đa quốc gia được cấp phép hoạt động tại Việt Nam trao tặng",
+      "condition": {
+        "field": "eligible_government_or_multinational_awards",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 10,
+      "unit": "per_award",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.6"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R57",
+      "criterion_id": "5.7",
+      "category_id": "C5",
+      "name": "Được học bổng do tổ chức có tư cách pháp nhân trao tặng vì tinh thần vượt khó, phấn đấu vươn lên; hoặc trường hợp không được học bổng nhưng được Hội đồng cấp Khoa thống nhất đề xuất",
+      "condition": {
+        "field": "eligible_overcoming_difficulties_scholarship_or_faculty_recommendation",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 10,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.7"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R58",
+      "criterion_id": "5.8",
+      "category_id": "C5",
+      "name": "Mồ côi cả cha lẫn mẹ",
+      "condition": {
+        "field": "orphaned_both_parents",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 20,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.8"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R59",
+      "criterion_id": "5.9",
+      "category_id": "C5",
+      "name": "Sinh viên khuyết tật, khó khăn trong đi lại và sinh hoạt",
+      "condition": {
+        "field": "disability_affecting_daily_life",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 10,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.9"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R510A",
+      "criterion_id": "5.10",
+      "category_id": "C5",
+      "name": "Hộ nghèo hoặc hộ cận nghèo được hưởng chính sách theo quy định của Bộ Giáo dục và Đào tạo",
+      "condition": {
+        "field": "eligible_poor_or_near_poor_household_policy",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 10,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.10"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R511",
+      "criterion_id": "5.11",
+      "category_id": "C5",
+      "name": "Được miễn hoặc giảm học phí, không thuộc các trường hợp tại ba nội dung đặc biệt nêu trước đó",
+      "condition": {
+        "field": "tuition_exemption_or_reduction_other_eligible_case",
+        "operator": "equals",
+        "value": true
+      },
+      "points": 10,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 5.11"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R61",
+      "criterion_id": "6.1",
+      "category_id": "DEDUCTION",
+      "name": "Không tham gia hoặc khai báo sai thông tin trong các khai báo/điều tra xã hội do Nhà trường yêu cầu",
+      "condition": {
+        "field": "missing_or_false_social_survey_responses",
+        "operator": "equals",
+        "value": true
+      },
+      "points": -5,
+      "unit": "per_period",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 6.1"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R62",
+      "criterion_id": "6.2",
+      "category_id": "DEDUCTION",
+      "name": "Không thực hiện khai báo, xác nhận ngoại trú theo quy định",
+      "condition": {
+        "field": "failed_residency_declaration",
+        "operator": "equals",
+        "value": true
+      },
+      "points": -15,
+      "unit": "per_semester",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 6.2"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R63",
+      "criterion_id": "6.3",
+      "category_id": "DEDUCTION",
+      "name": "Không hoàn thành nhiệm vụ của thành viên Ban cán sự lớp/cán bộ Đoàn-Hội các cấp",
+      "condition": {
+        "field": "failed_class_or_union_officer_duties",
+        "operator": "equals",
+        "value": true
+      },
+      "points": -5,
+      "unit": "per_occurrence",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 6.3"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R6401",
+      "criterion_id": "6.4",
+      "category_id": "DEDUCTION",
+      "name": "Không tham gia đủ nội dung sinh hoạt công dân đầu khóa, đầu năm hoặc cuối khóa theo yêu cầu",
+      "condition": {
+        "field": "student_citizenship_session_participation",
+        "operator": "equals",
+        "value": "incomplete"
+      },
+      "points": -20,
+      "unit": "per_period",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 6.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R6402",
+      "criterion_id": "6.4",
+      "category_id": "DEDUCTION",
+      "name": "Tham gia đủ sinh hoạt công dân nhưng không làm bài thu hoạch hoặc bài thu hoạch không đạt",
+      "condition": {
+        "field": "student_citizenship_reflection_result",
+        "operator": "in",
+        "value": [
+          "missing",
+          "failed"
+        ]
+      },
+      "points": -10,
+      "unit": "per_period",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 6.4"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R65",
+      "criterion_id": "6.5",
+      "category_id": "DEDUCTION",
+      "name": "Bị kỷ luật mức khiển trách",
+      "condition": {
+        "field": "disciplinary_action",
+        "operator": "equals",
+        "value": "reprimand"
+      },
+      "points": -10,
+      "unit": "in_semester_of_decision",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 6.5"
+      },
+      "status": "verified"
+    },
+    {
+      "rule_id": "R66",
+      "criterion_id": "6.6",
+      "category_id": "DEDUCTION",
+      "name": "Bị kỷ luật mức cảnh cáo trở lên",
+      "condition": {
+        "field": "disciplinary_action",
+        "operator": "equals",
+        "value": "warning"
+      },
+      "points": -20,
+      "unit": "in_semester_of_decision",
+      "evidence_required": true,
+      "source": {
+        "document_id": "1028/QD-KHTN-CTSV",
+        "location": "Phụ lục, mục 6.6"
+      },
+      "status": "verified"
+    }
+  ],
+  "calculation_rules": [
+    {
+      "rule_id": "CALC_01",
+      "name": "Giới hạn điểm tổng",
+      "logic": "final_score = min(max(sum(eligible_positive_points) + sum(deduction_points), 0), 100)",
+      "status": "verified"
+    },
+    {
+      "rule_id": "CALC_02",
+      "name": "Giới hạn điểm theo nhóm",
+      "logic": "Tổng điểm cộng của mỗi nhóm không vượt quá max_score được khai báo trong scoring_model.category_caps; điểm trừ được áp dụng theo quy chế và không bị giới hạn theo nhóm.",
+      "status": "verified"
+    },
+    {
+      "rule_id": "CALC_03",
+      "name": "Điểm năm học",
+      "logic": "Lấy trung bình cộng điểm rèn luyện của các học kỳ chính trong năm học.",
+      "status": "verified"
+    },
+    {
+      "rule_id": "CALC_04",
+      "name": "Điểm toàn khóa",
+      "logic": "Lấy trung bình cộng điểm rèn luyện của các học kỳ chính đến thời điểm sinh viên được công nhận hoàn tất chương trình đào tạo.",
+      "status": "verified"
+    },
+    {
+      "rule_id": "CALC_05",
+      "name": "Xử lý minh chứng",
+      "logic": "Chỉ tính điểm khi điều kiện và minh chứng/ xác nhận cần thiết được đáp ứng; nếu dữ liệu đầu vào thiếu hoặc không rõ thì chuyển sang cần xem xét, không tự suy đoán.",
+      "status": "verified"
+    }
+  ]
+}
