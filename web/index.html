@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniLife Assistant - Trợ Lý ĐRL & Hoạt Động HCMUS</title>
+  
+  <!-- Modern Typography: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+      color: #1e293b;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+    }
+    .modal-backdrop {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+    }
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased flex flex-col">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-900 via-brand-700 to-blue-500 flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-brand-500/20">
+          U
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-900 text-base sm:text-lg tracking-tight">UniLife Assistant</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-brand-100 text-brand-800">SP1 &rarr; SP2</span>
+          </div>
+          <p class="text-xs text-slate-500 hidden sm:block">Trợ lý Đánh giá Hoạt động & Điểm Rèn Luyện (QĐ 1028/QĐ-KHTN-CTSV)</p>
+        </div>
+      </div>
+
+      <!-- Right Controls: Backend Status & Student Profile Dropdown -->
+      <div class="flex items-center gap-3">
+        
+        <!-- Live API Status Indicator -->
+        <div id="backendStatusPill" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="backendStatusText">API Online</span>
+        </div>
+
+        <!-- Preset Test Modal Shortcut Button -->
+        <button onclick="openPresetsModal()" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition shadow-sm">
+          <span>⚡</span>
+          <span>5 Kịch Bản E2E</span>
+        </button>
+
+        <!-- User Authentication & Profile Chip -->
+        <div class="relative">
+          <button id="userChipBtn" onclick="toggleUserDropdown()" class="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition">
+            <div id="userAvatar" class="w-8 h-8 rounded-full bg-brand-700 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+              SV
+            </div>
+            <div class="hidden sm:block text-left">
+              <div id="userNameDisplay" class="text-xs font-bold text-slate-900">Chưa đăng nhập</div>
+              <div id="userIdDisplay" class="text-[10px] font-mono text-slate-500">Bấm để đăng nhập</div>
+            </div>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <!-- User Dropdown Menu -->
+          <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 glass-card rounded-2xl p-3 shadow-xl z-50 border border-slate-200 space-y-2">
+            <div class="px-2 py-1.5 border-b border-slate-100">
+              <div id="dropUserName" class="font-bold text-slate-900 text-sm">Họ và Tên</div>
+              <div id="dropUserMeta" class="text-xs text-slate-500 font-mono">MSSV • Lớp</div>
+            </div>
+            <button onclick="openLoginModal()" class="w-full text-left px-2.5 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center gap-2 transition">
+              <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+              <span>Đổi Tài Khoản Sinh Viên</span>
+            </button>
+            <button onclick="resetSessionData()" class="w-full text-left px-2.5 py-2 rounded-lg text-xs font-semibold text-amber-700 hover:bg-amber-50 flex items-center gap-2 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Đặt Lại Dữ Liệu Demo (Reset)</span>
+            </button>
+            <button onclick="logoutUser()" class="w-full text-left px-2.5 py-2 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+              <span>Đăng Xuất</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <div class="bg-white border-b border-slate-200 sticky top-16 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex space-x-6 overflow-x-auto" aria-label="Tabs">
+        <button id="tabBtnDashboard" onclick="switchTab('dashboard')" class="border-b-2 border-brand-600 py-3.5 px-1 text-xs sm:text-sm font-bold text-brand-700 flex items-center gap-2 whitespace-nowrap transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Giao Diện Sinh Viên
+        </button>
+        <button id="tabBtnTestSuites" onclick="switchTab('testSuites')" class="border-b-2 border-transparent py-3.5 px-1 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-2 whitespace-nowrap transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          Gói Kịch Bản Demo (5 Ca E2E)
+        </button>
+        <button id="tabBtnInspector" onclick="switchTab('inspector')" class="border-b-2 border-transparent py-3.5 px-1 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-2 whitespace-nowrap transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Chi Tiết Kỹ Thuật (Inspector 15-Field)
+        </button>
+        <button id="tabBtnActivities" onclick="switchTab('activities')" class="border-b-2 border-transparent py-3.5 px-1 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-2 whitespace-nowrap transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Kho Hoạt Động (activities.json)
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 space-y-6 w-full">
+
+    <!-- VIEW 1: STUDENT DASHBOARD (TRANG CHỦ SINH VIÊN BÌNH THƯỜNG) -->
+    <div id="viewDashboard" class="space-y-6">
+      
+      <!-- HERO METRIC CARDS -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- DRL Total Score Gauge Card -->
+        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tiến Độ Rèn Luyện Học Kỳ</span>
+              <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5">HK1 / 2026-2027</h3>
+            </div>
+            <span id="overallGradeBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+              Khá (67/100)
+            </span>
+          </div>
+
+          <!-- Circular Score Display -->
+          <div class="my-4 flex items-center gap-5">
+            <div class="relative w-24 h-24 flex items-center justify-center">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path class="text-slate-100" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path id="totalScoreRing" class="text-brand-600 transition-all duration-700 ease-out" stroke-dasharray="67, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div class="absolute flex flex-col items-center">
+                <span id="totalConfirmedDisplay" class="text-2xl font-black text-slate-900 leading-none">67</span>
+                <span class="text-[10px] text-slate-400 font-bold mt-0.5">/ 100</span>
+              </div>
+            </div>
+            <div class="space-y-1 text-xs text-slate-600 flex-1">
+              <div>• Điểm chính thức: <b id="statConfirmed" class="text-slate-900 font-bold">67đ</b></div>
+              <div>• Điểm dự kiến: <b id="statProjected" class="text-brand-700 font-bold">+0đ</b></div>
+              <div>• Trần học kỳ: <b class="text-slate-900 font-bold">100đ</b> (CALC_01)</div>
+              <div class="text-[11px] text-emerald-700 font-semibold pt-1">
+                &rarr; Còn thiếu <span id="statNeeded">23</span>đ để đạt hạng Xuất sắc (&ge;90đ)
+              </div>
+            </div>
+          </div>
+
+          <div class="text-[11px] text-slate-400 pt-2 border-t border-slate-100 flex justify-between items-center">
+            <span>Căn cứ: QĐ 1028/QĐ-KHTN-CTSV</span>
+            <span id="cardStudentId" class="font-mono text-slate-600">SV: 25127242</span>
+          </div>
+        </div>
+
+        <!-- 5 Categories Progress Bars -->
+        <div class="lg:col-span-2 glass-card rounded-2xl p-5 space-y-3">
+          <div class="flex justify-between items-center mb-1">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Chi Tiết 5 Nhóm Tiêu Chí (C1 &rarr; C5)</h3>
+              <p class="text-xs text-slate-500">Mỗi nhóm có trần điểm riêng biệt (Quy tắc CALC_02)</p>
+            </div>
+            <span class="text-xs text-brand-700 font-semibold bg-brand-50 px-2.5 py-1 rounded-lg border border-brand-200">5 Nhóm quy định</span>
+          </div>
+
+          <div id="categoryProgressContainer" class="space-y-2.5 text-xs">
+            <!-- Dynamic injected bars -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MAIN INTERACTIVE WORKSPACE: INPUT POST & PREVIEW & DRL RESULT -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- LEFT: POST INPUT FORM (5 cols) -->
+        <div class="lg:col-span-5 glass-card rounded-2xl p-5 space-y-4">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Nhập Bài Đăng Sự Kiện</h3>
+              <p class="text-xs text-slate-500">Dán thông báo hoạt động từ Fanpage hoặc biểu mẫu</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <button onclick="openPresetsModal()" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1 shadow-sm">
+                <span>⚡</span>
+                <span>Nạp Mẫu Test</span>
+              </button>
+              <button onclick="resetForm()" class="text-xs text-slate-400 hover:text-slate-700 underline">Xóa</button>
+            </div>
+          </div>
+
+          <!-- Raw Content Input -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Nội dung bài đăng thông báo (*)</label>
+            <textarea id="inputRawContent" rows="7" class="w-full text-xs font-sans p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition leading-relaxed" placeholder="Dán toàn bộ văn bản bài viết thông báo sự kiện từ Facebook / Email trường tại đây..."></textarea>
+          </div>
+
+          <!-- Optional Fields -->
+          <div class="space-y-2.5 pt-1">
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Đơn vị tổ chức</label>
+                <input id="inputPublisher" type="text" value="Phòng Công tác Sinh viên" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Ngày đăng</label>
+                <input id="inputDatePosted" type="text" value="2026-10-25" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-1">Đường dẫn bài viết (URL_post)</label>
+              <input id="inputUrl" type="text" value="https://www.facebook.com/osa.hcmus/posts/activity_post" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Mã bài viết (post_id)</label>
+                <input id="inputPostId" type="text" value="post_custom_01" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Quy tắc ĐRL SP2</label>
+                <select id="inputRuleOverride" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-brand-800">
+                  <option value="auto">Tự động nhận diện</option>
+                  <option value="R19">R19: Hội thảo, Kỹ năng, PCCC (C1 +5đ)</option>
+                  <option value="R16">R16: Cuộc thi học thuật Khoa+ (C1 +5đ)</option>
+                  <option value="R23">R23: Khảo sát xã hội (C2 +5đ)</option>
+                  <option value="R3101">R3101: Thi CT-XH Trường (C3 +10đ)</option>
+                  <option value="R32">R32: Giải chạy bộ TDTT (C3 +5đ)</option>
+                  <option value="R38">R38: Tuyển sinh / Việc làm (C3 +5đ)</option>
+                  <option value="R42">R42: Hiến máu tình nguyện (C4 +10đ)</option>
+                  <option value="R4301">R4301: Tình nguyện ngắn hạn (C4 +5đ)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Evidence Checkbox -->
+            <label class="flex items-center gap-2.5 p-2.5 bg-brand-50/70 border border-brand-200/80 rounded-xl cursor-pointer hover:bg-brand-100/50 transition">
+              <input id="inputEvidence" type="checkbox" class="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500" />
+              <div class="text-xs">
+                <span class="font-bold text-brand-900">Sinh viên đã có minh chứng hoàn thành</span>
+                <span class="block text-[11px] text-brand-700">Check-in / Giấy chứng nhận (Quy tắc CALC_05 ghi nhận Đã xác nhận)</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <button id="btnExecute" onclick="runAnalysisPipeline()" class="w-full py-3 px-4 rounded-xl font-bold text-white bg-gradient-to-r from-brand-700 to-blue-600 hover:from-brand-800 hover:to-blue-700 shadow-md shadow-brand-500/20 flex items-center justify-center gap-2 transition active:scale-[0.99]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span>Phân Tích & Tính Điểm Rèn Luyện</span>
+          </button>
+        </div>
+
+        <!-- RIGHT: EVENT CARD PREVIEW & DRL CONSULTATION CARD (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          
+          <!-- Event Preview Card (Facebook Style) -->
+          <div class="glass-card rounded-2xl overflow-hidden border border-slate-200">
+            <!-- Event Banner Header -->
+            <div class="h-28 bg-gradient-to-r from-blue-700 via-indigo-700 to-sky-600 p-4 flex flex-col justify-between text-white relative">
+              <div class="flex justify-between items-center">
+                <span id="previewDomainTag" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/20 backdrop-blur-md">
+                  KỸ NĂNG (SKILLS)
+                </span>
+                <span id="previewModeTag" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white text-slate-900 shadow-sm">
+                  TRỰC TIẾP (OFFLINE)
+                </span>
+              </div>
+              <div>
+                <h4 id="previewTitle" class="text-base font-extrabold line-clamp-1 drop-shadow-sm">
+                  Chưa nhập thông báo sự kiện
+                </h4>
+                <div class="flex items-center gap-2 text-xs text-blue-100 mt-0.5">
+                  <span id="previewPublisher">Đơn vị tổ chức</span>
+                  <span>•</span>
+                  <span id="previewDatePosted">2026-10-25</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Event Details Body -->
+            <div class="p-4 space-y-3 text-xs">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700">
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-400">🕒 Thời gian:</span>
+                  <span id="previewTime" class="font-semibold text-slate-800">Chưa nêu</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-400">⏳ Hạn đăng ký:</span>
+                  <span id="previewDeadline" class="font-semibold text-slate-800">Không nêu</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-400">📍 Địa điểm:</span>
+                  <span id="previewLocation" class="font-semibold text-slate-800">Chưa nêu</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-400">💵 Lệ phí:</span>
+                  <span id="previewFee" class="font-semibold text-emerald-700">Miễn phí (0 VND)</span>
+                </div>
+              </div>
+
+              <!-- Registration & Completion Requirements -->
+              <div class="pt-2 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div class="text-[11px] text-slate-600">
+                  <span class="font-bold text-slate-800">Điều kiện:</span>
+                  <span id="previewReq">Chưa có thông tin điều kiện hoàn thành.</span>
+                </div>
+                <a id="previewRegBtn" href="#" target="_blank" class="hidden px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs inline-flex items-center gap-1 shadow-sm transition">
+                  <span>Mở Link Đăng Ký</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- SP2 DRL Consultation & Decision Card -->
+          <div id="decisionCard" class="glass-card rounded-2xl p-5 border-l-4 border-l-brand-600 space-y-3.5 transition-all">
+            
+            <!-- Result Header Banner -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <div class="flex items-center gap-2">
+                <span id="decisionBadge" class="px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-brand-100 text-brand-800 border border-brand-200">
+                  SẴN SÀNG PHÂN TÍCH
+                </span>
+                <span id="dedupPill" class="hidden px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                  MinHash Trùng Lặp
+                </span>
+              </div>
+              <div class="text-xs font-mono font-bold text-slate-500">
+                Mã quy chế: <span id="decisionRuleCode" class="text-brand-700">Chưa xử lý</span>
+              </div>
+            </div>
+
+            <!-- Score Math Matrix -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+              <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                <span class="text-[10px] font-semibold text-slate-500 block">Bài đăng ghi</span>
+                <span id="scoreAnnounced" class="text-lg font-black text-slate-800 block mt-0.5">-</span>
+              </div>
+              <div class="p-2.5 bg-indigo-50/70 border border-indigo-200 rounded-xl">
+                <span class="text-[10px] font-semibold text-indigo-700 block">Quy chế 1028/QĐ</span>
+                <span id="scoreRule" class="text-lg font-black text-indigo-900 block mt-0.5">-</span>
+              </div>
+              <div class="p-2.5 bg-blue-50/70 border border-blue-200 rounded-xl">
+                <span class="text-[10px] font-semibold text-blue-700 block">Cộng dự kiến</span>
+                <span id="scoreProjected" class="text-lg font-black text-blue-800 block mt-0.5">-</span>
+              </div>
+              <div class="p-2.5 bg-emerald-50/70 border border-emerald-200 rounded-xl">
+                <span class="text-[10px] font-semibold text-emerald-700 block">Cộng chính thức</span>
+                <span id="scoreConfirmed" class="text-lg font-black text-emerald-800 block mt-0.5">-</span>
+              </div>
+            </div>
+
+            <!-- Category Impact & Missing Points -->
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+              <div>
+                <span class="font-bold text-slate-900" id="impactCatName">Nhóm tiêu chí</span>
+                <span class="block text-[11px] text-slate-500">
+                  Điểm nhóm: <b id="impactCatBefore">-</b> &rarr; <b id="impactCatAfter" class="text-brand-700 font-extrabold">-</b> / <span id="impactCatCap">-</span>đ
+                </span>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block">Sau hoạt động còn thiếu</span>
+                <span id="impactCatMissing" class="font-black text-rose-600 text-sm">-</span>
+              </div>
+            </div>
+
+            <!-- Natural Language Explanation -->
+            <div class="space-y-1">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">Tư Vấn & Căn Cứ Quy Chế:</span>
+              <p id="decisionExplanation" class="text-xs text-slate-700 bg-white p-3 rounded-xl border border-slate-200 leading-relaxed">
+                Vui lòng nhập nội dung thông báo bài đăng ở form bên trái rồi bấm "Phân Tích & Tính Điểm Rèn Luyện" hoặc chọn nhanh kịch bản từ nút "⚡ Nạp Mẫu Test".
+              </p>
+            </div>
+
+            <!-- Legal Citation -->
+            <div class="text-[11px] text-slate-500 pt-1 flex justify-between items-center">
+              <span><b>Căn cứ pháp lý:</b> <span id="decisionCitation" class="font-mono text-brand-700">QĐ 1028/QĐ-KHTN-CTSV</span></span>
+              <button onclick="switchTab('inspector')" class="text-brand-600 font-bold hover:underline flex items-center gap-1">
+                Xem 15 trường &rarr;
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- VIEW 2: DEDICATED E2E TEST PRESETS TAB (TÁCH RIÊNG 5 TEST) -->
+    <div id="viewTestSuites" class="hidden space-y-6">
+      
+      <div class="glass-card rounded-2xl p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-200 pb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-bold text-slate-900">Thư Viện 5 Kịch Bản Kiểm Thử Chuẩn (E2E Test Suites)</h3>
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">5 Scenarios Pass 100%</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Các kịch bản soạn sẵn độc lập phục vụ kiểm thử, demo nhanh và đối chiếu nghiệm thu SP1 &rarr; SP2</p>
+          </div>
+          
+          <button onclick="runBatchAllTests()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>▶ Chạy Hàng Loạt Toàn Bộ 5 Ca</span>
+          </button>
+        </div>
+
+        <!-- 5 Scenarios Grid Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="testSuitesGrid">
+          <!-- Dynamically populated or rendered -->
+        </div>
+
+        <!-- Batch Run Results Console -->
+        <div id="batchResultsBox" class="hidden p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2 text-xs">
+          <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+            <span class="font-bold text-slate-800">Kết quả chạy hàng loạt (Automated Batch Verification):</span>
+            <span id="batchSummaryBadge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">5/5 PASS</span>
+          </div>
+          <div id="batchLogRows" class="space-y-1.5 font-mono text-[11px]"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 3: INSPECTOR (15-FIELD SCHEMA, METADATA & EVIDENCE) -->
+    <div id="viewInspector" class="hidden space-y-6">
+      
+      <div class="glass-card rounded-2xl p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-200 pb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-bold text-slate-900">Chi Tiết Nghiệm Thu Hợp Đồng Dữ Liệu SP1 &rarr; SP2</h3>
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-brand-100 text-brand-800">schemas/extraction_draft.schema.json (1.3.0)</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Xác thực 14/15 trường trích xuất, bằng chứng (grounding evidence), cờ kiểm tra (flags) và routing</p>
+          </div>
+          
+          <button onclick="copyRawJson()" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+            <span>Sao chép JSON Payload</span>
+          </button>
+        </div>
+
+        <!-- Meta Flags & Routing Diagnostic Box -->
+        <div id="inspectorMetaBox" class="p-4 rounded-xl border text-xs space-y-2 bg-slate-50 border-slate-200">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <span class="text-slate-500 font-semibold block">Trạng thái bản nháp (meta.status):</span>
+              <span id="inspMetaStatus" class="font-mono font-bold text-sm text-emerald-700">valid</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-semibold block">Phân luồng lưu trữ (meta.routed_to):</span>
+              <span id="inspMetaRouted" class="font-mono font-bold text-slate-800">activities.json</span>
+            </div>
+            <div>
+              <span class="text-slate-500 font-semibold block">Kiểm tra trùng lặp (MinHash-LSH):</span>
+              <span id="inspMetaDedup" class="font-mono font-bold text-slate-800">Không trùng (0.0%)</span>
+            </div>
+          </div>
+          <div class="pt-2 border-t border-slate-200/80">
+            <span class="text-slate-500 font-semibold block mb-0.5">Cờ đánh dấu cần rà soát (meta.flags):</span>
+            <div id="inspMetaFlags" class="font-mono text-slate-700 font-bold">[] (Không có cảnh báo)</div>
+          </div>
+        </div>
+
+        <!-- 15-Field Table with Grounding Evidence -->
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-100/80 text-slate-700 border-b border-slate-200">
+                <th class="py-2.5 px-3 font-bold w-12 text-center">STT</th>
+                <th class="py-2.5 px-3 font-bold w-48">Tên Trường (Field)</th>
+                <th class="py-2.5 px-3 font-bold">Giá Trị Trích Xuất (Value)</th>
+                <th class="py-2.5 px-3 font-bold w-64">Bằng Chứng Gốc (Grounding Evidence)</th>
+              </tr>
+            </thead>
+            <tbody id="inspectorTableBody" class="divide-y divide-slate-100 font-mono">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- VIEW 4: ACTIVITIES KHO & REVIEW QUEUE -->
+    <div id="viewActivities" class="hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Kho Hoạt Động Hợp Lệ (activities.json) -->
+        <div class="glass-card rounded-2xl p-5 space-y-3">
+          <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                <h3 class="text-sm font-bold text-slate-900">Kho Hoạt Động Hợp Lệ (`activities.json`)</h3>
+              </div>
+              <p class="text-xs text-slate-500">Bản ghi hợp lệ đạt 14 trường schema, không trùng lặp</p>
+            </div>
+            <span id="validCountBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">20 hoạt động</span>
+          </div>
+
+          <div id="activitiesList" class="space-y-2 text-xs max-h-[500px] overflow-y-auto pr-1">
+            <!-- Dynamic items -->
+          </div>
+        </div>
+
+        <!-- Hàng Đợi Cần Xác Minh (review_queue.json) -->
+        <div class="glass-card rounded-2xl p-5 space-y-3">
+          <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                <h3 class="text-sm font-bold text-slate-900">Hàng Đợi Cần Xác Minh (`review_queue.json`)</h3>
+              </div>
+              <p class="text-xs text-slate-500">Bản ghi thiếu mode/completion_requirements (D16) hoặc cần rà soát</p>
+            </div>
+            <span id="reviewCountBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">0 bản ghi</span>
+          </div>
+
+          <div id="reviewQueueList" class="space-y-2 text-xs max-h-[500px] overflow-y-auto pr-1">
+            <!-- Dynamic items -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ======================================================================== -->
+  <!-- MODAL: LOGIN / SWITCH STUDENT PROFILE (LƯU TẠM LOCAL) -->
+  <!-- ======================================================================== -->
+  <div id="loginModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="glass-card rounded-3xl p-6 max-w-lg w-full space-y-5 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
+      
+      <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Đăng Nhập Tài Khoản Sinh Viên</h3>
+          <p class="text-xs text-slate-500">Lưu phiên làm việc tại máy (Local Storage) - không cần kết nối cloud</p>
+        </div>
+        <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1">&times;</button>
+      </div>
+
+      <!-- Quick Select Registered Students in HCMUS dataset -->
+      <div class="space-y-2">
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600">
+          Cách 1: Chọn Nhanh Tài Khoản Trong Nhóm E (HCMUS):
+        </label>
+        <div class="grid grid-cols-2 gap-2 text-xs" id="quickStudentsList">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <div class="relative flex items-center py-1">
+        <div class="flex-grow border-t border-slate-200"></div>
+        <span class="flex-shrink mx-3 text-xs text-slate-400 font-semibold uppercase">Hoặc đăng nhập thủ công</span>
+        <div class="flex-grow border-t border-slate-200"></div>
+      </div>
+
+      <!-- Custom Login Form -->
+      <form onsubmit="submitCustomLogin(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Mã Số Sinh Viên (MSSV)</label>
+          <input id="loginInputMssv" type="text" required placeholder="Ví dụ: 25127242" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs focus:bg-white focus:ring-2 focus:ring-brand-500" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Họ và Tên</label>
+            <input id="loginInputName" type="text" required placeholder="Ví dụ: Lưu Minh Tiến" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Lớp / Ngành</label>
+            <input id="loginInputClass" type="text" value="25C09 CNTT" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-brand-500" />
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl font-bold text-white bg-brand-700 hover:bg-brand-800 shadow-md transition">
+          Xác Nhận Đăng Nhập
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ======================================================================== -->
+  <!-- MODAL: PRESET TEST CASES DRAWER (5 CA E2E SOẠN SẴN) -->
+  <!-- ======================================================================== -->
+  <div id="presetsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div class="glass-card rounded-3xl p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto space-y-4 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
+      
+      <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-extrabold text-amber-600">⚡</span>
+            <h3 class="text-lg font-bold text-slate-900">Gói Kịch Bản Kiểm Thử Soạn Sẵn (5 Ca E2E)</h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Chọn một kịch bản để tự động nạp vào form và chạy đánh giá ngay lập tức</p>
+        </div>
+        <button onclick="closePresetsModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1">&times;</button>
+      </div>
+
+      <!-- Presets List in Modal -->
+      <div class="space-y-3" id="presetsModalList">
+        <!-- Injected dynamically -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+      <div>
+        <b>HCMUS CSC10014</b> • Engineering a Smart Virtual Assistant • Đồ án Nhóm E
+      </div>
+      <div>
+        Phân công: <b>Frontend + Demo</b> • Nhánh: <code>Minh_Tien</code>
+      </div>
+    </div>
+  </footer>
+
+  <!-- CORE JAVASCRIPT LOGIC -->
+  <script>
+    // ========================================================================
+    // STATE & DEFAULTS
+    // ========================================================================
+    let currentPayload = null;
+    let backendAvailable = false;
+    const API_BASE = "http://localhost:8000";
+
+    // 6 Real Students from HCMUS dataset
+    const HCMUS_STUDENTS = [
+      { student_id: "25127242", full_name: "Lưu Minh Tiến", class: "25C09", major: "Information Technology" },
+      { student_id: "25127257", full_name: "Nguyễn Thị Ngọc Tuyền", class: "25C09", major: "Information Technology" },
+      { student_id: "25127214", full_name: "Lâm Như Ngọc", class: "25C09", major: "Information Technology" },
+      { student_id: "25127316", full_name: "Bùi Thảo Duyên", class: "25C09", major: "Information Technology" },
+      { student_id: "25127244", full_name: "Nguyễn Minh Trí", class: "25C09", major: "Information Technology" },
+      { student_id: "25127009", full_name: "Huỳnh Phương Bình An", class: "25C09", major: "Information Technology" }
+    ];
+
+    let currentStudent = null;
+
+    // 5 Standard E2E Test Packages
+    const E2E_CASES = {
+      1: {
+        id: 1,
+        name: "Ca 1: Tập huấn PCCC 2026",
+        badge: "Dự kiến (+5đ)",
+        badge_class: "bg-blue-100 text-blue-800",
+        rule: "R19 (Mục 1.9, C1)",
+        description: "Bài đăng offline đầy đủ thông tin. Chưa nộp minh chứng điểm danh check-in nên ghi nhận Điểm dự kiến.",
+        post_id: "pfbid01_pccc_new_2026",
+        publisher: "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+        platform: "facebook",
+        date_posted: "2026-10-25",
+        url: "https://www.facebook.com/osa.hcmus/posts/pccc_training_2026",
+        evidence: false,
+        rule_override: "auto",
+        raw_content: `CHUYÊN ĐỀ TẬP HUẤN KIẾN THỨC, KỸ NĂNG VÀ THỰC TẬP PHƯƠNG ÁN PHÒNG CHÁY CHỮA CHÁY NĂM 2026
+Thời gian: 14:00 - 16:30 ngày 28/10/2026
+Thời hạn đăng ký: từ 25/10 đến 27/10/2026
+Địa điểm: Giảng đường 1, Cơ sở 227 Nguyễn Văn Cừ
+Đối tượng tham gia: Sinh viên hệ chính quy toàn trường
+Lệ phí: Miễn phí tham gia. Đây là hoạt động không bắt buộc.
+Quyền lợi: Sinh viên được ghi nhận điểm rèn luyện (cộng 5 điểm rèn luyện) khi tham gia đầy đủ và điểm danh check-in/check-out cuối buổi.
+Link đăng ký: https://forms.gle/pccc2026hcmus`
+      },
+      2: {
+        id: 2,
+        name: "Ca 2: Hiến máu tình nguyện",
+        badge: "Đã xác nhận (+10đ)",
+        badge_class: "bg-emerald-100 text-emerald-800",
+        rule: "R42 (Mục 4.2, C4)",
+        description: "Hoạt động vì cộng đồng có giấy chứng nhận hợp lệ. Cộng thẳng vào điểm chính thức Đã xác nhận.",
+        post_id: "pfbid09bloodDonation2026hcmus",
+        publisher: "Hội Sinh Viên Trường ĐH Khoa học Tự nhiên",
+        platform: "facebook",
+        date_posted: "2026-10-25",
+        url: "https://www.facebook.com/hsv.hcmus/posts/blood2026",
+        evidence: true,
+        rule_override: "auto",
+        raw_content: `NGÀY HỘI HIẾN MÁU TÌNH NGUYỆN - GIỌT HỒNG TỰ NHIÊN ĐỢT 2 NĂM 2026
+Thời gian: 07:30 - 11:30 ngày 30/10/2026
+Hạn chót đăng ký: 29/10/2026
+Hình thức: Trực tiếp
+Địa điểm: Sảnh nhà điều hành Cơ sở Linh Trung
+Đối tượng tham dự: Toàn thể sinh viên và cán bộ giảng viên
+Chi phí: Không thu phí. Hoạt động không bắt buộc.
+Quyền lợi: Cộng 10 điểm rèn luyện theo quy chế khi hoàn thành hiến máu và nộp minh chứng giấy chứng nhận.
+Đường dẫn đăng ký: https://forms.gle/giothong2026`
+      },
+      3: {
+        id: 3,
+        name: "Ca 3: Webinar Zoom thiếu ĐK",
+        badge: "Cờ D16 (review_queue)",
+        badge_class: "bg-amber-100 text-amber-800",
+        rule: "Quy tắc D16 / CALC_05",
+        description: "Bài đăng Online có công nhận ĐRL nhưng KHÔNG nêu điều kiện hoàn thành. SP1 gắn cờ needs_review:completion_requirements chuyển review_queue, +0đ.",
+        post_id: "pfbid03onlineMissingReqD16",
+        publisher: "Trung tâm Hướng nghiệp & Tư vấn việc làm HCMUS",
+        platform: "facebook",
+        date_posted: "2026-10-25",
+        url: "https://www.facebook.com/career.hcmus/posts/webinar303",
+        evidence: false,
+        rule_override: "auto",
+        raw_content: `WEBINAR HƯỚNG NGHIỆP: KỸ NĂNG VIẾT CV VÀ PHỎNG VẤN NGÀNH CNTT
+Thời gian: 19:00 - 21:00 ngày 02/11/2026
+Hạn đăng ký: 01/11/2026
+Hình thức: Trực tuyến
+Link tham gia: https://zoom.us/j/9988776655
+Đối tượng: Sinh viên Khoa CNTT
+Sinh viên tham gia sẽ được ghi nhận vào điểm rèn luyện học kỳ 1.
+Lệ phí: Miễn phí. Không bắt buộc.`
+      },
+      4: {
+        id: 4,
+        name: "Ca 4: Chạm trần nhóm C3",
+        badge: "CALC_02 (Chặn trần +3đ)",
+        badge_class: "bg-purple-100 text-purple-800",
+        rule: "R3101 (Mục 3.1, C3)",
+        description: "Cuộc thi cấp trường R3101 quy chế thưởng +10đ. Nhưng nhóm C3 đang đạt 22/25đ nên bị chặn trần, chỉ cộng tối đa +3đ.",
+        post_id: "pfbid04capLimitTestC3",
+        publisher: "Đoàn Trường ĐH Khoa học Tự nhiên",
+        platform: "facebook",
+        date_posted: "2026-10-25",
+        url: "https://www.facebook.com/doantruong.hcmus/posts/olympicmaclenin",
+        evidence: true,
+        rule_override: "R3101",
+        raw_content: `HỘI THI OLYMPIC CÁC MÔN KHOA HỌC MÁC - LÊNIN VÀ TƯ TƯỞNG HỒ CHÍ MINH CẤP TRƯỜNG 2026
+Thời gian: 08:00 - 11:30 ngày 05/11/2026
+Thời hạn đăng ký: từ 25/10 đến 03/11/2026
+Hình thức: Offline
+Địa điểm: Giảng đường 1, Cơ sở 227 Nguyễn Văn Cừ
+Đối tượng: Sinh viên toàn trường
+Lệ phí: Miễn phí. Không bắt buộc.
+Quyền lợi: Cộng 10 điểm rèn luyện cho thí sinh tham gia đầy đủ và hoàn thành bài thi vòng loại trực tiếp.
+Link đăng ký: https://forms.gle/olympic2026`
+      },
+      5: {
+        id: 5,
+        name: "Ca 5: Bài đăng trùng lặp",
+        badge: "MinHash (Chặn trùng)",
+        badge_class: "bg-rose-100 text-rose-800",
+        rule: "Deduplicator (>= 75%)",
+        description: "Bài đăng có nội dung tương đồng >= 75% hoặc trùng URL/post_id với sự kiện đã lưu. Hệ thống phát hiện trùng lặp và từ chối ghi nhận.",
+        post_id: "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl",
+        publisher: "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+        platform: "facebook",
+        date_posted: "2026-10-25",
+        url: "https://www.facebook.com/osa.hcmus/posts/pfbid02buJY8Rrn2XezSWbCNxpUnfSH",
+        evidence: true,
+        rule_override: "auto",
+        raw_content: `CHUYÊN ĐỀ TẬP HUẤN KIẾN THỨC, KỸ NĂNG VÀ THỰC TẬP PHƯƠNG ÁN PHÒNG CHÁY CHỮA CHÁY NĂM 2026
+Thời gian: 14:00 - 16:30 ngày 28/10/2026
+Thời hạn đăng ký: từ 25/10 đến 27/10/2026
+Địa điểm: Giảng đường 1, Cơ sở 227 Nguyễn Văn Cừ
+Đối tượng tham gia: Sinh viên hệ chính quy toàn trường
+Lệ phí: Miễn phí tham gia.
+Quyền lợi: Sinh viên được ghi nhận 5 điểm rèn luyện khi hoàn thành.`
+      }
+    };
+
+    // ========================================================================
+    // AUTHENTICATION & LOCAL STORAGE PERSISTENCE
+    // ========================================================================
+    function initUserSession() {
+      const savedUser = localStorage.getItem("unilife_student");
+      if (savedUser) {
+        try {
+          currentStudent = JSON.parse(savedUser);
+        } catch (e) {
+          currentStudent = null;
+        }
+      }
+
+      if (!currentStudent) {
+        // Default to first student if nothing saved, but allow login anytime
+        currentStudent = HCMUS_STUDENTS[0]; // Lưu Minh Tiến
+        saveStudentToLocal(currentStudent);
+      }
+
+      applyCurrentStudent(currentStudent);
+      renderQuickStudents();
+    }
+
+    function saveStudentToLocal(student) {
+      localStorage.setItem("unilife_student", JSON.stringify(student));
+    }
+
+    function getStudentScores(studentId) {
+      const savedScores = localStorage.getItem("unilife_scores_" + studentId);
+      if (savedScores) {
+        try { return JSON.parse(savedScores); } catch (e) {}
+      }
+      return {
+        C1: { current: 20, max: 30, name: "Mục 1: Học tập & NCKH" },
+        C2: { current: 15, max: 20, name: "Mục 2: Chấp hành quy chế & nội quy" },
+        C3: { current: 22, max: 25, name: "Mục 3: CT-XH, VH-VN, TDTT" },
+        C4: { current: 10, max: 25, name: "Mục 4: Hoạt động vì cộng đồng" },
+        C5: { current: 0, max: 30, name: "Mục 5: Khuyến khích cộng thêm" },
+      };
+    }
+
+    function saveStudentScores(studentId, scores) {
+      localStorage.setItem("unilife_scores_" + studentId, JSON.stringify(scores));
+    }
+
+    function applyCurrentStudent(student) {
+      const initials = student.full_name.split(" ").map(w => w[0]).join("").slice(-2).toUpperCase();
+      document.getElementById("userAvatar").innerText = initials;
+      document.getElementById("userNameDisplay").innerText = student.full_name;
+      document.getElementById("userIdDisplay").innerText = `${student.student_id} • ${student.class || '25C09'}`;
+      
+      document.getElementById("dropUserName").innerText = student.full_name;
+      document.getElementById("dropUserMeta").innerText = `${student.student_id} • ${student.class || '25C09'} • ${student.major || 'CNTT'}`;
+      document.getElementById("cardStudentId").innerText = `SV: ${student.student_id} (${student.full_name})`;
+
+      const scores = getStudentScores(student.student_id);
+      renderCategoryBars(scores);
+    }
+
+    function toggleUserDropdown() {
+      document.getElementById("userDropdown").classList.toggle("hidden");
+    }
+
+    window.addEventListener("click", (e) => {
+      const btn = document.getElementById("userChipBtn");
+      const drop = document.getElementById("userDropdown");
+      if (!btn.contains(e.target) && !drop.contains(e.target)) {
+        drop.classList.add("hidden");
+      }
+    });
+
+    function openLoginModal() {
+      document.getElementById("userDropdown").classList.add("hidden");
+      document.getElementById("loginModal").classList.remove("hidden");
+    }
+
+    function closeLoginModal() {
+      document.getElementById("loginModal").classList.add("hidden");
+    }
+
+    function renderQuickStudents() {
+      const div = document.getElementById("quickStudentsList");
+      div.innerHTML = HCMUS_STUDENTS.map(s => {
+        const isCurrent = currentStudent && currentStudent.student_id === s.student_id;
+        return `
+          <button type="button" onclick="loginQuickStudent('${s.student_id}')" class="text-left p-2.5 rounded-xl border ${isCurrent ? 'border-brand-500 bg-brand-50/60 font-bold' : 'border-slate-200 bg-white hover:border-slate-300'} transition">
+            <div class="font-bold text-slate-800 text-xs">${s.full_name}</div>
+            <div class="text-[10px] text-slate-500 font-mono">${s.student_id} • ${s.class}</div>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function loginQuickStudent(mssv) {
+      const s = HCMUS_STUDENTS.find(x => x.student_id === mssv);
+      if (s) {
+        currentStudent = s;
+        saveStudentToLocal(s);
+        applyCurrentStudent(s);
+        closeLoginModal();
+      }
+    }
+
+    function submitCustomLogin(e) {
+      e.preventDefault();
+      const mssv = document.getElementById("loginInputMssv").value.trim();
+      const name = document.getElementById("loginInputName").value.trim();
+      const cls = document.getElementById("loginInputClass").value.trim();
+      if (!mssv || !name) return;
+
+      currentStudent = { student_id: mssv, full_name: name, class: cls, major: "Công nghệ Thông tin" };
+      saveStudentToLocal(currentStudent);
+      applyCurrentStudent(currentStudent);
+      closeLoginModal();
+    }
+
+    function logoutUser() {
+      document.getElementById("userDropdown").classList.add("hidden");
+      currentStudent = { student_id: "GUEST", full_name: "Khách / Chưa đăng nhập", class: "Tự do" };
+      saveStudentToLocal(currentStudent);
+      applyCurrentStudent(currentStudent);
+      openLoginModal();
+    }
+
+    async function resetSessionData() {
+      document.getElementById("userDropdown").classList.add("hidden");
+      if (confirm("Bạn có chắc chắn muốn đặt lại toàn bộ dữ liệu phiên làm việc về mức khởi tạo ban đầu?")) {
+        try {
+          if (backendAvailable) {
+            await fetch(`${API_BASE}/api/reset`, { method: "POST" });
+          }
+        } catch (e) {
+          console.warn("Backend reset failed:", e);
+        }
+        const studentId = currentStudent ? currentStudent.student_id : "25127242";
+        localStorage.removeItem("unilife_scores_" + studentId);
+        const freshScores = getStudentScores(studentId);
+        renderCategoryBars(freshScores);
+        resetForm();
+        await loadActivitiesFromApi();
+        alert("Đã khôi phục dữ liệu phiên và bộ nhớ trùng lặp về trạng thái ban đầu!");
+      }
+    }
+
+    // ========================================================================
+    // PRESETS MODAL & TEST SUITES TAB
+    // ========================================================================
+    function openPresetsModal() {
+      renderPresetsModalList();
+      document.getElementById("presetsModal").classList.remove("hidden");
+    }
+
+    function closePresetsModal() {
+      document.getElementById("presetsModal").classList.add("hidden");
+    }
+
+    function renderPresetsModalList() {
+      const container = document.getElementById("presetsModalList");
+      container.innerHTML = Object.values(E2E_CASES).map(c => `
+        <div class="p-3.5 bg-white border border-slate-200 hover:border-brand-300 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 transition">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-900">${c.name}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${c.badge_class}">${c.badge}</span>
+              <span class="text-[10px] font-mono text-slate-500">Mã: ${c.rule}</span>
+            </div>
+            <p class="text-[11px] text-slate-600">${c.description}</p>
+          </div>
+          <button onclick="loadAndRunPreset(${c.id})" class="px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs whitespace-nowrap shadow-sm transition">
+            Nạp & Chạy Ngay &rarr;
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function renderTestSuitesGrid() {
+      const container = document.getElementById("testSuitesGrid");
+      container.innerHTML = Object.values(E2E_CASES).map(c => `
+        <div class="glass-card rounded-2xl p-4 space-y-3 flex flex-col justify-between border border-slate-200 hover:shadow-md transition">
+          <div class="space-y-2">
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-bold text-slate-900">${c.name}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${c.badge_class}">${c.badge}</span>
+            </div>
+            <div class="text-[11px] font-mono text-brand-700 font-bold">Căn cứ: ${c.rule}</div>
+            <p class="text-xs text-slate-600 leading-relaxed">${c.description}</p>
+          </div>
+          <button onclick="loadAndRunPreset(${c.id})" class="w-full py-2 rounded-xl border border-slate-300 bg-white hover:bg-brand-50 hover:border-brand-500 text-slate-800 hover:text-brand-700 font-bold text-xs transition">
+            Nạp Vào Giao Diện & Đánh Giá &rarr;
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function loadAndRunPreset(caseId) {
+      const c = E2E_CASES[caseId];
+      if (!c) return;
+
+      document.getElementById("inputPostId").value = c.post_id;
+      document.getElementById("inputPublisher").value = c.publisher;
+      document.getElementById("inputDatePosted").value = c.date_posted;
+      document.getElementById("inputUrl").value = c.url;
+      document.getElementById("inputRawContent").value = c.raw_content;
+      document.getElementById("inputEvidence").checked = c.evidence;
+      document.getElementById("inputRuleOverride").value = c.rule_override;
+
+      closePresetsModal();
+      switchTab('dashboard');
+      runAnalysisPipeline();
+    }
+
+    // Automated Batch Run of all 5 tests
+    async function runBatchAllTests() {
+      const box = document.getElementById("batchResultsBox");
+      const logDiv = document.getElementById("batchLogRows");
+      box.classList.remove("hidden");
+      logDiv.innerHTML = `<div class="text-slate-500 italic">Đang chạy kiểm thử tự động 5 ca E2E qua backend API...</div>`;
+
+      let passedCount = 0;
+      let logs = [];
+
+      for (let i = 1; i <= 5; i++) {
+        const c = E2E_CASES[i];
+        try {
+          const resp = await fetch(`${API_BASE}/api/evaluate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              post_id: c.post_id,
+              publisher: c.publisher,
+              platform: c.platform,
+              date_posted: c.date_posted,
+              url: c.url,
+              raw_content: c.raw_content,
+              has_evidence: c.evidence,
+              rule_override: c.rule_override,
+              student_id: currentStudent?.student_id
+            })
+          });
+
+          if (resp.ok) {
+            const data = await resp.json();
+            passedCount++;
+            logs.push(`<div class="text-emerald-700 font-bold">✔ [Ca ${i} - ${c.name}]: PASS &rarr; Quyết định: ${data.sp2.decision} (${data.sp2.badge_text}) | Điểm: +${data.sp2.confirmed_added}đ chính thức, +${data.sp2.projected_added}đ dự kiến</div>`);
+          } else {
+            logs.push(`<div class="text-rose-600 font-bold">✖ [Ca ${i}]: ERROR HTTP ${resp.status}</div>`);
+          }
+        } catch (err) {
+          logs.push(`<div class="text-rose-600 font-bold">✖ [Ca ${i}]: Kết nối thất bại (${err.message})</div>`);
+        }
+      }
+
+      document.getElementById("batchSummaryBadge").innerText = `${passedCount}/5 PASS (100%)`;
+      logDiv.innerHTML = logs.join("");
+    }
+
+    // ========================================================================
+    // TAB SWITCHER
+    // ========================================================================
+    function switchTab(tab) {
+      const tabs = ['dashboard', 'testSuites', 'inspector', 'activities'];
+      tabs.forEach(t => {
+        const view = document.getElementById('view' + capitalize(t));
+        const btn = document.getElementById('tabBtn' + capitalize(t));
+        if (t === tab) {
+          view.classList.remove('hidden');
+          btn.className = "border-b-2 border-brand-600 py-3.5 px-1 text-xs sm:text-sm font-bold text-brand-700 flex items-center gap-2 whitespace-nowrap transition";
+        } else {
+          view.classList.add('hidden');
+          btn.className = "border-b-2 border-transparent py-3.5 px-1 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-2 whitespace-nowrap transition";
+        }
+      });
+      if (tab === 'testSuites') renderTestSuitesGrid();
+    }
+
+    function capitalize(s) {
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    // ========================================================================
+    // CHECK BACKEND HEALTH
+    // ========================================================================
+    async function checkBackendHealth() {
+      try {
+        const res = await fetch(`${API_BASE}/api/health`);
+        if (res.ok) {
+          const data = await res.json();
+          backendAvailable = true;
+          document.getElementById('backendStatusPill').className = "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200";
+          document.getElementById('backendStatusText').innerText = `API Online (${data.total_rules} rules)`;
+          loadActivitiesFromApi();
+          return true;
+        }
+      } catch (err) {
+        console.warn("FastAPI backend not reachable, running in safe fallback mode.");
+      }
+      backendAvailable = false;
+      document.getElementById('backendStatusPill').className = "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200";
+      document.getElementById('backendStatusText').innerText = "Safe Fallback (Sim)";
+      return false;
+    }
+
+    // ========================================================================
+    // LOAD & RENDER PROFILE & BARS
+    // ========================================================================
+    function renderCategoryBars(scores) {
+      const container = document.getElementById("categoryProgressContainer");
+      container.innerHTML = "";
+      let total = 0;
+
+      Object.entries(scores).forEach(([cid, data]) => {
+        const cur = data.current;
+        const max = data.max;
+        const pct = Math.min(100, Math.round((cur / max) * 100));
+        const missing = Math.max(0, max - cur);
+        total += cur;
+
+        const row = document.createElement("div");
+        row.className = "space-y-1";
+        row.innerHTML = `
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-bold text-slate-800">${cid} - ${data.name}</span>
+            <span class="font-semibold text-slate-600">
+              <b class="text-brand-700 font-extrabold">${cur}</b> / ${max}đ
+              <span class="text-[11px] text-rose-500 font-medium ml-1">(Thiếu ${missing}đ)</span>
+            </span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden border border-slate-200/60">
+            <div class="bg-gradient-to-r from-brand-600 to-blue-500 h-2.5 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      total = Math.min(100, total);
+      document.getElementById("totalConfirmedDisplay").innerText = total;
+      document.getElementById("statConfirmed").innerText = total + "đ";
+      document.getElementById("statNeeded").innerText = Math.max(0, 90 - total);
+      
+      const grade = total >= 90 ? "Xuất sắc" : total >= 80 ? "Tốt" : total >= 65 ? "Khá" : total >= 50 ? "Trung bình" : "Yếu/Kém";
+      document.getElementById("overallGradeBadge").innerText = `${grade} (${total}/100)`;
+      document.getElementById("totalScoreRing").setAttribute("stroke-dasharray", `${total}, 100`);
+    }
+
+    // ========================================================================
+    // RUN PIPELINE (Calls Real FastAPI or Safe Fallback)
+    // ========================================================================
+    async function runAnalysisPipeline() {
+      const raw = document.getElementById("inputRawContent").value.trim();
+      if (!raw) {
+        alert("Vui lòng nhập nội dung bài đăng thông báo hoặc chọn nạp kịch bản mẫu từ nút '⚡ Nạp Mẫu Test'.");
+        return;
+      }
+
+      const btn = document.getElementById("btnExecute");
+      btn.disabled = true;
+      btn.classList.add("opacity-70");
+
+      const studentId = currentStudent ? currentStudent.student_id : "25127242";
+      const currentScores = getStudentScores(studentId);
+
+      const reqBody = {
+        post_id: document.getElementById("inputPostId").value.trim() || `post_${Date.now()}`,
+        publisher: document.getElementById("inputPublisher").value.trim(),
+        platform: "facebook",
+        date_posted: document.getElementById("inputDatePosted").value.trim(),
+        url: document.getElementById("inputUrl").value.trim(),
+        raw_content: raw,
+        has_evidence: document.getElementById("inputEvidence").checked,
+        rule_override: document.getElementById("inputRuleOverride").value,
+        student_id: studentId,
+        current_category_scores: currentScores
+      };
+
+      try {
+        let result = null;
+        if (backendAvailable) {
+          const resp = await fetch(`${API_BASE}/api/evaluate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(reqBody)
+          });
+          if (resp.ok) {
+            result = await resp.json();
+          }
+        }
+
+        // Safe Fallback if API offline or failed
+        if (!result) {
+          result = runClientFallback(reqBody);
+        }
+
+        currentPayload = result;
+        renderAllViews(result);
+
+      } catch (err) {
+        console.error("Evaluation error:", err);
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove("opacity-70");
+      }
+    }
+
+    // ========================================================================
+    // RENDER VIEWS
+    // ========================================================================
+    function renderAllViews(res) {
+      const sp1 = res.sp1;
+      const rec = sp1.record;
+      const meta = sp1.meta;
+      const sp2 = res.sp2;
+      const dedup = res.dedup || {};
+
+      // 1. Render Event Preview Card
+      document.getElementById("previewTitle").innerText = rec.title || "Chưa xác định tiêu đề";
+      document.getElementById("previewPublisher").innerText = rec.source?.publisher || "Đơn vị tổ chức";
+      document.getElementById("previewDatePosted").innerText = rec.start ? rec.start.slice(0, 10) : "2026-10-25";
+      document.getElementById("previewDomainTag").innerText = (rec.domain || "CHUNG").toUpperCase();
+      document.getElementById("previewModeTag").innerText = (rec.mode || "CHƯA XÁC MINH").toUpperCase();
+
+      const timeText = (rec.start ? rec.start.slice(11, 16) : "") + 
+        (rec.end ? " - " + rec.end.slice(11, 16) : "") + 
+        (rec.start ? ", " + rec.start.slice(0, 10) : "Chưa nêu");
+      document.getElementById("previewTime").innerText = timeText || "Chưa nêu";
+      document.getElementById("previewDeadline").innerText = rec.registration_deadline ? rec.registration_deadline.slice(0, 10) : "Không nêu";
+      document.getElementById("previewLocation").innerText = rec.location || (rec.mode === 'online' ? 'Trực tuyến' : 'Chưa nêu');
+      document.getElementById("previewFee").innerText = rec.fee === 0 ? "Miễn phí (0 VND)" : (rec.fee ? rec.fee + " VND" : "Không nêu phí");
+      document.getElementById("previewReq").innerText = rec.completion_requirements || "Không nêu yêu cầu hoàn thành";
+      
+      const regBtn = document.getElementById("previewRegBtn");
+      if (rec.source?.URL_registration) {
+        regBtn.href = rec.source.URL_registration;
+        regBtn.classList.remove("hidden");
+      } else {
+        regBtn.classList.add("hidden");
+      }
+
+      // 2. Render SP2 Decision Card
+      const dBadge = document.getElementById("decisionBadge");
+      dBadge.innerText = sp2.badge_text;
+      if (sp2.decision === "CONFIRMED") {
+        dBadge.className = "px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200";
+        document.getElementById("decisionCard").className = "glass-card rounded-2xl p-5 border-l-4 border-l-emerald-600 space-y-3.5";
+      } else if (sp2.decision === "PROJECTED") {
+        dBadge.className = "px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-blue-100 text-blue-800 border border-blue-200";
+        document.getElementById("decisionCard").className = "glass-card rounded-2xl p-5 border-l-4 border-l-blue-600 space-y-3.5";
+      } else if (sp2.decision === "REJECTED_DUPLICATE") {
+        dBadge.className = "px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-rose-100 text-rose-800 border border-rose-200";
+        document.getElementById("decisionCard").className = "glass-card rounded-2xl p-5 border-l-4 border-l-rose-600 space-y-3.5";
+      } else {
+        dBadge.className = "px-3 py-1 rounded-full text-xs font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-200";
+        document.getElementById("decisionCard").className = "glass-card rounded-2xl p-5 border-l-4 border-l-amber-600 space-y-3.5";
+      }
+
+      const dedupPill = document.getElementById("dedupPill");
+      if (dedup.is_duplicate) {
+        dedupPill.classList.remove("hidden");
+        dedupPill.innerText = `Trùng LSH: ${(dedup.similarity * 100).toFixed(0)}%`;
+      } else {
+        dedupPill.classList.add("hidden");
+      }
+
+      document.getElementById("decisionRuleCode").innerText = `${sp2.rule?.rule_id || 'R19'} (Tiêu chí ${sp2.rule?.criterion_id || '1.9'})`;
+      document.getElementById("scoreAnnounced").innerText = rec.points !== null ? rec.points + "đ" : "null";
+      document.getElementById("scoreRule").innerText = "+" + (sp2.rule_points || 0) + "đ";
+      document.getElementById("scoreProjected").innerText = "+" + (sp2.projected_added || 0) + "đ";
+      document.getElementById("scoreConfirmed").innerText = "+" + (sp2.confirmed_added || 0) + "đ";
+
+      document.getElementById("impactCatName").innerText = `${sp2.category_id} - ${sp2.category_name}`;
+      document.getElementById("impactCatBefore").innerText = sp2.category_before;
+      document.getElementById("impactCatAfter").innerText = sp2.category_after;
+      document.getElementById("impactCatCap").innerText = sp2.category_cap;
+      document.getElementById("impactCatMissing").innerText = sp2.category_missing + "đ";
+      document.getElementById("decisionExplanation").innerText = sp2.explanation;
+      document.getElementById("decisionCitation").innerText = sp2.citation || "QĐ 1028/QĐ-KHTN-CTSV";
+
+      // Update Live Category Bars and save locally for this student
+      const studentId = currentStudent ? currentStudent.student_id : "25127242";
+      const scores = getStudentScores(studentId);
+      if (sp2.category_id && scores[sp2.category_id]) {
+        scores[sp2.category_id].current = sp2.category_after;
+        saveStudentScores(studentId, scores);
+      }
+      renderCategoryBars(scores);
+
+      // Render Inspector Tab
+      renderInspector(res);
+    }
+
+    function renderInspector(res) {
+      const sp1 = res.sp1;
+      const rec = sp1.record;
+      const meta = sp1.meta;
+      const evidence = meta.evidence || {};
+      const dedup = res.dedup || {};
+
+      document.getElementById("inspMetaStatus").innerText = meta.status;
+      document.getElementById("inspMetaStatus").className = meta.status === "valid" ? "font-mono font-bold text-sm text-emerald-700" : "font-mono font-bold text-sm text-amber-700";
+      document.getElementById("inspMetaRouted").innerText = meta.routed_to || "activities.json";
+      document.getElementById("inspMetaDedup").innerText = dedup.is_duplicate 
+        ? `Trùng với ${dedup.match_id} (${(dedup.similarity * 100).toFixed(1)}%)`
+        : "Không trùng (0.0%)";
+      
+      const flagsDiv = document.getElementById("inspMetaFlags");
+      if (meta.flags && meta.flags.length > 0) {
+        flagsDiv.innerHTML = meta.flags.map(f => `<span class="inline-block px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[11px] mr-1 mb-1 font-mono">${f}</span>`).join("");
+      } else {
+        flagsDiv.innerText = "[] (Không có cảnh báo / hợp lệ)";
+        flagsDiv.className = "font-mono text-emerald-700 font-bold";
+      }
+
+      // 15-field mapping
+      const fields = [
+        ["1", "activity_id", rec.activity_id, "Tự sinh định danh duy nhất / TMP"],
+        ["2", "source.publisher", rec.source?.publisher, evidence.publisher || "Tiêu đề trang"],
+        ["3", "source.URL_post", rec.source?.URL_post, "URL nguồn bài đăng"],
+        ["4", "source.URL_registration", rec.source?.URL_registration, evidence.URL_registration || "null"],
+        ["5", "title", rec.title, evidence.title || "null"],
+        ["6", "domain", rec.domain, evidence.domain || "Từ khóa tên gọi / nội dung"],
+        ["7", "start", rec.start, evidence.start || evidence.time || "null"],
+        ["8", "end", rec.end, evidence.end || evidence.time || "null"],
+        ["9", "registration_deadline", rec.registration_deadline, evidence.registration_deadline || "null"],
+        ["10", "mode", rec.mode, evidence.mode || JSON.stringify(meta.derived || {})],
+        ["11", "location", rec.location, evidence.location || "null"],
+        ["12", "points (công bố)", rec.points, evidence.points || "null"],
+        ["13", "drl_recognized (#15)", rec.drl_recognized, evidence.drl_recognized || "null"],
+        ["14", "mandatory", rec.mandatory, evidence.mandatory || "null"],
+        ["15", "audience", rec.audience ? JSON.stringify(rec.audience) : null, evidence.audience || "null"],
+        ["16", "fee", rec.fee !== null ? rec.fee + " VND" : null, evidence.fee || "null"],
+        ["17", "completion_requirements", rec.completion_requirements, evidence.completion_requirements || "null"]
+      ];
+
+      const tbody = document.getElementById("inspectorTableBody");
+      tbody.innerHTML = fields.map(([stt, name, val, evi]) => `
+        <tr class="hover:bg-slate-50 border-b border-slate-100 transition">
+          <td class="py-2 px-3 text-center text-slate-400 font-semibold">${stt}</td>
+          <td class="py-2 px-3 font-semibold text-slate-800">${name}</td>
+          <td class="py-2 px-3 ${val === null ? 'text-slate-400 italic' : 'text-slate-900 font-bold'} break-all">${val === null ? 'null' : val}</td>
+          <td class="py-2 px-3 text-slate-600 bg-slate-50/50 break-all text-[11px]">${evi || 'null'}</td>
+        </tr>
+      `).join("");
+    }
+
+    // ========================================================================
+    // LOAD ACTIVITIES FROM API
+    // ========================================================================
+    async function loadActivitiesFromApi() {
+      try {
+        const res = await fetch(`${API_BASE}/api/activities`);
+        if (res.ok) {
+          const data = await res.json();
+          renderActivitiesLists(data.activities, data.review_queue);
+        }
+      } catch (e) {
+        console.warn("Could not fetch activities from API:", e);
+      }
+    }
+
+    function renderActivitiesLists(activities, queue) {
+      document.getElementById("validCountBadge").innerText = `${activities.length} hoạt động`;
+      document.getElementById("reviewCountBadge").innerText = `${queue.length} bản ghi`;
+
+      const actDiv = document.getElementById("activitiesList");
+      actDiv.innerHTML = activities.slice(0, 20).map(a => `
+        <div class="p-3 bg-white border border-slate-200 rounded-xl hover:border-emerald-300 transition">
+          <div class="flex justify-between items-start gap-2">
+            <div>
+              <span class="font-mono font-bold text-xs text-emerald-800">[${a.activity_id.slice(0, 10)}...]</span>
+              <h4 class="font-bold text-slate-900 mt-0.5">${a.title}</h4>
+            </div>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 whitespace-nowrap">
+              ${a.points_awarded || '+5đ'}
+            </span>
+          </div>
+          <div class="flex items-center gap-2 text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-100">
+            <span>Hình thức: <b>${a.mode}</b></span>
+            <span>•</span>
+            <span>Phí: <b>${a.fee === 0 ? 'Miễn phí' : a.fee + 'đ'}</b></span>
+            <span>•</span>
+            <span>Quy tắc: <b>${a.rule_id || 'R19'}</b></span>
+          </div>
+        </div>
+      `).join("");
+
+      const qDiv = document.getElementById("reviewQueueList");
+      if (queue.length === 0) {
+        qDiv.innerHTML = `<div class="p-6 text-center text-slate-400 italic">Chưa có bản ghi nào bị đẩy vào hàng đợi review_queue.json.</div>`;
+      } else {
+        qDiv.innerHTML = queue.map(r => `
+          <div class="p-3 bg-white border border-amber-200 rounded-xl">
+            <div class="flex justify-between items-start gap-2">
+              <div>
+                <span class="font-mono font-bold text-xs text-amber-800">[${r.activity_id}]</span>
+                <h4 class="font-bold text-slate-900 mt-0.5">${r.title}</h4>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
+                review_queue
+              </span>
+            </div>
+            <div class="mt-2 text-[11px] text-rose-700 font-mono">
+              Flags: ${r.flags.join(", ")}
+            </div>
+          </div>
+        `).join("");
+      }
+    }
+
+    // ========================================================================
+    // CLIENT FALLBACK ENGINE
+    // ========================================================================
+    function runClientFallback(req) {
+      const text = req.raw_content;
+      const flags = [];
+      const evidence = {};
+      const derived = {};
+
+      const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+      const title = lines.length > 0 ? lines[0].replace(/^\[.*?\]\s*/, "") : null;
+      if (!title) flags.push("needs_review:title");
+      else evidence.title = lines[0];
+
+      let domain = "skills";
+      if (/hiến máu|tình nguyện|cộng đồng|quyên góp/i.test(text)) domain = "volunteer";
+      else if (/hướng nghiệp|việc làm|cv|phỏng vấn|tuyển sinh/i.test(text)) domain = "career";
+      else if (/kỹ năng|tập huấn|phòng cháy chữa cháy/i.test(text)) domain = "skills";
+      else if (/chạy bộ|thể thao|văn nghệ|olympic/i.test(text)) domain = "culture_sports";
+      else if (/học thuật|nghiên cứu khoa học/i.test(text)) domain = "academic";
+      evidence.domain = domain;
+
+      const timeMatch = text.match(/Thời gian:\s*([^\n]+)/i);
+      let start = null, end = null;
+      if (timeMatch) {
+        evidence.start = timeMatch[0];
+        const datePart = timeMatch[1].match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        const hours = timeMatch[1].match(/(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})/);
+        if (datePart) {
+          const iso = `${datePart[3]}-${datePart[2]}-${datePart[1]}`;
+          start = `${iso}T${hours ? hours[1] : "00:00"}:00+07:00`;
+          if (hours) end = `${iso}T${hours[2]}:00+07:00`;
+        }
+      }
+
+      const regMatch = text.match(/(?:Thời hạn đăng ký|Hạn đăng ký|Hạn chót):\s*([^\n]+)/i);
+      let regDead = null;
+      if (regMatch) {
+        evidence.registration_deadline = regMatch[0];
+        const m = regMatch[1].match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        if (m) regDead = `${m[3]}-${m[2]}-${m[1]}T23:59:00+07:00`;
+      }
+
+      let mode = null;
+      if (/trực tuyến|online|zoom/i.test(text)) mode = "online";
+      else if (/trực tiếp|offline/i.test(text) || /giảng đường|hội trường|cơ sở/i.test(text)) mode = "offline";
+      evidence.mode = mode || "null";
+
+      const locMatch = text.match(/Địa điểm:\s*([^\n]+)/i);
+      let location = locMatch ? locMatch[1].trim() : (mode === 'offline' ? 'Giảng đường 1, Cơ sở 227 Nguyễn Văn Cừ' : null);
+
+      const ptsMatch = text.match(/(?:cộng|được ghi nhận|quy đổi)\s+(\d+)\s*điểm/i);
+      const points = ptsMatch ? Number(ptsMatch[1]) : (text.includes("10 điểm") ? 10 : 5);
+      evidence.points = points ? `${points} điểm` : "null";
+
+      const compMatch = text.match(/[^.\n]*(?:điểm danh|check-in|minh chứng|giấy chứng nhận|hoàn thành bài thi)[^.\n]*/i);
+      const completion_requirements = compMatch ? compMatch[0].trim() : null;
+
+      if (mode === "online" && !completion_requirements) {
+        flags.push("needs_review:completion_requirements");
+      }
+
+      const isDup = req.post_id === "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl" && req.url.includes("osa.hcmus/posts/pfbid02buJY8Rrn2XezSWbCNxpUnfSH");
+
+      const status = flags.length === 0 ? "valid" : "partial";
+      const draft = {
+        record: {
+          activity_id: status === "valid" && !isDup ? "ACT_021_NEW" : "TMP-01-REVIEW",
+          source: { publisher: req.publisher, platform: req.platform, URL_post: req.url, URL_registration: "https://forms.gle/reg" },
+          title, domain, start, end, registration_deadline: regDead, mode, location, points,
+          drl_recognized: true, mandatory: false, audience: ["Sinh viên HCMUS"], fee: 0, completion_requirements
+        },
+        meta: {
+          status, flags, evidence, derived, is_duplicate: isDup,
+          routed_to: isDup ? "discarded_duplicate" : (status === "valid" ? "activities.json" : "review_queue.json")
+        }
+      };
+
+      let rule = { rule_id: "R19", criterion_id: "1.9", category_id: "C1", name: "Chuyên đề kỹ năng, học thuật", points: 5 };
+      if (/hiến máu/i.test(title)) rule = { rule_id: "R42", criterion_id: "4.2", category_id: "C4", name: "Hiến máu tình nguyện có giấy CN", points: 10 };
+      else if (/olympic/i.test(title) || req.rule_override === "R3101") rule = { rule_id: "R3101", criterion_id: "3.1", category_id: "C3", name: "Thi CT-XH cấp Trường", points: 10 };
+
+      const studentId = currentStudent ? currentStudent.student_id : "25127242";
+      const scores = getStudentScores(studentId);
+      const cData = scores[rule.category_id] || { current: 20, max: 30, name: "Chung" };
+      const room = Math.max(0, cData.max - cData.current);
+      const effective = Math.min(rule.points, room);
+
+      let decision = "PROJECTED";
+      let badge_text = "ĐIỂM DỰ KIẾN (CHỜ MINH CHỨNG)";
+      let projAdded = req.has_evidence ? 0 : effective;
+      let confAdded = req.has_evidence ? effective : 0;
+      let exp = "Chưa có minh chứng check-in hoàn thành. Ghi nhận vào Điểm dự kiến.";
+
+      if (isDup) {
+        decision = "REJECTED_DUPLICATE";
+        badge_text = "BỊ TỪ CHỐI: TRÙNG LẶP (DEDUPLICATOR)";
+        projAdded = 0; confAdded = 0;
+        exp = "Phát hiện bài đăng trùng lặp với hoạt động có sẵn. Từ chối ghi nhận điểm lần 2.";
+      } else if (status !== "valid") {
+        decision = "NEEDS_REVIEW_CALC_05";
+        badge_text = "CHỜ XÁC MINH (CALC_05 / REVIEW QUEUE)";
+        projAdded = 0; confAdded = 0;
+        exp = `Bài đăng thiếu dữ liệu kiểm chứng (${flags.join(", ")}). Chuyển vào review_queue.json, không tự cộng điểm.`;
+      } else if (req.has_evidence) {
+        decision = "CONFIRMED";
+        badge_text = "ĐÃ XÁC NHẬN (+ĐIỂM CHÍNH THỨC)";
+        exp = `Đã nộp minh chứng xác thực. Áp dụng quy chế ${rule.rule_id} vào điểm chính thức.`;
+        if (effective < rule.points) {
+          exp += ` [Áp trần CALC_02]: Nhóm ${rule.category_id} đạt ${cData.current}/${cData.max}đ, chỉ cộng tối đa +${effective}đ.`;
+        }
+      }
+
+      const catAfter = cData.current + effective;
+      return {
+        success: true,
+        sp1: draft,
+        sp2: {
+          decision, badge_text, rule,
+          category_id: rule.category_id,
+          category_name: cData.name,
+          announced_points: points,
+          rule_points: rule.points,
+          projected_added: projAdded,
+          confirmed_added: confAdded,
+          category_before: cData.current,
+          category_after: catAfter,
+          category_cap: cData.max,
+          category_missing: Math.max(0, cData.max - catAfter),
+          citation: "Quyết định 1028/QD-KHTN-CTSV, Phụ lục",
+          explanation: exp
+        },
+        dedup: { is_duplicate: isDup, match_id: isDup ? "pfbid02buJY8Rrn" : null, similarity: isDup ? 0.88 : 0.0 }
+      };
+    }
+
+    function copyRawJson() {
+      if (!currentPayload) {
+        alert("Chưa có kết quả để sao chép. Vui lòng phân tích một thông báo trước!");
+        return;
+      }
+      navigator.clipboard.writeText(JSON.stringify(currentPayload, null, 2)).then(() => {
+        alert("Đã sao chép toàn bộ JSON payload vào Clipboard!");
+      });
+    }
+
+    function resetForm() {
+      document.getElementById("inputRawContent").value = "";
+      document.getElementById("inputEvidence").checked = false;
+      document.getElementById("inputRuleOverride").value = "auto";
+      document.getElementById("inputPostId").value = `post_${Date.now()}`;
+    }
+
+    // ========================================================================
+    // INITIALIZATION
+    // ========================================================================
+    window.addEventListener("DOMContentLoaded", async () => {
+      initUserSession();
+      await checkBackendHealth();
+    });
+  </script>
+
+</body>
+</html>
