@@ -1,4 +1,3 @@
-
 from data_reader import read_courses, read_students
 
 
