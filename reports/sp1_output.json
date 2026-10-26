@@ -1,0 +1,1085 @@
+[
+  {
+    "post_id": "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-2e8129ab-01",
+          "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl?rdid=wx5Ohz8ngGLTMIWQ",
+            "URL_registration": "https://forms.cloud.microsoft/r/qHiUsQc7WA"
+          },
+          "title": "CHUYÊN ĐỀ \"TẬP HUẤN KIẾN THỨC, KỸ NĂNG VÀ THỰC TẬP PHƯƠNG ÁN PHÒNG CHÁY CHỮA CHÁY, CỨU NẠN, CỨU HỘ\" NĂM 2026",
+          "domain": "career",
+          "start": "2026-10-30T14:00:00+07:00",
+          "end": null,
+          "registration_deadline": null,
+          "mode": "offline",
+          "location": "Giảng đường 1, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (227 Nguyễn Văn Cừ, phường Chợ Quán, TP. Hồ Chí Minh)",
+          "points": null,
+          "drl_recognized": true,
+          "mandatory": null,
+          "audience": [
+            "Tất cả sinh viên Trường Đại học Khoa học tự nhiên"
+          ],
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "valid",
+          "flags": [],
+          "evidence": {
+            "URL_registration": "https://forms.cloud.microsoft/r/qHiUsQc7WA",
+            "title": "CHUYÊN ĐỀ \"TẬP HUẤN KIẾN THỨC, KỸ NĂNG VÀ THỰC TẬP PHƯƠNG ÁN PHÒNG CHÁY CHỮA CHÁY, CỨU NẠN, CỨU HỘ\" NĂM 2026",
+            "domain": "THỰC TẬP",
+            "start": "14g00, thứ Sáu, ngày 30/10/2026",
+            "location": "Giảng đường 1, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (227 Nguyễn Văn Cừ, phường Chợ Quán, TP. Hồ Chí Minh)",
+            "drl_recognized": "GHI NHẬN HOẠT ĐỘNG",
+            "audience": "Tất cả sinh viên Trường Đại học Khoa học tự nhiên",
+            "mode": "Giảng đường 1, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (227 Nguyễn Văn Cừ, phường Chợ Quán, TP. Hồ Chí Minh)"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {
+            "mode": "venue_physical"
+          },
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid02EJmkk2oaZJuBw5VqRhEUeSUNqVW6dav9qSV4AZsK661vLikur7U4PPBqJcPDBYHzl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-1c2e42da-01",
+          "source": {
+            "publisher": "Đoàn khoa - Liên chi Hội CNTT KHTN",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/DoanKhoaLienChiHoi.CNTT.KHTN/posts/pfbid02EJmkk2oaZJuBw5VqRhEUeSUNqVW6dav9qSV4AZsK661vLikur7U4PPBqJcPDBYHzl?rdid=6vqXoYFkEhfVVKm3",
+            "URL_registration": null
+          },
+          "title": "- KEY ƠI, ĐỪNG QUÊN CÓ HẸN VỚI VÒNG 4 - ALT!",
+          "domain": null,
+          "start": "2026-10-17T12:30:00+07:00",
+          "end": "2026-10-18T11:00:00+07:00",
+          "registration_deadline": null,
+          "mode": null,
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": null,
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "partial",
+          "flags": [
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "title": "- KEY ƠI, ĐỪNG QUÊN CÓ HẸN VỚI VÒNG 4 - ALT!",
+            "start": "Từ 12h30 ngày 17/10/2026 (thứ Bảy) đến 11h00 ngày 18/10/2026 (Chủ nhật)",
+            "end": "Từ 12h30 ngày 17/10/2026 (thứ Bảy) đến 11h00 ngày 18/10/2026 (Chủ nhật)"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-5656c4cd-01",
+          "source": {
+            "publisher": "SAB in HCMUS",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/sab.ctda/posts/pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l?rdid=gcGEoE03T4OYb9Sg",
+            "URL_registration": "https://go.sabies.vn/lis26_dangky"
+          },
+          "title": "LET IT SHINE 2026",
+          "domain": null,
+          "start": "2026-11-01T00:00:00+07:00",
+          "end": "2026-11-22T20:30:00+07:00",
+          "registration_deadline": "2026-10-30T23:59:00+07:00",
+          "mode": "offline",
+          "location": "cơ sở phường Chợ Quán",
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": [
+            "Tất cả sinh viên đang theo học tại Khoa Công nghệ thông tin, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM"
+          ],
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "valid",
+          "flags": [],
+          "evidence": {
+            "URL_registration": "https://go.sabies.vn/lis26_dangky",
+            "title": "LET IT SHINE 2026",
+            "start": [
+              "Vòng Sơ khảo: 01/11/2026 tại cơ sở phường Chợ Quán.",
+              "Vòng Chung kết: 22/11/2026, từ 16h00 đến 20h30 tại Giảng đường 1, cơ sở phường Chợ Quán."
+            ],
+            "end": [
+              "Vòng Sơ khảo: 01/11/2026 tại cơ sở phường Chợ Quán.",
+              "Vòng Chung kết: 22/11/2026, từ 16h00 đến 20h30 tại Giảng đường 1, cơ sở phường Chợ Quán."
+            ],
+            "registration_deadline": "30/10/2026",
+            "location": "cơ sở phường Chợ Quán",
+            "audience": "Tất cả sinh viên đang theo học tại Khoa Công nghệ thông tin, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM",
+            "mode": "cơ sở phường Chợ Quán"
+          },
+          "time_defaults": {
+            "start": "date_only_0000",
+            "registration_deadline": "date_only_2359"
+          },
+          "year_from_posted": [],
+          "derived": {
+            "mode": "venue_physical"
+          },
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid0dmRU1XavPQ3rzXsGMSTaL69GEcdsmKnXeVaWA4LYybFFgsJDfg3qtMetBGfn7zKkl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-8585d8f5-01",
+          "source": {
+            "publisher": "Google Developer Group on Campus - HCMUS",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/gdgoc.hcmus/posts/pfbid0dmRU1XavPQ3rzXsGMSTaL69GEcdsmKnXeVaWA4LYybFFgsJDfg3qtMetBGfn7zKkl?rdid=fdFIooiRlkKO5YKW",
+            "URL_registration": "https://forms.gle/cQTpHUTMsaboQXYJ7"
+          },
+          "title": "Nhà G có gì hot? TIPS & Tricks đã trở lại với những nội dung bất bại rồi đây!",
+          "domain": "career",
+          "start": null,
+          "end": null,
+          "registration_deadline": null,
+          "mode": null,
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": [
+            "TẤT CẢ SINH VIÊN của trường Đại học Khoa học tự nhiên, ĐHQG-HCM, và đặc biệt còn cả những bạn sinh viên trong TP.HCM nữa nha!"
+          ],
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "failed",
+          "flags": [
+            "invalid_value:start",
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "URL_registration": "https://forms.gle/cQTpHUTMsaboQXYJ7",
+            "title": "Nhà G có gì hot? TIPS & Tricks đã trở lại với những nội dung bất bại rồi đây!",
+            "domain": "thực tập",
+            "audience": "TẤT CẢ SINH VIÊN của trường Đại học Khoa học tự nhiên, ĐHQG-HCM, và đặc biệt còn cả những bạn sinh viên trong TP.HCM nữa nha!"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid02o8CK5Ziex6z2ZjnEhnv49RyHkZwMxEcLkpF49QmVymQp3N2hghbSAcrvzFram89Pl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-e0ae02bb-01",
+          "source": {
+            "publisher": "Google Developer Group on Campus - HCMUS",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/gdgoc.hcmus/posts/pfbid02o8CK5Ziex6z2ZjnEhnv49RyHkZwMxEcLkpF49QmVymQp3N2hghbSAcrvzFram89Pl?rdid=bC3Ggj1RDuZoKvUg",
+            "URL_registration": "https://forms.gle/cQTpHUTMsaboQXYJ7"
+          },
+          "title": "Mỗi mảnh ghép đều mang một màu sắc và dấu ấn riêng, cùng nhau tạo nên bức tranh đầy sắc màu của GDGoC-HCMUS. Và để viết tiếp hành trình ấy, nhà G đang tìm kiếm những mảnh ghép mới. Biết đâu, bạn chính là mảnh ghép tiếp theo mà chúng mình đang chờ đợi?",
+          "domain": null,
+          "start": "2026-10-03T00:00:00+07:00",
+          "end": "2026-10-25T23:59:00+07:00",
+          "registration_deadline": null,
+          "mode": null,
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": [
+            "TẤT CẢ SINH VIÊN của trường Đại học Khoa học tự nhiên, ĐHQG-HCM, và đặc biệt còn cả những bạn sinh viên trong TP.HCM nữa nha!"
+          ],
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "partial",
+          "flags": [
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "URL_registration": "https://forms.gle/cQTpHUTMsaboQXYJ7",
+            "title": "Mỗi mảnh ghép đều mang một màu sắc và dấu ấn riêng, cùng nhau tạo nên bức tranh đầy sắc màu của GDGoC-HCMUS. Và để viết tiếp hành trình ấy, nhà G đang tìm kiếm những mảnh ghép mới. Biết đâu, bạn chính là mảnh ghép tiếp theo mà chúng mình đang chờ đợi?",
+            "start": [
+              ": Application (từ 3/10 đến 10/10)",
+              ": Interview (từ 12/10 đến 18/10)",
+              ": Intern (từ 20/10 đến 25/10)"
+            ],
+            "end": [
+              ": Application (từ 3/10 đến 10/10)",
+              ": Interview (từ 12/10 đến 18/10)",
+              ": Intern (từ 20/10 đến 25/10)"
+            ],
+            "audience": "TẤT CẢ SINH VIÊN của trường Đại học Khoa học tự nhiên, ĐHQG-HCM, và đặc biệt còn cả những bạn sinh viên trong TP.HCM nữa nha!"
+          },
+          "time_defaults": {
+            "start": "date_only_0000",
+            "end": "date_only_2359"
+          },
+          "year_from_posted": [
+            "start",
+            "end"
+          ],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-74cb8f85-01",
+          "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl?rdid=Ffr2GTRBFoXCDzst",
+            "URL_registration": null
+          },
+          "title": "THÔNG BÁO V/V ĐĂNG KÝ LỊCH KHÁM SỨC KHỎE ĐỊNH KỲ CHO SINH VIÊN ĐỢT 2 NĂM 2026",
+          "domain": null,
+          "start": "2025-09-09T00:00:00+07:00",
+          "end": "2026-09-04T23:59:00+07:00",
+          "registration_deadline": null,
+          "mode": null,
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": null,
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "partial",
+          "flags": [
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "title": "THÔNG BÁO V/V ĐĂNG KÝ LỊCH KHÁM SỨC KHỎE ĐỊNH KỲ CHO SINH VIÊN ĐỢT 2 NĂM 2026",
+            "start": [
+              "Căn cứ Nghị quyết số 72-NQ/TW ngày 09 tháng 9 năm 2025 của Bộ Chính trị về một số giải pháp đột phá nhằm tăng cường bảo vệ, chăm sóc và nâng cao sức khỏe Nhân dân;",
+              "Căn cứ Kế hoạch số 228/KH-UBND ngày 25/5/2026 của Ủy ban nhân dân Thành phố về tổ chức khám sức khỏe định kỳ cho người dân trên địa bàn Thành phố Hồ Chí Minh năm 2026;",
+              "Căn cứ Kế hoạch số 1250/KH-KHTN ngày 04/9/2026 của Hiệu trưởng Trường Đại học Khoa học tự nhiên, ĐHQG-HCM về việc tổ chức khám sức khỏe định kỳ cho sinh viên năm 2026;"
+            ],
+            "end": [
+              "Căn cứ Nghị quyết số 72-NQ/TW ngày 09 tháng 9 năm 2025 của Bộ Chính trị về một số giải pháp đột phá nhằm tăng cường bảo vệ, chăm sóc và nâng cao sức khỏe Nhân dân;",
+              "Căn cứ Kế hoạch số 228/KH-UBND ngày 25/5/2026 của Ủy ban nhân dân Thành phố về tổ chức khám sức khỏe định kỳ cho người dân trên địa bàn Thành phố Hồ Chí Minh năm 2026;",
+              "Căn cứ Kế hoạch số 1250/KH-KHTN ngày 04/9/2026 của Hiệu trưởng Trường Đại học Khoa học tự nhiên, ĐHQG-HCM về việc tổ chức khám sức khỏe định kỳ cho sinh viên năm 2026;"
+            ]
+          },
+          "time_defaults": {
+            "start": "date_only_0000",
+            "end": "date_only_2359"
+          },
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-86a74af8-01",
+          "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l?rdid=uEyy6zTGL1HAJDpP",
+            "URL_registration": "https://team1vn.xyz"
+          },
+          "title": "HỖ TRỢ TRUYỀN THÔNG",
+          "domain": "skills",
+          "start": "2026-11-02T00:00:00+07:00",
+          "end": "2026-11-30T23:59:00+07:00",
+          "registration_deadline": null,
+          "mode": "online",
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": null,
+          "fee": 0,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "valid",
+          "flags": [],
+          "evidence": {
+            "URL_registration": "https://team1vn.xyz",
+            "title": "HỖ TRỢ TRUYỀN THÔNG",
+            "domain": "kỹ năng",
+            "start": [
+              "Thực hiện nhiệm vụ thúc đẩy hệ sinh thái đổi mới sáng tạo, chuyển đổi số và nâng cao kỹ năng công nghệ cho sinh viên trong toàn hệ thống ĐHQG-HCM, Trung tâm Đổi mới sáng tạo ĐHQG-HCM (VIH) phối hợp cùng Team1 Việt Nam tổ chức chuỗi chương trình và cuộc thi phát triển ứng dụng công nghệ \"Avalanche Team1 UniHack HCMC 2026\", diễn ra từ ngày 02/11/2026 đến ngày 30/11/2026.",
+              "- Thời gian diễn ra chương trình: 2/11 - 30/11"
+            ],
+            "end": [
+              "Thực hiện nhiệm vụ thúc đẩy hệ sinh thái đổi mới sáng tạo, chuyển đổi số và nâng cao kỹ năng công nghệ cho sinh viên trong toàn hệ thống ĐHQG-HCM, Trung tâm Đổi mới sáng tạo ĐHQG-HCM (VIH) phối hợp cùng Team1 Việt Nam tổ chức chuỗi chương trình và cuộc thi phát triển ứng dụng công nghệ \"Avalanche Team1 UniHack HCMC 2026\", diễn ra từ ngày 02/11/2026 đến ngày 30/11/2026.",
+              "- Thời gian diễn ra chương trình: 2/11 - 30/11"
+            ],
+            "mode": "online",
+            "fee": "Miễn phí"
+          },
+          "time_defaults": {
+            "start": "date_only_0000",
+            "end": "date_only_2359"
+          },
+          "year_from_posted": [
+            "start",
+            "end"
+          ],
+          "derived": {
+            "location": "cleared_for_online"
+          },
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid02fsjfr4MEtTjN9TpVw3DvfWumQm7Wx2GGE56n7J51Y8sh4brg3p4k1uwhX41h26FFl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-7a083fa9-01",
+          "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid02fsjfr4MEtTjN9TpVw3DvfWumQm7Wx2GGE56n7J51Y8sh4brg3p4k1uwhX41h26FFl?rdid=PArszlPnHChIrwKY",
+            "URL_registration": "https://datastudio.google.com/.../e586d666.../page/cRFBG"
+          },
+          "title": "KHÁM SỨC KHỎE ĐỊNH KỲ CHO SINH VIÊN ĐỢT 1 NĂM 2026: 2 NGÀY ĐẦU TIÊN",
+          "domain": null,
+          "start": "2026-09-24T00:00:00+07:00",
+          "end": "2026-10-26T23:59:00+07:00",
+          "registration_deadline": null,
+          "mode": "offline",
+          "location": "Hội trường B và Phòng tự học (bên cạnh Hội trường B), cơ sở Khu đô thị ĐHQG-HCM",
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": null,
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "valid",
+          "flags": [],
+          "evidence": {
+            "URL_registration": "https://datastudio.google.com/.../e586d666.../page/cRFBG",
+            "title": "KHÁM SỨC KHỎE ĐỊNH KỲ CHO SINH VIÊN ĐỢT 1 NĂM 2026: 2 NGÀY ĐẦU TIÊN",
+            "start": [
+              "Các sinh viên đã đăng ký địa điểm khám sức khỏe tại cơ sở 2 (theo thông báo ngày 24/9/2026) nhưng chưa đăng ký ngày khám cụ thể (theo thông báo ngày 08/10/2026), Nhà trường sẽ bố trí sinh viên khám vào ngày 26/10/2026.",
+              "Các trường hợp đã đăng ký ngày chủ nhật sẽ được bố trí khám vào ngày 26/10/2026 (thứ 2) do Bệnh viện không nhận khám vào chủ nhật."
+            ],
+            "end": [
+              "Các sinh viên đã đăng ký địa điểm khám sức khỏe tại cơ sở 2 (theo thông báo ngày 24/9/2026) nhưng chưa đăng ký ngày khám cụ thể (theo thông báo ngày 08/10/2026), Nhà trường sẽ bố trí sinh viên khám vào ngày 26/10/2026.",
+              "Các trường hợp đã đăng ký ngày chủ nhật sẽ được bố trí khám vào ngày 26/10/2026 (thứ 2) do Bệnh viện không nhận khám vào chủ nhật."
+            ],
+            "location": "Hội trường B và Phòng tự học (bên cạnh Hội trường B), cơ sở Khu đô thị ĐHQG-HCM",
+            "mode": "Hội trường B và Phòng tự học (bên cạnh Hội trường B), cơ sở Khu đô thị ĐHQG-HCM"
+          },
+          "time_defaults": {
+            "start": "date_only_0000",
+            "end": "date_only_2359"
+          },
+          "year_from_posted": [],
+          "derived": {
+            "mode": "venue_physical"
+          },
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-aff9ac6f-01",
+          "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl?rdid=4T4m6qT6fR0mZdVn",
+            "URL_registration": "https://courses.hcmus.edu.vn/course/view.php?id=25541"
+          },
+          "title": "KHTN ZERO+ 2026 | SINH VIÊN KHTN ƠI, CÙNG THAM GIA THI TRỰC TUYẾN!",
+          "domain": "skills",
+          "start": "2026-10-19T08:00:00+07:00",
+          "end": "2026-10-23T23:59:00+07:00",
+          "registration_deadline": null,
+          "mode": "online",
+          "location": null,
+          "points": null,
+          "drl_recognized": true,
+          "mandatory": null,
+          "audience": null,
+          "fee": null,
+          "completion_requirements": "Sinh viên hoàn thành 70% bài thi: được ghi nhận tham gia hoạt động tại học kỳ 1/2026-2027"
+        },
+        "meta": {
+          "status": "valid",
+          "flags": [],
+          "evidence": {
+            "URL_registration": "https://courses.hcmus.edu.vn/course/view.php?id=25541",
+            "title": "KHTN ZERO+ 2026 | SINH VIÊN KHTN ƠI, CÙNG THAM GIA THI TRỰC TUYẾN!",
+            "domain": "kỹ năng",
+            "start": "Từ 08g00 ngày 19/10 đến hết ngày 23/10/2026",
+            "end": "Từ 08g00 ngày 19/10 đến hết ngày 23/10/2026",
+            "mode": "Thi trực tuyến trên hệ thống Moodle của Trường",
+            "drl_recognized": "ghi nhận tham gia hoạt động",
+            "completion_requirements": "Sinh viên hoàn thành 70% bài thi: được ghi nhận tham gia hoạt động tại học kỳ 1/2026-2027"
+          },
+          "time_defaults": {
+            "end": "date_only_2359"
+          },
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-5479351c-01",
+          "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl?rdid=m7xQl8X6DqnZ4h0R",
+            "URL_registration": "https://forms.cloud.microsoft/r/PfCU6uHVRa"
+          },
+          "title": "THÔNG BÁO Chuyên đề “Sinh viên với kỹ năng tham gia giao thông và đảm bảo trật tự, an toàn giao thông đường bộ”",
+          "domain": "skills",
+          "start": "2026-10-17T08:00:00+07:00",
+          "end": null,
+          "registration_deadline": null,
+          "mode": "offline",
+          "location": "Hội trường B, Trường ĐH Khoa học tự nhiên, ĐHQG-HCM (cơ sở Khu đô thị ĐHQG-HCM)",
+          "points": null,
+          "drl_recognized": true,
+          "mandatory": null,
+          "audience": [
+            "Sinh viên Trường ĐH Khoa học tự nhiên"
+          ],
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "valid",
+          "flags": [],
+          "evidence": {
+            "URL_registration": "https://forms.cloud.microsoft/r/PfCU6uHVRa",
+            "title": "THÔNG BÁO Chuyên đề “Sinh viên với kỹ năng tham gia giao thông và đảm bảo trật tự, an toàn giao thông đường bộ”",
+            "domain": "kỹ năng",
+            "start": "08g00, ngày 17/10/2026 (thứ 7)",
+            "location": "Hội trường B, Trường ĐH Khoa học tự nhiên, ĐHQG-HCM (cơ sở Khu đô thị ĐHQG-HCM)",
+            "drl_recognized": "ghi nhận tham gia hoạt động",
+            "audience": "Sinh viên Trường ĐH Khoa học tự nhiên",
+            "mode": "Hội trường B, Trường ĐH Khoa học tự nhiên, ĐHQG-HCM (cơ sở Khu đô thị ĐHQG-HCM)"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {
+            "mode": "venue_physical"
+          },
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-ce99c117-01",
+          "source": {
+            "publisher": "Đội Sinh Viên Tình Nguyện - Khoa Toán Tin Học",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/doisvtnkhoatoantin/posts/pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl?rdid=5S41MGdQVqVlOJkf",
+            "URL_registration": "https://forms.gle/8fTaa1qxYzU2BCR47"
+          },
+          "title": "Ánh trăng rằm tháng Tám không chỉ mang theo hương vị ngọt ngào của bánh nướng, bánh dẻo mà còn thắp sáng những nụ cười và ước mơ trẻ thơ. Tuy vậy, không phải tuổi thơ nào cũng rực rỡ ánh lồng đèn, và trung thu trọn vẹn cũng không tự nhiên mà có. Các em đang chờ đợi một phép màu xảy đến, để đêm rằm tháng tám không còn chỉ là những ước mơ dang dở nữa.",
+          "domain": "volunteer",
+          "start": "2026-09-27T07:30:00+07:00",
+          "end": "2026-09-27T19:00:00+07:00",
+          "registration_deadline": null,
+          "mode": null,
+          "location": "Lớp học tình thương (Miếu cây gõ, 87 Đ Bình Thung, Đông Hòa, thành phố Hồ Chí Minh)",
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": [
+            "40 sinh viên"
+          ],
+          "fee": 50000,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "partial",
+          "flags": [
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "URL_registration": "https://forms.gle/8fTaa1qxYzU2BCR47",
+            "title": "Ánh trăng rằm tháng Tám không chỉ mang theo hương vị ngọt ngào của bánh nướng, bánh dẻo mà còn thắp sáng những nụ cười và ước mơ trẻ thơ. Tuy vậy, không phải tuổi thơ nào cũng rực rỡ ánh lồng đèn, và trung thu trọn vẹn cũng không tự nhiên mà có. Các em đang chờ đợi một phép màu xảy đến, để đêm rằm tháng tám không còn chỉ là những ước mơ dang dở nữa.",
+            "domain": "Tình Nguyện",
+            "start": "Từ 07h30 đến 19h00 ngày 27/09/2026",
+            "end": "Từ 07h30 đến 19h00 ngày 27/09/2026",
+            "location": "Lớp học tình thương (Miếu cây gõ, 87 Đ Bình Thung, Đông Hòa, thành phố Hồ Chí Minh)",
+            "audience": "40 sinh viên",
+            "fee": "Lệ phí tham gia: 50.000 vnđ"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-1b9b9e20-01",
+          "source": {
+            "publisher": "Đội Sinh Viên Tình Nguyện - Khoa Toán Tin Học",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/doisvtnkhoatoantin/posts/pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl?rdid=OHbLft1qLD5mGcmk",
+            "URL_registration": "https://forms.gle/2MpDsrvqSFTcGH3W8"
+          },
+          "title": "HOA MÙA HÈ - VÌ TRẺ EM NGOẠI THÀNH 2026 - MỞ FORM ĐĂNG KÍ",
+          "domain": "volunteer",
+          "start": "2026-05-16T06:00:00+07:00",
+          "end": "2026-05-17T12:30:00+07:00",
+          "registration_deadline": null,
+          "mode": null,
+          "location": "Trường Tiểu học Sông Thao (xã Bàu Hàm, tỉnh Đồng Nai)",
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": null,
+          "fee": 140000,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "partial",
+          "flags": [
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "URL_registration": "https://forms.gle/2MpDsrvqSFTcGH3W8",
+            "title": "HOA MÙA HÈ - VÌ TRẺ EM NGOẠI THÀNH 2026 - MỞ FORM ĐĂNG KÍ",
+            "domain": "tình nguyện",
+            "start": "Từ 06h00 ngày 16/05/2026 đến 12h30 ngày 17/05/2026",
+            "end": "Từ 06h00 ngày 16/05/2026 đến 12h30 ngày 17/05/2026",
+            "location": "Trường Tiểu học Sông Thao (xã Bàu Hàm, tỉnh Đồng Nai)",
+            "fee": "Lệ phí: 140.000 VNĐ"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-9daf7ed3-01",
+          "source": {
+            "publisher": "Đội Sinh Viên Tình Nguyện - Khoa Toán Tin Học",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/doisvtnkhoatoantin/posts/pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl?rdid=JOKk1K5nGyFttIPF",
+            "URL_registration": "https://tinyurl.com/hatnangdem"
+          },
+          "title": "Tháng tư lại về … Xuân chưa nỡ rời xa",
+          "domain": "volunteer",
+          "start": null,
+          "end": null,
+          "registration_deadline": null,
+          "mode": null,
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": [
+            "30 - 35 sinh viên"
+          ],
+          "fee": 40000,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "failed",
+          "flags": [
+            "invalid_value:start",
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "URL_registration": "https://tinyurl.com/hatnangdem",
+            "title": "Tháng tư lại về … Xuân chưa nỡ rời xa",
+            "domain": "tình nguyện",
+            "audience": "30 - 35 sinh viên",
+            "fee": "Lệ phí: 40.000 VNĐ"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-6d0acebb-01",
+          "source": {
+            "publisher": "SAB in HCMUS",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/sab.ctda/posts/pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l?rdid=tjSkLDHo0LUDXJsH",
+            "URL_registration": "https://t.sab.edu.vn/fsl26_form"
+          },
+          "title": "FIT SUPER LEAGUE 2026",
+          "domain": "skills",
+          "start": "2026-03-14T18:00:00+07:00",
+          "end": "2026-04-04T21:00:00+07:00",
+          "registration_deadline": null,
+          "mode": null,
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": null,
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "partial",
+          "flags": [
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "URL_registration": "https://t.sab.edu.vn/fsl26_form",
+            "title": "FIT SUPER LEAGUE 2026",
+            "domain": "kĩ năng",
+            "start": "Thời gian thi đấu: 14/03/2026 - 04/04/2026. (Vào 18h - 21h các ngày thứ 7, Chủ nhật hàng tuần)",
+            "end": "Thời gian thi đấu: 14/03/2026 - 04/04/2026. (Vào 18h - 21h các ngày thứ 7, Chủ nhật hàng tuần)"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid026SJmz8cRXUkDwHvJrZyZv4bsikCC1t4pdDBt46gTuwxaTkBKtSHvCPvwJH1KJ47l",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-23cfd95a-01",
+          "source": {
+            "publisher": "FIT HCMUS Kênh Hoạt động",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/fit.hcmus.hoatdong/posts/pfbid026SJmz8cRXUkDwHvJrZyZv4bsikCC1t4pdDBt46gTuwxaTkBKtSHvCPvwJH1KJ47l?rdid=jGLRcXWCNsEHd6dH",
+            "URL_registration": null
+          },
+          "title": "- MỞ FORM ĐĂNG KÝ",
+          "domain": "skills",
+          "start": null,
+          "end": null,
+          "registration_deadline": null,
+          "mode": null,
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": [
+            "Các bạn Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+          ],
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "partial",
+          "flags": [
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "title": "- MỞ FORM ĐĂNG KÝ",
+            "domain": "kỹ năng",
+            "audience": "Các bạn Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-1f7d4d46-01",
+          "source": {
+            "publisher": "FIT HCMUS Kênh Hoạt động",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/fit.hcmus.hoatdong/posts/pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl?rdid=cLA0wHapkTLSz1qG",
+            "URL_registration": "https://link.hcmus.edu.vn/OLP-AI-HCMUS26"
+          },
+          "title": "Đăng ký đội thi Olympic AI HCMUS 2026",
+          "domain": "academic",
+          "start": "2026-10-11T00:00:00+07:00",
+          "end": null,
+          "registration_deadline": "2026-10-08T23:59:00+07:00",
+          "mode": "offline",
+          "location": "Cơ sở Nguyễn Văn Cừ, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": [
+            "sinh viên trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+          ],
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "valid",
+          "flags": [],
+          "evidence": {
+            "URL_registration": "https://link.hcmus.edu.vn/OLP-AI-HCMUS26",
+            "title": "Đăng ký đội thi Olympic AI HCMUS 2026",
+            "domain": "Olympic",
+            "start": "Thời gian thi đấu dự kiến: Trưa Chủ nhật, 11/10/2026",
+            "registration_deadline": "Hạn chót đăng ký: 8/10/2026 ( hoặc đóng sớm nếu đã đủ đội đăng ký - dự kiến là 30 đội)",
+            "location": "Cơ sở Nguyễn Văn Cừ, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+            "audience": "sinh viên trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+            "mode": "Cơ sở Nguyễn Văn Cừ, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+          },
+          "time_defaults": {
+            "start": "date_only_0000",
+            "registration_deadline": "date_only_2359"
+          },
+          "year_from_posted": [],
+          "derived": {
+            "mode": "venue_physical"
+          },
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-3faad37b-01",
+          "source": {
+            "publisher": "FIT HCMUS Kênh Hoạt động",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/fit.hcmus.hoatdong/posts/pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl?rdid=nQKoyzGVYjAKszOS",
+            "URL_registration": "https://link.hcmus.edu.vn/OLP-HCMUS26"
+          },
+          "title": "Thông báo v/v đăng ký tham dự Kỳ thi Olympic tin học sinh viên trường Đại học Khoa học tự nhiên năm 2026",
+          "domain": "academic",
+          "start": "2026-10-04T23:59:00+07:00",
+          "end": "2026-10-25T07:30:00+07:00",
+          "registration_deadline": null,
+          "mode": null,
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": null,
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "partial",
+          "flags": [
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "URL_registration": "https://link.hcmus.edu.vn/OLP-HCMUS26",
+            "title": "Thông báo v/v đăng ký tham dự Kỳ thi Olympic tin học sinh viên trường Đại học Khoa học tự nhiên năm 2026",
+            "domain": "Olympic",
+            "start": [
+              "- Đăng ký tham dự: đến 23g59, Chủ nhật 04/10/2026",
+              "- Nộp cam kết tham dự: 05–08/10/2026.",
+              "- Duyệt đội và thông báo kết quả: 08–15/10/2026.",
+              "- Vòng cấp trường Olympic-HCMUS 2026: 7g30, Chủ nhật 25/10/2026, thi trực tiếp tại một trong hai cơ sở của Trường. Thí sinh sẽ được thông báo địa điểm qua email."
+            ],
+            "end": [
+              "- Đăng ký tham dự: đến 23g59, Chủ nhật 04/10/2026",
+              "- Nộp cam kết tham dự: 05–08/10/2026.",
+              "- Duyệt đội và thông báo kết quả: 08–15/10/2026.",
+              "- Vòng cấp trường Olympic-HCMUS 2026: 7g30, Chủ nhật 25/10/2026, thi trực tiếp tại một trong hai cơ sở của Trường. Thí sinh sẽ được thông báo địa điểm qua email."
+            ]
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid02buju6UWyad8k9Z4xH1tR5eNwpWsuaZtnwfesY2o8UQzdFh3p7cHemVx24dkaHSdFl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-614e950e-01",
+          "source": {
+            "publisher": "Đoàn khoa - Liên chi Hội CNTT KHTN",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/DoanKhoaLienChiHoi.CNTT.KHTN/posts/pfbid02buju6UWyad8k9Z4xH1tR5eNwpWsuaZtnwfesY2o8UQzdFh3p7cHemVx24dkaHSdFl?rdid=1KLtY2yU79GvkbpH",
+            "URL_registration": "https://bit.ly/ITogether_2026"
+          },
+          "title": "- “+1 MÁY” LÊN KÈO, VÈO VÈO CHẠY TRẠM",
+          "domain": "volunteer",
+          "start": null,
+          "end": null,
+          "registration_deadline": null,
+          "mode": null,
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": null,
+          "fee": null,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "partial",
+          "flags": [
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "URL_registration": "https://bit.ly/ITogether_2026",
+            "title": "- “+1 MÁY” LÊN KÈO, VÈO VÈO CHẠY TRẠM",
+            "domain": "Tình nguyện"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-8bc5845d-01",
+          "source": {
+            "publisher": "Đoàn khoa - Liên chi Hội CNTT KHTN",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/DoanKhoaLienChiHoi.CNTT.KHTN/posts/pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl?rdid=UlxSTqURl0S4fHqq",
+            "URL_registration": "https://bit.ly/TheoDauChanNguoi2026"
+          },
+          "title": "CUỘC THI TRẮC NGHIỆM TRỰC TUYẾN “THEO DẤU CHÂN NGƯỜI”",
+          "domain": null,
+          "start": null,
+          "end": null,
+          "registration_deadline": null,
+          "mode": "online",
+          "location": null,
+          "points": null,
+          "drl_recognized": true,
+          "mandatory": null,
+          "audience": null,
+          "fee": null,
+          "completion_requirements": "Ghi nhận tham gia: Sinh viên đạt từ 23/30 câu đúng trở lên được ghi nhận tham gia hoạt động học kỳ 2 năm học 2025 - 2026 đối với sinh viên chương trình Chuẩn, hoặc học kỳ 3 năm học 2025 - 2026 đối với sinh viên chương trình Đề án"
+        },
+        "meta": {
+          "status": "failed",
+          "flags": [
+            "invalid_value:start"
+          ],
+          "evidence": {
+            "URL_registration": "bit.ly/TheoDauChanNguoi2026",
+            "title": "CUỘC THI TRẮC NGHIỆM TRỰC TUYẾN “THEO DẤU CHÂN NGƯỜI”",
+            "mode": "TRỰC TUYẾN",
+            "drl_recognized": "ghi nhận tham gia hoạt động",
+            "completion_requirements": "Ghi nhận tham gia: Sinh viên đạt từ 23/30 câu đúng trở lên được ghi nhận tham gia hoạt động học kỳ 2 năm học 2025 - 2026 đối với sinh viên chương trình Chuẩn, hoặc học kỳ 3 năm học 2025 - 2026 đối với sinh viên chương trình Đề án"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  },
+  {
+    "post_id": "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al",
+    "drafts": [
+      {
+        "record": {
+          "activity_id": "TMP-d714ef9d-01",
+          "source": {
+            "publisher": "Design ITUS",
+            "platform": "Facebook",
+            "URL_post": "https://www.facebook.com/design.itus/posts/pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al?rdid=zoxy7jxu8FrpkjS4",
+            "URL_registration": null
+          },
+          "title": "- MỞ FORM ĐĂNG KÝ",
+          "domain": "skills",
+          "start": null,
+          "end": null,
+          "registration_deadline": null,
+          "mode": null,
+          "location": null,
+          "points": null,
+          "drl_recognized": null,
+          "mandatory": null,
+          "audience": [
+            "Các bạn Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+          ],
+          "fee": 20000,
+          "completion_requirements": null
+        },
+        "meta": {
+          "status": "partial",
+          "flags": [
+            "needs_review:mode"
+          ],
+          "evidence": {
+            "title": "- MỞ FORM ĐĂNG KÝ",
+            "domain": "kỹ năng",
+            "audience": "Các bạn Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+            "fee": "Lệ phí: 20.000 đ"
+          },
+          "time_defaults": {},
+          "year_from_posted": [],
+          "derived": {},
+          "method": "regex",
+          "model": null,
+          "fallback_from": null,
+          "draft_schema_version": "1.3.0"
+        }
+      }
+    ]
+  }
+]

@@ -22,10 +22,11 @@ The collector's posts file: a JSON array of posts.
 |---|---|---|
 | `post_id` | yes | non-empty string |
 | `url` | yes | the post URL (http/https), becomes `source.URL_post` |
+| `share_url` | no | collector's original sharing link; accepted but not used for extraction, output source or IDs |
 | `raw_content` | yes | the post text, at most 20 000 characters |
 | `publisher` | yes | page or unit that posted it |
 | `platform` | yes | e.g. `facebook` |
-| `date_posted` | no | `YYYY-MM-DD`, used only to fill a missing year (see date rules) |
+| `date_posted` | no | `YYYY-MM-DD` or an ISO datetime (only the date part is used), used only to fill a missing year (see date rules) |
 
 Any other key is an input error. All posts are assumed to contain the real post text.
 `extract(text, source)` can also be called directly, with `source = {publisher, platform, URL_post}`.
@@ -172,7 +173,7 @@ python -m pytest -q tests/sp1
 CLI (regex path) over a posts file:
 
 ```
-PYTHONPATH=src python -m sp1.extractor --input data/raw/posts.json --output data/interim/drafts.json
+PYTHONPATH=src python -m sp1.extractor --input data/raw/source.json --output reports/sp1_output.json
 ```
 
 In PowerShell, set `$env:PYTHONPATH = "src"` first.
@@ -192,12 +193,14 @@ path. `meta.fallback_from` records this.
 ## Evaluation
 
 ```
-PYTHONPATH=src python -m sp1.evaluate --posts data/raw/posts.json --gold data/gold/gold.json --out reports/sp1_eval.md
+PYTHONPATH=src python -m sp1.evaluate --posts data/raw/source.json --gold data/gold/source_gold.json --out reports/sp1_evaluation.md
 ```
 
 The evaluator runs the regex extractor on the posts file and compares the result with the gold file.
 It writes a markdown report and prints the summary. The deliverable needs at least 20 labelled posts;
 `schemas/examples/gold_example.json` has 2 (the two posts in `tests/sp1/fixtures/`).
+`data/gold/source_gold.json` has the collector's 20 posts labelled by Minh Tri (provenance in
+`data/gold/README.md`); results and error analysis: `reports/sp1_test_report.md`.
 
 Gold format: a JSON array, one entry per labelled post.
 
