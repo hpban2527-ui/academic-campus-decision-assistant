@@ -644,6 +644,35 @@ def test_extract_post_maps_fields():
                    "URL_post": POST["url"], "URL_registration": None}
 
 
+def test_share_url_does_not_change_extraction_or_source():
+    post = {**POST, "share_url": "https://www.facebook.com/share/p/original-link/"}
+    assert extract_post(post) == extract_post(POST)
+
+
+def test_share_url_does_not_replace_required_url():
+    post = {k: v for k, v in POST.items() if k != "url"}
+    post["share_url"] = "https://www.facebook.com/share/p/original-link/"
+    with pytest.raises(InputError, match="missing.*url"):
+        extract_post(post)
+
+
+def test_tri_source_file_is_accepted_without_preprocessing():
+    path = SCHEMA_PATH.parents[1] / "data" / "raw" / "source.json"
+    posts = json.loads(path.read_text(encoding="utf-8"))
+    assert len(posts) == 20 and len({p["post_id"] for p in posts}) == 20
+    assert all("share_url" in p for p in posts)
+    results = run_posts(posts)
+    assert len(results) == len(posts)
+    for post, result in zip(posts, results):
+        assert "error" not in result
+        assert result["post_id"] == post["post_id"] and len(result["drafts"]) == 1
+        record = result["drafts"][0]["record"]
+        assert record["source"]["URL_post"] == post["url"]
+        assert record["source"]["publisher"] == post["publisher"]
+        assert record["source"]["platform"] == post["platform"]
+        assert "share_url" not in record["source"]
+
+
 def test_extract_post_rejects_collected_at():
     with pytest.raises(InputError):
         extract_post({**POST, "collected_at": "2026-10-25"})

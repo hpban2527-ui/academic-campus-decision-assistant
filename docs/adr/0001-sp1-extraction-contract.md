@@ -45,6 +45,8 @@ post, checked by code, or explicitly derived and recorded.
 - **D11 Posts file and missing year.** SP1 reads the collector's posts file directly.
   - A missing year is taken from `date_posted`: the posted year, or the next year if the date would
     fall more than 60 days before the post. This is recorded in `meta.year_from_posted`.
+  - Optional `share_url` (the collector's original share link) is accepted and not used:
+    `url` stays `source.URL_post` and the input of the temporary ID (2026-10-26, asked by Binh An).
 - **D12 Scope of v1.** Thematic seminars (chuyên đề A/B) are out of v1. Mandatory items in v1 are
   the required surveys from the handbook (team to confirm).
 - **D13 Mode and location.** `location` is a physical venue only, and only for offline or hybrid
@@ -98,6 +100,9 @@ post, checked by code, or explicitly derived and recorded.
 
 ## Changelog
 
+- **D11 (2026-10-26), no schema change, still 1.3.0**
+  - Posts may carry `share_url`; it is accepted and ignored. `date_posted` may be an ISO datetime;
+    only the date part is used.
 - **D15, D16 (2026-10-25), no schema shape change, still 1.3.0**
   - Money and score ratios are not dates.
   - The registration window gives the deadline.
