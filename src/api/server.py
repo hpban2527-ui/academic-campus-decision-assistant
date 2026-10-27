@@ -544,6 +544,7 @@ def lead_data_audit():
     """Quick read-only audit. Audits are not official rule certification."""
     from api.lead_contract import audit_dataset
     from sp2.drl_engine import audit_rules_config
+    from api.dedup_review import possible_duplicates
     return {
         "mode": "DEMO_ONLY",
         "regulation_id": DRL_RULES_CONFIG.get("regulation", {}).get("regulation_id"),
@@ -552,6 +553,7 @@ def lead_data_audit():
         "rules_needing_review": [r["rule_id"] for r in DRL_RULES_CONFIG.get("rules", [])
                                if r.get("status") != "verified"],
         "dataset": audit_dataset(ACTIVITIES_DATA),
+        "duplicate_candidate_groups": possible_duplicates(load_json(ROOT_DIR / "Collecting_Data/source.json", [])),
     }
 
 
