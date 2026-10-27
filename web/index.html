@@ -70,6 +70,9 @@
   </style>
 </head>
 <body class="min-h-screen antialiased flex flex-col">
+  <div role="status" class="bg-amber-50 border-b border-amber-200 text-amber-900 px-4 py-2 text-center text-xs sm:text-sm font-semibold">
+    DEMO / DỮ LIỆU MINH HỌA — Điểm trên hồ sơ mẫu không phải điểm rèn luyện chính thức. Bài đăng và checkbox không tự xác nhận điểm.
+  </div>
 
   <!-- TOP NAVIGATION BAR -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
@@ -1073,7 +1076,7 @@ Quyền lợi: Sinh viên được ghi nhận 5 điểm rèn luyện khi hoàn t
           if (resp.ok) {
             const data = await resp.json();
             passedCount++;
-            logs.push(`<div class="text-emerald-700 font-bold">✔ [Ca ${i} - ${c.name}]: PASS &rarr; Quyết định: ${data.sp2.decision} (${data.sp2.badge_text}) | Điểm: +${data.sp2.confirmed_added}đ chính thức, +${data.sp2.projected_added}đ dự kiến</div>`);
+            logs.push(`<div class="text-emerald-700 font-bold">ℹ [Ca ${i} - ${c.name}]: API OK &rarr; Quyết định: ${data.sp2.decision} (${data.sp2.badge_text}) | Điểm: +${data.sp2.confirmed_added}đ chính thức, +${data.sp2.projected_added}đ dự kiến</div>`);
           } else {
             logs.push(`<div class="text-rose-600 font-bold">✖ [Ca ${i}]: ERROR HTTP ${resp.status}</div>`);
           }
@@ -1082,7 +1085,7 @@ Quyền lợi: Sinh viên được ghi nhận 5 điểm rèn luyện khi hoàn t
         }
       }
 
-      document.getElementById("batchSummaryBadge").innerText = `${passedCount}/5 PASS (100%)`;
+      document.getElementById("batchSummaryBadge").innerText = `${passedCount}/5 API phản hồi (không phải kiểm thử điểm)`;
       logDiv.innerHTML = logs.join("");
     }
 
@@ -1124,11 +1127,11 @@ Quyền lợi: Sinh viên được ghi nhận 5 điểm rèn luyện khi hoàn t
           return true;
         }
       } catch (err) {
-        console.warn("FastAPI backend not reachable, running in safe fallback mode.");
+        console.warn("FastAPI backend not reachable; analysis disabled (no simulated results).");
       }
       backendAvailable = false;
       document.getElementById('backendStatusPill').className = "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200";
-      document.getElementById('backendStatusText').innerText = "Safe Fallback (Sim)";
+      document.getElementById('backendStatusText').innerText = "API Offline — không mô phỏng điểm";
       return false;
     }
 
@@ -1217,9 +1220,9 @@ Quyền lợi: Sinh viên được ghi nhận 5 điểm rèn luyện khi hoàn t
           }
         }
 
-        // Safe Fallback if API offline or failed
+        // Never substitute fake extraction or invented scores when the API is unavailable.
         if (!result) {
-          result = runClientFallback(reqBody);
+          throw new Error("Không có kết quả API. Kiểm tra máy chủ hoặc dữ liệu đầu vào.");
         }
 
         currentPayload = result;
@@ -1227,6 +1230,7 @@ Quyền lợi: Sinh viên được ghi nhận 5 điểm rèn luyện khi hoàn t
 
       } catch (err) {
         console.error("Evaluation error:", err);
+        alert("Không thể xử lý thông báo: " + err.message);
       } finally {
         btn.disabled = false;
         btn.classList.remove("opacity-70");
@@ -1292,24 +1296,24 @@ Quyền lợi: Sinh viên được ghi nhận 5 điểm rèn luyện khi hoàn t
         dedupPill.classList.add("hidden");
       }
 
-      document.getElementById("decisionRuleCode").innerText = `${sp2.rule?.rule_id || 'R19'} (Tiêu chí ${sp2.rule?.criterion_id || '1.9'})`;
+      document.getElementById("decisionRuleCode").innerText = sp2.rule ? `${sp2.rule.rule_id} (chưa xác minh áp dụng)` : 'Chưa xác minh quy tắc';
       document.getElementById("scoreAnnounced").innerText = rec.points !== null ? rec.points + "đ" : "null";
-      document.getElementById("scoreRule").innerText = "+" + (sp2.rule_points || 0) + "đ";
+      document.getElementById("scoreRule").innerText = sp2.rule_points == null ? "Chưa xác minh" : "+" + sp2.rule_points + "đ";
       document.getElementById("scoreProjected").innerText = "+" + (sp2.projected_added || 0) + "đ";
       document.getElementById("scoreConfirmed").innerText = "+" + (sp2.confirmed_added || 0) + "đ";
 
-      document.getElementById("impactCatName").innerText = `${sp2.category_id} - ${sp2.category_name}`;
-      document.getElementById("impactCatBefore").innerText = sp2.category_before;
-      document.getElementById("impactCatAfter").innerText = sp2.category_after;
-      document.getElementById("impactCatCap").innerText = sp2.category_cap;
-      document.getElementById("impactCatMissing").innerText = sp2.category_missing + "đ";
+      document.getElementById("impactCatName").innerText = sp2.category_id ? `${sp2.category_id} - ${sp2.category_name}` : 'Chưa xác minh danh mục';
+      document.getElementById("impactCatBefore").innerText = sp2.category_before ?? '—';
+      document.getElementById("impactCatAfter").innerText = sp2.category_after ?? '—';
+      document.getElementById("impactCatCap").innerText = sp2.category_cap ?? '—';
+      document.getElementById("impactCatMissing").innerText = sp2.category_missing == null ? '—' : sp2.category_missing + "đ";
       document.getElementById("decisionExplanation").innerText = sp2.explanation;
       document.getElementById("decisionCitation").innerText = sp2.citation || "QĐ 1028/QĐ-KHTN-CTSV";
 
       // Update Live Category Bars and save locally for this student
       const studentId = currentStudent ? currentStudent.student_id : "25127242";
       const scores = getStudentScores(studentId);
-      if (sp2.category_id && scores[sp2.category_id]) {
+      if (sp2.official_award_verified === true && sp2.decision === "CONFIRMED" && sp2.category_id && scores[sp2.category_id]) {
         scores[sp2.category_id].current = sp2.category_after;
         saveStudentScores(studentId, scores);
       }
@@ -1401,7 +1405,7 @@ Quyền lợi: Sinh viên được ghi nhận 5 điểm rèn luyện khi hoàn t
               <h4 class="font-bold text-slate-900 mt-0.5">${a.title}</h4>
             </div>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 whitespace-nowrap">
-              ${a.points_awarded || '+5đ'}
+              ${a.points_awarded || 'Chưa xác minh'}
             </span>
           </div>
           <div class="flex items-center gap-2 text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-100">
@@ -1409,7 +1413,7 @@ Quyền lợi: Sinh viên được ghi nhận 5 điểm rèn luyện khi hoàn t
             <span>•</span>
             <span>Phí: <b>${a.fee === 0 ? 'Miễn phí' : a.fee + 'đ'}</b></span>
             <span>•</span>
-            <span>Quy tắc: <b>${a.rule_id || 'R19'}</b></span>
+            <span>Quy tắc: <b>${a.rule_id || '—'}</b></span>
           </div>
         </div>
       `).join("");
@@ -1441,139 +1445,10 @@ Quyền lợi: Sinh viên được ghi nhận 5 điểm rèn luyện khi hoàn t
     // CLIENT FALLBACK ENGINE
     // ========================================================================
     function runClientFallback(req) {
-      const text = req.raw_content;
-      const flags = [];
-      const evidence = {};
-      const derived = {};
-
-      const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-      const title = lines.length > 0 ? lines[0].replace(/^\[.*?\]\s*/, "") : null;
-      if (!title) flags.push("needs_review:title");
-      else evidence.title = lines[0];
-
-      let domain = "skills";
-      if (/hiến máu|tình nguyện|cộng đồng|quyên góp/i.test(text)) domain = "volunteer";
-      else if (/hướng nghiệp|việc làm|cv|phỏng vấn|tuyển sinh/i.test(text)) domain = "career";
-      else if (/kỹ năng|tập huấn|phòng cháy chữa cháy/i.test(text)) domain = "skills";
-      else if (/chạy bộ|thể thao|văn nghệ|olympic/i.test(text)) domain = "culture_sports";
-      else if (/học thuật|nghiên cứu khoa học/i.test(text)) domain = "academic";
-      evidence.domain = domain;
-
-      const timeMatch = text.match(/Thời gian:\s*([^\n]+)/i);
-      let start = null, end = null;
-      if (timeMatch) {
-        evidence.start = timeMatch[0];
-        const datePart = timeMatch[1].match(/(\d{2})\/(\d{2})\/(\d{4})/);
-        const hours = timeMatch[1].match(/(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})/);
-        if (datePart) {
-          const iso = `${datePart[3]}-${datePart[2]}-${datePart[1]}`;
-          start = `${iso}T${hours ? hours[1] : "00:00"}:00+07:00`;
-          if (hours) end = `${iso}T${hours[2]}:00+07:00`;
-        }
-      }
-
-      const regMatch = text.match(/(?:Thời hạn đăng ký|Hạn đăng ký|Hạn chót):\s*([^\n]+)/i);
-      let regDead = null;
-      if (regMatch) {
-        evidence.registration_deadline = regMatch[0];
-        const m = regMatch[1].match(/(\d{2})\/(\d{2})\/(\d{4})/);
-        if (m) regDead = `${m[3]}-${m[2]}-${m[1]}T23:59:00+07:00`;
-      }
-
-      let mode = null;
-      if (/trực tuyến|online|zoom/i.test(text)) mode = "online";
-      else if (/trực tiếp|offline/i.test(text) || /giảng đường|hội trường|cơ sở/i.test(text)) mode = "offline";
-      evidence.mode = mode || "null";
-
-      const locMatch = text.match(/Địa điểm:\s*([^\n]+)/i);
-      let location = locMatch ? locMatch[1].trim() : (mode === 'offline' ? 'Giảng đường 1, Cơ sở 227 Nguyễn Văn Cừ' : null);
-
-      const ptsMatch = text.match(/(?:cộng|được ghi nhận|quy đổi)\s+(\d+)\s*điểm/i);
-      const points = ptsMatch ? Number(ptsMatch[1]) : (text.includes("10 điểm") ? 10 : 5);
-      evidence.points = points ? `${points} điểm` : "null";
-
-      const compMatch = text.match(/[^.\n]*(?:điểm danh|check-in|minh chứng|giấy chứng nhận|hoàn thành bài thi)[^.\n]*/i);
-      const completion_requirements = compMatch ? compMatch[0].trim() : null;
-
-      if (mode === "online" && !completion_requirements) {
-        flags.push("needs_review:completion_requirements");
-      }
-
-      const isDup = req.post_id === "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl" && req.url.includes("osa.hcmus/posts/pfbid02buJY8Rrn2XezSWbCNxpUnfSH");
-
-      const status = flags.length === 0 ? "valid" : "partial";
-      const draft = {
-        record: {
-          activity_id: status === "valid" && !isDup ? "ACT_021_NEW" : "TMP-01-REVIEW",
-          source: { publisher: req.publisher, platform: req.platform, URL_post: req.url, URL_registration: "https://forms.gle/reg" },
-          title, domain, start, end, registration_deadline: regDead, mode, location, points,
-          drl_recognized: true, mandatory: false, audience: ["Sinh viên HCMUS"], fee: 0, completion_requirements
-        },
-        meta: {
-          status, flags, evidence, derived, is_duplicate: isDup,
-          routed_to: isDup ? "discarded_duplicate" : (status === "valid" ? "activities.json" : "review_queue.json")
-        }
-      };
-
-      let rule = { rule_id: "R19", criterion_id: "1.9", category_id: "C1", name: "Chuyên đề kỹ năng, học thuật", points: 5 };
-      if (/hiến máu/i.test(title)) rule = { rule_id: "R42", criterion_id: "4.2", category_id: "C4", name: "Hiến máu tình nguyện có giấy CN", points: 10 };
-      else if (/olympic/i.test(title) || req.rule_override === "R3101") rule = { rule_id: "R3101", criterion_id: "3.1", category_id: "C3", name: "Thi CT-XH cấp Trường", points: 10 };
-
-      const studentId = currentStudent ? currentStudent.student_id : "25127242";
-      const scores = getStudentScores(studentId);
-      const cData = scores[rule.category_id] || { current: 20, max: 30, name: "Chung" };
-      const room = Math.max(0, cData.max - cData.current);
-      const effective = Math.min(rule.points, room);
-
-      let decision = "PROJECTED";
-      let badge_text = "ĐIỂM DỰ KIẾN (CHỜ MINH CHỨNG)";
-      let projAdded = req.has_evidence ? 0 : effective;
-      let confAdded = req.has_evidence ? effective : 0;
-      let exp = "Chưa có minh chứng check-in hoàn thành. Ghi nhận vào Điểm dự kiến.";
-
-      if (isDup) {
-        decision = "REJECTED_DUPLICATE";
-        badge_text = "BỊ TỪ CHỐI: TRÙNG LẶP (DEDUPLICATOR)";
-        projAdded = 0; confAdded = 0;
-        exp = "Phát hiện bài đăng trùng lặp với hoạt động có sẵn. Từ chối ghi nhận điểm lần 2.";
-      } else if (status !== "valid") {
-        decision = "NEEDS_REVIEW_CALC_05";
-        badge_text = "CHỜ XÁC MINH (CALC_05 / REVIEW QUEUE)";
-        projAdded = 0; confAdded = 0;
-        exp = `Bài đăng thiếu dữ liệu kiểm chứng (${flags.join(", ")}). Chuyển vào review_queue.json, không tự cộng điểm.`;
-      } else if (req.has_evidence) {
-        decision = "CONFIRMED";
-        badge_text = "ĐÃ XÁC NHẬN (+ĐIỂM CHÍNH THỨC)";
-        exp = `Đã nộp minh chứng xác thực. Áp dụng quy chế ${rule.rule_id} vào điểm chính thức.`;
-        if (effective < rule.points) {
-          exp += ` [Áp trần CALC_02]: Nhóm ${rule.category_id} đạt ${cData.current}/${cData.max}đ, chỉ cộng tối đa +${effective}đ.`;
-        }
-      }
-
-      const catAfter = cData.current + effective;
-      return {
-        success: true,
-        sp1: draft,
-        sp2: {
-          decision, badge_text, rule,
-          category_id: rule.category_id,
-          category_name: cData.name,
-          announced_points: points,
-          rule_points: rule.points,
-          projected_added: projAdded,
-          confirmed_added: confAdded,
-          category_before: cData.current,
-          category_after: catAfter,
-          category_cap: cData.max,
-          category_missing: Math.max(0, cData.max - catAfter),
-          citation: "Quyết định 1028/QD-KHTN-CTSV, Phụ lục",
-          explanation: exp
-        },
-        dedup: { is_duplicate: isDup, match_id: isDup ? "pfbid02buJY8Rrn" : null, similarity: isDup ? 0.88 : 0.0 }
-      };
+      throw new Error("Simulated point calculations are intentionally disabled. Run the backend API.");
     }
 
-    function copyRawJson() {
+        function copyRawJson() {
       if (!currentPayload) {
         alert("Chưa có kết quả để sao chép. Vui lòng phân tích một thông báo trước!");
         return;
