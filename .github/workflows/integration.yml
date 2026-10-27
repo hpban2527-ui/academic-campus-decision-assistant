@@ -1,0 +1,28 @@
+name: Project E integration CI
+
+on:
+  push:
+    branches:
+      - "integration/**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install runtime and test dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Verify SP1, SP2 and Lead contracts and E2E
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q tests/sp1 tests/sp2 tests/integration tests/test_e2e_pipeline.py
+      - name: Compile Python source
+        run: python -m compileall -q src tests scripts run_server.py
