@@ -326,253 +326,139 @@ def reset_session_state():
 
 @app.post("/api/evaluate")
 def evaluate_announcement(req: EvaluationRequest):
-    source = {
-        "publisher": req.publisher,
-        "platform": req.platform,
-        "URL_post": req.url,
-    }
+    """Real SP1 extraction; no score is awarded from a post or checkbox alone."""
+    from api.lead_contract import canonical_url, prepare_publication
 
-    # 1. Run SP1 Deterministic Extractor first to obtain normalized activity_id & title
+    source = {"publisher": req.publisher, "platform": req.platform, "URL_post": req.url}
     try:
         drafts = extract(req.raw_content, source, posted_date=req.date_posted)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"SP1 Extractor error: {str(e)}")
+        if not drafts:
+            raise HTTPException(status_code=422, detail="No activity detected in announcement")
+        draft = prepare_publication(drafts[0])
+    except HTTPException:
+        raise
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(status_code=422, detail=f"SP1 input/contract error: {exc}")
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"SP1 extraction error: {exc}")
 
-    if not drafts:
-        raise HTTPException(status_code=400, detail="Không tìm thấy hoạt động nào trong văn bản thông báo.")
-
-    draft = drafts[0]
-    rec = draft["record"]
-    meta = draft["meta"]
-    current_activity_id = rec.get("activity_id")
-
-    # 2. Deduplication Check (MinHash LSH + Catalog Exact Match)
-    # Important: Do not match a post against itself if re-analyzing the same form
-    is_duplicate = False
-    dup_match_id = None
-    dup_sim = 0.0
-
-    # Check exact URL or post_id match against existing catalog (excluding itself)
-    for act in session_activities:
-        act_id = act.get("activity_id")
-        act_src = act.get("source", {})
-        # If this post was created in the current request or shares the exact ID of current form
-        if act_id and act_id == current_activity_id and req.post_id == act_id:
-            continue
-        if (req.url and act_src.get("URL_post") == req.url and act_id != req.post_id and act_id != current_activity_id) or \
-           (req.post_id and act_id == req.post_id and act_id in [s.get("post_id") for s in SOURCE_POSTS]):
-            is_duplicate = True
-            dup_match_id = act_id
-            dup_sim = 1.0
+    rec, meta = draft["record"], draft["meta"]
+    normalized = canonical_url(req.url)
+    dup_match_id, dup_sim = None, 0.0
+    # Re-analysis of an already collected post is a duplicate, including the
+    # same post_id: never count identical content twice.
+    for post in SOURCE_POSTS:
+        try:
+            same_url = canonical_url(post.get("url", "")) == normalized
+        except ValueError:
+            same_url = False
+        if (req.post_id and req.post_id == post.get("post_id")) or same_url:
+            dup_match_id, dup_sim = post.get("post_id"), 1.0
             break
-
-    # LSH match against existing indexed posts (excluding itself)
-    if not is_duplicate and req.raw_content:
+    if dup_match_id is None:
         match = deduplicator.find_duplicate(req.raw_content)
-        if match:
-            cand_id, sim = match
-            # Ensure it is matching a DIFFERENT existing post in the database, not itself!
-            if sim >= 0.75 and cand_id != req.post_id and cand_id != current_activity_id:
-                is_duplicate = True
-                dup_match_id = cand_id
-                dup_sim = round(float(sim), 3)
-
+        if match and match[1] >= 0.75:
+            dup_match_id, dup_sim = match
+    is_duplicate = dup_match_id is not None
     meta["is_duplicate"] = is_duplicate
-    if is_duplicate:
-        meta["routed_to"] = f"discarded_duplicate (MinHash LSH sim: {dup_sim}, match: {dup_match_id})"
-    else:
-        meta["routed_to"] = "activities.json" if meta["status"] == "valid" else "review_queue.json"
-
-    # 3. SP2 Rule Engine Mapping
-    rules_list = DRL_RULES_CONFIG.get("rules", [])
-    rule_map = {r["rule_id"]: r for r in rules_list if "rule_id" in r}
-
-    matched_rule = None
-    if req.rule_override != "auto" and req.rule_override in rule_map:
-        matched_rule = rule_map[req.rule_override]
-    else:
-        title_lower = (rec.get("title") or "").lower()
-        content_lower = req.raw_content.lower()
-
-        if "hiến máu" in title_lower or "hiến máu" in content_lower:
-            matched_rule = rule_map.get("R42")
-        elif any(k in title_lower or k in content_lower for k in ["pccc", "phòng cháy", "kỹ năng", "tập huấn", "chuyên đề"]):
-            matched_rule = rule_map.get("R19")
-        elif any(k in title_lower or k in content_lower for k in ["olympic", "mác - lênin", "mác-lênin"]):
-            matched_rule = rule_map.get("R3101")
-        elif any(k in title_lower or k in content_lower for k in ["chạy bộ", "thể thao", "thanh niên khỏe"]):
-            matched_rule = rule_map.get("R32")
-        elif any(k in title_lower or k in content_lower for k in ["tuyển sinh", "ngày hội việc làm", "hội chợ việc làm"]):
-            matched_rule = rule_map.get("R38")
-        elif rec.get("domain") == "volunteer" or "tình nguyện" in content_lower:
-            matched_rule = rule_map.get("R4301")
-        elif any(k in content_lower for k in ["khảo sát", "điều tra xã hội"]):
-            matched_rule = rule_map.get("R23")
-        elif rec.get("domain") in ["academic", "skills", "career"]:
-            matched_rule = rule_map.get("R19")
-        else:
-            matched_rule = rule_map.get("R19")
-
-    if not matched_rule:
-        matched_rule = {
-            "rule_id": "R19",
-            "criterion_id": "1.9",
-            "category_id": "C1",
-            "name": "Tham gia hội thảo, chuyên đề kỹ năng hoặc học thuật",
-            "points": 5,
-            "unit": "per_activity",
-            "source": {"document_id": "1028/QD-KHTN-CTSV", "location": "Phụ lục, mục 1.9"},
-        }
-
-    category_id = matched_rule.get("category_id", "C1")
-    cat_cfg = STUDENT_BASELINE["category_scores"].get(
-        category_id, {"current": 0, "max": 25, "name": "Chung"}
-    )
-    if req.current_category_scores and category_id in req.current_category_scores:
-        custom_score = req.current_category_scores[category_id]
-        if isinstance(custom_score, dict):
-            current_cat_score = custom_score.get("current", cat_cfg["current"])
-            cat_cap = custom_score.get("max", cat_cfg["max"])
-        elif isinstance(custom_score, (int, float)):
-            current_cat_score = custom_score
-            cat_cap = cat_cfg["max"]
-        else:
-            current_cat_score = cat_cfg["current"]
-            cat_cap = cat_cfg["max"]
-    else:
-        current_cat_score = cat_cfg["current"]
-        cat_cap = cat_cfg["max"]
-
-    announced_points = rec.get("points")
-    rule_points = matched_rule.get("points", 5)
-
-    # 4. Compute SP2 Evaluation Decision
+    meta["routed_to"] = "discarded_duplicate" if is_duplicate else "review_queue"
     if is_duplicate:
         decision = "REJECTED_DUPLICATE"
-        badge_text = "BỊ TỪ CHỐI: TRÙNG LẶP (DEDUPLICATOR)"
-        badge_class = "badge-danger"
-        projected_added = 0
-        confirmed_added = 0
-        cat_after = current_cat_score
-        explanation = (
-            f"Bài đăng đã được ghi nhận trước đó (trùng lặp với {dup_match_id}, "
-            f"độ tương đồng MinHash-LSH đạt {dup_sim * 100:.1f}% >= 75%). "
-            f"Hệ thống từ chối cộng điểm lần 2 để đảm bảo tính trung thực theo quy định."
-        )
-    elif meta["status"] != "valid":
-        decision = "NEEDS_REVIEW_CALC_05"
-        badge_text = "CHỜ XÁC MINH (CALC_05 / REVIEW QUEUE)"
-        badge_class = "badge-warning"
-        projected_added = 0
-        confirmed_added = 0
-        cat_after = current_cat_score
-        explanation = (
-            f"Theo quy tắc CALC_05 (drl_rules.json) và D16 (sp1_extractor): "
-            f"Bản nháp SP1 ở trạng thái '{meta['status']}' do thiếu dữ liệu hoặc cần rà soát "
-            f"({', '.join(meta.get('flags', []))}). Hoạt động được lưu vào review_queue.json, "
-            f"chưa được cộng điểm dự kiến hoặc xác nhận khi chưa có đủ căn cứ minh chứng."
-        )
-        # Add to review queue
-        if not any(r.get("activity_id") == rec.get("activity_id") for r in review_queue):
-            review_queue.append({
-                "activity_id": rec.get("activity_id"),
-                "title": rec.get("title") or "Thông báo cần rà soát",
-                "flags": meta.get("flags", []),
-                "date_posted": req.date_posted,
-                "url": req.url,
-            })
+        explanation = "Bài đăng trùng dữ liệu đã thu thập; không cộng điểm."
+    elif meta.get("status") != "valid" or meta.get("flags"):
+        decision = "NEEDS_REVIEW"
+        explanation = "Trích xuất chưa đủ tin cậy: cần kiểm tra nguồn và trường bị gắn cờ."
     else:
-        # Valid activity -> Apply category cap CALC_02 & Evidence CALC_05
-        room = max(0, cat_cap - current_cat_score)
-        effective_points = min(rule_points, room)
-        is_capped = effective_points < rule_points
+        decision = "PENDING_REVIEW"
+        explanation = "Đã trích xuất. Cần người duyệt nguồn, điều kiện, quy tắc ĐRL và minh chứng hoàn thành trước khi tính điểm."
+    if req.has_evidence:
+        explanation += " Ô chọn 'có minh chứng' chỉ là khai báo của người dùng, chưa phải chứng thực."
 
-        projected_added = 0 if req.has_evidence else effective_points
-        confirmed_added = effective_points if req.has_evidence else 0
-        cat_after = current_cat_score + effective_points
-
-        if req.has_evidence:
-            decision = "CONFIRMED"
-            badge_text = "ĐÃ XÁC NHẬN (+ĐIỂM CHÍNH THỨC)"
-            badge_class = "badge-success"
-            exp_core = f"Sinh viên đã nộp minh chứng xác thực hoàn thành ('{rec.get('completion_requirements') or 'Giấy chứng nhận/Điểm danh'}'). "
-        else:
-            decision = "PROJECTED"
-            badge_text = "ĐIỂM DỰ KIẾN (CHỜ MINH CHỨNG)"
-            badge_class = "badge-primary"
-            exp_core = f"Chưa có minh chứng hoàn thành. Ghi nhận vào Điểm dự kiến (+{projected_added}đ), chưa cộng vào điểm chính thức. "
-
-        if is_capped:
-            exp_cap = (
-                f"[Áp trần CALC_02]: Quy chế {matched_rule.get('rule_id')} ban hành mức +{rule_points}đ, "
-                f"nhưng nhóm {category_id} ({cat_cfg['name']}) của bạn đang đạt {current_cat_score}/{cat_cap}đ "
-                f"(chỉ còn thiếu {room}đ để đạt tối đa). Do đó điểm được ghi nhận tối đa là +{effective_points}đ."
-            )
-        else:
-            exp_cap = f"Áp dụng nguyên vẹn mức +{effective_points}đ theo tiêu chí {matched_rule.get('criterion_id')} ({matched_rule.get('rule_id')})."
-
-        explanation = exp_core + exp_cap
-
-        # Add to valid activities
-        if not any(a.get("activity_id") == rec.get("activity_id") for a in session_activities):
-            session_activities.insert(0, {
-                "activity_id": rec.get("activity_id"),
-                "source": rec.get("source"),
-                "title": rec.get("title"),
-                "domain": rec.get("domain"),
-                "start": rec.get("start"),
-                "end": rec.get("end"),
-                "mode": rec.get("mode"),
-                "location": rec.get("location"),
-                "points": rec.get("points"),
-                "mandatory": rec.get("mandatory"),
-                "audience": rec.get("audience"),
-                "fee": rec.get("fee"),
-                "completion_requirements": rec.get("completion_requirements"),
-                "rule_id": matched_rule.get("rule_id"),
-                "points_awarded": f"+{confirmed_added if req.has_evidence else projected_added}đ ({'Đã xác nhận' if req.has_evidence else 'Dự kiến'})",
-            })
-            # Also index in deduplicator
-            deduplicator.index_post(rec.get("activity_id"), req.raw_content)
-
-    cat_missing_after = max(0, cat_cap - cat_after)
-    total_confirmed_after = min(100, sum(
-        (cat_after if cid == category_id else c["current"])
-        for cid, c in STUDENT_BASELINE["category_scores"].items()
-    ))
-
-    source_info = matched_rule.get("source", {})
-    citation = f"Quyết định {source_info.get('document_id', '1028/QD-KHTN-CTSV')}, {source_info.get('location', 'Phụ lục')}"
-
+    # An arbitrary dropdown rule ID is not verified eligibility evidence.
+    # Only the separate student-snapshot endpoint invokes the real SP2 rules
+    # engine and clearly labels its result as a demo until externally verified.
+    suggestion = None
+    if req.rule_override and req.rule_override != "auto":
+        suggestion = next((r for r in DRL_RULES_CONFIG.get("rules", [])
+                           if r.get("rule_id") == req.rule_override), None)
+        if suggestion is not None:
+            explanation += f" Quy tắc {req.rule_override} do người dùng chọn, chưa được xác nhận áp dụng."
+    if not is_duplicate and not any(x.get("activity_id") == rec["activity_id"] for x in review_queue):
+        review_queue.append({
+            "activity_id": rec["activity_id"], "title": rec["title"],
+            "flags": meta.get("flags", []) + ["source_review_required"],
+            "url": rec["source"]["URL_post"], "date_posted": req.date_posted,
+        })
+    score_cap = None
+    rule_category = suggestion.get("category_id") if suggestion else None
+    if rule_category:
+        score_cap = next((c.get("max_score") for c in DRL_RULES_CONFIG.get("scoring_model", {}).get("category_caps", [])
+                          if c.get("category_id") == rule_category), None)
     return {
         "success": True,
         "sp1": draft,
         "sp2": {
             "decision": decision,
-            "badge_text": badge_text,
-            "badge_class": badge_class,
-            "rule": matched_rule,
-            "category_id": category_id,
-            "category_name": cat_cfg["name"],
-            "announced_points": announced_points,
-            "rule_points": rule_points,
-            "projected_added": projected_added,
-            "confirmed_added": confirmed_added,
-            "category_before": current_cat_score,
-            "category_after": cat_after,
-            "category_cap": cat_cap,
-            "category_missing": cat_missing_after,
-            "total_score_after": total_confirmed_after,
-            "grade_label": get_grade_label(total_confirmed_after),
+            "badge_text": {
+                "REJECTED_DUPLICATE": "BÀI ĐĂNG TRÙNG",
+                "NEEDS_REVIEW": "CẦN KIỂM TRA DỮ LIỆU",
+                "PENDING_REVIEW": "CHỜ DUYỆT / CHƯA CỘNG ĐIỂM",
+            }[decision],
+            "badge_class": "badge-warning",
+            "rule": suggestion,
+            "category_id": rule_category,
+            "category_name": "Chưa xác minh" if not rule_category else rule_category,
+            "announced_points": rec.get("points"),
+            "rule_points": None,
+            "projected_added": 0,
+            "confirmed_added": 0,
+            "category_before": None,
+            "category_after": None,
+            "category_cap": score_cap,
+            "category_missing": None,
+            "total_score_after": None,
+            "grade_label": "Chưa xác minh",
             "explanation": explanation,
-            "citation": citation,
+            "citation": "Nguồn ĐRL cần được kiểm chứng độc lập; không có điểm được xác nhận tại bước này.",
         },
-        "dedup": {
-            "is_duplicate": is_duplicate,
-            "match_id": dup_match_id,
-            "similarity": dup_sim,
-        },
+        "dedup": {"is_duplicate": is_duplicate, "match_id": dup_match_id, "similarity": round(float(dup_sim), 4)},
     }
+
+
+class VerifiedSnapshotRequest(BaseModel):
+    student_profile: dict[str, Any]
+    student_snapshot: dict[str, Any]
+    scope: dict[str, Any]
+    personal_targets: Optional[dict[str, float]] = None
+    required_fields: list[str] = Field(default_factory=list)
+    demo: bool = True
+
+
+@app.post("/api/sp2/evaluate")
+def evaluate_verified_snapshot(req: VerifiedSnapshotRequest):
+    """SP2 rule-to-progress bridge on an explicitly marked demo snapshot.
+
+    Client-supplied evidence_status=VERIFIED is not independent proof of actual
+    student performance, so real awards cannot be certified by this endpoint.
+    """
+    from sp2.drl_engine import DRLEngineError, evaluate_rules_progress
+    if not req.demo:
+        raise HTTPException(status_code=422, detail="Only demo snapshots are supported; official proof is not connected")
+    try:
+        report = evaluate_rules_progress(
+            DRL_RULES_CONFIG, req.student_profile, req.student_snapshot,
+            scope=req.scope, personal_targets=req.personal_targets,
+            required_fields=req.required_fields,
+        )
+    except (DRLEngineError, ValueError, TypeError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return {
+        "mode": "DEMO_ONLY",
+        "official_award_verified": False,
+        "disclaimer": "Calculated from submitted example. Not an official DRL award or verified academic record.",
+        "sp2": report,
+    }
+
 
 # Serve Frontend static files if web directory exists
 if WEB_DIR.exists():
