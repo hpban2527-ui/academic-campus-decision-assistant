@@ -17,7 +17,9 @@ Web: http://localhost:8000. Phải bật server; JavaScript **không** còn cơ 
 - GET /api/activities — dữ liệu hoạt động thu thập, **chưa được xác nhận ĐRL**.
 - GET /api/rules — bộ 75 quy tắc của Tuyền và nguồn.
 - POST /api/evaluate — văn bản + nguồn → SP1 → 14-field candidate → trùng lặp/review. Không cộng điểm từ bài đăng hoặc checkbox.
-- POST /api/sp2/evaluate — chạy **engine của Ngọc với rules của Tuyền** trong chế độ DEMO_ONLY. Phải có snapshot sinh viên được đánh dấu minh chứng hợp lệ trong dữ liệu demo. Trả official_award_verified=false.
+- POST /api/sp2/evaluate — chạy engine của Ngọc trên snapshot mẫu; trả `DEMO_ONLY`, không xác nhận điểm chính thức.
+- POST /api/pipeline/demo — **bài đăng mẫu → SP1 → bước duyệt mô phỏng → rule R19 → engine SP2**; so sánh điểm dự kiến với minh chứng mô phỏng. Chỉ chấp nhận kịch bản mẫu phía server, không cho client tự duyệt.
+- GET /api/lead/audit — kiểm tra chất lượng dataset, rules đang cần review và nhóm thông báo trùng có đầy đủ nguồn.
 
 Ví dụ input POST /api/sp2/evaluate:
 
@@ -25,7 +27,7 @@ Ví dụ input POST /api/sp2/evaluate:
 {"demo":true,"student_profile":{"university":"HCMUS"},"scope":{"universities":["HCMUS"]},"student_snapshot":{"status":"CONFIRMED","evidence_status":"VERIFIED","values":{"semester_gpa":8.5,"academic_exam_violations":0}},"personal_targets":{"C1":30}}
 ~~~
 
-Kết quả logic minh họa C1 = 25/30, còn thiếu 5; **không** phải kết quả ĐRL chính thức.
+Kết quả logic minh họa C1 = 20/30, còn thiếu 10; **không** phải kết quả ĐRL chính thức.
 
 ## Hợp đồng đã khóa
 
@@ -45,12 +47,33 @@ python -m compileall -q src tests scripts run_server.py
 
 Trên PowerShell, đặt $env:PYTHONPATH = "src" trước khi chạy lệnh pytest. CI: .github/workflows/integration.yml.
 
-## Chưa thể gọi là nghiệm thu cuối
+## Kết quả đã kiểm thử
 
-- Duyên báo 20 bài: 7 valid, 10 partial, 3 failed; 5/7 valid còn sai ít nhất một trường. Cần review thủ công/lỗi ngày được sửa và đo lại.
-- R22 và R23 của Tuyền có điều kiện trùng; R4302 có ngưỡng "one_week" không phải số. Engine đánh dấu chưa thể tự chấm; phải đối chiếu văn bản quy chế trước khi sửa.
-- Dữ liệu Trí có bài đăng chéo và nguồn tổ chức khác nguồn chia sẻ; giữ URL nguồn/ghi nhận xung đột.
-- Checkbox has_evidence, lựa chọn rule_override và tự gửi "VERIFIED" từ trình duyệt không được coi là xác minh độc lập. Để xác nhận điểm chính thức cần nguồn dữ liệu/thẩm quyền từ trường.
-- Frontend có hồ sơ và số điểm mẫu; đã gắn banner DEMO, không phù hợp dùng trực tiếp cho hồ sơ thật.
+CI: [GitHub Actions](https://github.com/hpban2527-ui/academic-campus-decision-assistant/actions). Trên commit được ghi ở `reports/LEAD_INTEGRATION_CI_20261027.md`, backend và integration đã chạy qua GitHub Actions; số lượng test có thể tăng sau mỗi commit.
 
-Chỉ mở nhánh/PR để review, **không merge main**.
+Kịch bản API mới:
+
+~~~bash
+curl -X POST http://localhost:8000/api/pipeline/demo -H "Content-Type: application/json" -d '{"case_id":1}'
+curl -X POST http://localhost:8000/api/pipeline/demo -H "Content-Type: application/json" -d '{"case_id":1,"with_demo_confirmation":true}'
+~~~
+
+- Trường hợp chưa có minh chứng: điểm **dự kiến**, không tăng điểm đã xác nhận.
+- Trường hợp có minh chứng từ fixture phía server: chỉ tính **xác nhận trong demo**, không được hiểu là xác nhận chính thức.
+- Không tự chọn quy tắc bằng từ khóa; mapping `rule_id` nằm trong bản duyệt.
+- Không tự cộng hoạt động có trong danh sách đã tính; áp trần qua engine SP2.
+- Mọi hoạt động được regex trả `valid` vẫn cần người duyệt. P08 với ngày trích dẫn từ thông báo cũ sẽ bị gắn cờ.
+- Bài trùng vẫn giữ các URL và đơn vị đăng, đưa về review.
+
+## Quy chế và giới hạn
+
+- Quyết định 1028 (phụ lục mục 1.1): **R11 = 10 điểm**; đã sửa riêng bản trên nhánh tích hợp và cập nhật expected outputs.
+- Mục 2.2: **R22** là đánh giá trên 50% môn học; **R23** không có căn cứ độc lập trong phụ lục đang đối chiếu, đã đặt `needs_review` để không tự cộng.
+- Mục 4.3: **R4302** dùng phân nhóm thời lượng đã xác minh `24_hours_to_under_one_week`, không chuyển "một tuần" thành 168 giờ lao động.
+- Sổ tay HCMUS đã đăng khung của **Thông tư 40/2026** với cơ cấu điểm mới. Khả năng áp dụng bộ 1028 cho học kỳ hiện tại phải được xác nhận với nhà trường. Toàn bộ đầu ra trên nhánh này chỉ là **demo**, không phải điểm ĐRL chính thức.
+- Chưa có hệ thống xác thực minh chứng của HCMUS hoặc quy trình phê duyệt nhân sự thực tế. Test dùng bản duyệt và giấy xác nhận **giả lập, có gắn nhãn**.
+- Phần UI do Tiến phụ trách; Lead chỉ quản lý hợp đồng API, kiểm thử và merge sau khi review.
+
+Nguồn và danh sách các hạn chế: `docs/REGULATION_SOURCE_AUDIT_20261027.md`, `docs/LEAD_INTEGRATION_HANDOFF.md`.
+
+Chưa merge `main` khi chưa được approval theo ruleset và xác minh điều kiện nghiệm thu.
