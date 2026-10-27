@@ -141,6 +141,8 @@ def test_api_reviewer_fixture_is_explicitly_demo_only():
     assert r.json()["mode"] == "DEMO_ONLY"
     assert r.json()["official_award_verified"] is False
     assert r.json()["sp2"]["confirmed_added"] == 0
+    assert r.json()["sp2"]["status"] == "PROJECTED"
+    assert r.json()["sp2"]["projected_added"] == 5
 
 
 def test_audit_includes_quarantined_rule_and_data_quality():
@@ -148,3 +150,11 @@ def test_audit_includes_quarantined_rule_and_data_quality():
     assert r.status_code == 200, r.text
     assert "R23" in r.json()["rules_needing_review"]
     assert r.json()["dataset"]["total"] >= 20
+
+
+def test_api_demo_verification_is_not_official():
+    r = CLIENT.post("/api/pipeline/demo", json={"case_id": 1, "with_demo_confirmation": True})
+    assert r.status_code == 200, r.text
+    assert r.json()["sp2"]["status"] == "DEMO_CONFIRMED"
+    assert r.json()["sp2"]["confirmed_added"] == 5
+    assert r.json()["official_award_verified"] is False
