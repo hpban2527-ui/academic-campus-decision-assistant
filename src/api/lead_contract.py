@@ -111,6 +111,25 @@ def prepare_publication(draft: dict) -> dict:
         flags.append("invalid_value:activity_contract")
     if set(source) != {"publisher", "platform", "URL_post", "URL_registration"}:
         flags.append("invalid_value:source")
+    # Regex can accidentally treat quoted older notices, registration dates,
+    # anniversaries or decision numbers as the actual event schedule (P08).
+    # Flag unlabelled date evidence, even when the extractor returns "valid".
+    evidence = meta.get("evidence") or {}
+    if isinstance(evidence, dict):
+        for key in ("start", "end"):
+            proof = evidence.get(key)
+            if isinstance(proof, list) and proof:
+                flag_terms = ("theo thông báo ngày", "căn cứ nghị quyết", "căn cứ kế hoạch",
+                              "đăng ký tham dự:", "đăng ký", "các mốc thời gian")
+                joined = " ".join(str(v).casefold() for v in proof)
+                if any(term in joined for term in flag_terms):
+                    flags.append("needs_review:" + key + "_date_provenance")
+    reg_url = source.get("URL_registration")
+    if reg_url is not None:
+        if not isinstance(reg_url, str) or "..." in reg_url:
+            flags.append("needs_review:URL_registration")
+        elif urlsplit(reg_url).scheme not in {"http", "https"} or not urlsplit(reg_url).netloc:
+            flags.append("needs_review:URL_registration")
     meta["flags"] = sorted(set(flags))
     # The source extractor has known unflagged date errors on its validation set:
     # a "valid" draft must not bypass human review.
