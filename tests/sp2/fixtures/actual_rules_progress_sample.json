@@ -1,0 +1,51 @@
+{
+  "description": "Confirmed HCMUS semester snapshot evaluated with the shared DRL rules",
+  "input": {
+    "student_profile": {
+      "student_id": "demo-student-001",
+      "university": "HCMUS"
+    },
+    "student_snapshot": {
+      "record_id": "semester-2026-1",
+      "status": "CONFIRMED",
+      "evidence_status": "VERIFIED",
+      "values": {
+        "semester_gpa": 8.5,
+        "academic_exam_violations": 0
+      }
+    },
+    "scope": {
+      "universities": [
+        "HCMUS"
+      ]
+    },
+    "personal_targets": {
+      "C1": 30
+    }
+  },
+  "expected_output": {
+    "rule_resolution": "APPLICABLE",
+    "matched_rules": [
+      {
+        "rule_id": "R11",
+        "criterion_id": "1.1",
+        "points": 15
+      },
+      {
+        "rule_id": "R1203",
+        "criterion_id": "1.2",
+        "points": 10
+      }
+    ],
+    "category": {
+      "code": "C1",
+      "raw_score": 25,
+      "score": 25,
+      "max_score": 30,
+      "target": 30,
+      "remaining": 5
+    },
+    "confirmed_total": 25,
+    "pending_items": []
+  }
+}
