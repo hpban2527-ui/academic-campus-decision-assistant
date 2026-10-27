@@ -69,6 +69,18 @@ def _jsonish(value: Any) -> Any:
     return value
 
 
+def _condition_signature(rule: Mapping[str, Any]) -> tuple[Any, ...]:
+    condition = rule.get("condition", {})
+    if not isinstance(condition, Mapping):
+        return (rule.get("criterion_id"), None, None, None)
+    return (
+        rule.get("criterion_id"),
+        condition.get("field"),
+        condition.get("operator"),
+        _jsonish({key: value for key, value in condition.items() if key != "field"}),
+    )
+
+
 def audit_rules_config(config: Mapping[str, Any]) -> list[dict[str, str]]:
     """Check the rules file and return errors or warnings."""
 
@@ -196,12 +208,7 @@ def audit_rules_config(config: Mapping[str, Any]) -> list[dict[str, str]]:
                     )
                 )
 
-        signature = (
-            rule.get("criterion_id"),
-            field,
-            operator,
-            _jsonish({k: v for k, v in condition.items() if k != "field"}),
-        )
+        signature = _condition_signature(rule)
         previous = condition_signatures.get(signature)
         if previous and isinstance(rule_id, str):
             issues.append(
@@ -307,7 +314,19 @@ def evaluate_rule_conditions(
     rules = config["rules"]
     scoring = config["scoring_model"]
     matched: list[dict[str, Any]] = []
+    skipped_rules: list[dict[str, str]] = []
     by_category_raw: dict[str, float] = {}
+    seen_conditions: dict[tuple[Any, ...], str] = {}
+    relevant_configuration_issues: list[dict[str, str]] = []
+
+    for issue in configuration_issues:
+        if issue["severity"] != "error" or not issue["path"].startswith("rules["):
+            continue
+        index = int(issue["path"].split("[")[1].split("]")[0])
+        condition = rules[index].get("condition", {})
+        field = condition.get("field") if isinstance(condition, Mapping) else None
+        if field in student_record and student_record[field] is not None:
+            relevant_configuration_issues.append(issue)
 
     for index, rule in enumerate(rules):
         # Skip the broken rule but keep checking the other rules.
@@ -320,6 +339,16 @@ def evaluate_rule_conditions(
         actual = student_record[field]
         if not _condition_matches(condition, actual):
             continue
+        signature = _condition_signature(rule)
+        if signature in seen_conditions:
+            skipped_rules.append(
+                {
+                    "rule_id": str(rule["rule_id"]),
+                    "reason": f"same condition already matched by {seen_conditions[signature]}",
+                }
+            )
+            continue
+        seen_conditions[signature] = str(rule["rule_id"])
         multiplier = _repeat_count(rule, actual)
         awarded = rule["points"] * multiplier
         matched.append(
@@ -373,10 +402,11 @@ def evaluate_rule_conditions(
         "category_scores": by_category,
         "raw_total_before_cap": _clean_number(raw_total),
         "final_score": _clean_number(final_score),
-        "needs_review": bool(missing)
-        or any(issue["severity"] == "error" for issue in configuration_issues),
+        "needs_review": bool(missing or relevant_configuration_issues or skipped_rules),
         "missing_fields": missing,
+        "skipped_rules": skipped_rules,
         "configuration_issues": configuration_issues,
+        "relevant_configuration_issues": relevant_configuration_issues,
     }
 
 
@@ -703,8 +733,11 @@ def evaluate_progress(
             )
 
     max_total = rule_set.get("max_total_score")
+    min_total = rule_set.get("min_total_score")
     if _is_number(max_total):
         confirmed_total = min(confirmed_total, max_total)
+    if _is_number(min_total):
+        confirmed_total = max(confirmed_total, min_total)
 
     topic_progress: list[dict[str, Any]] = []
     for raw_code, definition in topic_by_code.items():
@@ -742,3 +775,141 @@ def evaluate_progress(
         "verification_flags": flags,
         "applied_records": applied_records,
     }
+
+
+def _progress_rule_set(
+    config: Mapping[str, Any], scope: Mapping[str, Any]
+) -> dict[str, Any]:
+    scoring = config.get("scoring_model", {})
+    regulation = config.get("regulation", {})
+    if not isinstance(scoring, Mapping) or not isinstance(regulation, Mapping):
+        raise DRLEngineError("regulation and scoring_model must be objects")
+
+    criteria: list[dict[str, Any]] = []
+    known: set[str] = set()
+    for category in scoring.get("category_caps", []):
+        if not isinstance(category, Mapping) or category.get("category_id") is None:
+            continue
+        code = str(category["category_id"])
+        known.add(code)
+        criteria.append(
+            {
+                "code": code,
+                "name": category.get("name"),
+                "max_score": category.get("max_score"),
+                "default_target": None,
+            }
+        )
+
+    for rule in config.get("rules", []):
+        if not isinstance(rule, Mapping) or rule.get("category_id") is None:
+            continue
+        code = str(rule["category_id"])
+        if code not in known:
+            known.add(code)
+            criteria.append(
+                {"code": code, "name": code, "max_score": None, "default_target": None}
+            )
+
+    verified = (
+        str(regulation.get("status", "")).lower() == "verified"
+        and str(scoring.get("status", "")).lower() == "verified"
+    )
+    return {
+        "rule_set_id": regulation.get("regulation_id"),
+        "version": regulation.get("effective_from") or regulation.get("issued_date"),
+        "scope": dict(scope),
+        "verified": verified,
+        "source_ids": [regulation.get("source")] if regulation.get("source") else [],
+        "criteria": criteria,
+        "topic_requirements": [],
+        "min_total_score": scoring.get("semester_score_min"),
+        "max_total_score": scoring.get("max_total_score"),
+    }
+
+
+def evaluate_rules_progress(
+    config: Mapping[str, Any],
+    student_profile: Mapping[str, Any],
+    student_snapshot: Mapping[str, Any],
+    *,
+    scope: Mapping[str, Any],
+    personal_targets: Mapping[str, Real] | None = None,
+    required_fields: Iterable[str] = (),
+) -> dict[str, Any]:
+    """Run the flat rules, then build the normal SP2 progress report."""
+
+    values = student_snapshot.get("values")
+    if not isinstance(values, Mapping):
+        raise DRLEngineError("student_snapshot.values must be an object")
+
+    base = values.get("current_confirmed_score", 0)
+    extras = values.get("eligible_extra_points", 0)
+    if (_is_number(base) and base != 0) or (_is_number(extras) and extras != 0):
+        raise DRLEngineError(
+            "current_confirmed_score and eligible_extra_points need category allocation "
+            "before progress calculation"
+        )
+
+    rule_set = _progress_rule_set(config, scope)
+    status = str(student_snapshot.get("status", "")).upper()
+    snapshot_record = {
+        "record_id": str(student_snapshot.get("record_id") or "rule-snapshot"),
+        "status": status,
+        "evidence_status": student_snapshot.get("evidence_status"),
+        "evidence_verified": student_snapshot.get("evidence_verified"),
+        "evidence": student_snapshot.get("evidence"),
+        "evidence_id": student_snapshot.get("evidence_id"),
+        "confirmed_by": student_snapshot.get("confirmed_by"),
+        "confirmed_at": student_snapshot.get("confirmed_at"),
+    }
+
+    if status != "CONFIRMED" or not _evidence_is_verified(snapshot_record):
+        report = evaluate_progress(
+            rule_set,
+            student_profile,
+            [snapshot_record],
+            personal_targets=personal_targets,
+            require_verified_rules=True,
+        )
+        report["rule_evaluation"] = None
+        return report
+
+    rule_result = evaluate_rule_conditions(
+        config, values, required_fields=required_fields
+    )
+    records: list[dict[str, Any]] = []
+    for category in rule_result["category_scores"]:
+        if category["score"] == 0:
+            continue
+        records.append(
+            {
+                "record_id": f"rule-category-{category['category_id']}",
+                "status": "CONFIRMED",
+                "evidence_status": "VERIFIED",
+                "criterion_code": category["category_id"],
+                "points": category["score"],
+            }
+        )
+
+    report = evaluate_progress(
+        rule_set,
+        student_profile,
+        records,
+        personal_targets=personal_targets,
+        require_verified_rules=True,
+    )
+    if rule_result["needs_review"]:
+        report["verification_flags"].extend(
+            f"Missing field: {field}" for field in rule_result["missing_fields"]
+        )
+        report["verification_flags"].extend(
+            f"Skipped rule {item['rule_id']}: {item['reason']}"
+            for item in rule_result["skipped_rules"]
+        )
+        report["verification_flags"].extend(
+            f"Rule config: {item['message']}"
+            for item in rule_result["relevant_configuration_issues"]
+        )
+    report["rule_evaluation"] = rule_result
+    return report
