@@ -113,3 +113,23 @@ def test_invalid_http_url_rejected():
     draft["record"]["source"]["URL_post"] = "file:///etc/passwd"
     with pytest.raises(ValueError):
         prepare_publication(draft)
+
+
+def test_quoted_prior_notice_dates_are_not_silently_accepted():
+    draft = sample_draft()
+    draft["record"]["start"] = "2026-09-24T00:00:00+07:00"
+    draft["record"]["end"] = "2026-10-26T23:59:00+07:00"
+    draft["meta"]["evidence"]["start"] = [
+        "SV đã đăng ký tại cơ sở 2 (theo thông báo ngày 24/9/2026) chưa chọn ngày khám."
+    ]
+    draft["meta"]["evidence"]["end"] = [
+        "Theo thông báo ngày 08/10/2026, Nhà trường sẽ bố trí ngày 26/10/2026."
+    ]
+    draft["record"]["source"]["URL_registration"] = (
+        "https://datastudio.google.com/.../e586.../page/demo"
+    )
+    result = prepare_publication(draft)
+    assert "needs_review:start_date_provenance" in result["meta"]["flags"]
+    assert "needs_review:end_date_provenance" in result["meta"]["flags"]
+    assert "needs_review:URL_registration" in result["meta"]["flags"]
+    assert result["meta"]["publication_status"] == "REVIEW_REQUIRED"
