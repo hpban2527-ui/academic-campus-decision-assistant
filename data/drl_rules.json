@@ -5,7 +5,13 @@
     "issued_date": "2020-09-04",
     "effective_from": "HK1/2020-2021",
     "source": "https://hcmus.edu.vn/wp-content/uploads/2024/03/QD-1028-QC-DRL-2020_20231.pdf",
-    "status": "verified"
+    "status": "verified",
+    "source_review": {
+      "appendix_checked": "https://hcmus.edu.vn/wp-content/uploads/2024/03/QD-1028-QC-DRL-2020_20231.pdf",
+      "base_rule_check": "Appendix p.8: R11=10; p.9: 2.2 course evaluation; p.10: 4.3 24h to below 1 week.",
+      "later_framework_notice": "https://stsv.hcmus.edu.vn/quy-che-diem-ren-luyen",
+      "note": "2026 national student-regulation framework published. School-level applicability of 2020 scoring matrix for current semester requires human confirmation. Internal outputs are demo-only."
+    }
   },
   "scoring_model": {
     "assessment_period": "official_semester",
@@ -88,7 +94,7 @@
         "operator": "equals",
         "value": 0
       },
-      "points": 15,
+      "points": 10,
       "unit": "per_semester",
       "evidence_required": true,
       "source": {
@@ -105,7 +111,7 @@
       "condition": {
         "field": "semester_gpa",
         "operator": "range",
-        "min_inclusive": 5.0,
+        "min_inclusive": 5,
         "max_exclusive": 6.5
       },
       "points": 5,
@@ -126,7 +132,7 @@
         "field": "semester_gpa",
         "operator": "range",
         "min_inclusive": 6.5,
-        "max_exclusive": 8.0
+        "max_exclusive": 8
       },
       "points": 7,
       "unit": "per_semester",
@@ -145,8 +151,8 @@
       "condition": {
         "field": "semester_gpa",
         "operator": "range",
-        "min_inclusive": 8.0,
-        "max_exclusive": 9.0
+        "min_inclusive": 8,
+        "max_exclusive": 9
       },
       "points": 10,
       "unit": "per_semester",
@@ -165,8 +171,8 @@
       "condition": {
         "field": "semester_gpa",
         "operator": "range",
-        "min_inclusive": 9.0,
-        "max_inclusive": 10.0
+        "min_inclusive": 9,
+        "max_inclusive": 10
       },
       "points": 15,
       "unit": "per_semester",
@@ -453,9 +459,9 @@
       "category_id": "C2",
       "name": "Tham gia các đợt khảo sát, điều tra xã hội",
       "condition": {
-        "field": "course_evaluation_completion_rate",
-        "operator": "greater_than",
-        "value": 0.5
+        "field": "institutional_social_survey_participation",
+        "operator": "equals",
+        "value": true
       },
       "points": 5,
       "unit": "per_semester",
@@ -464,7 +470,8 @@
         "document_id": "1028/QD-KHTN-CTSV",
         "location": "Phụ lục, mục 2.2"
       },
-      "status": "verified"
+      "status": "needs_review",
+      "note": "No independent positive-scoring row for surveys found in QD 1028 appendix section 2; disabled pending school confirmation. Do not reuse course evaluation participation evidence."
     },
     {
       "rule_id": "R3101",
@@ -705,7 +712,7 @@
       "condition": {
         "field": "officially_selected_international_exchange_delegate",
         "operator": "count_greater_than",
-        "value": 0 
+        "value": 0
       },
       "points": 15,
       "unit": "per_activity",
@@ -874,10 +881,9 @@
       "category_id": "C4",
       "name": "Tình nguyện viên hoạt động cộng đồng trung hạn, từ 24 giờ đến dưới 1 tuần",
       "condition": {
-        "field": "volunteer_hours_per_activity",
-        "operator": "range",
-        "min_inclusive": 24,
-        "max_exclusive": "one_week"
+        "field": "volunteer_duration_bucket",
+        "operator": "equals",
+        "value": "24_hours_to_under_one_week"
       },
       "points": 10,
       "unit": "per_activity",
@@ -886,7 +892,8 @@
         "document_id": "1028/QD-KHTN-CTSV",
         "location": "Phụ lục, mục 4.3"
       },
-      "status": "verified"
+      "status": "verified",
+      "note": "Manual evidence classification of under-one-week tier; never convert one calendar week to 168 verified work hours."
     },
     {
       "rule_id": "R4303",
