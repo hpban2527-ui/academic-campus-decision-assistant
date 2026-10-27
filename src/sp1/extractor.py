@@ -62,7 +62,8 @@ _INJECTION = re.compile(
 
 # Collector posts file (Minh Tri): a JSON array of these objects.
 POST_REQUIRED = ("post_id", "url", "raw_content", "publisher", "platform")
-POST_OPTIONAL = ("date_posted",)
+# share_url is the collector's original link; url remains the activity's source and ID input.
+POST_OPTIONAL = ("date_posted", "share_url")
 
 
 class InputError(ValueError):
