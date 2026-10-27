@@ -118,7 +118,7 @@
       "status": "verified"
     },
     {
-      "rule_id": "RR1202",
+      "rule_id": "R1202",
       "criterion_id": "1.2",
       "category_id": "C1",
       "name": "Điểm trung bình tích lũy trong học kỳ từ 6,5 đến dưới 8,0",
