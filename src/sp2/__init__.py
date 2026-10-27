@@ -6,6 +6,7 @@ from .drl_engine import (
     audit_rules_config,
     evaluate_progress,
     evaluate_rule_conditions,
+    evaluate_rules_progress,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "audit_rules_config",
     "evaluate_progress",
     "evaluate_rule_conditions",
+    "evaluate_rules_progress",
 ]
