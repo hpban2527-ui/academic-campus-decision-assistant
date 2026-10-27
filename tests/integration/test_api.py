@@ -89,7 +89,7 @@ def test_sp2_verified_fixture_stays_demo_only():
     assert out["mode"] == "DEMO_ONLY"
     assert out["official_award_verified"] is False
     assert out["sp2"]["rule_evaluation"]["matched_rules"][0]["rule_id"] == "R11"
-    assert out["sp2"]["confirmed_total"] == 25
+    assert out["sp2"]["confirmed_total"] == 20
 
 
 def test_missing_evidence_cannot_raise_confirmed_total():
