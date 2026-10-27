@@ -467,6 +467,94 @@ def evaluate_verified_snapshot(req: VerifiedSnapshotRequest):
     }
 
 
+
+class DemoPipelineRequest(BaseModel):
+    case_id: int = 1
+    with_demo_confirmation: bool = False
+
+
+@app.post("/api/pipeline/demo")
+def evaluate_end_to_end_demo(req: DemoPipelineRequest):
+    """SP1 post -> reviewed 14-field candidate -> SP2, for a labeled fixture.
+
+    This deliberately accepts no client-provided reviewer, approval or proof.
+    Real school-awarded points cannot be authorized through this endpoint.
+    """
+    from api.lead_contract import prepare_publication
+    from api.reviewed_pipeline import fingerprint, evaluate_reviewed_activity
+    from jsonschema import ValidationError
+
+    if req.case_id != 1:
+        raise HTTPException(status_code=422, detail="Only reviewed demo fixture 1 is available")
+    case = E2E_SCENARIOS[1]
+    source = {"publisher": case["publisher"], "platform": case["platform"], "URL_post": case["url"]}
+    drafts = extract(case["raw_content"], source, posted_date=case["date_posted"])
+    if not drafts:
+        raise HTTPException(status_code=422, detail="Demo extraction returned no records")
+    candidate = prepare_publication(drafts[0])
+    activity = candidate["record"]
+    schema = load_json(SCHEMAS_DIR / "activity.schema.json", {})
+    # Demo fixture approval follows the extracted deterministic record; it is
+    # NOT evidence of a real reviewer or university award.
+    simulated_approval = {
+        "decision": "APPROVED", "activity_id": activity["activity_id"],
+        "fingerprint": fingerprint(activity),
+        "source_url": activity["source"]["URL_post"],
+        "reviewer_id": "SYNTHETIC_REVIEWER_FIXTURE",
+        "reviewed_at": "2026-10-27T12:00:00+07:00",
+        "regulation_id": DRL_RULES_CONFIG.get("regulation", {}).get("regulation_id"),
+        "rule_id": "R19",
+    }
+    student_profile = {"student_id": "demo-student-001", "university": "HCMUS"}
+    baseline = {
+        "student_id": student_profile["student_id"],
+        "regulation_id": DRL_RULES_CONFIG.get("regulation", {}).get("regulation_id"),
+        "category_scores": {"C1": 20, "C2": 0, "C3": 0, "C4": 0, "C5": 0},
+        "included_activity_ids": [],
+    }
+    participation = None
+    if req.with_demo_confirmation:
+        participation = {
+            "student_id": student_profile["student_id"],
+            "activity_id": activity["activity_id"],
+            "status": "CONFIRMED", "evidence_status": "VERIFIED",
+            "verifier_id": "SYNTHETIC_EVIDENCE_FIXTURE",
+            "verified_at": "2026-10-27T12:00:00+07:00",
+            "evidence_ref": "synthetic://fixture/checkin-01",
+        }
+    try:
+        result = evaluate_reviewed_activity(
+            record=activity, metadata=candidate["meta"],
+            approval=simulated_approval, participation=participation,
+            baseline=baseline, student_profile=student_profile,
+            rules_config=DRL_RULES_CONFIG, schema=schema,
+        )
+    except (ValueError, TypeError, ValidationError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return {
+        "mode": "DEMO_ONLY", "source": "SYNTHETIC_SCENARIO_1",
+        "official_award_verified": False,
+        "activity": candidate,
+        "sp2": result,
+    }
+
+
+@app.get("/api/lead/audit")
+def lead_data_audit():
+    """Quick read-only audit. Audits are not official rule certification."""
+    from api.lead_contract import audit_dataset
+    from sp2.drl_engine import audit_rules_config
+    return {
+        "mode": "DEMO_ONLY",
+        "regulation_id": DRL_RULES_CONFIG.get("regulation", {}).get("regulation_id"),
+        "applicability_current_semester": "NEEDS_SCHOOL_CONFIRMATION",
+        "regulation_issues": audit_rules_config(DRL_RULES_CONFIG),
+        "rules_needing_review": [r["rule_id"] for r in DRL_RULES_CONFIG.get("rules", [])
+                               if r.get("status") != "verified"],
+        "dataset": audit_dataset(ACTIVITIES_DATA),
+    }
+
+
 # Serve Frontend static files if web directory exists
 if WEB_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(WEB_DIR)), name="static")
