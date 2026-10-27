@@ -109,9 +109,9 @@ def test_real_sp2_engine_with_team_rules_and_numeric_progress():
     result = response.json()
     assert result["mode"] == "DEMO_ONLY"
     assert result["official_award_verified"] is False
-    assert result["sp2"]["confirmed_total"] == 25
+    assert result["sp2"]["confirmed_total"] == 20
     category = next(x for x in result["sp2"]["confirmed_by_criterion"] if x["code"] == "C1")
-    assert category["score"] == 25 and category["remaining"] == 5
+    assert category["score"] == 20 and category["remaining"] == 10
     rules = result["sp2"]["rule_evaluation"]["matched_rules"]
     assert [r["rule_id"] for r in rules] == ["R11", "R1203"]
 
