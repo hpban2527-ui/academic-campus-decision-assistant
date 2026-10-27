@@ -9,7 +9,8 @@ on:
       - main
 
 jobs:
-  verify:
+  backend_contracts:
+    name: SP1 / SP2 / Lead contract gates
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -18,11 +19,32 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - name: Install runtime and test dependencies
+      - name: Install dependencies
         run: python -m pip install -r requirements.txt
-      - name: Verify SP1, SP2 and Lead contracts and E2E
+      - name: Execute backend unit + integration tests
         env:
           PYTHONPATH: src
-        run: python -m pytest -q tests/sp1 tests/sp2 tests/integration tests/test_e2e_pipeline.py
-      - name: Compile Python source
+        run: python -m pytest -q tests/sp1 tests/sp2 tests/integration
+      - name: Check SP2 ten expected cases
+        env:
+          PYTHONPATH: src
+        run: python scripts/check_sp2_cases.py
+      - name: Compile Python sources
         run: python -m compileall -q src tests scripts run_server.py
+
+  frontend_contract_review:
+    name: Legacy frontend E2E contract (must be realigned by UI owner)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Report current frontend E2E compatibility
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q tests/test_e2e_pipeline.py
