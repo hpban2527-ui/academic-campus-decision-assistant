@@ -226,8 +226,12 @@ def get_grade_label(score: float) -> str:
 
 @app.get("/api/health")
 def health_check():
+    from sp2.drl_engine import audit_rules_config
+    rule_issues = audit_rules_config(DRL_RULES_CONFIG)
     return {
-        "status": "healthy",
+        "status": "degraded" if any(x["severity"] == "error" for x in rule_issues) else "healthy",
+        "rule_audit_issues": rule_issues,
+        "rule_audit_count": len(rule_issues),
         "regulation": DRL_RULES_CONFIG.get("regulation", {}).get("regulation_id", "1028/QD-KHTN-CTSV"),
         "total_rules": len(DRL_RULES_CONFIG.get("rules", [])),
         "total_activities": len(session_activities),
@@ -286,7 +290,10 @@ def get_student_profile(student_id: Optional[str] = None):
     return {
         **base,
         "total_confirmed_score": total_confirmed,
-        "grade_label": get_grade_label(total_confirmed),
+        "demo_only": True,
+        "official_score_verified": False,
+        "score_source": "SYNTHETIC_DEMO_BASELINE",
+        "grade_label": "DEMO - " + get_grade_label(total_confirmed),
     }
 
 @app.get("/api/rules")
