@@ -6,7 +6,7 @@
 
 | Test ID | Nội dung kiểm thử | Kết quả mong đợi |
 |---|---|---|
-| TC01 | GPA = 8.5, không vi phạm học vụ/khảo thí | R11 (+10), R123 (+10); tổng điểm rule = 20 |
+| TC01 | GPA = 8.5, không vi phạm học vụ/khảo thí | R11 (+15), R1203 (+10); tổng điểm rule = 25 |
 | TC02 | Không tham gia đủ nội dung sinh hoạt công dân | R6401 (-20) |
 | TC03 | GPA = 9.0, có 1 vi phạm học vụ/khảo thí| Chỉ R1204 (+15) |
 | TC04 | GPA = 7.2, có 1 vi phạm học vụ/khảo thí | Chỉ R1202 (+7) |
@@ -15,5 +15,5 @@
 | TC07 | Vai trò hoạt động học thuật = CTV | R1702 (+5) |
 | TC08 | Không khai báo ngoại trú | R62 (-15) |
 | TC09 | Thiếu `academic_exam_violations` | R1203 (+10); `needs_review = true`, báo thiếu trường; không tự gán 0 |
-| TC10 | Điểm hiện có 96, điểm đủ điều kiện cộng thêm 25 | Tổng thô 121, điểm cuối sau giới hạn = 100; phải tránh cộng trùng |
+| TC10 | Điểm hiện có 96, điểm đủ điều kiện cộng thêm 30 | Tổng thô 126, điểm cuối sau giới hạn = 100; phải tránh cộng trùng |
 
