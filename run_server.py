@@ -20,4 +20,4 @@ if __name__ == "__main__":
     print("  HCMUS Academic Campus Decision Assistant (SP1 -> SP2)")
     print("  Frontend & API Server starting on http://localhost:8000")
     print("=" * 70)
-    uvicorn.run("api.server:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run("api.server:app", host="0.0.0.0", port=8000, reload=True, reload_dirs=[str(src_dir)])

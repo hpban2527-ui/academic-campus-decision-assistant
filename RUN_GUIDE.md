@@ -1,102 +1,68 @@
-# HƯỚNG DẪN KHỞI CHẠY VÀ NGHIỆM THU (RUN GUIDE)
+# HƯỚNG DẪN KHỞI CHẠY VÀ NGHIỆM THU WEB DEMO (RUN GUIDE)
 **Hệ Thống Hỗ Trợ Đánh Giá Hoạt Động & Điểm Rèn Luyện (SP1 &rarr; SP2)**
-*Môn học: CSC10014 - Computational Thinking | Nhóm E*  
-*Thành viên phụ trách: **Lưu Minh Tiến** (Gói: Frontend + Demo | Nhánh: `Minh_Tien`)*
+*Môn học: CSC10014 - Tư Duy Tính Toán | Nhóm E*  
+*Thành viên phụ trách Giao diện & Web Demo: **Lưu Minh Tiến (25127242)** | Nhánh: `Minh_Tien`*
 
 ---
 
-## 1. TỔNG QUAN HỆ THỐNG
-Hệ thống là ứng dụng Web hoàn chỉnh tích hợp luồng xử lý tự động từ **SP1** (Trích xuất thông tin bài đăng sự kiện theo hợp đồng 14/15 trường JSON) sang **SP2** (Phân loại tiêu chí và tính điểm rèn luyện theo Quyết định 1028/QĐ-KHTN-CTSV).
+## 1. TỔNG QUAN CÁC TÍNH NĂNG TRÊN WEB DEMO
 
-### Điểm nổi bật:
-1. **Gọi API Thật (Real Backend API)**: Toàn bộ quá trình trích xuất (`sp1.extractor`), kiểm tra trùng lặp (`sp1.deduplication` với MinHash-LSH), và tính toán quy chế (`sp2.drl_engine`) được thực thi trên máy chủ FastAPI.
-2. **Tính Năng Đăng Nhập Riêng & Lưu Trữ Cục Bộ (Local Storage)**: Không hardcode cố định tên sinh viên; người dùng có thể chọn nhanh bất kỳ sinh viên nào trong nhóm hoặc nhập MSSV/Họ tên bất kỳ để quản lý hồ sơ và tiến độ ĐRL riêng biệt lưu tại máy.
-3. **Giao Diện Dashboard Sinh Viên Thoáng Đãng**: Toàn bộ 5 ca test đã được tách riêng khỏi màn hình chính; sinh viên có thể tự do nhập liệu, dán link, kiểm tra bài đăng sự kiện bất kỳ như ứng dụng thật.
-4. **Thư Viện Kịch Bản Mẫu (5 Ca E2E) & Chạy Hàng Loạt (Batch Run)**: Có nút nạp mẫu test nhanh (`⚡ 5 Kịch Bản E2E`) và tab riêng cho phép chạy hàng loạt cả 5 ca kiểm thử tự động trực quan.
-5. **Khung Nghiệm Thu Kỹ Thuật (Inspector Tab)**: Tra cứu toàn bộ 15 trường dữ liệu thô, bằng chứng trích xuất (grounding evidence), cờ kiểm tra (`meta.flags`), và phân luồng (`activities.json` vs `review_queue.json`).
-6. **Bộ 5 Ca Kiểm Thử E2E Tự Động**: Đạt 100% PASS qua test suite `pytest`.
+Giao diện Web (`web/index.html`) kết nối trực tiếp với máy chủ **FastAPI (`src/api/server.py`)**, tích hợp đầy đủ các thành phần của cả nhóm:
+
+1. **Gọi API Thật 100%, Không Hardcode / Không Giả Lập Trên Client**:
+   - Mọi dữ liệu hồ sơ sinh viên (`/api/students`, `/api/profile`), 5 kịch bản kiểm thử (`/api/e2e-cases`), kho hoạt động (`/api/activities`), kiểm toán dữ liệu (`/api/lead/audit`), và tính điểm ĐRL (`/api/evaluate`, `/api/pipeline/demo`, `/api/sp2/evaluate`) đều được xử lý tại Backend.
+   - Đã loại bỏ hoàn toàn cơ chế tính điểm giả trên trình duyệt (`runClientFallback`).
+2. **Hỗ Trợ Chế Độ Kép (Dual-Mode Evaluation)**:
+   - **Chế độ 1 — Mô Phỏng ĐRL Demo (`simulate_demo=true`, mặc định trên UI)**: Chạy xuyên suốt `SP1 (extract)` $\rightarrow$ `prepare_publication (14 trường)` $\rightarrow$ `evaluate_reviewed_activity` $\rightarrow$ `sp2.drl_engine.evaluate_progress`. Hiển thị đầy đủ điểm theo mục (`C1..C5`), điểm thiếu, điểm dự kiến tách biệt với điểm xác nhận Demo, chặn trần `CALC_02`, lý do và nguồn quy chế kèm nhãn `DEMO_ONLY` (`official_award_verified=false`).
+   - **Chế độ 2 — Cổng Tiếp Nhận Nghiêm Ngặt (`simulate_demo=false`, theo PR #3)**: Chuẩn hóa 14 trường, kiểm tra trùng lặp và đẩy vào `review_queue` (`publication_status="REVIEW_REQUIRED"`), trả về `+0đ` và xử lý an toàn toàn bộ các trường `null`.
+3. **Tách Biệt Rõ Ràng Điểm Dự Kiến (`PROJECTED`) Và Điểm Xác Nhận Demo (`DEMO_CONFIRMED`)**:
+   - Khi hoạt động chưa có minh chứng (như Ca 1 PCCC), hệ thống chỉ cộng vào **Điểm dự kiến (+5đ)** và giữ nguyên **Điểm xác nhận (20/30đ)** trên thanh tiến độ, hiển thị đồng thời cả hai dải màu trên biểu đồ nhóm tiêu chí.
+4. **Tích Hợp Mô Phỏng Snapshot Học Vụ (`POST /api/sp2/evaluate`)**:
+   - Cho phép nhập GPA học kỳ, số lần vi phạm quy chế thi, tỷ lệ đánh giá môn học và thử kích hoạt quy tắc khảo sát `R23` để kiểm chứng trực tiếp hàm `evaluate_rules_progress()` của SP2.
+5. **Tích Hợp Kiểm Toán Dữ Liệu & Quy Chế (`GET /api/lead/audit`)**:
+   - Hiển thị trực tiếp số bài thiếu `mode` (5 bài), thiếu `completion_requirements` (18 bài), quy tắc tạm khóa (`R23`), và cụm bài đăng trùng nguồn (`possible_duplicates`).
 
 ---
 
 ## 2. HƯỚNG DẪN CÀI ĐẶT & KHỞI CHẠY
 
-### Bước 1: Yêu cầu môi trường
-- Python >= 3.10
-- Các thư viện phụ thuộc:
-  ```bash
-  pip install fastapi uvicorn pydantic pytest datasketch
-  ```
+### Bước 1: Cài đặt thư viện phụ thuộc
+Yêu cầu Python >= 3.10. Chạy lệnh sau tại thư mục gốc của dự án:
+```bash
+python -m pip install -r requirements.txt
+```
 
-### Bước 2: Khởi động Server
-Chạy lệnh duy nhất tại thư mục gốc của repository:
+### Bước 2: Khởi động máy chủ FastAPI & Web UI
 ```bash
 python run_server.py
 ```
-*Server sẽ khởi động tại địa chỉ: `http://localhost:8000`*
+Server sẽ lắng nghe tại địa chỉ: `http://localhost:8000`
 
-### Bước 3: Mở ứng dụng trên trình duyệt
-Truy cập:
-👉 **[http://localhost:8000](http://localhost:8000)**
-
-*(Lưu ý: Ứng dụng cũng tích hợp sẵn cơ chế **Safe Fallback** - nếu server chưa bật, giao diện vẫn có thể mô phỏng chính xác thuật toán để trình diễn mượt mà).*
+### Bước 3: Mở giao diện Web trên trình duyệt
+Truy cập: **[http://localhost:8000](http://localhost:8000)**
 
 ---
 
-## 3. HƯỚNG DẪN CHẠY BỘ TEST E2E TỰ ĐỘNG
-Để chạy toàn bộ các bài kiểm thử End-to-End kiểm tra tính toàn vẹn của API và 5 kịch bản quy chuẩn:
-```bash
-python -m pytest tests/test_e2e_pipeline.py -v
-```
+## 3. CHI TIẾT 5 KỊCH BẢN KIỂM THỬ E2E TRÊN GIAO DIỆN
 
-**Kết quả kiểm thử đạt 100% PASS:**
-- `test_api_health_endpoint`: Kiểm tra trạng thái máy chủ và bộ 75 quy tắc ĐRL.
-- `test_student_profile_endpoint`: Kiểm tra hồ sơ sinh viên Lưu Minh Tiến (25127242).
-- `test_e2e_case_1_pccc_projected_points`: Ca 1 - Tập huấn PCCC ghi nhận Điểm dự kiến (+5đ Mục 1.9, C1: 20 &rarr; 25/30đ).
-- `test_e2e_case_2_blood_donation_confirmed_points`: Ca 2 - Hiến máu có giấy chứng nhận ghi nhận Đã xác nhận (+10đ Mục 4.2, C4: 10 &rarr; 20/25đ).
-- `test_e2e_case_3_online_missing_requirements_d16`: Ca 3 - Webinar online thiếu điều kiện hoàn thành kích hoạt cờ D16 `needs_review:completion_requirements`, chuyển `review_queue.json`.
-- `test_e2e_case_4_category_cap_c3`: Ca 4 - Kiểm tra chặn trần CALC_02 (Nhóm C3 đang 22/25đ, cuộc thi 10đ chỉ được cộng tối đa +3đ).
-- `test_e2e_case_5_duplicate_detection`: Ca 5 - MinHash-LSH phát hiện bài đăng trùng lặp &ge; 75%, từ chối ghi nhận điểm.
+Trên giao diện Web, bấm nút **`⚡ 5 Ca E2E Mẫu`** (góc trên bên phải) hoặc chuyển sang Tab **`2. Kịch Bản Kiểm Thử (5 Ca E2E)`** và bấm **`▶ Chạy Kiểm Thử Tự Động Cả 5 Ca (Kiểm Tra Assertions)`**:
 
----
-
-## 4. CHI TIẾT 5 KỊCH BẢN NGHIỆM THU TRÊN GIAO DIỆN
-
-| Ca | Tên sự kiện | Hành vi SP1 | Hành vi SP2 (QĐ 1028/QĐ) | Kết quả hiển thị |
+| Ca | Tên kịch bản | Hành vi SP1 & Cổng 14 trường (`lead_contract`) | Hành vi SP2 (`sp2.drl_engine`) ở Chế độ Demo | Kết quả hiển thị trên UI |
 |---|---|---|---|---|
-| **Ca 1** | **Tập huấn PCCC 2026** | Trích xuất đủ 14 trường offline, status `valid`. | Khớp Quy tắc R19 (Mục 1.9), chưa có minh chứng điểm danh. | `PROJECTED` (+5đ dự kiến, C1: 20 &rarr; 25/30đ). |
-| **Ca 2** | **Hiến máu tình nguyện** | Trích xuất đủ 14 trường offline, status `valid`. | Khớp Quy tắc R42 (Mục 4.2), có giấy chứng nhận. | `CONFIRMED` (+10đ chính thức, C4: 10 &rarr; 20/25đ). |
-| **Ca 3** | **Webinar Zoom** | Phát hiện bài Online có ĐRL nhưng thiếu ĐK hoàn thành &rarr; Cờ D16. | Quy tắc CALC_05: thiếu điều kiện thì không suy đoán điểm. | `NEEDS_REVIEW_CALC_05` (Chuyển `review_queue.json`, +0đ). |
-| **Ca 4** | **Olympic Mác-Lênin** | Trích xuất đủ 14 trường, status `valid`. | Khớp Quy tắc R3101 (Mục 3.1: +10đ). C3 đang đạt 22/25đ &rarr; CALC_02 áp trần. | `CONFIRMED` (Chặn trần +3đ, C3 đạt tối đa 25/25đ). |
-| **Ca 5** | **Bài đăng trùng lặp** | MinHash-LSH quét qua cơ sở dữ liệu `source_posts.json`. | Phát hiện trùng URL/nội dung &ge; 75%. | `REJECTED_DUPLICATE` (Từ chối ghi nhận điểm). |
+| **Ca 1** | **Tập huấn PCCC 2026** | Trích xuất đủ 14 trường offline, `status="valid"`, `mandatory=false`, `fee=0`. | Khớp `R19` (Mục 1.9, C1 `+5đ`). Chưa có minh chứng (`evidence=false`). | `PROJECTED`: **+5đ dự kiến**, `+0đ xác nhận`. Mục C1 giữ `20/30đ` xác nhận (gộp dự kiến `25/30đ`, thiếu `5đ`). |
+| **Ca 2** | **Hiến máu tình nguyện** | Trích xuất đủ 14 trường offline, `status="valid"`, có điều kiện giấy chứng nhận. | Khớp `R42` (Mục 4.2, C4 `+10đ`). Có minh chứng mô phỏng (`evidence=true`). | `DEMO_CONFIRMED`: **+10đ xác nhận Demo**. Mục C4 tăng từ `10` $\rightarrow$ `20/25đ` (thiếu `5đ`). |
+| **Ca 3** | **Webinar Trực tuyến thiếu ĐK** | Bài đăng `online` có công nhận ĐRL nhưng thiếu điều kiện hoàn thành $\rightarrow$ gắn cờ D16 `needs_review:completion_requirements`. | Quy tắc `CALC_05`: bản ghi có cờ `needs_review` bị chặn tính điểm, chuyển vào `review_queue`. | `NEEDS_REVIEW`: **+0đ dự kiến, +0đ xác nhận**. Hiển thị rõ cờ lỗi `needs_review:completion_requirements`. |
+| **Ca 4** | **Hội thi Olympic Mác-Lênin (Chạm trần C3)** | Trích xuất đủ 14 trường offline, `status="valid"`. | Khớp `R3101` (Mục 3.1, quy chế `+10đ`). Do nhóm C3 đang ở mức `22/25đ`, `evaluate_progress` áp trần `CALC_02`. | `DEMO_CONFIRMED`: **Chỉ cộng +3đ** (thay vì `+10đ`). Mục C3 đạt tối đa `25/25đ` (thiếu `0đ`). |
+| **Ca 5** | **Bài đăng trùng lặp (Deduplicator)** | Trùng `post_id` và tương đồng MinHash-LSH $\ge 75\%$ với bài đăng gốc trong `source_posts.json`. | Chặn cộng điểm lặp lần 2, phân luồng `discarded_duplicate`. | `REJECTED_DUPLICATE`: **+0đ**. Hiển thị cảnh báo trùng nguồn và mã bài gốc. |
 
 ---
 
-## 5. CẤU TRÚC MÃ NGUỒN GÓI BÀN GIAO (`Minh_Tien`)
-```text
-academic-campus-decision-assistant/
-├── run_server.py                      # File khởi động FastAPI server & Web UI
-├── RUN_GUIDE.md                       # Tài liệu hướng dẫn khởi chạy chi tiết
-├── web/
-│   └── index.html                     # Giao diện Web Dashboard sinh viên & Inspector
-├── src/
-│   ├── api/
-│   │   ├── __init__.py
-│   │   └── server.py                  # FastAPI REST API kết nối SP1 -> SP2
-│   ├── sp1/
-│   │   ├── extractor.py               # Bộ trích xuất 14/15 trường deterministic
-│   │   ├── deduplication.py           # MinHash-LSH Deduplicator
-│   │   ├── dates.py                   # Parser thời gian ISO 8601
-│   │   └── regex_baseline.py          # Baseline regex patterns
-│   └── sp2/
-│       └── drl_engine.py              # Engine tính điểm ĐRL theo 1028/QĐ
-├── data/
-│   ├── activities.json                # Bộ 20 hoạt động chuẩn 14 trường của nhóm
-│   ├── source_posts.json              # Dữ liệu 20 bài đăng Facebook gốc
-│   ├── drl_rules.json                 # 75 quy tắc ĐRL theo QĐ 1028/QĐ-KHTN-CTSV
-│   ├── student_profile.json           # Hồ sơ sinh viên
-│   └── sample_e2e_io.json             # File mẫu Input / Expected Output nghiệm thu
-├── schemas/
-│   └── extraction_draft.schema.json   # Hợp đồng JSON schema draft v1.3.0
-└── tests/
-    └── test_e2e_pipeline.py           # 7 unit & E2E tests đạt 100% PASS
+## 4. HƯỚNG DẪN CHẠY BỘ TEST TỰ ĐỘNG (`pytest`)
+
+Để kiểm tra toàn bộ các bài test tích hợp (cả chế độ Strict Intake của PR #3, chế độ Demo 5 ca E2E, và 10 test cases quy chế SP2):
+
+```powershell
+$env:PYTHONPATH = "src"
+python scripts/check_sp2_cases.py
+python -m pytest -v tests/integration tests/test_e2e_pipeline.py
 ```

@@ -1,8 +1,8 @@
 {
   "project": "HCMUS Academic Campus Decision Assistant (CSC10014)",
-  "contract_spec": "SP1 (14 fields schema) -> SP2 (Quy chế 1028/QD-KHTN-CTSV DRL)",
+  "contract_spec": "SP1 (15-field draft -> 14-field published schema) -> SP2 (Quy chế 1028/QD-KHTN-CTSV DRL via sp2.drl_engine)",
   "sample_case": {
-    "title": "Mẫu đánh giá bài đăng sự kiện Tập huấn PCCC 2026",
+    "title": "Mẫu đánh giá bài đăng sự kiện Tập huấn PCCC 2026 (Chế độ Demo SP1 -> SP2)",
     "scenario_id": "E2E_CASE_1",
     "input": {
       "post_id": "pfbid01_pccc_new_2026",
@@ -12,12 +12,21 @@
       "url": "https://www.facebook.com/osa.hcmus/posts/pccc_training_2026",
       "has_evidence": false,
       "rule_override": "auto",
+      "simulate_demo": true,
       "raw_content": "CHUYÊN ĐỀ TẬP HUẤN KIẾN THỨC, KỸ NĂNG VÀ THỰC TẬP PHƯƠNG ÁN PHÒNG CHÁY CHỮA CHÁY NĂM 2026\nThời gian: 14:00 - 16:30 ngày 28/10/2026\nThời hạn đăng ký: từ 25/10 đến 27/10/2026\nĐịa điểm: Giảng đường 1, Cơ sở 227 Nguyễn Văn Cừ\nĐối tượng tham gia: Sinh viên hệ chính quy toàn trường\nLệ phí: Miễn phí tham gia. Đây là hoạt động không bắt buộc.\nQuyền lợi: Sinh viên được ghi nhận điểm rèn luyện (cộng 5 điểm rèn luyện) khi tham gia đầy đủ và điểm danh check-in/check-out cuối buổi.\nLink đăng ký: https://forms.gle/pccc2026hcmus"
     },
     "expected_output": {
+      "mode": "DEMO_ONLY",
+      "official_award_verified": false,
       "sp1_extraction": {
         "record": {
-          "activity_id": "ACT_SAMPLE_01",
+          "activity_id": "ACT-8F48F3389515",
+          "source": {
+            "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+            "platform": "facebook",
+            "URL_post": "https://www.facebook.com/osa.hcmus/posts/pccc_training_2026",
+            "URL_registration": "https://forms.gle/pccc2026hcmus"
+          },
           "title": "CHUYÊN ĐỀ TẬP HUẤN KIẾN THỨC, KỸ NĂNG VÀ THỰC TẬP PHƯƠNG ÁN PHÒNG CHÁY CHỮA CHÁY NĂM 2026",
           "domain": "skills",
           "start": "2026-10-28T14:00:00+07:00",
@@ -26,7 +35,6 @@
           "mode": "offline",
           "location": "Giảng đường 1, Cơ sở 227 Nguyễn Văn Cừ",
           "points": 5.0,
-          "drl_recognized": true,
           "mandatory": false,
           "audience": [
             "Sinh viên hệ chính quy toàn trường"
@@ -37,13 +45,17 @@
         "meta": {
           "status": "valid",
           "flags": [],
-          "routed_to": "activities.json",
+          "drl_recognized": true,
+          "publication_status": "REVIEW_REQUIRED",
+          "routed_to": "activities.json (demo_approved)",
           "is_duplicate": false
         }
       },
       "sp2_evaluation": {
+        "mode": "DEMO_ONLY",
+        "official_award_verified": false,
         "decision": "PROJECTED",
-        "badge_text": "ĐIỂM DỰ KIẾN (CHỜ MINH CHỨNG)",
+        "badge_text": "DEMO: ĐIỂM DỰ KIẾN (+5đ - CHỜ MINH CHỨNG)",
         "rule": {
           "rule_id": "R19",
           "criterion_id": "1.9",
@@ -62,11 +74,11 @@
         "projected_added": 5,
         "confirmed_added": 0,
         "category_before": 20,
-        "category_after": 25,
+        "category_after": 20,
+        "hypothetical_category_after": 25,
         "category_cap": 30,
         "category_missing": 5,
-        "citation": "Quyết định 1028/QD-KHTN-CTSV, Phụ lục, mục 1.9",
-        "explanation": "Chưa có minh chứng hoàn thành. Ghi nhận vào Điểm dự kiến (+5đ), chưa cộng vào điểm chính thức. Áp dụng nguyên vẹn mức +5đ theo tiêu chí 1.9 (R19)."
+        "citation": "Quyết định 1028/QD-KHTN-CTSV, Phụ lục, mục 1.9 (DEMO_ONLY - cần xác nhận hiệu lực học kỳ hiện hành)"
       },
       "deduplication": {
         "is_duplicate": false,

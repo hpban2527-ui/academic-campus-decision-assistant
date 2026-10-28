@@ -1,0 +1,217 @@
+[
+  {
+    "test_id": "TC01",
+    "name": "GPA nằm trong khoảng 8.0 đến dưới 9.0",
+    "input": {
+      "student_record": {
+        "semester_gpa": 8.5,
+        "academic_exam_violations": 0
+      }
+    },
+    "expected_output": {
+      "matched_rules": [
+        {
+          "rule_id": "R11",
+          "criterion_id": "1.1",
+          "points": 10
+        },
+        {
+          "rule_id": "R1203",
+          "criterion_id": "1.2",
+          "points": 10
+        }
+      ],
+      "rule_points_total": 20,
+      "needs_review": false
+    }
+  },
+  {
+    "test_id": "TC02",
+    "name": "Không tham gia đủ nội dung sinh hoạt công dân",
+    "input": {
+      "student_record": {
+        "student_citizenship_session_participation": "incomplete"
+      }
+    },
+    "expected_output": {
+      "matched_rules": [
+        {
+          "rule_id": "R6401",
+          "criterion_id": "6.4",
+          "points": -20
+        }
+      ],
+      "rule_points_total": -20,
+      "needs_review": false
+    }
+  },
+  {
+    "test_id": "TC03",
+    "name": "GPA đúng ngưỡng 9.0, có 1 vi phạm học vụ/khảo thí",
+    "input": {
+      "student_record": {
+        "semester_gpa": 9,
+        "academic_exam_violations": 1
+      }
+    },
+    "expected_output": {
+      "matched_rules": [
+        {
+          "rule_id": "R1204",
+          "criterion_id": "1.2",
+          "points": 15
+        }
+      ],
+      "rule_points_total": 15,
+      "needs_review": false
+    }
+  },
+  {
+    "test_id": "TC04",
+    "name": "Có vi phạm quy chế học vụ/khảo thí",
+    "input": {
+      "student_record": {
+        "academic_exam_violations": 1,
+        "semester_gpa": 7.2
+      }
+    },
+    "expected_output": {
+      "matched_rules": [
+        {
+          "rule_id": "R1202",
+          "criterion_id": "1.2",
+          "points": 7
+        }
+      ],
+      "rule_points_total": 7,
+      "needs_review": false
+    }
+  },
+  {
+    "test_id": "TC05",
+    "name": "Có đề tài nghiên cứu đủ điều kiện",
+    "input": {
+      "student_record": {
+        "research_projects_eligible": 1
+      }
+    },
+    "expected_output": {
+      "matched_rules": [
+        {
+          "rule_id": "R15",
+          "criterion_id": "1.5",
+          "points": 15
+        }
+      ],
+      "rule_points_total": 15,
+      "needs_review": false
+    }
+  },
+  {
+    "test_id": "TC06",
+    "name": "Tham gia cuộc thi học thuật với vai trò ban tổ chức",
+    "input": {
+      "student_record": {
+        "academic_event_role": "organizer"
+      }
+    },
+    "expected_output": {
+      "matched_rules": [
+        {
+          "rule_id": "R1701",
+          "criterion_id": "1.7",
+          "points": 10
+        }
+      ],
+      "rule_points_total": 10,
+      "needs_review": false
+    }
+  },
+  {
+    "test_id": "TC07",
+    "name": "Tham gia hoạt động với vai trò cộng tác viên",
+    "input": {
+      "student_record": {
+        "academic_event_role": "collaborator"
+      }
+    },
+    "expected_output": {
+      "matched_rules": [
+        {
+          "rule_id": "R1702",
+          "criterion_id": "1.7",
+          "points": 5
+        }
+      ],
+      "rule_points_total": 5,
+      "needs_review": false
+    }
+  },
+  {
+    "test_id": "TC08",
+    "name": "Không khai báo ngoại trú theo quy định",
+    "input": {
+      "student_record": {
+        "failed_residency_declaration": true
+      }
+    },
+    "expected_output": {
+      "matched_rules": [
+        {
+          "rule_id": "R62",
+          "criterion_id": "6.2",
+          "points": -15
+        }
+      ],
+      "rule_points_total": -15,
+      "needs_review": false
+    }
+  },
+  {
+    "test_id": "TC09",
+    "name": "Thiếu trường dữ liệu cần thiết",
+    "input": {
+      "student_record": {
+        "semester_gpa": 8.5
+      }
+    },
+    "expected_output": {
+      "matched_rules": [
+        {
+          "rule_id": "R1203",
+          "criterion_id": "1.2",
+          "points": 10
+        }
+      ],
+      "rule_points_total": 10,
+      "needs_review": true,
+      "missing_fields": [
+        "academic_exam_violations"
+      ]
+    }
+  },
+  {
+    "test_id": "TC10",
+    "name": "Điểm tổng bị giới hạn ở 100",
+    "input": {
+      "student_record": {
+        "current_confirmed_score": 96,
+        "eligible_extra_points": 15,
+        "academic_exam_violations": 0
+      }
+    },
+    "expected_output": {
+      "matched_rules": [
+        {
+          "rule_id": "R11",
+          "criterion_id": "1.1",
+          "points": 10
+        }
+      ],
+      "raw_total_before_cap": 121,
+      "final_score": 100,
+      "needs_review": false,
+      "note": "Test giới hạn tổng điểm; engine cần định nghĩa rõ current_confirmed_score và eligible_extra_points là đầu vào đã xác minh, tránh cộng trùng."
+    }
+  }
+]
