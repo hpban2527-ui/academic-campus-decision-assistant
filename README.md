@@ -4,65 +4,82 @@ Hệ thống hỗ trợ trích xuất thông báo hoạt động ngoại khóa (
 
 - **Môn học**: CSC10014 — Tư Duy Tính Toán (Computational Thinking)
 - **Phân công nhóm E**:
-  - **Lead & Integration**: Huỳnh Phương Bình An
-  - **SP1 (Data & Extractor)**: Nguyễn Minh Trí (Dataset), Bùi Thảo Duyên (Extractor)
-  - **SP2 (Rules & Engine)**: Nguyễn Thị Ngọc Tuyền (Rules), Lâm Như Ngọc (DRL Engine)
-  - **Frontend & Web Demo**: Lưu Minh Tiến (`Minh_Tien`)
+  - **Lead & Integration**: Huỳnh Phương Bình An (`25127009`)
+  - **SP1 (Data & Extractor)**: Nguyễn Minh Trí (`25127244`), Bùi Thảo Duyên (`25127316`)
+  - **SP2 (Rules & Engine)**: Nguyễn Thị Ngọc Tuyền (`25127257`), Lâm Như Ngọc (`25127214`)
+  - **Frontend & Web Demo**: Lưu Minh Tiến (`25127242`)
 
 ---
 
-## 1. Khởi chạy nhanh (Quick Start)
+## 1. Cấu trúc thư mục dự án
 
-```bash
+```text
+academic-campus-decision-assistant/
+├── data/
+│   ├── activities.json                 # 20 hoạt động gốc đã thu thập
+│   ├── drl_rules.json                  # Bộ quy tắc ĐRL (QĐ 1028/QĐ-KHTN-CTSV)
+│   ├── source_posts.json               # Dữ liệu bài đăng nguồn cho MinHash-LSH
+│   └── student_profile.json            # Hồ sơ 6 sinh viên trong nhóm
+├── prompts/
+│   └── extraction_v1.txt               # Prompt chuẩn cho SP1 LLM backend
+├── Report/
+│   └── UniLife_Assistant_Product_Scouting_and_UX_Concept.pdf
+├── schemas/
+│   ├── activity.schema.json            # Schema 14 trường công bố (Lead contract)
+│   └── extraction_draft.schema.json    # Schema 15 trường trích xuất nháp (SP1)
+├── src/
+│   ├── api/
+│   │   ├── dedup_review.py             # Kiểm toán bài đăng trùng nguồn
+│   │   ├── lead_contract.py            # Cổng chuẩn hóa 14 trường (prepare_publication)
+│   │   ├── reviewed_pipeline.py        # Cầu nối SP1 -> SP2 đã duyệt
+│   │   └── server.py                   # Máy chủ FastAPI chính
+│   ├── sp1/
+│   │   ├── dates.py                    # Chuẩn hóa thời gian tiếng Việt
+│   │   ├── deduplication.py            # MinHash-LSH Deduplicator
+│   │   ├── extractor.py                # Bộ trích xuất SP1 chính
+│   │   ├── llm_backend.py              # Kết nối LLM (tùy chọn)
+│   │   └── regex_baseline.py           # Bộ trích xuất Regex tiếng Việt
+│   └── sp2/
+│       └── drl_engine.py               # Engine tính điểm rèn luyện SP2
+├── tests/
+│   ├── test_e2e_pipeline.py            # Kiểm thử tích hợp E2E (SP1 -> SP2 & API)
+│   └── test_session_flow.py            # Kiểm thử luồng người dùng (Preview & Lưu điểm)
+├── web/
+│   └── index.html                      # Giao diện Web UniLife ĐRL
+├── requirements.txt
+└── run_server.py                       # Điểm khởi chạy ứng dụng
+```
+
+---
+
+## 2. Khởi chạy nhanh (Quick Start)
+
+```powershell
 python -m pip install -r requirements.txt
 python run_server.py
 ```
 
 Mở trình duyệt tại: **[http://localhost:8000](http://localhost:8000)**
 
-> **Lưu ý:** Toàn bộ giao diện gọi trực tiếp REST API trên máy chủ FastAPI (`sp1.extractor` $\rightarrow$ `lead_contract.prepare_publication` $\rightarrow$ `reviewed_pipeline.evaluate_reviewed_activity` $\rightarrow$ `sp2.drl_engine`). Cơ chế tính điểm giả trên trình duyệt (`runClientFallback`) đã được vô hiệu hóa hoàn toàn.
-
 ---
 
-## 2. Kiến trúc Chế độ Kép (Dual-Mode Evaluation) & Các Endpoint API
+## 3. Các Endpoint API chính
 
 | Endpoint | Phương thức | Chức năng chính |
 |---|---|---|
-| `/api/health` | `GET` | Kiểm tra trạng thái máy chủ, 75 quy tắc ĐRL, kết quả kiểm toán cấu hình quy chế (`audit_rules_config`). |
+| `/api/health` | `GET` | Kiểm tra trạng thái máy chủ, 75 quy tắc ĐRL, kết quả kiểm toán quy chế (`audit_rules_config`). |
 | `/api/students` | `GET` | Danh sách hồ sơ sinh viên từ `data/student_profile.json`. |
-| `/api/profile` | `GET` | Hồ sơ điểm rèn luyện cơ sở (`DEMO_ONLY`, `official_score_verified=false`) với trần điểm chuẩn từ `data/drl_rules.json`. |
-| `/api/e2e-cases` | `GET` | Danh sách 5 kịch bản kiểm thử E2E chuẩn kèm các kỳ vọng (assertions). |
-| `/api/evaluate` | `POST` | **Chế độ Kép (Dual-Mode)**:<br>• `simulate_demo=false` *(Mặc định - Cổng Tiếp Nhận Nghiêm Ngặt PR#3)*: Chuẩn hóa đúng 14 trường (`schemas/activity.schema.json`), kiểm tra trùng lặp MinHash-LSH & URL, gắn `publication_status="REVIEW_REQUIRED"`, đẩy vào `review_queue` và trả `+0đ`.<br>• `simulate_demo=true` *(Chế độ Mô Phỏng ĐRL Demo)*: Thực thi trọn vẹn luồng `SP1 -> prepare_publication -> simulated_approval -> evaluate_reviewed_activity -> sp2.drl_engine.evaluate_progress` với nhãn `DEMO_ONLY` (`official_award_verified=false`). |
-| `/api/pipeline/demo` | `POST` | Chạy kịch bản mẫu E2E (`case_id: 1..5`) qua `evaluate_reviewed_activity` và `evaluate_progress`. |
-| `/api/sp2/evaluate` | `POST` | Chạy `evaluate_rules_progress` trên Snapshot học vụ (`semester_gpa`, `academic_exam_violations`, `course_evaluation_completion_rate`), tự động bỏ qua quy tắc đang tạm khóa (`R23`). |
-| `/api/lead/audit` | `GET` | Kiểm toán chất lượng bộ 20 hoạt động thu thập (`activities.json`), danh sách quy tắc `needs_review` và các cụm bài đăng trùng nguồn (`possible_duplicates`). |
-
----
-
-## 3. Hợp đồng Dữ liệu & Quy chế ĐRL đã khóa
-
-1. **Hợp đồng 14 trường công bố (`schemas/activity.schema.json`)**:
-   - Bộ trích xuất SP1 tạo bản nháp 15 trường; cổng `prepare_publication()` chuyển `drl_recognized` vào `meta.drl_recognized` để bản ghi `record` có đúng **14 trường**.
-   - Áp dụng quy ước mặc định của nhóm khi bài đăng không nêu: `mandatory = false`, `fee = 0` (lưu vết tại `meta.derived`).
-   - Chuẩn hóa URL (`canonical_url`) loại bỏ các tham số tracking (`rdid`, `fbclid`, `utm_*`) để tạo định danh `ACT-<sha256[:12]>` ổn định.
-2. **Đối chiếu Quy chế ĐRL (`data/drl_rules.json` - QĐ 1028/QĐ-KHTN-CTSV)**:
-   - `R11`: `+10đ` khi không vi phạm quy chế học vụ/khảo thí (theo Phụ lục QĐ 1028 trang 8).
-   - `R1202`: Đã sửa mã lỗi chính tả từ `RR1202` thành `R1202`.
-   - `R23`: Đặt `status = "needs_review"` để không tự động cộng trùng với `R22`.
-   - `R4302`: Sử dụng phân nhóm thời lượng `volunteer_duration_bucket = "24_hours_to_under_one_week"`.
-   - Mọi kết quả tính điểm đều gắn cờ `mode = "DEMO_ONLY"`, `official_award_verified = false`.
+| `/api/profile` | `GET` | Hồ sơ sinh viên & bảng điểm rèn luyện hiện tại trong phiên (`DEMO_ONLY`). |
+| `/api/scores` | `GET` | Điểm số hiện tại theo 5 nhóm tiêu chí (`C1..C5`) và danh sách hoạt động đã lưu của sinh viên. |
+| `/api/evaluate` | `POST` | **Kiểm tra điểm (Pure Preview — Không ghi trạng thái)**: Chạy `SP1 -> prepare_publication -> SP2` để xem trước điểm cộng dự tính mà không tự động lưu hay đánh dấu trùng lặp. |
+| `/api/commit` | `POST` | **Lưu vào bảng điểm / Gửi duyệt**: Chốt cộng điểm chính thức vào bảng điểm học kỳ hoặc gửi bài đăng vào hàng đợi rà soát, lưu tự động xuống `data/sessions/current_session.json`. |
+| `/api/sp2/evaluate` | `POST` | Đánh giá Snapshot điểm học vụ (`semester_gpa`, `academic_exam_violations`, `academic_warning_count`) qua `evaluate_rules_progress`. |
+| `/api/lead/audit` | `GET` | Kiểm toán chất lượng bộ 20 hoạt động thu thập (`activities.json`), quy tắc `needs_review` và cụm bài đăng trùng nguồn. |
 
 ---
 
 ## 4. Chạy Kiểm Thử Tự Động (Automated Tests)
 
-Trên PowerShell:
 ```powershell
-$env:PYTHONPATH = "src"
-python scripts/check_sp2_cases.py
-python -m pytest -v tests/integration tests/test_e2e_pipeline.py
-python -m compileall -q src tests scripts run_server.py
+python -m pytest tests/test_session_flow.py tests/test_e2e_pipeline.py -q
 ```
-
-Chi tiết hướng dẫn vận hành giao diện và 5 kịch bản E2E xem tại **[`RUN_GUIDE.md`](RUN_GUIDE.md)**.
-
