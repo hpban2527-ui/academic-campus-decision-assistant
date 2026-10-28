@@ -17,10 +17,10 @@
         "points": null,
         "mandatory": false,
         "audience": [
-            "Tất cả sinh viên Trường Đại học Khoa học tự nhiên"
+            "Sinh viên Trường Đại học Khoa học tự nhiên"
         ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid02EJmkk2oaZJuBw5VqRhEUeSUNqVW6dav9qSV4AZsK661vLikur7U4PPBqJcPDBYHzl",
@@ -31,7 +31,7 @@
             "URL_registration": null
         },
         "title": "[BẢN LĨNH IT 2026] - KEY ƠI, ĐỪNG QUÊN CÓ HẸN VỚI VÒNG 4 - ALT!",
-        "domain": "skills",
+        "domain": "other",
         "start": "2026-10-17T12:30:00+07:00",
         "end": "2026-10-18T11:00:00+07:00",
         "registration_deadline": null,
@@ -39,9 +39,11 @@
         "location": "Vườn điều, Cơ sở phường Đông Hòa, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
         "points": null,
         "mandatory": false,
-        "audience": null,
+        "audience": [
+            "Tân sinh viên Khoa Công nghệ thông tin, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM"
+        ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l",
@@ -61,10 +63,10 @@
         "points": null,
         "mandatory": false,
         "audience": [
-            "Tất cả sinh viên đang theo học tại Khoa Công nghệ thông tin, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM"
+            "Sinh viên Khoa Công nghệ thông tin, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM"
         ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid0dmRU1XavPQ3rzXsGMSTaL69GEcdsmKnXeVaWA4LYybFFgsJDfg3qtMetBGfn7zKkl",
@@ -75,7 +77,7 @@
             "URL_registration": "https://forms.gle/cQTpHUTMsaboQXYJ7"
         },
         "title": "[GDGoC-HCMUS TIPS & TRICKS]",
-        "domain": "career",
+        "domain": "other",
         "start": "2026-10-03T00:00:00+07:00",
         "end": "2026-10-25T23:59:00+07:00",
         "registration_deadline": "2026-10-10T23:59:00+07:00",
@@ -84,10 +86,10 @@
         "points": null,
         "mandatory": false,
         "audience": [
-            "Tất cả sinh viên của trường Đại học Khoa học tự nhiên, ĐHQG-HCM, và sinh viên trong TP.HCM"
+            "Sinh viên của trường Đại học Khoa học tự nhiên, ĐHQG-HCM, và sinh viên trong TP.HCM"
         ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid02o8CK5Ziex6z2ZjnEhnv49RyHkZwMxEcLkpF49QmVymQp3N2hghbSAcrvzFram89Pl",
@@ -98,7 +100,7 @@
             "URL_registration": "https://forms.gle/cQTpHUTMsaboQXYJ7"
         },
         "title": "[GDGoC-HCMUS RECRUITMENT 2026]",
-        "domain": "career",
+        "domain": "other",
         "start": "2026-10-03T00:00:00+07:00",
         "end": "2026-10-25T23:59:00+07:00",
         "registration_deadline": "2026-10-10T23:59:00+07:00",
@@ -110,7 +112,7 @@
             "Tất cả sinh viên của trường Đại học Khoa học tự nhiên, ĐHQG-HCM, và sinh viên trong TP.HCM"
         ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl",
@@ -131,7 +133,7 @@
         "mandatory": false,
         "audience": null,
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l",
@@ -154,7 +156,7 @@
             "Sinh viên trên toàn quốc"
         ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid02fsjfr4MEtTjN9TpVw3DvfWumQm7Wx2GGE56n7J51Y8sh4brg3p4k1uwhX41h26FFl",
@@ -175,7 +177,7 @@
         "mandatory": false,
         "audience": null,
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl",
@@ -195,7 +197,7 @@
         "points": null,
         "mandatory": false,
         "audience": [
-            "Toàn thể sinh viên Trường Đại học Khoa học tự nhiên"
+            "Sinh viên Trường Đại học Khoa học tự nhiên"
         ],
         "fee": 0,
         "completion_requirements": "Hoàn thành 70% bài thi"
@@ -221,7 +223,7 @@
             "Sinh viên Trường ĐH Khoa học tự nhiên"
         ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl",
@@ -242,7 +244,7 @@
         "mandatory": false,
         "audience": null,
         "fee": 50000,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
@@ -263,7 +265,7 @@
         "mandatory": false,
         "audience": null,
         "fee": 140000,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl",
@@ -284,7 +286,7 @@
         "mandatory": false,
         "audience": null,
         "fee": 40000,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l",
@@ -307,7 +309,7 @@
             "Sinh viên khoa Công nghệ Thông tin"
         ],
         "fee": 500000,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid026SJmz8cRXUkDwHvJrZyZv4bsikCC1t4pdDBt46gTuwxaTkBKtSHvCPvwJH1KJ47l",
@@ -327,10 +329,10 @@
         "points": null,
         "mandatory": false,
         "audience": [
-            "Các bạn Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+            "Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
         ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl",
@@ -353,7 +355,7 @@
             "Sinh viên trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
         ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl",
@@ -376,7 +378,7 @@
             "Sinh viên Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
         ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid02buju6UWyad8k9Z4xH1tR5eNwpWsuaZtnwfesY2o8UQzdFh3p7cHemVx24dkaHSdFl",
@@ -399,7 +401,7 @@
             "Tân sinh viên khoa Công nghệ thông tin"
         ],
         "fee": 0,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     },
     {
         "activity_id": "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
@@ -407,7 +409,7 @@
             "publisher": "Đoàn khoa - Liên chi Hội CNTT KHTN",
             "platform": "facebook",
             "URL_post": "https://www.facebook.com/DoanKhoaLienChiHoi.CNTT.KHTN/posts/pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
-            "URL_registration": null
+            "URL_registration": "bit.ly/TheoDauChanNguoi2026"
         },
         "title": "CUỘC THI TRẮC NGHIỆM TRỰC TUYẾN \"THEO DẤU CHÂN NGƯỜI\"",
         "domain": "other",
@@ -442,9 +444,9 @@
         "points": null,
         "mandatory": false,
         "audience": [
-            "Các bạn Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
+            "Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM"
         ],
         "fee": 20000,
-        "completion_requirements": null
+        "completion_requirements": "Tham gia hoạt động"
     }
 ]
