@@ -47,6 +47,7 @@ Kết quả logic minh họa C1 = 20/30, còn thiếu 10; **không** phải kế
 ~~~bash
 PYTHONPATH=src python -m pytest -q tests/sp1 tests/sp2 tests/integration tests/test_e2e_pipeline.py tests/test_session_flow.py
 python -m compileall -q src tests scripts run_server.py
+python scripts/check_team_source_integrity.py
 ~~~
 
 Trên PowerShell, đặt $env:PYTHONPATH = "src" trước khi chạy lệnh pytest. CI: .github/workflows/integration.yml.
@@ -68,11 +69,11 @@ python scripts/verify_browser_e2e.py
 ~~~
 
 Kết quả và ba hình ảnh demo tự động được tải lên GitHub Actions artifact:
-https://github.com/hpban2527-ui/academic-campus-decision-assistant/actions/runs/40857704270/artifacts/12890480714
+https://github.com/hpban2527-ui/academic-campus-decision-assistant/actions/runs/40859734284/artifacts/12889804760
 
 Kết quả nghiệm thu đã ghi trong `reports/H4_H5_ACCEPTANCE_20261029.md`. Review PR #4 và kiểm tra bảo toàn tài liệu nằm trong `docs/PR4_REVIEW_20261029.md`.
 
-**Chưa merge `main`.** Cần người khác review/approve theo ruleset và quyết định cuối của nhóm trưởng.
+**Chưa merge `main`.** Đã yêu cầu Tiến và Như Ngọc review; cần ít nhất 1 approval hợp lệ theo ruleset trước khi nhóm trưởng quyết định. CI cuối: 269 backend + 25 frontend/session tests, 10/10 rules, 5/5 Chromium; 54/54 tệp nhóm giữ nguyên SHA.
 
 ## Kết quả đã kiểm thử
 
