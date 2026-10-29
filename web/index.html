@@ -1457,8 +1457,22 @@
           const projOk = sp2.projected_added === exp.projected_added;
           const confOk = sp2.confirmed_added === exp.confirmed_added;
           const afterOk = sp2.category_after === exp.category_after;
+          const expectedKeys = ["category_before", "category_cap", "hypothetical_category_after",
+                                "category_id", "rule_id"];
+          const checks = {
+            category_before: sp2.category_before,
+            category_cap: sp2.category_cap,
+            hypothetical_category_after: sp2.hypothetical_category_after,
+            category_id: sp2.category_id,
+            rule_id: sp2.rule?.rule_id
+          };
+          const allExpectedOk = expectedKeys.every(k =>
+            !Object.prototype.hasOwnProperty.call(exp, k) || checks[k] === exp[k]
+          );
+          const isDemo = data.mode === "DEMO_ONLY" && data.official_award_verified === false;
+          const wasSuccessful = resp.ok && data.success === true;
 
-          if (fieldCountOk && decisionOk && projOk && confOk && afterOk) {
+          if (wasSuccessful && isDemo && fieldCountOk && decisionOk && projOk && confOk && afterOk && allExpectedOk) {
             passedCount++;
             logs.push(
               `<div class="p-2.5 rounded-lg bg-emerald-50 text-emerald-800 font-semibold">✔ [Ca ${i} — ${escapeHTML(c.name)}]: PASS | ` +
