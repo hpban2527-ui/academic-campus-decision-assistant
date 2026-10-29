@@ -16,13 +16,13 @@
 
 ## 2. Kiểm thử máy thật trên GitHub Actions
 
-Workflow: https://github.com/hpban2527-ui/academic-campus-decision-assistant/actions/runs/40857704270  
-Commit được kiểm thử: `844b39a3a3a71eb014eb9c9eb0278a1ec3d92480`.
+Workflow: https://github.com/hpban2527-ui/academic-campus-decision-assistant/actions/runs/40859734284  
+Commit được kiểm thử: `2ad8fb6ffcc26aad9849eda2688075f1be26d610`.
 
 | Nhóm kiểm thử | Kết quả thật |
 | --- | --- |
 | SP1, SP2 và Lead backend integration | **269 passed**, 1 warning |
-| Kiểm thử API/frontend và lưu điểm phiên | **23 passed**, 1 warning |
+| Kiểm thử API/frontend và lưu điểm phiên | **25 passed**, 1 warning |
 | 10 expected outputs quy tắc SP2 | **10/10 passed** |
 | Chromium thật: 5 ca E2E qua giao diện → FastAPI | **5/5 passed** |
 | XSS: API activity/review và evidence inspector | **2/2 không thực thi payload** |
@@ -51,7 +51,7 @@ GitHub Actions đã lưu ZIP artifact, gồm:
 - `03_xss_safe_rendering.png`: trang hoạt động khi bơm payload HTML;
 - `evidence.json`: năm ca PASS, kết quả XSS và số lỗi JS.
 
-Artifact: https://github.com/hpban2527-ui/academic-campus-decision-assistant/actions/runs/40857704270/artifacts/12890480714
+Artifact: https://github.com/hpban2527-ui/academic-campus-decision-assistant/actions/runs/40859734284/artifacts/12889804760
 
 Các ảnh được Chromium tạo trong CI; đây là bằng chứng kiểm thử chạy thực, không phải ảnh dựng thủ công. Artifact có thể bị GitHub xóa sau thời gian lưu trữ, nên lưu bản ZIP khi chốt hồ sơ môn học.
 
@@ -73,6 +73,18 @@ Cách đối chiếu: Git REST `git/trees/<tree-sha>?recursive=1` (blob paths v�
 - Sổ tay ĐRL hiện hành 2026 cần được nhà trường xác nhận khi dùng ngoài demo; bộ QĐ1028 là bộ quy tắc mô phỏng đã đối chiếu một số mục (R11, R23, R4302).
 - Checkbox minh chứng hoặc `SYNTHETIC_EVIDENCE_FIXTURE` không xác nhận điểm chính thức; `official_award_verified=false`.
 - Browser automation là kiểm thử E2E ở một môi trường GitHub Actions và không bảo đảm mọi trình duyệt, mọi dữ liệu đều không lỗi.
-- PR #5 đang **Draft** để nhóm review; chưa có approval và **không merge `main`**.
+- PR #5 đã mở để review (không Draft), đã yêu cầu Tiến và Như Ngọc review; **chưa có approval**, **không merge `main`**.
 
 **Kết luận kỹ thuật H4/H5:** phần tích hợp/demo đạt các tiêu chí tự động đã kiểm thử. **Trạng thái release:** `READY_FOR_OWNER_REVIEW`, không phải `MERGED` hoặc `OFFICIAL_DRL_PRODUCTION`. Nhóm trưởng quyết định khi có review/approval thật.
+
+## 6. Bổ sung kiểm soát cuối trước khi đề nghị chấp thuận
+
+- GitHub ruleset `Protect main` (id `24875672`, enforcement `active`) yêu cầu **1 approving review**, cấm xóa branch và cấm force push. Không lách branch protection.
+- Đã gửi yêu cầu review PR #5 cho `TienLuu2007` (owner frontend) và `lamngoc0312` (owner SP2 engine). GitHub xác nhận yêu cầu được tạo, **chưa phải approval**.
+- Thêm `docs/TEAM_SOURCE_LOCK_20261029.json` ghi blob SHA của **54 file** từ nền Lead; `scripts/check_team_source_integrity.py` kiểm tra từng byte bằng thuật toán Git SHA-1 blob và chạy trong CI.
+- Log GitHub Actions trên `2ad8fb6f`: **54/54 unchanged**, backend **269 passed**, frontend/API/session **25 passed**, rules **10/10**, Chromium **5/5**, XSS probe **2/2**, browser JS error **0**.
+- Sửa lệch điểm công bố/rule: `/api/evaluate` không còn tự đổi `record.points` sang `rule.points`; trường hợp không khớp trả `NEEDS_REVIEW` (+0). Hai test hồi quy kiểm tra cả xem trước và lưu không tự cộng.
+- Bản phân công 23–25/10 không cho tự mặc định `mandatory`/`fee`; quyết định vận hành nhóm sau đó chấp thuận mặc định `false`/`0` ở publication boundary, **vẫn đánh dấu trạng thái chờ duyệt và ghi nguồn gốc trong `meta.derived`**. Đây là điều chỉnh từ quyết định nhóm, không phải văn bản trường.
+- Trạng thái: **đạt tiêu chí kỹ thuật H4/H5 cho demo theo phạm vi kiểm thử**, chưa có quyền xác minh minh chứng ĐRL chính thức, chưa có approval và chưa merge.
+
+**Quyền quyết định release:** Nhóm trưởng, sau khi xem review hợp lệ. Không coi CI PASS là bảo đảm tuyệt đối 10/10.
