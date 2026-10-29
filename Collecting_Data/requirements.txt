@@ -1,0 +1,9 @@
+# Web Automation & Browser Interaction
+playwright>=1.40.0
+playwright-stealth>=2.0.0
+
+# Text Shingling & MinHash-LSH Deduplication
+datasketch>=1.6.0
+
+# Date & Time Parsing
+dateparser>=1.2.0

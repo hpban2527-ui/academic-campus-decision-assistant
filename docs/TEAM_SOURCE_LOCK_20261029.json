@@ -1,0 +1,223 @@
+{
+  "description": "Release freeze integrity: teammate source/data/test/doc files preserved exactly from Lead-accepted integration base. Update only through reviewed changes.",
+  "baseline_commit": "69d8d8348bb664da151f52b40d2203e4d530931d",
+  "release_branch": "integration/h4-h5-owner-review-20261029",
+  "files": [
+    {
+      "path": "Collecting_Data/config.py",
+      "blob_sha": "4b309588a0ba156d4dddc2143347ae8bcd39dc34"
+    },
+    {
+      "path": "Collecting_Data/datacollecting.py",
+      "blob_sha": "f30423a5488b2ebbc7c3faae93c7ef764ced1d54"
+    },
+    {
+      "path": "Collecting_Data/deduplication.py",
+      "blob_sha": "72b2b0f1db68ab28f016d84646a1636d33244cee"
+    },
+    {
+      "path": "Collecting_Data/instructor.md",
+      "blob_sha": "0e80248210a5d5ba808304daa63dd691a8e74b0b"
+    },
+    {
+      "path": "Collecting_Data/requirements.txt",
+      "blob_sha": "b2ae2be77ce85ebcf0334a7b0ff1c75dbbaf0d4d"
+    },
+    {
+      "path": "Collecting_Data/scraper.py",
+      "blob_sha": "410bbdeb9dc234855e00ee3ef0ab1213cf25369f"
+    },
+    {
+      "path": "Collecting_Data/source.json",
+      "blob_sha": "3a85d76e86293b8246be557ad3a8e3423e53a2ad"
+    },
+    {
+      "path": "Collecting_Data/storage.py",
+      "blob_sha": "1be012da4f62618ecde319a9a588cfcad20549bd"
+    },
+    {
+      "path": "Collecting_Data/urls.txt",
+      "blob_sha": "1860e1e6cdd4ecf7906795e165cf0511ddb296f1"
+    },
+    {
+      "path": "data/activities.json",
+      "blob_sha": "c88e4130de1973934c192fff646e7f8539136002"
+    },
+    {
+      "path": "data/drl_rules.json",
+      "blob_sha": "cf4969325e38fe3e66b5e8d6d0d726fc71fb0615"
+    },
+    {
+      "path": "data/drl_sources.md",
+      "blob_sha": "e6e5443f3688cd8730512adf3dcefae23b82b552"
+    },
+    {
+      "path": "data/drl_test_cases.json",
+      "blob_sha": "920b3d997c86746bc94e1c2a5970271935be23f7"
+    },
+    {
+      "path": "data/drl_test_cases.md",
+      "blob_sha": "684b9d062d61fc1d62985937f13c888f3080630a"
+    },
+    {
+      "path": "data/gold/README.md",
+      "blob_sha": "ac68e5018441369a88abcadd44fd57f34b7c8e2c"
+    },
+    {
+      "path": "data/gold/source_gold.json",
+      "blob_sha": "aeec5a39699045ffa5244e9e686f66627dc6f712"
+    },
+    {
+      "path": "data/raw/source.json",
+      "blob_sha": "3a85d76e86293b8246be557ad3a8e3423e53a2ad"
+    },
+    {
+      "path": "data/sample_e2e_io.json",
+      "blob_sha": "836b124ece06094eac7507a8c8f2e5d629476cd0"
+    },
+    {
+      "path": "data/source_posts.json",
+      "blob_sha": "3a85d76e86293b8246be557ad3a8e3423e53a2ad"
+    },
+    {
+      "path": "data/student_profile.json",
+      "blob_sha": "c884410cfd8e815bc01357bd88382bfab714b36d"
+    },
+    {
+      "path": "docs/LEAD_INTEGRATION_HANDOFF.md",
+      "blob_sha": "8dbe72a08c946a6a88e1995f80ad247b91be368c"
+    },
+    {
+      "path": "docs/REGULATION_SOURCE_AUDIT_20261027.md",
+      "blob_sha": "b2c1d209fdda342bdda71f9d4665192b435a96c2"
+    },
+    {
+      "path": "docs/WORKFLOW.md",
+      "blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/adr/0001-sp1-extraction-contract.md",
+      "blob_sha": "0da0a7e462b28603530f1cfb194ac03f42265819"
+    },
+    {
+      "path": "docs/sp1_run_guide.md",
+      "blob_sha": "6486ec7ffd86abb7538d86d83061e6d2a2fe9fef"
+    },
+    {
+      "path": "reports/sp1_evaluation.md",
+      "blob_sha": "f215c69c5684c680f93f248ad051e251670bc16f"
+    },
+    {
+      "path": "reports/sp1_output.json",
+      "blob_sha": "8d1cbf8ee29e6bad22cfd8b26c52e9d726a5089f"
+    },
+    {
+      "path": "reports/sp1_sample.json",
+      "blob_sha": "dc1751b5ab89ea76fe66ae2af30962c0fe5deb8d"
+    },
+    {
+      "path": "reports/sp1_test_report.md",
+      "blob_sha": "14437003e62a1f0d522d4ec27ea7fd1eb22f96f8"
+    },
+    {
+      "path": "schemas/activity.schema.json",
+      "blob_sha": "b00ecd5d6062a20680f7931fc7b65b186eeda14b"
+    },
+    {
+      "path": "schemas/examples/announcement_input.json",
+      "blob_sha": "80162b344569a087af00f886ccfc4478f61bf740"
+    },
+    {
+      "path": "schemas/examples/extraction_draft_example.json",
+      "blob_sha": "e416a7e25f6f33e215f77b97917bc44065f7b8e6"
+    },
+    {
+      "path": "schemas/examples/gold_example.json",
+      "blob_sha": "85b841f7e15ad5dbb77a5c3b4cdcd89a559833e7"
+    },
+    {
+      "path": "schemas/examples/posts_example.json",
+      "blob_sha": "84e7c64966c3d10beebb5ba8683c39d4f200ef96"
+    },
+    {
+      "path": "schemas/extraction_draft.schema.json",
+      "blob_sha": "28f3eb8f3d25555034e9f35f16042197d7a07fd0"
+    },
+    {
+      "path": "scripts/check_sp2_cases.py",
+      "blob_sha": "8232a453666c45692ef7326daf8519ef96085f97"
+    },
+    {
+      "path": "src/sp1/__init__.py",
+      "blob_sha": "4623941beced42eaacfdad745e0d5d84597d66c1"
+    },
+    {
+      "path": "src/sp1/dates.py",
+      "blob_sha": "157e7033df51f709afe22eabbce6bcb62cb37ae9"
+    },
+    {
+      "path": "src/sp1/deduplication.py",
+      "blob_sha": "9f521a97922b8ba14de1389fed21f4a915c6ae88"
+    },
+    {
+      "path": "src/sp1/evaluate.py",
+      "blob_sha": "39811a0f03088df834522004a9bf2b296fac25da"
+    },
+    {
+      "path": "src/sp1/extractor.py",
+      "blob_sha": "4ae0b322646aa221e0fc5b178eed14d83aa20f10"
+    },
+    {
+      "path": "src/sp1/llm_backend.py",
+      "blob_sha": "301c37344fd9c0dde38039ad9ef742ad075a2ee6"
+    },
+    {
+      "path": "src/sp1/regex_baseline.py",
+      "blob_sha": "e0138e5e565b8874c9bd811837453284007a06d4"
+    },
+    {
+      "path": "src/sp2/__init__.py",
+      "blob_sha": "a9558efc859f891aff9dddedf092cb18affefd18"
+    },
+    {
+      "path": "src/sp2/drl_engine.py",
+      "blob_sha": "639297e97b562168f4c5511b5f9c5643bbf6aca9"
+    },
+    {
+      "path": "tests/sp1/conftest.py",
+      "blob_sha": "14de74a686a47fb6cdbe7d6b73342b700969a7fd"
+    },
+    {
+      "path": "tests/sp1/fixtures/khtn_zero_2026_raw.txt",
+      "blob_sha": "1dd9c0f7500c2b762613c2be58a37b27a6864b76"
+    },
+    {
+      "path": "tests/sp1/fixtures/lis_2026_raw.txt",
+      "blob_sha": "ce24dc1654e5cbbb0307daabac1bbc2a4e60644a"
+    },
+    {
+      "path": "tests/sp1/test_dates.py",
+      "blob_sha": "62b7feef572f00e69ca2534c176ce74046e21c67"
+    },
+    {
+      "path": "tests/sp1/test_extractor.py",
+      "blob_sha": "47231997499776b59ac22da170a35606953e77c2"
+    },
+    {
+      "path": "tests/sp2/conftest.py",
+      "blob_sha": "2306d96e7575ae2d7126b86a5f0b8918f40f2fff"
+    },
+    {
+      "path": "tests/sp2/fixtures/actual_rules_progress_sample.json",
+      "blob_sha": "3062c9c785fa2cf8208f975c57e9e18fe6894fb5"
+    },
+    {
+      "path": "tests/sp2/test_drl_engine.py",
+      "blob_sha": "1685e1ce46b33969368ecd99ea0a1558b32f70f5"
+    },
+    {
+      "path": "tests/sp2/test_rule_bridge.py",
+      "blob_sha": "86730d688aad84a7b7ac436b2c18302ba7b7e618"
+    }
+  ]
+}
