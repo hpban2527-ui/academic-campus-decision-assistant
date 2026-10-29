@@ -802,6 +802,18 @@
   <!-- ======================================================================== -->
   <script>
     const API_BASE = "";
+    // Escape data from posts, profile inputs and API responses before HTML template insertion.
+    // Only our own hard-coded HTML tags/classes may be interpolated unescaped.
+    function escapeHTML(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[ch]);
+    }
+    function safeNumber(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
     let backendAvailable = false;
     let currentStudent = null;
     let lastRawResponse = null;
@@ -1163,7 +1175,7 @@
             <div class="flex items-center justify-between text-sm mb-2.5">
               <div class="font-bold text-slate-800 flex items-center">
                 <span class="w-3 h-3 rounded-full mr-2.5 shrink-0" style="background-color: ${FIELD_COLORS[cid]}"></span>
-                <span class="text-[15px]">${info.name}</span>
+                <span class="text-[15px]">${escapeHTML(info.name)}</span>
                 ${deltaTag}
               </div>
               <div class="font-extrabold text-slate-900 text-base shrink-0">
@@ -1219,9 +1231,9 @@
           <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2 text-xs">
             <div class="truncate font-semibold text-slate-800">
               <span class="font-mono text-slate-400 mr-1">#${idx + 1}</span>
-              <span>${item.title || item.commit_id}</span>
+              <span>${escapeHTML(item.title || item.commit_id)}</span>
             </div>
-            <span class="px-2 py-0.5 rounded font-bold shrink-0 ${badgeCls}">${pts} (${item.category_id})</span>
+            <span class="px-2 py-0.5 rounded font-bold shrink-0 ${badgeCls}">${pts} (${escapeHTML(item.category_id)})</span>
           </div>
         `;
       }).join("");
@@ -1367,13 +1379,13 @@
         <div class="bg-white rounded-2xl p-5 space-y-4 flex flex-col justify-between border border-slate-200 shadow-xs">
           <div class="space-y-2">
             <div class="flex justify-between items-start gap-2">
-              <span class="text-base font-extrabold text-slate-900">${c.name}</span>
-              <span class="px-2 py-0.5 rounded-md text-xs font-bold whitespace-nowrap ${c.badge_class || 'bg-blue-100 text-blue-800'}">${c.badge}</span>
+              <span class="text-base font-extrabold text-slate-900">${escapeHTML(c.name)}</span>
+              <span class="px-2 py-0.5 rounded-md text-xs font-bold whitespace-nowrap ${escapeHTML(c.badge_class || 'bg-blue-100 text-blue-800')}">${escapeHTML(c.badge)}</span>
             </div>
-            <div class="text-xs font-mono text-brand-700 font-bold">${c.rule_label || c.rule_override}</div>
-            <p class="text-sm text-slate-600 leading-relaxed">${c.description}</p>
+            <div class="text-xs font-mono text-brand-700 font-bold">${escapeHTML(c.rule_label || c.rule_override)}</div>
+            <p class="text-sm text-slate-600 leading-relaxed">${escapeHTML(c.description)}</p>
           </div>
-          <button onclick="loadAndRunPreset(${c.id})" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-brand-600 text-slate-800 hover:text-white font-bold text-sm transition">
+          <button onclick="loadAndRunPreset(${safeNumber(c.id)})" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-brand-600 text-slate-800 hover:text-white font-bold text-sm transition">
             Chạy kịch bản này &rarr;
           </button>
         </div>
@@ -1449,15 +1461,15 @@
           if (fieldCountOk && decisionOk && projOk && confOk && afterOk) {
             passedCount++;
             logs.push(
-              `<div class="p-2.5 rounded-lg bg-emerald-50 text-emerald-800 font-semibold">✔ [Ca ${i} — ${c.name}]: PASS | ` +
-              `14 trường OK | ${sp2.decision} | Dự kiến: +${sp2.projected_added}đ | Xác nhận: +${sp2.confirmed_added}đ | ` +
-              `${sp2.category_id}: ${sp2.category_before} &rarr; ${sp2.category_after}/${sp2.category_cap}đ</div>`
+              `<div class="p-2.5 rounded-lg bg-emerald-50 text-emerald-800 font-semibold">✔ [Ca ${i} — ${escapeHTML(c.name)}]: PASS | ` +
+              `14 trường OK | ${escapeHTML(sp2.decision)} | Dự kiến: +${sp2.projected_added}đ | Xác nhận: +${sp2.confirmed_added}đ | ` +
+              `${escapeHTML(sp2.category_id)}: ${sp2.category_before} &rarr; ${sp2.category_after}/${sp2.category_cap}đ</div>`
             );
           } else {
             logs.push(`<div class="p-2.5 rounded-lg bg-rose-50 text-rose-700 font-semibold">✖ [Ca ${i}]: SAI LỆCH</div>`);
           }
         } catch (err) {
-          logs.push(`<div class="p-2.5 rounded-lg bg-rose-50 text-rose-700 font-semibold">✖ [Ca ${i}]: Lỗi (${err.message})</div>`);
+          logs.push(`<div class="p-2.5 rounded-lg bg-rose-50 text-rose-700 font-semibold">✖ [Ca ${i}]: Lỗi (${escapeHTML(err.message)})</div>`);
         }
       }
 
@@ -1511,14 +1523,14 @@
           ? `<div class="text-slate-400">Chưa có tiêu chí nào đạt điểm.</div>`
           : matched.map(r => `
               <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex justify-between items-center">
-                <span class="font-semibold text-slate-800">${r.title}</span>
+                <span class="font-semibold text-slate-800">${escapeHTML(r.title)}</span>
                 <span class="font-extrabold text-emerald-700 text-base">+${r.points} điểm</span>
               </div>
             `).join("");
 
         const critHtml = criteria.filter(c => c.score > 0 || c.target != null).map(c => `
           <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center">
-            <span class="font-bold text-slate-800">Mục ${c.code.replace('C', '')} (Tối đa ${c.max_score}đ)</span>
+            <span class="font-bold text-slate-800">Mục ${escapeHTML(String(c.code).replace('C', ''))} (Tối đa ${c.max_score}đ)</span>
             <div>
               <span class="font-extrabold text-brand-700 text-base">${c.score} / ${c.max_score} điểm</span>
             </div>
@@ -1839,9 +1851,9 @@
         return `
           <tr class="hover:bg-slate-50">
             <td class="py-2.5 px-4 text-center text-slate-400">${idx + 1}</td>
-            <td class="py-2.5 px-4 font-bold text-brand-700">${field}</td>
-            <td class="py-2.5 px-4 text-slate-800 break-all">${typeof val === 'object' ? JSON.stringify(val) : String(val ?? 'null')}</td>
-            <td class="py-2.5 px-4 text-slate-500">${typeof ev === 'object' ? JSON.stringify(ev) : String(ev)}</td>
+            <td class="py-2.5 px-4 font-bold text-brand-700">${escapeHTML(field)}</td>
+            <td class="py-2.5 px-4 text-slate-800 break-all">${escapeHTML(typeof val === 'object' ? JSON.stringify(val) : String(val ?? 'null'))}</td>
+            <td class="py-2.5 px-4 text-slate-500">${escapeHTML(typeof ev === 'object' ? JSON.stringify(ev) : String(ev))}</td>
           </tr>
         `;
       }).join("");
@@ -2016,16 +2028,16 @@
                   <div class="flex items-start justify-between gap-3">
                     <div class="font-bold text-sm text-slate-900 leading-snug">
                       <span class="text-xs font-mono font-bold text-slate-400 mr-1.5">#${idx + 1}</span>
-                      <span>${a.title || a.activity_id}</span>
+                      <span>${escapeHTML(a.title || a.activity_id)}</span>
                     </div>
                     <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-100 text-emerald-800 whitespace-nowrap shrink-0">
-                      ${ptsDisplay}
+                      ${escapeHTML(ptsDisplay)}
                     </span>
                   </div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-500 pt-1 border-t border-slate-200/60">
-                    <div><b>Đơn vị:</b> <span class="text-slate-700">${a.source?.publisher || a.organizer || 'Trường ĐH KHTN'}</span></div>
-                    <div><b>Thời gian:</b> <span class="text-slate-700 font-mono">${timeDisplay}</span></div>
-                    <div class="sm:col-span-2"><b>Địa điểm:</b> <span class="text-slate-700">${locDisplay}</span></div>
+                    <div><b>Đơn vị:</b> <span class="text-slate-700">${escapeHTML(a.source?.publisher || a.organizer || 'Trường ĐH KHTN')}</span></div>
+                    <div><b>Thời gian:</b> <span class="text-slate-700 font-mono">${escapeHTML(timeDisplay)}</span></div>
+                    <div class="sm:col-span-2"><b>Địa điểm:</b> <span class="text-slate-700">${escapeHTML(locDisplay)}</span></div>
                   </div>
                 </div>
               `;
@@ -2040,12 +2052,12 @@
                 <div class="flex items-start justify-between gap-2">
                   <div class="font-bold text-sm text-amber-900 leading-snug">
                     <span class="text-xs font-mono text-amber-600 mr-1">#${idx + 1}</span>
-                    ${item.record?.title || item.title || 'Bài đăng cần rà soát'}
+                    ${escapeHTML(item.record?.title || item.title || 'Bài đăng cần rà soát')}
                   </div>
                   <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-900 shrink-0">Chờ duyệt</span>
                 </div>
                 <div class="text-xs font-mono text-amber-800">
-                  <b>Cờ:</b> ${(item.meta?.flags || item.flags || []).join(", ") || 'REVIEW_REQUIRED'}
+                  <b>Cờ:</b> ${escapeHTML((item.meta?.flags || item.flags || []).join(", ") || 'REVIEW_REQUIRED')}
                 </div>
               </div>
             `).join("");
@@ -2074,7 +2086,7 @@
             </div>
           </div>
           <div class="text-[11px] font-mono text-slate-500 pt-1">
-            Quy chế: ${data.regulation_id} • Trùng chéo: ${dups.length} nhóm
+            Quy chế: ${escapeHTML(data.regulation_id)} • Trùng chéo: ${dups.length} nhóm
           </div>
         `;
       } catch (e) {}
