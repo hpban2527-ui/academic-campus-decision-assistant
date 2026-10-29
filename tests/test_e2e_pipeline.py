@@ -235,3 +235,33 @@ def test_frontend_cannot_fallback_to_fake_credit():
     html = (ROOT / "web/index.html").read_text(encoding="utf-8")
     assert "result = runClientFallback(reqBody)" not in html
     assert "Simulated point calculations are intentionally disabled" in html
+
+
+def test_demo_does_not_rewrite_announced_points_to_selected_rule():
+    """Wrong rule override must not manufacture source evidence or award even demo points."""
+    c = payload(1, simulate_demo=True)
+    # The PCCC notice states +5, while R3101 is +10 in the team rule set.
+    c["rule_override"] = "R3101"
+    response = client.post("/api/evaluate", json=c)
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["sp1"]["record"]["points"] == 5
+    assert data["sp2"]["announced_points"] == 5
+    assert data["sp2"]["rule_points"] == 10
+    assert data["sp2"]["decision"] == "NEEDS_REVIEW"
+    assert data["sp2"]["projected_added"] == 0
+    assert data["sp2"]["confirmed_added"] == 0
+    assert data["commit"]["kind"] == "review"
+    assert "không được tự đổi điểm công bố" in data["sp2"]["explanation"]
+
+
+def test_conflicting_rule_cannot_be_saved_as_demo_credit():
+    c = payload(1, simulate_demo=True)
+    c["rule_override"] = "R3101"
+    response = client.post("/api/commit", json=c)
+    assert response.status_code == 200, response.text
+    assert response.json()["kind"] == "review"
+    scores = client.get("/api/scores", params={"student_id": "25127242"}).json()
+    assert scores["total_confirmed"] == 69
+    assert scores["total_projected"] == 0
+
