@@ -886,6 +886,10 @@ def evaluate_announcement(req: EvaluationRequest):
         or meta.get("flags")
         or matched_rule is None
         or matched_rule.get("status") != "verified"
+        or (
+            rec.get("points") is not None
+            and rec["points"] != matched_rule.get("points")
+        )
     ):
         meta["routed_to"] = "review_queue"
         decision = "NEEDS_REVIEW"
@@ -905,6 +909,11 @@ def evaluate_announcement(req: EvaluationRequest):
                 f"Quy tắc {matched_rule.get('rule_id')} đang ở trạng thái '{matched_rule.get('status')}' "
                 "(tạm khóa chờ trường xác nhận theo đối chiếu QĐ 1028), nên engine SP2 không tự cộng điểm."
             )
+        elif rec.get("points") is not None and rec["points"] != matched_rule.get("points"):
+            reason_detail = (
+                f"Bài đăng công bố +{rec['points']} điểm nhưng quy tắc {matched_rule['rule_id']} "
+                f"quy định +{matched_rule['points']} điểm. Cần đối chiếu lại; không được tự đổi điểm công bố."
+            )
         else:
             reason_detail = (
                 f"Bản trích xuất SP1 ở trạng thái '{meta.get('status')}' hoặc có cờ cảnh báo "
@@ -916,10 +925,7 @@ def evaluate_announcement(req: EvaluationRequest):
     else:
         # Execute real SP2 evaluation via evaluate_reviewed_activity -> sp2.drl_engine.evaluate_progress
         eval_record = dict(rec)
-        # If post announced points differ from rule points when user explicitly overrides rule (e.g. Case 4),
-        # align record points for the simulated approval fixture while reporting both in the response.
-        if eval_record.get("points") is not None and eval_record.get("points") != rule_points:
-            eval_record["points"] = rule_points
+        # Preserve SP1's source-grounded announced points. Demo approval never rewrites a claim.
 
         simulated_approval = {
             "decision": "APPROVED",
