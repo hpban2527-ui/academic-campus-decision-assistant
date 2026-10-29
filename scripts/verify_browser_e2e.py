@@ -75,7 +75,7 @@ def main() -> None:
             # Open one real preset through its normal browser UI.
             page.locator("#testSuitesGrid button").first.click()
             page.wait_for_function(
-                "document.querySelector('#resDecisionBadge').textContent.includes('DỰ KIẾN')",
+                "document.querySelector('#resDecisionBadge').textContent.toLocaleLowerCase('vi').includes('dự kiến')",
                 timeout=25000,
             )
             output["single_preset"] = {
