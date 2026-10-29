@@ -9,14 +9,18 @@ python -m pip install -r requirements.txt
 python run_server.py
 ~~~
 
-Web: http://localhost:8000. Phải bật server; JavaScript **không** còn cơ chế tính điểm giả khi API mất kết nối.
+Web: http://localhost:8000. Bật server trước khi mở trang. Giao diện do Tiến xây, dữ liệu và điểm đang ở chế độ **DEMO_ONLY** (không phải điểm ĐRL chính thức).
 
 ## API và đầu ra
 
 - GET /api/health — trạng thái, số lượng rules, cảnh báo quy chế.
 - GET /api/activities — dữ liệu hoạt động thu thập, **chưa được xác nhận ĐRL**.
 - GET /api/rules — bộ 75 quy tắc của Tuyền và nguồn.
-- POST /api/evaluate — văn bản + nguồn → SP1 → 14-field candidate → trùng lặp/review. Không cộng điểm từ bài đăng hoặc checkbox.
+- POST /api/evaluate — văn bản + nguồn → SP1 → 14-field candidate → kiểm tra trùng/review. Mặc định là strict intake, không tự cộng điểm. Với `simulate_demo=true` sẽ chạy chấm điểm mô phỏng trên engine SP2.
+- POST /api/commit — thao tác **Lưu** riêng sau bước xem trước; backend đánh giá lại, tránh cộng trùng; chỉ ghi bảng điểm demo hoặc đưa bài vào hàng đợi review.
+- GET /api/scores?student_id=... — trả điểm đã lưu/dự kiến theo sinh viên (demo).
+- POST /api/reset — đặt lại trạng thái phiên mẫu.
+- GET /api/e2e-cases — trả 5 ca kiểm thử kèm expected output.
 - POST /api/sp2/evaluate — chạy engine của Ngọc trên snapshot mẫu; trả `DEMO_ONLY`, không xác nhận điểm chính thức.
 - POST /api/pipeline/demo — **bài đăng mẫu → SP1 → bước duyệt mô phỏng → rule R19 → engine SP2**; so sánh điểm dự kiến với minh chứng mô phỏng. Chỉ chấp nhận kịch bản mẫu phía server, không cho client tự duyệt.
 - GET /api/lead/audit — kiểm tra chất lượng dataset, rules đang cần review và nhóm thông báo trùng có đầy đủ nguồn.
@@ -41,11 +45,34 @@ Kết quả logic minh họa C1 = 20/30, còn thiếu 10; **không** phải kế
 ## Chạy kiểm thử
 
 ~~~bash
-PYTHONPATH=src python -m pytest -q tests/sp1 tests/sp2 tests/integration tests/test_e2e_pipeline.py
+PYTHONPATH=src python -m pytest -q tests/sp1 tests/sp2 tests/integration tests/test_e2e_pipeline.py tests/test_session_flow.py
 python -m compileall -q src tests scripts run_server.py
 ~~~
 
 Trên PowerShell, đặt $env:PYTHONPATH = "src" trước khi chạy lệnh pytest. CI: .github/workflows/integration.yml.
+
+## Bàn giao H4–H5 – bản tích hợp cuối chờ duyệt
+
+PR tổng hợp: https://github.com/hpban2527-ui/academic-campus-decision-assistant/pull/5
+
+Nhánh `integration/h4-h5-owner-review-20261029` nhận giao diện và luồng lưu điểm từ PR #4 của Tiến vào nền code SP1/SP2/Lead trên PR #3. **Không có file nào của nhóm bị xóa.**
+
+Để chạy thử đủ luồng: mở web, vào danh sách 5 ca demo, bấm chạy từng ca hoặc **Chạy tất cả 5 ca** trong chế độ developer. Mỗi ca so sánh bản ghi 14 trường, trạng thái, quy tắc, nhóm, trần và điểm với expected output. Hai bước **Xem trước** và **Lưu** là hai thao tác khác nhau.
+
+Kiểm thử qua Chromium thật (cần Playwright):
+
+~~~bash
+python -m pip install playwright
+python -m playwright install chromium
+python scripts/verify_browser_e2e.py
+~~~
+
+Kết quả và ba hình ảnh demo tự động được tải lên GitHub Actions artifact:
+https://github.com/hpban2527-ui/academic-campus-decision-assistant/actions/runs/40857704270/artifacts/12890480714
+
+Kết quả nghiệm thu đã ghi trong `reports/H4_H5_ACCEPTANCE_20261029.md`. Review PR #4 và kiểm tra bảo toàn tài liệu nằm trong `docs/PR4_REVIEW_20261029.md`.
+
+**Chưa merge `main`.** Cần người khác review/approve theo ruleset và quyết định cuối của nhóm trưởng.
 
 ## Kết quả đã kiểm thử
 
