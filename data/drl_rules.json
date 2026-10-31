@@ -5,7 +5,14 @@
     "issued_date": "2020-09-04",
     "effective_from": "HK1/2020-2021",
     "source": "https://hcmus.edu.vn/wp-content/uploads/2024/03/QD-1028-QC-DRL-2020_20231.pdf",
-    "status": "verified"
+    "status": "verified",
+    "scope": {
+    "university": "HCMUS",
+    "student_type": "full_time",
+    "faculty": null,
+    "cohort": null,
+    "program": null
+  }
   },
   "scoring_model": {
     "assessment_period": "official_semester",
@@ -449,20 +456,20 @@
     },
     {
       "rule_id": "R23",
-      "criterion_id": "2.2",
+      "criterion_id": "2.3",
       "category_id": "C2",
       "name": "Tham gia các đợt khảo sát, điều tra xã hội",
       "condition": {
-        "field": "course_evaluation_completion_rate",
-        "operator": "greater_than",
-        "value": 0.5
+        "field": "social_survey_participation",
+        "operator": "count_greater_than",
+        "value": 0
       },
       "points": 5,
       "unit": "per_semester",
       "evidence_required": true,
       "source": {
         "document_id": "1028/QD-KHTN-CTSV",
-        "location": "Phụ lục, mục 2.2"
+        "location": "Phụ lục, mục 2.3"
       },
       "status": "verified"
     },
@@ -877,7 +884,7 @@
         "field": "volunteer_hours_per_activity",
         "operator": "range",
         "min_inclusive": 24,
-        "max_exclusive": "one_week"
+        "max_exclusive": 168
       },
       "points": 10,
       "unit": "per_activity",
@@ -896,7 +903,7 @@
       "condition": {
         "field": "volunteer_duration",
         "operator": "greater_than_or_equal",
-        "value": "one_week"
+        "value": 168
       },
       "points": 15,
       "unit": "per_activity",
