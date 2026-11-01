@@ -42,6 +42,38 @@ VERIFIED_CLAIM_STATUSES = {
 }
 NON_CONFIRMED_RECORD_STATUSES = {"PENDING", "POTENTIAL"}
 
+# A unit describes how often one matched rule may contribute.  Period/semester
+# units are deliberately single-award units: a count field only proves that the
+# condition is met; it does not multiply the award.  Count-based entity units
+# represent independently countable achievements.
+REPEATABLE_COUNT_UNITS = {
+    "per_activity",
+    "per_award",
+    "per_certificate_or_activity",
+    "per_competition",
+    "per_eligible_achievement",
+    "per_project",
+    "per_published_article",
+}
+SINGLE_AWARD_UNITS = {
+    "in_semester_of_decision",
+    "per_activity_period",
+    "per_assessed_semester",
+    "per_occurrence",
+    "per_period",
+    "per_semester",
+}
+KNOWN_UNITS = REPEATABLE_COUNT_UNITS | SINGLE_AWARD_UNITS
+
+_SCOPE_ALIASES = {
+    "universities": ("universities", "university"),
+    "faculties": ("faculties", "faculty"),
+    "cohorts": ("cohorts", "cohort"),
+    "programs": ("programs", "program"),
+    "campuses": ("campuses", "campus"),
+    "student_types": ("student_types", "student_type"),
+}
+
 
 def _is_number(value: Any) -> bool:
     return isinstance(value, Real) and not isinstance(value, bool)
@@ -143,6 +175,23 @@ def audit_rules_config(config: Mapping[str, Any]) -> list[dict[str, str]]:
             issues.append(
                 AuditIssue(
                     "error", "POINTS_NOT_NUMERIC", f"{path}.points", "points must be numeric"
+                )
+            )
+
+        unit = rule.get("unit")
+        if not isinstance(unit, str) or not unit.strip():
+            issues.append(
+                AuditIssue(
+                    "warning", "UNIT_MISSING", f"{path}.unit", "unit is required"
+                )
+            )
+        elif unit not in KNOWN_UNITS:
+            issues.append(
+                AuditIssue(
+                    "warning",
+                    "UNSUPPORTED_UNIT",
+                    f"{path}.unit",
+                    f"unsupported unit {unit!r}",
                 )
             )
 
@@ -261,19 +310,11 @@ def _condition_matches(condition: Mapping[str, Any], actual: Any) -> bool:
 def _repeat_count(rule: Mapping[str, Any], actual: Any) -> int:
     """Get the multiplier for rules that can be counted more than once."""
 
-    repeatable_units = {
-        "per_activity",
-        "per_award",
-        "per_competition",
-        "per_eligible_achievement",
-        "per_project",
-        "per_published_article",
-    }
     condition = rule.get("condition", {})
     if (
         isinstance(condition, Mapping)
         and condition.get("operator") == "count_greater_than"
-        and rule.get("unit") in repeatable_units
+        and rule.get("unit") in REPEATABLE_COUNT_UNITS
         and _is_number(actual)
     ):
         return max(1, int(actual))
@@ -315,7 +356,8 @@ def evaluate_rule_conditions(
     scoring = config["scoring_model"]
     matched: list[dict[str, Any]] = []
     skipped_rules: list[dict[str, str]] = []
-    by_category_raw: dict[str, float] = {}
+    by_criterion_raw: dict[tuple[str, str], float] = {}
+    criterion_caps: dict[tuple[str, str], Real | None] = {}
     seen_conditions: dict[tuple[Any, ...], str] = {}
     relevant_configuration_issues: list[dict[str, str]] = []
 
@@ -368,11 +410,45 @@ def evaluate_rule_conditions(
                 "points": awarded,
                 "base_points": rule["points"],
                 "multiplier": multiplier,
+                "unit": rule.get("unit"),
                 "source": rule.get("source"),
             }
         )
         category = str(rule.get("category_id"))
-        by_category_raw[category] = by_category_raw.get(category, 0) + awarded
+        criterion = str(rule.get("criterion_id"))
+        criterion_key = (category, criterion)
+        by_criterion_raw[criterion_key] = (
+            by_criterion_raw.get(criterion_key, 0) + awarded
+        )
+        configured_criterion_cap = rule.get(
+            "criterion_max_score", rule.get("criterion_cap")
+        )
+        if _is_number(configured_criterion_cap):
+            previous_cap = criterion_caps.get(criterion_key)
+            if previous_cap is not None and previous_cap != configured_criterion_cap:
+                raise DRLEngineError(
+                    f"conflicting criterion cap for {criterion!r}: "
+                    f"{previous_cap!r} and {configured_criterion_cap!r}"
+                )
+            criterion_caps[criterion_key] = configured_criterion_cap
+        else:
+            criterion_caps.setdefault(criterion_key, None)
+
+    by_criterion: list[dict[str, Any]] = []
+    by_category_raw: dict[str, float] = {}
+    for (category, criterion), raw_score in by_criterion_raw.items():
+        cap = criterion_caps[(category, criterion)]
+        score = min(raw_score, cap) if _is_number(cap) and raw_score > 0 else raw_score
+        by_criterion.append(
+            {
+                "criterion_id": criterion,
+                "category_id": category,
+                "raw_score": _clean_number(raw_score),
+                "cap": cap,
+                "score": _clean_number(score),
+            }
+        )
+        by_category_raw[category] = by_category_raw.get(category, 0) + score
 
     caps = {
         str(item.get("category_id")): item.get("max_score")
@@ -385,7 +461,12 @@ def evaluate_rule_conditions(
         cap = caps.get(category)
         score = min(raw_score, cap) if _is_number(cap) and raw_score > 0 else raw_score
         by_category.append(
-            {"category_id": category, "raw_score": raw_score, "cap": cap, "score": score}
+            {
+                "category_id": category,
+                "raw_score": _clean_number(raw_score),
+                "cap": cap,
+                "score": _clean_number(score),
+            }
         )
         rule_points_total += score
 
@@ -394,7 +475,9 @@ def evaluate_rule_conditions(
     if not _is_number(base) or not _is_number(extras):
         raise DRLEngineError("current_confirmed_score and eligible_extra_points must be numeric")
     raw_total = base + extras + rule_points_total
-    maximum = scoring.get("max_total_score", 100)
+    maximum = scoring.get(
+        "max_total_score", scoring.get("semester_score_max", 100)
+    )
     minimum = scoring.get("semester_score_min", 0)
     if not _is_number(maximum) or not _is_number(minimum):
         raise DRLEngineError("score minimum and maximum must be numeric")
@@ -409,6 +492,7 @@ def evaluate_rule_conditions(
         "matched_rules": matched,
         "rule_points_total": _clean_number(rule_points_total),
         "category_scores": by_category,
+        "criterion_scores": by_criterion,
         "raw_total_before_cap": _clean_number(raw_total),
         "final_score": _clean_number(final_score),
         "needs_review": bool(missing or relevant_configuration_issues or skipped_rules),
@@ -424,35 +508,79 @@ def _clean_number(value: float | int) -> float | int:
 
 
 def _scope_value(profile: Mapping[str, Any], plural_key: str) -> Any:
-    aliases = {
-        "universities": ("university", "universities"),
-        "faculties": ("faculty", "faculties"),
-        "cohorts": ("cohort", "cohorts"),
-        "programs": ("program", "programs"),
-        "campuses": ("campus", "campuses"),
-    }
-    for key in aliases.get(plural_key, (plural_key,)):
+    for key in _SCOPE_ALIASES.get(plural_key, (plural_key,)):
         if key in profile:
             return profile[key]
     return None
 
 
+def _normalise_scope(scope: Any) -> dict[str, list[Any]]:
+    """Accept singular regulation keys and plural API keys in one shape."""
+
+    if not isinstance(scope, Mapping):
+        return {}
+    normalised: dict[str, list[Any]] = {}
+    for canonical, aliases in _SCOPE_ALIASES.items():
+        value: Any = None
+        for alias in aliases:
+            if alias in scope and scope[alias] is not None:
+                value = scope[alias]
+                break
+        values = _as_list(value)
+        if values:
+            normalised[canonical] = values
+    return normalised
+
+
+def _effective_scope(
+    config: Mapping[str, Any], requested_scope: Mapping[str, Any] | None
+) -> dict[str, list[Any]]:
+    """Combine the regulation's trusted scope with optional API narrowing."""
+
+    regulation = config.get("regulation", {})
+    regulation_scope = (
+        _normalise_scope(regulation.get("scope"))
+        if isinstance(regulation, Mapping)
+        else {}
+    )
+    requested = _normalise_scope(requested_scope)
+    if not regulation_scope:
+        return requested
+    if not requested:
+        return regulation_scope
+
+    combined = dict(regulation_scope)
+    for key, requested_values in requested.items():
+        if key not in regulation_scope:
+            combined[key] = requested_values
+            continue
+        trusted_by_normalised = {
+            _normalise_scalar(value): value for value in regulation_scope[key]
+        }
+        overlap = [
+            trusted_by_normalised[_normalise_scalar(value)]
+            for value in requested_values
+            if _normalise_scalar(value) in trusted_by_normalised
+        ]
+        if not overlap:
+            raise DRLEngineError(
+                f"requested {key} scope conflicts with regulation.scope"
+            )
+        combined[key] = overlap
+    return combined
+
+
 def _resolve_scope(
     scope: Any, profile: Mapping[str, Any]
 ) -> tuple[str, list[str]]:
-    if not isinstance(scope, Mapping) or not scope:
+    normalised_scope = _normalise_scope(scope)
+    if not normalised_scope:
         return "NEEDS_VERIFICATION", ["Rule set has no explicit scope"]
 
     reasons: list[str] = []
     missing = False
     mismatch = False
-    for scope_key in ("universities", "faculties", "cohorts", "programs", "campuses"):
-        allowed = scope.get(scope_key)
-        if allowed is None:
-            continue
-        allowed_values = _as_list(allowed)
-        if not allowed_values:
-            continue
+    for scope_key, allowed_values in normalised_scope.items():
         actual = _scope_value(profile, scope_key)
         if actual is None:
             missing = True
@@ -787,7 +915,7 @@ def evaluate_progress(
 
 
 def _progress_rule_set(
-    config: Mapping[str, Any], scope: Mapping[str, Any]
+    config: Mapping[str, Any], scope: Mapping[str, Any] | None = None
 ) -> dict[str, Any]:
     scoring = config.get("scoring_model", {})
     regulation = config.get("regulation", {})
@@ -824,16 +952,19 @@ def _progress_rule_set(
         str(regulation.get("status", "")).lower() == "verified"
         and str(scoring.get("status", "")).lower() == "verified"
     )
+    effective_scope = _effective_scope(config, scope)
     return {
         "rule_set_id": regulation.get("regulation_id"),
         "version": regulation.get("effective_from") or regulation.get("issued_date"),
-        "scope": dict(scope),
+        "scope": effective_scope,
         "verified": verified,
         "source_ids": [regulation.get("source")] if regulation.get("source") else [],
         "criteria": criteria,
         "topic_requirements": [],
         "min_total_score": scoring.get("semester_score_min"),
-        "max_total_score": scoring.get("max_total_score"),
+        "max_total_score": scoring.get(
+            "max_total_score", scoring.get("semester_score_max")
+        ),
     }
 
 
@@ -842,7 +973,7 @@ def evaluate_rules_progress(
     student_profile: Mapping[str, Any],
     student_snapshot: Mapping[str, Any],
     *,
-    scope: Mapping[str, Any],
+    scope: Mapping[str, Any] | None = None,
     personal_targets: Mapping[str, Real] | None = None,
     required_fields: Iterable[str] = (),
 ) -> dict[str, Any]:
@@ -882,6 +1013,8 @@ def evaluate_rules_progress(
             require_verified_rules=True,
         )
         report["rule_evaluation"] = None
+        report["category_scores"] = []
+        report["criterion_scores"] = []
         return report
 
     rule_result = evaluate_rule_conditions(
@@ -921,4 +1054,13 @@ def evaluate_rules_progress(
             for item in rule_result["relevant_configuration_issues"]
         )
     report["rule_evaluation"] = rule_result
+    # Explicit SP2 → SP3 bridge fields.  The legacy
+    # ``confirmed_by_criterion`` field contains category aggregates for this
+    # flat-rule adapter and remains unchanged for compatibility.
+    if report["rule_resolution"] == "APPLICABLE":
+        report["category_scores"] = rule_result["category_scores"]
+        report["criterion_scores"] = rule_result["criterion_scores"]
+    else:
+        report["category_scores"] = []
+        report["criterion_scores"] = []
     return report
