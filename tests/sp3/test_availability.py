@@ -256,6 +256,12 @@ def test_resolved_intervals_feed_the_existing_feasibility_contract():
         evidence=FeasibilityEvidence(
             term_verified=True,
             eligibility_by_activity={"ACT-MONDAY": "ELIGIBLE"},
+                schedule_by_activity={
+                    "ACT-MONDAY": {
+                        "schedule_type": "FIXED",
+                        "required_duration_minutes": None,
+                    }
+                },
         ),
     )
 

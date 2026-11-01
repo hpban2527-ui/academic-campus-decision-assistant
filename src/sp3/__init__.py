@@ -13,6 +13,7 @@ from .feasibility import (
     FeasibilityContractError,
     FeasibilityEvidence,
     FeasibilityStatus,
+    ScheduleType,
     TermScopeStatus,
     assess_feasibility,
 )
@@ -26,6 +27,7 @@ __all__ = [
     "FeasibilityContractError",
     "FeasibilityEvidence",
     "FeasibilityStatus",
+    "ScheduleType",
     "TermScopeStatus",
     "assess_feasibility",
     "resolve_availability",

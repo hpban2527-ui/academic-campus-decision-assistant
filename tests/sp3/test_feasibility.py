@@ -71,11 +71,25 @@ def request(*activities, intervals=None):
     }
 
 
-def evidence(*ids: str, term_verified=True, source_review_by_activity=None):
+def schedule_record(schedule_type="FIXED", required_duration_minutes=None):
+    return {
+        "schedule_type": schedule_type,
+        "required_duration_minutes": required_duration_minutes,
+    }
+
+
+def evidence(
+    *ids: str,
+    term_verified=True,
+    source_review_by_activity=None,
+    schedule_by_activity=None,
+):
     return FeasibilityEvidence(
         term_verified=term_verified,
         eligibility_by_activity={item: "ELIGIBLE" for item in ids},
         source_review_by_activity=source_review_by_activity or {},
+        schedule_by_activity=schedule_by_activity
+        or {item: schedule_record() for item in ids},
     )
 
 
@@ -193,6 +207,10 @@ def test_unknown_and_explicitly_failed_eligibility_are_distinct():
     trusted = FeasibilityEvidence(
         term_verified=True,
         eligibility_by_activity={"B": "INELIGIBLE"},
+        schedule_by_activity={
+            "A": schedule_record(),
+            "B": schedule_record(),
+        },
     )
     result = assess_feasibility(payload, evidence=trusted)
     assert result["candidates"][0]["feasibility"] == {
@@ -212,6 +230,7 @@ def test_unverified_term_source_and_missing_binding_require_review():
         term_verified=None,
         eligibility_by_activity={"A": "ELIGIBLE"},
         source_review_by_activity={"A": False},
+        schedule_by_activity={"A": schedule_record()},
     )
     assert assessment(payload, trusted) == {
         "status": "NEEDS_REVIEW",
@@ -243,6 +262,7 @@ def test_per_activity_data_qa_term_scope_is_applied(term_scope, expected):
         term_verified=None,
         eligibility_by_activity={"A": "ELIGIBLE"},
         term_scope_by_activity={"A": term_scope},
+        schedule_by_activity={"A": schedule_record()},
     )
     assert assessment(payload, trusted) == expected
 
@@ -257,12 +277,155 @@ def test_conflicts_are_sorted_unique_and_use_half_open_intervals():
     assert result["conflict_pairs"] == [["A", "B"], ["B", "C"]]
 
 
+def test_online_with_unknown_schedule_type_needs_review_instead_of_false_rejection():
+    payload = request(activity("A"), intervals=[])
+    trusted = FeasibilityEvidence(
+        term_verified=True,
+        eligibility_by_activity={"A": "ELIGIBLE"},
+    )
+
+    assert assessment(payload, trusted) == {
+        "status": "NEEDS_REVIEW",
+        "reason_codes": ["MISSING_SCHEDULE_TYPE"],
+    }
+
+
+def test_flexible_online_window_sums_separate_free_time_fragments():
+    payload = request(
+        activity(
+            "A",
+            start="2026-11-01T09:00:00+07:00",
+            end="2026-11-03T18:00:00+07:00",
+        ),
+        intervals=[
+            {
+                "start": "2026-11-02T09:00:00+07:00",
+                "end": "2026-11-02T09:30:00+07:00",
+            },
+            {
+                "start": "2026-11-03T14:00:00+07:00",
+                "end": "2026-11-03T14:30:00+07:00",
+            },
+        ],
+    )
+    trusted = evidence(
+        "A",
+        schedule_by_activity={
+            "A": schedule_record("FLEXIBLE_WINDOW", 60),
+        },
+    )
+
+    assert assessment(payload, trusted) == {
+        "status": "FEASIBLE",
+        "reason_codes": [],
+    }
+
+
+def test_flexible_online_window_is_infeasible_only_when_total_free_time_is_too_short():
+    payload = request(
+        activity(
+            "A",
+            start="2026-11-01T09:00:00+07:00",
+            end="2026-11-03T18:00:00+07:00",
+        ),
+        intervals=[
+            {
+                "start": "2026-11-02T09:00:00+07:00",
+                "end": "2026-11-02T09:45:00+07:00",
+            }
+        ],
+    )
+    trusted = evidence(
+        "A",
+        schedule_by_activity={
+            "A": schedule_record("FLEXIBLE_WINDOW", 60),
+        },
+    )
+
+    assert assessment(payload, trusted) == {
+        "status": "INFEASIBLE",
+        "reason_codes": ["OUTSIDE_AVAILABILITY"],
+    }
+
+
+def test_flexible_online_window_without_workload_requires_review_not_rejection():
+    payload = request(activity("A"), intervals=[])
+    trusted = evidence(
+        "A",
+        schedule_by_activity={
+            "A": schedule_record("FLEXIBLE_WINDOW"),
+        },
+    )
+
+    assert assessment(payload, trusted) == {
+        "status": "NEEDS_REVIEW",
+        "reason_codes": ["MISSING_REQUIRED_DURATION"],
+    }
+
+
+def test_asynchronous_online_activity_ignores_clock_availability_and_conflicts():
+    payload = request(
+        activity("ASYNC"),
+        activity("FIXED"),
+    )
+    trusted = evidence(
+        "ASYNC",
+        "FIXED",
+        schedule_by_activity={
+            "ASYNC": schedule_record("ASYNCHRONOUS"),
+            "FIXED": schedule_record("FIXED"),
+        },
+    )
+
+    result = assess_feasibility(payload, evidence=trusted)
+
+    assert result["candidates"][0]["feasibility"] == {
+        "status": "FEASIBLE",
+        "reason_codes": [],
+    }
+    assert result["conflict_pairs"] == []
+
+
+def test_offline_activity_without_schedule_evidence_remains_fixed_time():
+    payload = request(
+        activity("A", mode="offline", location="Room A"),
+        intervals=[],
+    )
+    trusted = FeasibilityEvidence(
+        term_verified=True,
+        eligibility_by_activity={"A": "ELIGIBLE"},
+    )
+
+    assert assessment(payload, trusted) == {
+        "status": "INFEASIBLE",
+        "reason_codes": ["OUTSIDE_AVAILABILITY"],
+    }
+
+
+def test_invalid_schedule_evidence_is_rejected():
+    payload = request(activity("A"))
+    trusted = evidence(
+        "A",
+        schedule_by_activity={
+            "A": schedule_record("FLEXIBLE_WINDOW", -1),
+        },
+    )
+
+    with pytest.raises(FeasibilityContractError, match="positive number"):
+        assess_feasibility(payload, evidence=trusted)
+
+
 def test_known_failure_wins_over_review_but_keeps_all_reason_codes():
     payload = request(
         activity("A", registration_deadline=None),
         intervals=[],
     )
-    assert assessment(payload, FeasibilityEvidence()) == {
+    assert assessment(
+        payload,
+        FeasibilityEvidence(
+            schedule_by_activity={"A": schedule_record()},
+        ),
+    ) == {
         "status": "INFEASIBLE",
         "reason_codes": [
             "OUTSIDE_AVAILABILITY",
