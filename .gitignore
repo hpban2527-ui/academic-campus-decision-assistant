@@ -1,5 +1,12 @@
 __pycache__/
-.pytest_cache/
-*.pyc
 .vscode/
+*.py[cod]
+*$py.class
+.pytest_cache/
 .venv/
+venv/
+*.egg-info/
+.DS_Store
+Thumbs.db
+draft/
+data/sessions/

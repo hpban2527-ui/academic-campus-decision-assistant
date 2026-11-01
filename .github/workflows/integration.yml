@@ -1,0 +1,78 @@
+name: Project E integration CI
+
+on:
+  push:
+    branches:
+      - "integration/**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend_contracts:
+    name: SP1 / SP2 / Lead contract gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Verify all accepted teammate files remain byte-for-byte unchanged
+        run: python scripts/check_team_source_integrity.py
+      - name: Execute backend unit + integration tests
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q tests/sp1 tests/sp2 tests/integration
+      - name: Check SP2 ten expected cases
+        env:
+          PYTHONPATH: src
+        run: python scripts/check_sp2_cases.py
+      - name: Compile Python sources
+        run: python -m compileall -q src tests scripts run_server.py
+
+  frontend_contract_review:
+    name: Legacy frontend E2E contract (must be realigned by UI owner)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Report current frontend E2E compatibility
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q tests/test_e2e_pipeline.py tests/test_session_flow.py
+
+  browser_e2e:
+    name: H4 real Chromium 5-case demo + XSS checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install app and browser testing
+        run: |
+          python -m pip install -r requirements.txt playwright
+          python -m playwright install --with-deps chromium
+      - name: Verify H4 in a real browser
+        env:
+          PYTHONPATH: src
+        run: python scripts/verify_browser_e2e.py
+      - name: Publish browser acceptance screenshots and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-e-h4-chromium-evidence
+          path: artifacts/h4_browser/
+          if-no-files-found: warn

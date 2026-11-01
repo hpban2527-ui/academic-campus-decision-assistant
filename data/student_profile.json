@@ -1,0 +1,134 @@
+[
+  {
+    "student_id": "25127257",
+    "full_name": "Nguyễn Thị Ngọc Tuyền",
+    "class": "25C09",
+    "major": "Information Technology",
+    "accumulated_credits": 45,
+    "gpa": 4.0,
+    "completed_courses": [
+      "BAA00004",
+      "MTH00005",
+      "MTH00008",
+      "MTH00009",
+      "MTH00058",
+      "PHY00005",
+      "CSC00004",
+      "CSC10003",
+      "CSC10004",
+      "CSC10008",
+      "CSC10012",
+      "CSC10121"
+    ]
+  },
+  {
+    "student_id": "25127214",
+    "full_name": "Lâm Như Ngọc",
+    "class": "25C09",
+    "major": "Information Technology",
+    "accumulated_credits": 45,
+    "gpa": 4.0,
+    "completed_courses": [
+      "BAA00004",
+      "MTH00005",
+      "MTH00008",
+      "MTH00009",
+      "MTH00058",
+      "PHY00005",
+      "CSC00004",
+      "CSC10003",
+      "CSC10004",
+      "CSC10008",
+      "CSC10012",
+      "CSC10121"
+    ]
+  },
+  {
+    "student_id": "25127316",
+    "full_name": "Bùi Thảo Duyên",
+    "class": "25C09",
+    "major": "Information Technology",
+    "accumulated_credits": 45,
+    "gpa": 4.0,
+    "completed_courses": [
+      "BAA00004",
+      "MTH00005",
+      "MTH00008",
+      "MTH00009",
+      "MTH00058",
+      "PHY00005",
+      "CSC00004",
+      "CSC10003",
+      "CSC10004",
+      "CSC10008",
+      "CSC10012",
+      "CSC10121"
+    ]
+  },
+  {
+    "student_id": "25127244",
+    "full_name": "Nguyễn Minh Trí",
+    "class": "25C09",
+    "major": "Information Technology",
+    "accumulated_credits": 45,
+    "gpa": 4.0,
+    "completed_courses": [
+      "BAA00004",
+      "MTH00005",
+      "MTH00008",
+      "MTH00009",
+      "MTH00058",
+      "PHY00005",
+      "CSC00004",
+      "CSC10003",
+      "CSC10004",
+      "CSC10008",
+      "CSC10012",
+      "CSC10121"
+    ]
+  },
+  {
+    "student_id": "25127242",
+    "full_name": "Lưu Minh Tiến",
+    "class": "25C09",
+    "major": "Information Technology",
+    "accumulated_credits": 45,
+    "gpa": 4.0,
+    "completed_courses": [
+      "BAA00004",
+      "MTH00005",
+      "MTH00008",
+      "MTH00009",
+      "MTH00058",
+      "PHY00005",
+      "CSC00004",
+      "CSC10003",
+      "CSC10004",
+      "CSC10008",
+      "CSC10012",
+      "CSC10121"
+    ]
+  },
+  {
+    "student_id": "25127009",
+    "full_name": "Huỳnh Phương Bình An",
+    "class": "25C09",
+    "major": "Information Technology",
+    "accumulated_credits": 45,
+    "gpa": 4.0,
+    "completed_courses": [
+      "BAA00004",
+      "MTH00005",
+      "MTH00008",
+      "MTH00009",
+      "MTH00058",
+      "PHY00005",
+      "CSC00004",
+      "CSC10003",
+      "CSC10004",
+      "CSC10008",
+      "CSC10012",
+      "CSC10121"
+    ]
+  }
+] 
