@@ -329,6 +329,15 @@ def evaluate_rule_conditions(
             relevant_configuration_issues.append(issue)
 
     for index, rule in enumerate(rules):
+        # A disputed or unverified regulation item must never accrue points.
+        if rule.get("status", "verified") != "verified":
+            cond = rule.get("condition", {})
+            if isinstance(cond, Mapping) and cond.get("field") in student_record and student_record[cond.get("field")] is not None:
+                skipped_rules.append({
+                    "rule_id": str(rule.get("rule_id", "unknown")),
+                    "reason": "rule is not reviewer-verified",
+                })
+            continue
         # Skip the broken rule but keep checking the other rules.
         if index in invalid_rule_indexes:
             continue

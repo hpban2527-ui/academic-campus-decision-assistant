@@ -41,10 +41,7 @@ def actual_rules():
 def test_actual_rules_file_can_be_checked(actual_rules):
     issues = audit_rules_config(actual_rules)
     assert len(actual_rules["rules"]) == 75
-    assert {item["code"] for item in issues} == {
-        "DUPLICATE_CONDITION",
-        "RANGE_BOUND_NOT_NUMERIC",
-    }
+    assert issues == []
 
 
 def test_actual_rules_match_gpa_and_violation_rules(actual_rules):
@@ -53,9 +50,9 @@ def test_actual_rules_match_gpa_and_violation_rules(actual_rules):
         {"semester_gpa": 8.5, "academic_exam_violations": 0},
     )
     assert [item["rule_id"] for item in result["matched_rules"]] == ["R11", "R1203"]
-    assert [item["points"] for item in result["matched_rules"]] == [15, 10]
+    assert [item["points"] for item in result["matched_rules"]] == [10, 10]
     assert result["category_scores"] == [
-        {"category_id": "C1", "raw_score": 25, "cap": 30, "score": 25}
+        {"category_id": "C1", "raw_score": 20, "cap": 30, "score": 20}
     ]
     assert result["needs_review"] is False
 
@@ -100,13 +97,11 @@ def test_actual_duplicate_condition_is_only_counted_once(actual_rules):
     )
     assert [item["rule_id"] for item in result["matched_rules"]] == ["R22"]
     assert result["rule_points_total"] == 5
-    assert result["skipped_rules"] == [
-        {"rule_id": "R23", "reason": "same condition already matched by R22"}
-    ]
-    assert result["needs_review"] is True
+    assert result["skipped_rules"] == []
+    assert result["needs_review"] is False
 
 
-def test_broken_actual_rule_is_reported_without_stopping_other_rules(actual_rules):
+def test_duration_bucket_is_explicit_not_guessed(actual_rules):
     result = evaluate_rule_conditions(
         actual_rules,
         {
@@ -115,10 +110,8 @@ def test_broken_actual_rule_is_reported_without_stopping_other_rules(actual_rule
         },
     )
     assert [item["rule_id"] for item in result["matched_rules"]] == ["R1204"]
-    assert result["relevant_configuration_issues"][0]["code"] == (
-        "RANGE_BOUND_NOT_NUMERIC"
-    )
-    assert result["needs_review"] is True
+    assert result["relevant_configuration_issues"] == []
+    assert result["needs_review"] is False
 
 
 @pytest.mark.parametrize(

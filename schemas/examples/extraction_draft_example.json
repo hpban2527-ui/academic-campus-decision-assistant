@@ -1,0 +1,102 @@
+[
+  {
+    "record": {
+      "activity_id": "TMP-8047726d-01",
+      "source": {
+        "publisher": "Example publisher",
+        "platform": "facebook",
+        "URL_post": "https://example.com/posts/123",
+        "URL_registration": null
+      },
+      "title": "Workshop Kỹ năng học tập hiệu quả",
+      "domain": "skills",
+      "start": "2026-10-27T14:00:00+07:00",
+      "end": "2026-10-27T16:00:00+07:00",
+      "registration_deadline": "2026-10-26T23:59:00+07:00",
+      "mode": "offline",
+      "location": "Phòng B101",
+      "points": null,
+      "drl_recognized": true,
+      "mandatory": null,
+      "audience": [
+        "Sinh viên HCMUS"
+      ],
+      "fee": null,
+      "completion_requirements": "tham gia đầy đủ và điểm danh đầu - cuối buổi"
+    },
+    "meta": {
+      "status": "valid",
+      "flags": [],
+      "evidence": {
+        "title": "Workshop Kỹ năng học tập hiệu quả",
+        "domain": "Kỹ năng học tập",
+        "start": "14h00 - 16h00 ngày 27/10/2026",
+        "end": "14h00 - 16h00 ngày 27/10/2026",
+        "registration_deadline": "Hạn đăng ký: 26/10/2026",
+        "mode": "Phòng B101",
+        "location": "Phòng B101",
+        "drl_recognized": "được ghi nhận hoạt động",
+        "audience": "Sinh viên HCMUS",
+        "completion_requirements": "tham gia đầy đủ và điểm danh đầu - cuối buổi"
+      },
+      "time_defaults": {
+        "registration_deadline": "date_only_2359"
+      },
+      "year_from_posted": [],
+      "derived": {
+        "mode": "venue_physical"
+      },
+      "method": "llm",
+      "model": "example-model/prompt_v1",
+      "fallback_from": null,
+      "draft_schema_version": "1.3.0"
+    }
+  },
+  {
+    "record": {
+      "activity_id": "TMP-8047726d-02",
+      "source": {
+        "publisher": "Example publisher",
+        "platform": "facebook",
+        "URL_post": "https://example.com/posts/123",
+        "URL_registration": null
+      },
+      "title": "Khảo sát ý kiến về chương trình đào tạo",
+      "domain": "academic",
+      "start": "2026-10-28T00:00:00+07:00",
+      "end": "2026-10-30T23:59:00+07:00",
+      "registration_deadline": null,
+      "mode": "online",
+      "location": null,
+      "points": null,
+      "drl_recognized": true,
+      "mandatory": null,
+      "audience": null,
+      "fee": null,
+      "completion_requirements": "Hoàn thành form khảo sát"
+    },
+    "meta": {
+      "status": "valid",
+      "flags": [],
+      "evidence": {
+        "title": "Khảo sát ý kiến về chương trình đào tạo",
+        "domain": "chương trình đào tạo",
+        "start": "ngày 28/10/2026",
+        "end": "ngày 30/10/2026",
+        "mode": "trực tuyến",
+        "drl_recognized": "được ghi nhận hoạt động",
+        "completion_requirements": "Hoàn thành form khảo sát"
+      },
+      "time_defaults": {
+        "start": "date_only_0000",
+        "end": "date_only_2359"
+      },
+      "year_from_posted": [],
+      "derived": {},
+      "method": "llm",
+      "model": "example-model/prompt_v1",
+      "fallback_from": null,
+      "draft_schema_version": "1.3.0"
+    }
+  }
+]

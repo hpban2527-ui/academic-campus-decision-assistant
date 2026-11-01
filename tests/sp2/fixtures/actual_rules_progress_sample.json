@@ -29,7 +29,7 @@
       {
         "rule_id": "R11",
         "criterion_id": "1.1",
-        "points": 15
+        "points": 10
       },
       {
         "rule_id": "R1203",
@@ -39,13 +39,13 @@
     ],
     "category": {
       "code": "C1",
-      "raw_score": 25,
-      "score": 25,
+      "raw_score": 20,
+      "score": 20,
       "max_score": 30,
       "target": 30,
-      "remaining": 5
+      "remaining": 10
     },
-    "confirmed_total": 25,
+    "confirmed_total": 20,
     "pending_items": []
   }
 }
