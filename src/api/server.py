@@ -1,4 +1,4 @@
-"""FastAPI Server for Academic Campus Decision Assistant (SP1 -> SP2).
+"""FastAPI Server for Academic Campus Decision Assistant (SP1 -> SP2 -> SP3).
 
 Integrates:
 - SP1 Extractor (15-field draft) + Lead Publication Gate (14-field activity.schema.json)
@@ -8,6 +8,7 @@ Integrates:
   1. Strict Fail-Closed Intake Mode (default POST /api/evaluate: REVIEW_REQUIRED, 0 auto-awarded points)
   2. Demo Simulation Mode (simulate_demo=True & POST /api/pipeline/demo: runs real SP2 engine with DEMO_ONLY label)
 - Academic Snapshot DRL Evaluation (POST /api/sp2/evaluate) & Dataset/Regulation Audit (GET /api/lead/audit)
+- SP3 weekly availability resolution (POST /api/sp3/availability/resolve)
 """
 
 from __future__ import annotations
@@ -43,6 +44,7 @@ from sp2.drl_engine import (
     evaluate_rule_conditions,
     evaluate_rules_progress,
 )
+from sp3 import AvailabilityContractError, resolve_availability
 
 DATA_DIR = ROOT_DIR / "data"
 WEB_DIR = ROOT_DIR / "web"
@@ -50,8 +52,8 @@ SCHEMAS_DIR = ROOT_DIR / "schemas"
 
 app = FastAPI(
     title="HCMUS Academic Campus Decision Assistant API",
-    description="Backend API integrating SP1 (Information Extraction) -> SP2 (DRL Evaluation)",
-    version="1.1.0",
+    description="Backend API integrating SP1, SP2 and SP3 availability/feasibility contracts",
+    version="1.2.0",
 )
 
 app.add_middleware(
@@ -1263,6 +1265,31 @@ def evaluate_verified_snapshot(req: VerifiedSnapshotRequest):
         "official_award_verified": False,
         "disclaimer": "Calculated from submitted example. Not an official DRL award or verified academic record.",
         "sp2": report,
+    }
+
+
+class AvailabilityResolveRequest(BaseModel):
+    availability: dict[str, Any]
+    window_start: str
+    window_end: str
+
+
+@app.post("/api/sp3/availability/resolve")
+def resolve_sp3_availability(req: AvailabilityResolveRequest):
+    """Expand a UI week template without persisting or inferring free time."""
+
+    try:
+        resolved = resolve_availability(
+            req.availability,
+            window_start=req.window_start,
+            window_end=req.window_end,
+        )
+    except (AvailabilityContractError, ValueError, TypeError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return {
+        "mode": "DEMO_ONLY",
+        "persistent": False,
+        **resolved,
     }
 
 
