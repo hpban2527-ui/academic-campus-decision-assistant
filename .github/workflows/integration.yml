@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - "integration/**"
+      - Thao_Duyen
   pull_request:
     branches:
       - main
 
 jobs:
   backend_contracts:
-    name: SP1 / SP2 / Lead contract gates
+    name: SP1 / SP2 / SP3 / Lead contract gates
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -27,6 +28,19 @@ jobs:
         env:
           PYTHONPATH: src
         run: python -m pytest -q tests/sp1 tests/sp2 tests/integration
+      # Explicit paths make an incomplete SP3 handoff fail instead of silently
+      # passing only the tests that happened to be committed.
+      - name: Execute SP3 v1 handoff tests (including real SP2 integration)
+        env:
+          PYTHONPATH: src
+        run: >-
+          python -m pytest -q
+          tests/sp3/test_scorer_adapter.py
+          tests/sp3/test_planner.py
+          tests/sp3/test_planner_properties.py
+          tests/sp3/test_plan_checker.py
+          tests/sp3/test_projected_scorer.py
+          tests/sp3/test_projected_scorer_integration.py
       - name: Check SP2 ten expected cases
         env:
           PYTHONPATH: src

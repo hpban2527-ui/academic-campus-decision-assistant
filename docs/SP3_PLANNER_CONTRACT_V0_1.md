@@ -23,12 +23,14 @@ the student, or change the review queue. All results remain
 | Minh Trí | Activity data QA, stable IDs, term scope, source and schedule completeness | Activity records and QA findings |
 | Như Ngọc | Individual feasibility and activity conflicts | `feasibility_request → feasibility_response` |
 | Ngọc Tuyền, with the SP2 engine owner | Score snapshots, rule mappings, caps, and scoring requirements | Baseline and SP2 bridge data |
-| Thảo Duyên | Plan selection, ranking, explanations, and unmet-target handling | `planner_input → planner_output` |
+| Thảo Duyên | Plan selection, ranking, explanations, unmet-target handling, and the planner-side scoring bridge | `planner_input → planner_output`; projected scoring adapter/backend |
 | Minh Tiến | Goal/preferences form and plan presentation | `plan_request` and `planner_output` |
-| Bình An | Backend orchestration, interface review, and integration | API and assignment of the SP2 adapter implementation |
+| Bình An | Backend orchestration, interface review, and integration | API and trusted-data wiring |
 
-The SP2 adapter implementer still needs confirmation by Bình An. Until the
-adapter is ready, Duyên can use the static scoring expectations in Section 9.
+Thảo Duyên has implemented the planner-side adapter and projected scorer in
+`src/sp3`. The projected scorer delegates rule evaluation to the SP2 engine;
+trusted baseline facts and activity-to-rule bindings remain integration inputs.
+Section 9 provides static expectations for contract tests, not real-student data.
 
 ```text
 UI plan_request
@@ -358,8 +360,9 @@ These are proposed endpoint behaviors, not changes to existing APIs.
 
 ## 9. Inline examples and expected results
 
-All examples are synthetic contract specifications, not executed planner tests
-or real SP2 results. Only C1 is modeled in these examples. A real baseline must
+All examples are synthetic contract specifications, not real SP2 results. They
+are also exercised as planner tests in the v1 handoff (Section 10).
+Only C1 is modeled in these examples. A real baseline must
 include all categories defined by its ruleset.
 
 ### 9.1 Example 1 — complete planner input
@@ -492,4 +495,83 @@ null. All listed evaluations return OK. The mock may use rule_id=MOCK_R_A or
 MOCK_R_B for the corresponding contribution. A mock scorer must fail on an
 unspecified set rather than invent a result.
 
-\
+## 10. Planner v1 implementation handoff
+
+This handoff preserves `sp3-planner/0.1`: one fixed interval per activity.
+Flexible scheduling, participation-state handling and replan belong to the
+agreed v0.2 work; they are not implemented or claimed by this v1 handoff.
+The planning API, persistent plans and real-data feasibility integration are
+also outside this handoff. All scoring remains DEMO_ONLY and unverified.
+
+### 10.1 Implementation and required test files
+
+The tracked implementation consists of `src/sp3/contract.py`,
+`scorer_adapter.py`, `projected_scorer.py`, `planner.py` and `plan_checker.py`.
+The entry point is `build_plan(planner_input, ScorerAdapter(backend).score_plan)`.
+`ProjectedScorer` provides the SP2-backed backend; `InMemoryScoringData` supplies
+explicit data for tests/demo. It is not a real-student data resolver.
+
+All six test modules must be present in the handoff:
+
+| Test module under `tests/sp3` | Coverage |
+| --- | --- |
+| `test_scorer_adapter.py` | Request/response validation, whole-set delegation, mutation isolation and safe errors |
+| `test_planner.py` | Three expected-output examples, ranking, conflicts, limits and failure handling |
+| `test_planner_properties.py` | 300 seeded cases against an exhaustive oracle and 100 budget-limited cases |
+| `test_plan_checker.py` | Detection of inconsistent plans, scores, explanations and search claims |
+| `test_projected_scorer.py` | Trusted-data resolution, binding validation, caps and attribution |
+| `test_projected_scorer_integration.py` | Real SP2 engine and repository rules on synthetic student/activity/binding data |
+
+Keep `tests/sp3/planner_doubles.py` and both fixtures with those tests:
+`tests/sp3/fixtures/contract_examples.json` and
+`tests/sp3/fixtures/synthetic_scoring_data.json`.
+The three contract examples use static mock scores; the separate integration
+fixture uses the real engine and `data/drl_rules.json`. Neither proves operation
+on real student records. Missing SP2 is a test failure, not a skipped test suite.
+
+### 10.2 Reproduce the checks
+
+Use Python 3.12 with the dependencies in `requirements.txt`. From the repository
+root, with the project environment active, run:
+
+```text
+python -m pytest -q tests/sp3/test_scorer_adapter.py tests/sp3/test_planner.py tests/sp3/test_planner_properties.py tests/sp3/test_plan_checker.py tests/sp3/test_projected_scorer.py tests/sp3/test_projected_scorer_integration.py
+python -m pytest -q tests
+```
+
+The first command deliberately names every required test module: omitting a
+file from the commit must fail collection. Tests set up the repository's `src`
+imports; CI also sets `PYTHONPATH=src`.
+
+`.github/workflows/integration.yml` runs the explicit SP3 suite on pushes to
+`Thao_Duyen` and `integration/**`, and on pull requests targeting `main`.
+Existing SP1/SP2, protected-source, frontend and browser checks remain enabled.
+Local pytest results do not establish that GitHub Actions or browser checks
+have run successfully; those results must be reviewed after push.
+
+### 10.3 Files to include in the completion commit
+
+The planner implementation, adapter test, fixtures and test helper are already
+tracked at `cf0a648`. Include the five remaining test modules, this document,
+and `.github/workflows/integration.yml` in the handoff completion commit.
+The draft contract, ZIP archive, standalone schema examples and
+`scripts/check_sp3_contract.py` are not dependencies of this handoff.
+Review the file list before committing; staging, committing and pushing are
+left to the repository owner.
+
+### 10.4 Local verification on 2026-11-02
+
+Verified against implementation commit `cf0a648` plus this handoff's working
+tree changes: **1,000 tests passed, zero failures/errors/skips**. SP3 accounts
+for 706 tests: adapter 118, planner 95, planner properties 400, checker 27,
+projected scorer 58, and real-engine integration 8. The three contract examples
+are included in the planner tests. One upstream Starlette/httpx deprecation
+warning remains; it does not fail the tests.
+
+The SP2 expected-case check passed 10/10; Python compilation and `git diff
+--check` passed. The protected-source checker passed 54/54 in a temporary LF
+copy: 53 workspace files differ from the manifest only because this Windows
+checkout uses CRLF (`core.autocrlf=true`). Running the raw-byte checker directly
+on this Windows checkout reports those line-ending differences. Original files,
+the checker and the manifest were not rewritten. GitHub Actions and the real
+browser suite have not been run as part of this local handoff verification.
