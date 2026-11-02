@@ -14,9 +14,11 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Mapping, Sequence
 from urllib.parse import urlparse
+from zoneinfo import ZoneInfo
 
 
-CONTRACT_VERSION = "sp3-planner/0.1"
+CONTRACT_VERSION = "sp3-planner/0.2"
+TIMEZONE = "Asia/Ho_Chi_Minh"
 
 _REQUEST_FIELDS = {
     "contract_version",
@@ -37,7 +39,8 @@ _CONTEXT_FIELDS = {
     "ruleset_version",
     "calendar_version",
 }
-_ACTIVITY_ENTRY_FIELDS = {"activity", "score_binding_ref"}
+_ACTIVITY_ENTRY_FIELDS = {"activity", "score_binding_ref", "participation"}
+_PARTICIPATION_FIELDS = {"registration", "progress"}
 _ACTIVITY_FIELDS = {
     "activity_id",
     "source",
@@ -64,18 +67,19 @@ _REASON_ORDER = (
     "OUTSIDE_WINDOW",
     "OUTSIDE_AVAILABILITY",
     "WINDOW_ENDED",
-    "DEADLINE_PASSED",
     "ALREADY_STARTED",
+    "DEADLINE_PASSED",
     "INELIGIBLE",
+    "ALREADY_COMPLETED",
+    "CANCELLED",
     "MISSING_SCHEDULE",
     "MISSING_SCHEDULE_TYPE",
-    "MISSING_REQUIRED_DURATION",
+    "UNSUPPORTED_SCHEDULE",
     "MISSING_DEADLINE",
     "MISSING_ELIGIBILITY",
     "NEEDS_SOURCE_REVIEW",
     "TERM_UNVERIFIED",
     "MISSING_SCORE_BINDING",
-    "UNSUPPORTED_SCHEDULE",
 )
 _INFEASIBLE_REASONS = {
     "OUTSIDE_WINDOW",
@@ -84,11 +88,13 @@ _INFEASIBLE_REASONS = {
     "DEADLINE_PASSED",
     "ALREADY_STARTED",
     "INELIGIBLE",
+    "ALREADY_COMPLETED",
+    "CANCELLED",
 }
 
 
 class FeasibilityContractError(ValueError):
-    """Raised when an internal feasibility request violates contract v0.1."""
+    """Raised when an internal feasibility request violates contract v0.2."""
 
 
 class FeasibilityStatus(str, Enum):
@@ -116,7 +122,17 @@ class ScheduleType(str, Enum):
 
     FIXED = "FIXED"
     FLEXIBLE_WINDOW = "FLEXIBLE_WINDOW"
-    ASYNCHRONOUS = "ASYNCHRONOUS"
+
+
+class RegistrationStatus(str, Enum):
+    REGISTERED = "REGISTERED"
+    NOT_REGISTERED = "NOT_REGISTERED"
+
+
+class ProgressStatus(str, Enum):
+    NOT_STARTED = "NOT_STARTED"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
 
 
 @dataclass(frozen=True)
@@ -146,12 +162,17 @@ class _ParsedActivity:
     start: datetime | None
     end: datetime | None
     deadline: datetime | None
+    registration: RegistrationStatus
+    progress: ProgressStatus
 
 
 @dataclass(frozen=True)
 class _ResolvedSchedule:
-    schedule_type: ScheduleType | None
-    required_duration_minutes: float | None = None
+    schedule_type: ScheduleType
+    fixed_blocks: tuple[tuple[datetime, datetime], ...] = ()
+    window_start: datetime | None = None
+    window_end: datetime | None = None
+    duration_minutes: int | None = None
 
 
 def _fail(path: str, message: str) -> None:
@@ -258,6 +279,29 @@ def _validate_activity(value: Any, path: str) -> tuple[str, datetime | None, dat
     return activity_id, start, end, deadline
 
 
+def _validate_participation(
+    value: Any,
+    path: str,
+) -> tuple[RegistrationStatus, ProgressStatus]:
+    participation = _mapping(value, path)
+    _exact_fields(participation, _PARTICIPATION_FIELDS, path)
+    try:
+        registration = RegistrationStatus(participation["registration"])
+    except (TypeError, ValueError):
+        _fail(
+            f"{path}.registration",
+            f"must be one of {[item.value for item in RegistrationStatus]}",
+        )
+    try:
+        progress = ProgressStatus(participation["progress"])
+    except (TypeError, ValueError):
+        _fail(
+            f"{path}.progress",
+            f"must be one of {[item.value for item in ProgressStatus]}",
+        )
+    return registration, progress
+
+
 def _validate_request(request: Any) -> tuple[
     Mapping[str, Any], datetime, datetime, datetime, list[tuple[datetime, datetime]], list[_ParsedActivity]
 ]:
@@ -275,8 +319,8 @@ def _validate_request(request: Any) -> tuple[
         "as_of",
     }:
         _non_empty_string(context[field_name], f"request.context.{field_name}")
-    if context["timezone"] != "Asia/Ho_Chi_Minh":
-        _fail("request.context.timezone", "must equal 'Asia/Ho_Chi_Minh'")
+    if context["timezone"] != TIMEZONE:
+        _fail("request.context.timezone", f"must equal {TIMEZONE!r}")
     window_start = _timestamp(context["window_start"], "request.context.window_start")
     window_end = _timestamp(context["window_end"], "request.context.window_end")
     as_of = _timestamp(context["as_of"], "request.context.as_of")
@@ -319,7 +363,21 @@ def _validate_request(request: Any) -> tuple[
         binding = entry["score_binding_ref"]
         if binding is not None:
             _non_empty_string(binding, f"{path}.score_binding_ref")
-        activities.append(_ParsedActivity(entry, activity_id, start, end, deadline))
+        registration, progress = _validate_participation(
+            entry["participation"],
+            f"{path}.participation",
+        )
+        activities.append(
+            _ParsedActivity(
+                entry,
+                activity_id,
+                start,
+                end,
+                deadline,
+                registration,
+                progress,
+            )
+        )
     return payload, window_start, window_end, as_of, _merge_intervals(intervals), activities
 
 
@@ -344,61 +402,146 @@ def _covered_by_availability(
     return any(free_start <= start and end <= free_end for free_start, free_end in available_intervals)
 
 
-def _available_minutes_within(
+def _has_contiguous_slot(
     start: datetime,
     end: datetime,
+    duration_minutes: int,
     available_intervals: Sequence[tuple[datetime, datetime]],
-) -> float:
-    """Sum merged free-time fragments inside a flexible activity window."""
+) -> bool:
+    """Return whether one free fragment can hold the complete sitting."""
 
-    seconds = 0.0
     for free_start, free_end in available_intervals:
         overlap_start = max(start, free_start)
         overlap_end = min(end, free_end)
-        if overlap_start < overlap_end:
-            seconds += (overlap_end - overlap_start).total_seconds()
-    return seconds / 60
+        if (
+            overlap_start < overlap_end
+            and (overlap_end - overlap_start).total_seconds() >= duration_minutes * 60
+        ):
+            return True
+    return False
+
+
+def _schedule_json(schedule: _ResolvedSchedule | None) -> dict[str, Any] | None:
+    if schedule is None:
+        return None
+    if schedule.schedule_type is ScheduleType.FIXED:
+        return {
+            "type": ScheduleType.FIXED.value,
+            "fixed_blocks": [
+                {
+                    "start": start.isoformat(timespec="seconds"),
+                    "end": end.isoformat(timespec="seconds"),
+                }
+                for start, end in schedule.fixed_blocks
+            ],
+        }
+    assert schedule.window_start is not None
+    assert schedule.window_end is not None
+    assert schedule.duration_minutes is not None
+    return {
+        "type": ScheduleType.FLEXIBLE_WINDOW.value,
+        "window_start": schedule.window_start.isoformat(timespec="seconds"),
+        "window_end": schedule.window_end.isoformat(timespec="seconds"),
+        "duration_minutes": schedule.duration_minutes,
+    }
+
+
+def _fixed_schedule(
+    blocks: Sequence[tuple[datetime, datetime]],
+    path: str,
+) -> _ResolvedSchedule:
+    if not blocks:
+        _fail(f"{path}.fixed_blocks", "must be a non-empty array")
+    previous_end: datetime | None = None
+    for index, (start, end) in enumerate(blocks):
+        if start >= end:
+            _fail(f"{path}.fixed_blocks[{index}]", "start must be earlier than end")
+        if previous_end is not None and start < previous_end:
+            _fail(
+                f"{path}.fixed_blocks",
+                "must be sorted by start and non-overlapping",
+            )
+        previous_end = end
+    return _ResolvedSchedule(
+        ScheduleType.FIXED,
+        fixed_blocks=tuple(blocks),
+    )
 
 
 def _resolve_schedule(
     parsed: _ParsedActivity,
     evidence: FeasibilityEvidence,
-) -> _ResolvedSchedule:
+) -> tuple[_ResolvedSchedule | None, set[str]]:
     """Resolve schedule semantics without changing SP1's 14-field activity.
 
-    Offline and hybrid activities keep the v0.1 fixed-time behaviour when no
-    additional evidence is available.  Online activities are deliberately not
-    guessed: an unknown online schedule becomes a review state instead of
-    being falsely rejected as if its whole availability window were a meeting.
+    Evidence is authoritative.  The fallback for same-local-date offline or
+    hybrid activities preserves the contract's documented v0.2 convention;
+    every other unknown schedule becomes a review state instead of a guess.
     """
 
     path = f"evidence.schedule_by_activity[{parsed.activity_id!r}]"
     raw = evidence.schedule_by_activity.get(parsed.activity_id)
-    if raw is None:
-        mode = parsed.entry["activity"]["mode"]
-        if mode == "online":
-            return _ResolvedSchedule(None)
-        return _ResolvedSchedule(ScheduleType.FIXED)
-    value = _mapping(raw, path)
-    _exact_fields(value, {"schedule_type", "required_duration_minutes"}, path)
-    try:
-        schedule_type = ScheduleType(value["schedule_type"])
-    except (ValueError, TypeError):
-        _fail(path + ".schedule_type", f"must be one of {[item.value for item in ScheduleType]}")
+    if raw is not None:
+        value = _mapping(raw, path)
+        schedule_type = value.get("type")
+        if schedule_type == ScheduleType.FIXED.value:
+            _exact_fields(value, {"type", "fixed_blocks"}, path)
+            raw_blocks = value["fixed_blocks"]
+            if not isinstance(raw_blocks, list):
+                _fail(f"{path}.fixed_blocks", "must be a non-empty array")
+            blocks: list[tuple[datetime, datetime]] = []
+            for index, raw_block in enumerate(raw_blocks):
+                block_path = f"{path}.fixed_blocks[{index}]"
+                block = _mapping(raw_block, block_path)
+                _exact_fields(block, _INTERVAL_FIELDS, block_path)
+                start = _timestamp(block["start"], f"{block_path}.start")
+                end = _timestamp(block["end"], f"{block_path}.end")
+                assert start is not None and end is not None
+                blocks.append((start, end))
+            return _fixed_schedule(blocks, path), set()
+        if schedule_type == ScheduleType.FLEXIBLE_WINDOW.value:
+            _exact_fields(value, {"type", "duration_minutes"}, path)
+            duration = value["duration_minutes"]
+            if isinstance(duration, bool) or not isinstance(duration, int) or duration <= 0:
+                _fail(f"{path}.duration_minutes", "must be a positive integer")
+            if parsed.start is None or parsed.end is None:
+                return None, {"MISSING_SCHEDULE"}
+            if parsed.start >= parsed.end:
+                return None, {"UNSUPPORTED_SCHEDULE"}
+            window_minutes = (parsed.end - parsed.start).total_seconds() / 60
+            if duration > window_minutes:
+                return None, {"UNSUPPORTED_SCHEDULE"}
+            return (
+                _ResolvedSchedule(
+                    ScheduleType.FLEXIBLE_WINDOW,
+                    window_start=parsed.start,
+                    window_end=parsed.end,
+                    duration_minutes=duration,
+                ),
+                set(),
+            )
+        _exact_fields(value, {"type"}, path)
+        return None, {"UNSUPPORTED_SCHEDULE"}
 
-    duration = value["required_duration_minutes"]
-    if duration is not None:
-        if isinstance(duration, bool) or not isinstance(duration, (int, float)):
-            _fail(path + ".required_duration_minutes", "must be a positive number or null")
-        if duration <= 0 or duration != duration or duration in (float("inf"), float("-inf")):
-            _fail(path + ".required_duration_minutes", "must be a finite positive number or null")
-        duration = float(duration)
-    if schedule_type is not ScheduleType.FLEXIBLE_WINDOW and duration is not None:
-        _fail(
-            path + ".required_duration_minutes",
-            "must be null unless schedule_type is FLEXIBLE_WINDOW",
+    if parsed.start is None or parsed.end is None:
+        return None, {"MISSING_SCHEDULE"}
+    if parsed.start >= parsed.end:
+        return None, {"UNSUPPORTED_SCHEDULE"}
+    mode = parsed.entry["activity"]["mode"]
+    local_timezone = ZoneInfo(TIMEZONE)
+    same_local_date = (
+        parsed.start.astimezone(local_timezone).date()
+        == parsed.end.astimezone(local_timezone).date()
+    )
+    if mode in {"offline", "hybrid"} and same_local_date:
+        return (
+            _ResolvedSchedule(
+                ScheduleType.FIXED,
+                fixed_blocks=((parsed.start, parsed.end),),
+            ),
+            set(),
         )
-    return _ResolvedSchedule(schedule_type, duration)
+    return None, {"MISSING_SCHEDULE_TYPE"}
 
 
 def _normalise_eligibility(value: EligibilityStatus | str | None, path: str) -> EligibilityStatus:
@@ -429,57 +572,53 @@ def _ordered_reasons(reasons: set[str]) -> list[str]:
 def _assess_one(
     parsed: _ParsedActivity,
     *,
-    schedule: _ResolvedSchedule,
+    schedule: _ResolvedSchedule | None,
+    schedule_reasons: set[str],
     window_start: datetime,
     window_end: datetime,
     as_of: datetime,
     available_intervals: Sequence[tuple[datetime, datetime]],
     evidence: FeasibilityEvidence,
 ) -> dict[str, Any]:
-    reasons: set[str] = set()
-    start, end = parsed.start, parsed.end
+    reasons = set(schedule_reasons)
 
-    if start is None or end is None:
-        reasons.add("MISSING_SCHEDULE")
-    elif start >= end:
-        reasons.add("UNSUPPORTED_SCHEDULE")
-    elif schedule.schedule_type is ScheduleType.FIXED:
-        if start < window_start or end > window_end:
-            reasons.add("OUTSIDE_WINDOW")
-        if start < as_of:
+    if parsed.progress is ProgressStatus.COMPLETED:
+        reasons.add("ALREADY_COMPLETED")
+    elif parsed.progress is ProgressStatus.CANCELLED:
+        reasons.add("CANCELLED")
+
+    if schedule is not None and schedule.schedule_type is ScheduleType.FIXED:
+        for start, end in schedule.fixed_blocks:
+            if start < window_start or end > window_end:
+                reasons.add("OUTSIDE_WINDOW")
+            if not _covered_by_availability(start, end, available_intervals):
+                reasons.add("OUTSIDE_AVAILABILITY")
+        if schedule.fixed_blocks[0][0] < as_of:
             reasons.add("ALREADY_STARTED")
-        if not _covered_by_availability(start, end, available_intervals):
-            reasons.add("OUTSIDE_AVAILABILITY")
-    else:
-        # For flexible/asynchronous online work, start/end describe an access
-        # window.  Opening before ``as_of`` is valid; only an ended or wholly
-        # out-of-scope window is a certain failure.
-        if schedule.schedule_type is None:
-            reasons.add("MISSING_SCHEDULE_TYPE")
-        if end <= as_of:
-            reasons.add("WINDOW_ENDED")
-        elif end <= window_start or start >= window_end:
-            reasons.add("OUTSIDE_WINDOW")
-        elif schedule.schedule_type is ScheduleType.FLEXIBLE_WINDOW:
-            duration = schedule.required_duration_minutes
-            if duration is None:
-                reasons.add("MISSING_REQUIRED_DURATION")
+    elif schedule is not None:
+        assert schedule.window_start is not None
+        assert schedule.window_end is not None
+        assert schedule.duration_minutes is not None
+        usable_start = max(schedule.window_start, window_start, as_of)
+        usable_end = min(schedule.window_end, window_end)
+        if usable_start >= usable_end:
+            if schedule.window_end <= as_of:
+                reasons.add("WINDOW_ENDED")
             else:
-                usable_start = max(start, window_start, as_of)
-                usable_end = min(end, window_end)
-                if (
-                    usable_start >= usable_end
-                    or _available_minutes_within(
-                        usable_start, usable_end, available_intervals
-                    )
-                    < duration
-                ):
-                    reasons.add("OUTSIDE_AVAILABILITY")
+                reasons.add("OUTSIDE_WINDOW")
+        elif not _has_contiguous_slot(
+            usable_start,
+            usable_end,
+            schedule.duration_minutes,
+            available_intervals,
+        ):
+            reasons.add("OUTSIDE_AVAILABILITY")
 
-    if parsed.deadline is None:
-        reasons.add("MISSING_DEADLINE")
-    elif as_of >= parsed.deadline:
-        reasons.add("DEADLINE_PASSED")
+    if parsed.registration is RegistrationStatus.NOT_REGISTERED:
+        if parsed.deadline is None:
+            reasons.add("MISSING_DEADLINE")
+        elif as_of >= parsed.deadline:
+            reasons.add("DEADLINE_PASSED")
 
     eligibility = _normalise_eligibility(
         evidence.eligibility_by_activity.get(parsed.activity_id),
@@ -490,7 +629,7 @@ def _assess_one(
     elif eligibility is EligibilityStatus.NEEDS_REVIEW:
         reasons.add("MISSING_ELIGIBILITY")
 
-    source_review = evidence.source_review_by_activity.get(parsed.activity_id, True)
+    source_review = evidence.source_review_by_activity.get(parsed.activity_id)
     if source_review is not True:
         reasons.add("NEEDS_SOURCE_REVIEW")
     term_scope = _normalise_term_scope(
@@ -514,6 +653,7 @@ def _assess_one(
         status = FeasibilityStatus.FEASIBLE
 
     result = deepcopy(dict(parsed.entry))
+    result["schedule"] = _schedule_json(schedule)
     result["feasibility"] = {
         "status": status.value,
         "reason_codes": _ordered_reasons(reasons),
@@ -523,23 +663,26 @@ def _assess_one(
 
 def _conflict_pairs(
     activities: Sequence[_ParsedActivity],
-    schedules: Mapping[str, _ResolvedSchedule],
+    schedules: Mapping[str, _ResolvedSchedule | None],
 ) -> list[list[str]]:
     scheduled = [
         item
         for item in activities
-        if schedules[item.activity_id].schedule_type is ScheduleType.FIXED
-        and item.start is not None
-        and item.end is not None
-        and item.start < item.end
+        if schedules[item.activity_id] is not None
+        and schedules[item.activity_id].schedule_type is ScheduleType.FIXED
     ]
     pairs: set[tuple[str, str]] = set()
     for left_index, left in enumerate(scheduled):
         for right in scheduled[left_index + 1 :]:
-            assert left.start is not None and left.end is not None
-            assert right.start is not None and right.end is not None
-            # Half-open intervals: adjoining activities do not conflict.
-            if left.start < right.end and right.start < left.end:
+            left_schedule = schedules[left.activity_id]
+            right_schedule = schedules[right.activity_id]
+            assert left_schedule is not None and right_schedule is not None
+            overlaps = any(
+                left_start < right_end and right_start < left_end
+                for left_start, left_end in left_schedule.fixed_blocks
+                for right_start, right_end in right_schedule.fixed_blocks
+            )
+            if overlaps:
                 pairs.add(tuple(sorted((left.activity_id, right.activity_id))))
     return [list(pair) for pair in sorted(pairs)]
 
@@ -549,7 +692,7 @@ def assess_feasibility(
     *,
     evidence: FeasibilityEvidence | None = None,
 ) -> dict[str, Any]:
-    """Validate and assess a ``feasibility_request`` from planner contract v0.1.
+    """Validate and assess a ``feasibility_request`` from planner contract v0.2.
 
     Unknown eligibility and term verification are review states, never implicit
     approval.  The backend should pass trusted :class:`FeasibilityEvidence` to
@@ -565,14 +708,19 @@ def assess_feasibility(
         available_intervals,
         activities,
     ) = _validate_request(request)
-    schedules = {
+    resolutions = {
         activity.activity_id: _resolve_schedule(activity, trusted_evidence)
         for activity in activities
+    }
+    schedules = {
+        activity_id: resolution[0]
+        for activity_id, resolution in resolutions.items()
     }
     candidates = [
         _assess_one(
             activity,
             schedule=schedules[activity.activity_id],
+            schedule_reasons=resolutions[activity.activity_id][1],
             window_start=window_start,
             window_end=window_end,
             as_of=as_of,

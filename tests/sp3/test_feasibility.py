@@ -1,15 +1,24 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
+from pathlib import Path
 
 import pytest
 
 from sp3 import (
+    CONTRACT_VERSION,
     FeasibilityContractError,
     FeasibilityEvidence,
     TermScopeStatus,
     assess_feasibility,
 )
+
+
+WINDOW_START = "2026-11-01T00:00:00+07:00"
+WINDOW_END = "2026-11-06T00:00:00+07:00"
+AS_OF = "2026-11-01T08:00:00+07:00"
+FIXTURE_PATH = Path(__file__).parent / "fixtures" / "v0_2_feasibility_cases.json"
 
 
 def activity(activity_id: str = "A", **changes):
@@ -38,18 +47,23 @@ def activity(activity_id: str = "A", **changes):
     return value
 
 
-def request(*activities, intervals=None):
+def participation(registration="NOT_REGISTERED", progress="NOT_STARTED"):
+    return {"registration": registration, "progress": progress}
+
+
+def request(*activities, intervals=None, participation_by_id=None):
     if not activities:
         activities = (activity(),)
+    participation_by_id = participation_by_id or {}
     return {
-        "contract_version": "sp3-planner/0.1",
+        "contract_version": CONTRACT_VERSION,
         "request_id": "feasibility-test",
         "context": {
             "student_id": "synthetic-student",
             "term_id": "SYNTHETIC-DEMO",
-            "window_start": "2026-11-01T00:00:00+07:00",
-            "window_end": "2026-11-04T00:00:00+07:00",
-            "as_of": "2026-11-01T08:00:00+07:00",
+            "window_start": WINDOW_START,
+            "window_end": WINDOW_END,
+            "as_of": AS_OF,
             "timezone": "Asia/Ho_Chi_Minh",
             "baseline_ref": "mock-baseline-01",
             "dataset_version": "mock-data-01",
@@ -58,38 +72,62 @@ def request(*activities, intervals=None):
         },
         "available_intervals": intervals
         if intervals is not None
-        else [
-            {
-                "start": "2026-11-01T00:00:00+07:00",
-                "end": "2026-11-04T00:00:00+07:00",
-            }
-        ],
+        else [{"start": WINDOW_START, "end": WINDOW_END}],
         "activities": [
-            {"activity": item, "score_binding_ref": f"binding-{item['activity_id']}"}
+            {
+                "activity": item,
+                "score_binding_ref": f"binding-{item['activity_id']}",
+                "participation": participation_by_id.get(
+                    item["activity_id"], participation()
+                ),
+            }
             for item in activities
         ],
     }
 
 
-def schedule_record(schedule_type="FIXED", required_duration_minutes=None):
+def fixed_schedule(*blocks):
     return {
-        "schedule_type": schedule_type,
-        "required_duration_minutes": required_duration_minutes,
+        "type": "FIXED",
+        "fixed_blocks": [
+            {"start": start, "end": end} for start, end in blocks
+        ],
+    }
+
+
+def activity_fixed_schedule(item):
+    return fixed_schedule((item["start"], item["end"]))
+
+
+def flexible_schedule(duration_minutes):
+    return {
+        "type": "FLEXIBLE_WINDOW",
+        "duration_minutes": duration_minutes,
     }
 
 
 def evidence(
-    *ids: str,
+    *activities,
     term_verified=True,
+    eligibility_by_activity=None,
     source_review_by_activity=None,
     schedule_by_activity=None,
 ):
+    ids = [item["activity_id"] for item in activities]
+    if eligibility_by_activity is None:
+        eligibility_by_activity = {item: "ELIGIBLE" for item in ids}
+    if source_review_by_activity is None:
+        source_review_by_activity = {item: True for item in ids}
+    if schedule_by_activity is None:
+        schedule_by_activity = {
+            item["activity_id"]: activity_fixed_schedule(item)
+            for item in activities
+        }
     return FeasibilityEvidence(
         term_verified=term_verified,
-        eligibility_by_activity={item: "ELIGIBLE" for item in ids},
-        source_review_by_activity=source_review_by_activity or {},
-        schedule_by_activity=schedule_by_activity
-        or {item: schedule_record() for item in ids},
+        eligibility_by_activity=eligibility_by_activity,
+        source_review_by_activity=source_review_by_activity,
+        schedule_by_activity=schedule_by_activity,
     )
 
 
@@ -99,18 +137,35 @@ def assessment(payload, trusted=None, index=0):
     ]
 
 
-def test_complete_activity_is_feasible_with_explicit_trusted_evidence():
-    payload = request(activity("A"))
+def test_contract_version_is_v0_2():
+    assert CONTRACT_VERSION == "sp3-planner/0.2"
 
-    result = assess_feasibility(payload, evidence=evidence("A"))
 
+def test_shared_acceptance_fixture_contains_f1_through_f6():
+    fixture = json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
+    assert fixture["contract_version"] == CONTRACT_VERSION
+    assert [case["id"] for case in fixture["cases"]] == [
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5",
+        "F6",
+    ]
+
+
+def test_complete_activity_returns_normalized_schedule_and_participation():
+    item = activity("A")
+    payload = request(item)
+    result = assess_feasibility(payload, evidence=evidence(item))
     assert result == {
-        "contract_version": "sp3-planner/0.1",
+        "contract_version": CONTRACT_VERSION,
         "request_id": "feasibility-test",
         "context": payload["context"],
         "candidates": [
             {
                 **payload["activities"][0],
+                "schedule": activity_fixed_schedule(item),
                 "feasibility": {"status": "FEASIBLE", "reason_codes": []},
             }
         ],
@@ -118,101 +173,290 @@ def test_complete_activity_is_feasible_with_explicit_trusted_evidence():
     }
 
 
-@pytest.mark.parametrize(
-    ("changes", "expected_reasons"),
-    [
-        ({"start": None}, ["MISSING_SCHEDULE"]),
-        ({"end": None}, ["MISSING_SCHEDULE"]),
-        ({"registration_deadline": None}, ["MISSING_DEADLINE"]),
-        (
-            {"registration_deadline": "2026-11-01T08:00:00+07:00"},
-            ["DEADLINE_PASSED"],
-        ),
-        (
-            {
-                "start": "2026-11-01T07:00:00+07:00",
-                "end": "2026-11-01T09:00:00+07:00",
-            },
-            ["ALREADY_STARTED"],
-        ),
-        (
-            {
-                "start": "2026-11-04T09:00:00+07:00",
-                "end": "2026-11-04T10:00:00+07:00",
-            },
-            ["OUTSIDE_WINDOW", "OUTSIDE_AVAILABILITY"],
-        ),
-        (
-            {
-                "start": "2026-11-02T10:00:00+07:00",
-                "end": "2026-11-02T09:00:00+07:00",
-            },
-            ["UNSUPPORTED_SCHEDULE"],
-        ),
-    ],
-)
-def test_time_and_deadline_cases_have_expected_output(changes, expected_reasons):
-    result = assessment(request(activity("A", **changes)), evidence("A"))
-    expected_status = (
-        "INFEASIBLE"
-        if set(expected_reasons)
-        & {"DEADLINE_PASSED", "ALREADY_STARTED", "OUTSIDE_WINDOW"}
-        else "NEEDS_REVIEW"
+def test_fixed_evidence_supports_multiple_required_sessions():
+    item = activity("A", start=None, end=None)
+    payload = request(item)
+    schedule = fixed_schedule(
+        ("2026-11-02T09:00:00+07:00", "2026-11-02T10:00:00+07:00"),
+        ("2026-11-03T09:00:00+07:00", "2026-11-03T10:00:00+07:00"),
     )
-    assert result == {"status": expected_status, "reason_codes": expected_reasons}
+    result = assess_feasibility(
+        payload,
+        evidence=evidence(item, schedule_by_activity={"A": schedule}),
+    )
+    assert result["candidates"][0]["schedule"] == schedule
+    assert result["candidates"][0]["feasibility"]["status"] == "FEASIBLE"
 
 
-def test_activity_outside_free_intervals_is_infeasible():
+def test_fixed_session_outside_availability_is_infeasible():
+    item = activity("A", start=None, end=None)
     payload = request(
-        activity("A"),
+        item,
         intervals=[
             {
-                "start": "2026-11-02T07:00:00+07:00",
-                "end": "2026-11-02T08:00:00+07:00",
+                "start": "2026-11-02T08:00:00+07:00",
+                "end": "2026-11-02T11:00:00+07:00",
             }
         ],
     )
-    assert assessment(payload, evidence("A")) == {
+    schedule = fixed_schedule(
+        ("2026-11-02T09:00:00+07:00", "2026-11-02T10:00:00+07:00"),
+        ("2026-11-03T09:00:00+07:00", "2026-11-03T10:00:00+07:00"),
+    )
+    assert assessment(
+        payload,
+        evidence(item, schedule_by_activity={"A": schedule}),
+    ) == {
         "status": "INFEASIBLE",
         "reason_codes": ["OUTSIDE_AVAILABILITY"],
     }
 
 
-def test_overlapping_and_adjoining_free_intervals_are_merged():
+def test_flexible_requires_one_contiguous_free_interval():
+    item = activity(
+        "A",
+        start="2026-11-02T08:00:00+07:00",
+        end="2026-11-02T12:00:00+07:00",
+    )
     payload = request(
-        activity("A", start="2026-11-02T09:30:00+07:00", end="2026-11-02T11:00:00+07:00"),
+        item,
         intervals=[
             {
-                "start": "2026-11-02T09:00:00+07:00",
-                "end": "2026-11-02T10:00:00+07:00",
+                "start": "2026-11-02T08:00:00+07:00",
+                "end": "2026-11-02T08:30:00+07:00",
             },
             {
                 "start": "2026-11-02T10:00:00+07:00",
                 "end": "2026-11-02T10:30:00+07:00",
             },
-            {
-                "start": "2026-11-02T10:15:00+07:00",
-                "end": "2026-11-02T11:00:00+07:00",
-            },
         ],
     )
-    assert assessment(payload, evidence("A")) == {
+    assert assessment(
+        payload,
+        evidence(item, schedule_by_activity={"A": flexible_schedule(60)}),
+    ) == {
+        "status": "INFEASIBLE",
+        "reason_codes": ["OUTSIDE_AVAILABILITY"],
+    }
+
+
+def test_flexible_exact_contiguous_duration_is_feasible():
+    item = activity(
+        "A",
+        start="2026-11-02T08:00:00+07:00",
+        end="2026-11-02T12:00:00+07:00",
+    )
+    payload = request(
+        item,
+        intervals=[
+            {
+                "start": "2026-11-02T09:00:00+07:00",
+                "end": "2026-11-02T10:00:00+07:00",
+            }
+        ],
+    )
+    result = assess_feasibility(
+        payload,
+        evidence=evidence(item, schedule_by_activity={"A": flexible_schedule(60)}),
+    )
+    assert result["candidates"][0]["feasibility"] == {
+        "status": "FEASIBLE",
+        "reason_codes": [],
+    }
+    assert result["candidates"][0]["schedule"] == {
+        "type": "FLEXIBLE_WINDOW",
+        "window_start": "2026-11-02T08:00:00+07:00",
+        "window_end": "2026-11-02T12:00:00+07:00",
+        "duration_minutes": 60,
+    }
+
+
+def test_flexible_duration_larger_than_window_needs_review():
+    item = activity("A")
+    result = assess_feasibility(
+        request(item),
+        evidence=evidence(item, schedule_by_activity={"A": flexible_schedule(61)}),
+    )
+    assert result["candidates"][0]["schedule"] is None
+    assert result["candidates"][0]["feasibility"] == {
+        "status": "NEEDS_REVIEW",
+        "reason_codes": ["UNSUPPORTED_SCHEDULE"],
+    }
+
+
+def test_online_without_schedule_evidence_needs_review():
+    item = activity("A")
+    result = assess_feasibility(
+        request(item),
+        evidence=evidence(item, schedule_by_activity={}),
+    )
+    assert result["candidates"][0]["schedule"] is None
+    assert result["candidates"][0]["feasibility"] == {
+        "status": "NEEDS_REVIEW",
+        "reason_codes": ["MISSING_SCHEDULE_TYPE"],
+    }
+
+
+def test_same_day_offline_without_evidence_uses_fixed_fallback():
+    item = activity("A", mode="offline", location="Room A")
+    result = assess_feasibility(
+        request(item),
+        evidence=evidence(item, schedule_by_activity={}),
+    )
+    assert result["candidates"][0]["schedule"] == activity_fixed_schedule(item)
+    assert result["candidates"][0]["feasibility"]["status"] == "FEASIBLE"
+
+
+def test_multi_day_offline_without_evidence_needs_schedule_type():
+    item = activity(
+        "A",
+        mode="offline",
+        location="Campus",
+        start="2026-11-02T09:00:00+07:00",
+        end="2026-11-03T10:00:00+07:00",
+    )
+    result = assess_feasibility(
+        request(item),
+        evidence=evidence(item, schedule_by_activity={}),
+    )
+    assert result["candidates"][0]["schedule"] is None
+    assert result["candidates"][0]["feasibility"] == {
+        "status": "NEEDS_REVIEW",
+        "reason_codes": ["MISSING_SCHEDULE_TYPE"],
+    }
+
+
+def test_local_date_fallback_uses_vietnam_timezone_not_raw_offsets():
+    item = activity(
+        "A",
+        mode="offline",
+        location="Campus",
+        start="2026-11-02T23:30:00+08:00",
+        end="2026-11-03T00:30:00+08:00",
+    )
+    result = assess_feasibility(
+        request(item),
+        evidence=evidence(item, schedule_by_activity={}),
+    )
+    assert result["candidates"][0]["schedule"]["type"] == "FIXED"
+
+
+def test_registered_activity_skips_missing_deadline():
+    item = activity("A", registration_deadline=None)
+    payload = request(
+        item,
+        participation_by_id={"A": participation("REGISTERED")},
+    )
+    assert assessment(payload, evidence(item)) == {
         "status": "FEASIBLE",
         "reason_codes": [],
     }
 
 
-def test_unknown_and_explicitly_failed_eligibility_are_distinct():
-    payload = request(activity("A"), activity("B"))
-    trusted = FeasibilityEvidence(
-        term_verified=True,
-        eligibility_by_activity={"B": "INELIGIBLE"},
-        schedule_by_activity={
-            "A": schedule_record(),
-            "B": schedule_record(),
-        },
+def test_registered_activity_skips_passed_deadline():
+    item = activity(
+        "A",
+        registration_deadline="2026-11-01T07:00:00+07:00",
     )
-    result = assess_feasibility(payload, evidence=trusted)
+    payload = request(
+        item,
+        participation_by_id={"A": participation("REGISTERED")},
+    )
+    assert assessment(payload, evidence(item)) == {
+        "status": "FEASIBLE",
+        "reason_codes": [],
+    }
+
+
+def test_not_registered_activity_checks_deadline():
+    item = activity("A", registration_deadline=AS_OF)
+    assert assessment(request(item), evidence(item)) == {
+        "status": "INFEASIBLE",
+        "reason_codes": ["DEADLINE_PASSED"],
+    }
+
+
+@pytest.mark.parametrize(
+    ("progress", "reason"),
+    [("COMPLETED", "ALREADY_COMPLETED"), ("CANCELLED", "CANCELLED")],
+)
+def test_completed_and_cancelled_are_infeasible(progress, reason):
+    item = activity("A")
+    payload = request(
+        item,
+        participation_by_id={"A": participation(progress=progress)},
+    )
+    assert assessment(payload, evidence(item)) == {
+        "status": "INFEASIBLE",
+        "reason_codes": [reason],
+    }
+
+
+def test_multi_session_conflicts_are_sorted_unique_and_half_open():
+    first = activity("A", start=None, end=None)
+    second = activity("B", start=None, end=None)
+    adjoining = activity("C", start=None, end=None)
+    schedules = {
+        "A": fixed_schedule(
+            ("2026-11-02T08:00:00+07:00", "2026-11-02T09:00:00+07:00"),
+            ("2026-11-03T10:00:00+07:00", "2026-11-03T11:00:00+07:00"),
+        ),
+        "B": fixed_schedule(
+            ("2026-11-03T10:30:00+07:00", "2026-11-03T11:30:00+07:00"),
+        ),
+        "C": fixed_schedule(
+            ("2026-11-02T09:00:00+07:00", "2026-11-02T10:00:00+07:00"),
+        ),
+    }
+    result = assess_feasibility(
+        request(first, second, adjoining),
+        evidence=evidence(
+            first,
+            second,
+            adjoining,
+            schedule_by_activity=schedules,
+        ),
+    )
+    assert result["conflict_pairs"] == [["A", "B"]]
+
+
+def test_flexible_candidates_never_create_conflict_pairs():
+    flexible = activity("A")
+    fixed = activity("B")
+    result = assess_feasibility(
+        request(flexible, fixed),
+        evidence=evidence(
+            flexible,
+            fixed,
+            schedule_by_activity={
+                "A": flexible_schedule(30),
+                "B": activity_fixed_schedule(fixed),
+            },
+        ),
+    )
+    assert result["conflict_pairs"] == []
+
+
+def test_missing_source_review_is_not_implicitly_trusted():
+    item = activity("A")
+    assert assessment(
+        request(item),
+        evidence(item, source_review_by_activity={}),
+    ) == {
+        "status": "NEEDS_REVIEW",
+        "reason_codes": ["NEEDS_SOURCE_REVIEW"],
+    }
+
+
+def test_unknown_and_failed_eligibility_remain_distinct():
+    first = activity("A")
+    second = activity("B")
+    trusted = evidence(
+        first,
+        second,
+        eligibility_by_activity={"B": "INELIGIBLE"},
+    )
+    result = assess_feasibility(request(first, second), evidence=trusted)
     assert result["candidates"][0]["feasibility"] == {
         "status": "NEEDS_REVIEW",
         "reason_codes": ["MISSING_ELIGIBILITY"],
@@ -220,25 +464,6 @@ def test_unknown_and_explicitly_failed_eligibility_are_distinct():
     assert result["candidates"][1]["feasibility"] == {
         "status": "INFEASIBLE",
         "reason_codes": ["INELIGIBLE"],
-    }
-
-
-def test_unverified_term_source_and_missing_binding_require_review():
-    payload = request(activity("A"))
-    payload["activities"][0]["score_binding_ref"] = None
-    trusted = FeasibilityEvidence(
-        term_verified=None,
-        eligibility_by_activity={"A": "ELIGIBLE"},
-        source_review_by_activity={"A": False},
-        schedule_by_activity={"A": schedule_record()},
-    )
-    assert assessment(payload, trusted) == {
-        "status": "NEEDS_REVIEW",
-        "reason_codes": [
-            "NEEDS_SOURCE_REVIEW",
-            "TERM_UNVERIFIED",
-            "MISSING_SCORE_BINDING",
-        ],
     }
 
 
@@ -256,184 +481,46 @@ def test_unverified_term_source_and_missing_binding_require_review():
         ),
     ],
 )
-def test_per_activity_data_qa_term_scope_is_applied(term_scope, expected):
-    payload = request(activity("A"))
+def test_per_activity_term_scope_is_applied(term_scope, expected):
+    item = activity("A")
     trusted = FeasibilityEvidence(
         term_verified=None,
         eligibility_by_activity={"A": "ELIGIBLE"},
         term_scope_by_activity={"A": term_scope},
-        schedule_by_activity={"A": schedule_record()},
+        source_review_by_activity={"A": True},
+        schedule_by_activity={"A": activity_fixed_schedule(item)},
     )
-    assert assessment(payload, trusted) == expected
+    assert assessment(request(item), trusted) == expected
 
 
-def test_conflicts_are_sorted_unique_and_use_half_open_intervals():
-    payload = request(
-        activity("C", start="2026-11-02T10:00:00+07:00", end="2026-11-02T11:00:00+07:00"),
-        activity("A", start="2026-11-02T09:00:00+07:00", end="2026-11-02T10:00:00+07:00"),
-        activity("B", start="2026-11-02T09:30:00+07:00", end="2026-11-02T10:30:00+07:00"),
-    )
-    result = assess_feasibility(payload, evidence=evidence("A", "B", "C"))
-    assert result["conflict_pairs"] == [["A", "B"], ["B", "C"]]
-
-
-def test_online_with_unknown_schedule_type_needs_review_instead_of_false_rejection():
-    payload = request(activity("A"), intervals=[])
+def test_known_failure_wins_over_review_and_keeps_all_reasons():
+    item = activity("A", registration_deadline=None)
     trusted = FeasibilityEvidence(
-        term_verified=True,
-        eligibility_by_activity={"A": "ELIGIBLE"},
+        schedule_by_activity={"A": activity_fixed_schedule(item)},
     )
-
-    assert assessment(payload, trusted) == {
-        "status": "NEEDS_REVIEW",
-        "reason_codes": ["MISSING_SCHEDULE_TYPE"],
-    }
-
-
-def test_flexible_online_window_sums_separate_free_time_fragments():
-    payload = request(
-        activity(
-            "A",
-            start="2026-11-01T09:00:00+07:00",
-            end="2026-11-03T18:00:00+07:00",
-        ),
-        intervals=[
-            {
-                "start": "2026-11-02T09:00:00+07:00",
-                "end": "2026-11-02T09:30:00+07:00",
-            },
-            {
-                "start": "2026-11-03T14:00:00+07:00",
-                "end": "2026-11-03T14:30:00+07:00",
-            },
-        ],
-    )
-    trusted = evidence(
-        "A",
-        schedule_by_activity={
-            "A": schedule_record("FLEXIBLE_WINDOW", 60),
-        },
-    )
-
-    assert assessment(payload, trusted) == {
-        "status": "FEASIBLE",
-        "reason_codes": [],
-    }
-
-
-def test_flexible_online_window_is_infeasible_only_when_total_free_time_is_too_short():
-    payload = request(
-        activity(
-            "A",
-            start="2026-11-01T09:00:00+07:00",
-            end="2026-11-03T18:00:00+07:00",
-        ),
-        intervals=[
-            {
-                "start": "2026-11-02T09:00:00+07:00",
-                "end": "2026-11-02T09:45:00+07:00",
-            }
-        ],
-    )
-    trusted = evidence(
-        "A",
-        schedule_by_activity={
-            "A": schedule_record("FLEXIBLE_WINDOW", 60),
-        },
-    )
-
-    assert assessment(payload, trusted) == {
-        "status": "INFEASIBLE",
-        "reason_codes": ["OUTSIDE_AVAILABILITY"],
-    }
-
-
-def test_flexible_online_window_without_workload_requires_review_not_rejection():
-    payload = request(activity("A"), intervals=[])
-    trusted = evidence(
-        "A",
-        schedule_by_activity={
-            "A": schedule_record("FLEXIBLE_WINDOW"),
-        },
-    )
-
-    assert assessment(payload, trusted) == {
-        "status": "NEEDS_REVIEW",
-        "reason_codes": ["MISSING_REQUIRED_DURATION"],
-    }
-
-
-def test_asynchronous_online_activity_ignores_clock_availability_and_conflicts():
-    payload = request(
-        activity("ASYNC"),
-        activity("FIXED"),
-    )
-    trusted = evidence(
-        "ASYNC",
-        "FIXED",
-        schedule_by_activity={
-            "ASYNC": schedule_record("ASYNCHRONOUS"),
-            "FIXED": schedule_record("FIXED"),
-        },
-    )
-
-    result = assess_feasibility(payload, evidence=trusted)
-
-    assert result["candidates"][0]["feasibility"] == {
-        "status": "FEASIBLE",
-        "reason_codes": [],
-    }
-    assert result["conflict_pairs"] == []
-
-
-def test_offline_activity_without_schedule_evidence_remains_fixed_time():
-    payload = request(
-        activity("A", mode="offline", location="Room A"),
-        intervals=[],
-    )
-    trusted = FeasibilityEvidence(
-        term_verified=True,
-        eligibility_by_activity={"A": "ELIGIBLE"},
-    )
-
-    assert assessment(payload, trusted) == {
-        "status": "INFEASIBLE",
-        "reason_codes": ["OUTSIDE_AVAILABILITY"],
-    }
-
-
-def test_invalid_schedule_evidence_is_rejected():
-    payload = request(activity("A"))
-    trusted = evidence(
-        "A",
-        schedule_by_activity={
-            "A": schedule_record("FLEXIBLE_WINDOW", -1),
-        },
-    )
-
-    with pytest.raises(FeasibilityContractError, match="positive number"):
-        assess_feasibility(payload, evidence=trusted)
-
-
-def test_known_failure_wins_over_review_but_keeps_all_reason_codes():
-    payload = request(
-        activity("A", registration_deadline=None),
-        intervals=[],
-    )
-    assert assessment(
-        payload,
-        FeasibilityEvidence(
-            schedule_by_activity={"A": schedule_record()},
-        ),
-    ) == {
+    assert assessment(request(item, intervals=[]), trusted) == {
         "status": "INFEASIBLE",
         "reason_codes": [
             "OUTSIDE_AVAILABILITY",
             "MISSING_DEADLINE",
             "MISSING_ELIGIBILITY",
+            "NEEDS_SOURCE_REVIEW",
             "TERM_UNVERIFIED",
         ],
     }
+
+
+def test_invalid_fixed_evidence_is_rejected():
+    item = activity("A")
+    invalid = fixed_schedule(
+        ("2026-11-02T10:00:00+07:00", "2026-11-02T11:00:00+07:00"),
+        ("2026-11-02T09:00:00+07:00", "2026-11-02T09:30:00+07:00"),
+    )
+    with pytest.raises(FeasibilityContractError, match="sorted by start"):
+        assess_feasibility(
+            request(item),
+            evidence=evidence(item, schedule_by_activity={"A": invalid}),
+        )
 
 
 @pytest.mark.parametrize(
@@ -452,18 +539,34 @@ def test_known_failure_wins_over_review_but_keeps_all_reason_codes():
             ),
             "duplicate ID",
         ),
+        (
+            lambda payload: payload["activities"][0].pop("participation"),
+            "missing fields: participation",
+        ),
+        (
+            lambda payload: payload["activities"][0]["participation"].update(
+                progress="UNKNOWN"
+            ),
+            "must be one of",
+        ),
         (lambda payload: payload.update(unexpected=True), "unexpected fields"),
     ],
 )
 def test_invalid_contract_inputs_are_rejected(mutate, message):
-    payload = request(activity("A"))
+    item = activity("A")
+    payload = request(item)
     mutate(payload)
     with pytest.raises(FeasibilityContractError, match=message):
-        assess_feasibility(payload, evidence=evidence("A"))
+        assess_feasibility(payload, evidence=evidence(item))
 
 
-def test_assessment_does_not_mutate_the_request():
-    payload = request(activity("A"), activity("B"))
-    original = deepcopy(payload)
-    assess_feasibility(payload, evidence=evidence("A", "B"))
-    assert payload == original
+def test_assessment_does_not_mutate_request_or_evidence():
+    first = activity("A")
+    second = activity("B")
+    payload = request(first, second)
+    trusted = evidence(first, second)
+    original_payload = deepcopy(payload)
+    original_schedules = deepcopy(trusted.schedule_by_activity)
+    assess_feasibility(payload, evidence=trusted)
+    assert payload == original_payload
+    assert trusted.schedule_by_activity == original_schedules
