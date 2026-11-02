@@ -1,13 +1,12 @@
 """Test doubles and synthetic input builders for SP3 planner tests.
 
 These are NOT SP2 scorers. StaticTableScorer replays a fixed table and fails
-on any unlisted set (contract section 9). CappedAdditiveScorer is a small,
-independent model used only for property tests.
+on any unlisted set (contract section 9 of v0.1). CappedAdditiveScorer is a
+small, independent model used only for property tests.
 """
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import datetime
 import math
 from pathlib import Path
 import sys
@@ -17,6 +16,8 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 ECHO_FIELDS = ("contract_version", "request_id", "context", "selected_activity_ids")
+CONTRACT_VERSION = "sp3-planner/0.2"
+PREVIOUS_PLAN_VERSION = "sp3plan-00000000000000aa"
 DEFAULT_CONTEXT = {
     "student_id": "synthetic-student",
     "term_id": "SYNTHETIC-DEMO",
@@ -29,6 +30,7 @@ DEFAULT_CONTEXT = {
     "ruleset_version": "synthetic-rules",
     "calendar_version": "synthetic-calendar",
 }
+NOT_STARTED = {"registration": "NOT_REGISTERED", "progress": "NOT_STARTED"}
 
 
 def envelope(request: dict[str, Any], *, status: str = "OK", result: Any = None, errors: list | None = None) -> dict[str, Any]:
@@ -43,11 +45,15 @@ def envelope(request: dict[str, Any], *, status: str = "OK", result: Any = None,
 
 
 class StaticTableScorer:
-    """Replays a table keyed by the sorted selected-ID tuple; anything else is ERROR."""
+    """Replays a table keyed by the sorted selected-ID tuple; anything else is ERROR.
+
+    An entry that also gives ``attribution_order`` matches only that order.
+    """
 
     def __init__(self, entries: list[dict[str, Any]]) -> None:
-        self.table = {tuple(entry["selected_activity_ids"]): deepcopy(entry) for entry in entries}
+        self.entries = [deepcopy(entry) for entry in entries]
         self.calls: list[tuple[str, ...]] = []
+        self.orders: list[tuple[str, ...]] = []
 
     @property
     def call_count(self) -> int:
@@ -55,8 +61,13 @@ class StaticTableScorer:
 
     def __call__(self, request: dict[str, Any]) -> dict[str, Any]:
         key = tuple(request["selected_activity_ids"])
+        order = list(request["attribution_order"])
         self.calls.append(key)
-        entry = self.table.get(key)
+        self.orders.append(tuple(order))
+        entry = next(
+            (e for e in self.entries if tuple(e["selected_activity_ids"]) == key and e.get("attribution_order", order) == order),
+            None,
+        )
         if entry is None:
             return envelope(request, status="ERROR", errors=[{
                 "code": "UNSPECIFIED_SET", "message": "The static table has no entry for this set.", "activity_id": None,
@@ -85,12 +96,12 @@ def static_result(before: dict[str, float], after: dict[str, float], max_total: 
 class CappedAdditiveScorer:
     """Independent toy model: per-activity points into one category with caps.
 
-    Contributions are allocated in (start, activity_id) order; each activity
-    adds ``min(points, remaining category cap)``. The total is capped by
-    max_total_score. ``activities`` maps ID -> (category, points, start).
+    Contributions are allocated in the request's ``attribution_order``; each
+    activity adds ``min(points, remaining category cap)``. The total is capped
+    by max_total_score. ``activities`` maps ID -> (category, points).
     """
 
-    def __init__(self, activities: dict[str, tuple[str, float, str]]) -> None:
+    def __init__(self, activities: dict[str, tuple[str, float]]) -> None:
         self.activities = dict(activities)
         self.call_count = 0
 
@@ -100,13 +111,9 @@ class CappedAdditiveScorer:
         before = baseline["category_scores"]
         caps = baseline["category_caps"]
         after = dict(before)
-        order = sorted(
-            request["selected_activity_ids"],
-            key=lambda a: (datetime.fromisoformat(self.activities[a][2]), a),
-        )
         contributions = []
-        for activity_id in order:
-            category, points, _ = self.activities[activity_id]
+        for activity_id in request["attribution_order"]:
+            category, points = self.activities[activity_id]
             added = max(0, min(points, caps[category] - after[category]))
             after[category] += added
             contributions.append({
@@ -147,14 +154,61 @@ def make_activity(activity_id: str, start: str | None, end: str | None, *, domai
     }
 
 
-def make_candidate(activity: dict[str, Any], status: str = "FEASIBLE", reason_codes: list[str] | None = None, binding: str | None = "binding") -> dict[str, Any]:
+def fixed_schedule(*blocks: tuple[str, str]) -> dict[str, Any]:
+    return {"type": "FIXED", "fixed_blocks": [{"start": start, "end": end} for start, end in blocks]}
+
+
+def flexible_schedule(window_start: str, window_end: str, minutes: int) -> dict[str, Any]:
+    return {"type": "FLEXIBLE_WINDOW", "window_start": window_start, "window_end": window_end, "duration_minutes": minutes}
+
+
+_DEFAULT = object()
+
+
+def make_candidate(
+    activity: dict[str, Any],
+    status: str = "FEASIBLE",
+    reason_codes: list[str] | None = None,
+    binding: str | None = "binding",
+    *,
+    schedule: Any = _DEFAULT,
+    registration: str = "NOT_REGISTERED",
+    progress: str = "NOT_STARTED",
+) -> dict[str, Any]:
+    """A section 6.5 candidate; by default a FIXED schedule of [start, end)."""
     if status != "FEASIBLE" and reason_codes is None:
         reason_codes = ["MISSING_ELIGIBILITY"] if status == "NEEDS_REVIEW" else ["DEADLINE_PASSED"]
+    if schedule is _DEFAULT:
+        has_times = activity["start"] is not None and activity["end"] is not None
+        schedule = fixed_schedule((activity["start"], activity["end"])) if has_times else None
     return {
         "activity": activity,
         "score_binding_ref": None if binding is None else f"{binding}-{activity['activity_id']}",
+        "participation": {"registration": registration, "progress": progress},
+        "schedule": schedule,
         "feasibility": {"status": status, "reason_codes": list(reason_codes or [])},
     }
+
+
+def make_previous_plan(blocks_by_id: dict[str, list[tuple[str, str]]], *, version: str = PREVIOUS_PLAN_VERSION) -> dict[str, Any]:
+    return {
+        "plan_version": version,
+        "based_on": {
+            "calendar_version": "previous-calendar",
+            "dataset_version": DEFAULT_CONTEXT["dataset_version"],
+            "ruleset_version": DEFAULT_CONTEXT["ruleset_version"],
+            "baseline_ref": DEFAULT_CONTEXT["baseline_ref"],
+            "previous_plan_version": None,
+        },
+        "selected_activities": [
+            {"activity_id": activity_id, "scheduled_blocks": [{"start": s, "end": e} for s, e in blocks]}
+            for activity_id, blocks in blocks_by_id.items()
+        ],
+    }
+
+
+def keep(*activity_ids: str) -> list[dict[str, str]]:
+    return [{"activity_id": activity_id, "mode": "KEEP_TIME"} for activity_id in activity_ids]
 
 
 def make_planner_input(
@@ -171,10 +225,16 @@ def make_planner_input(
     max_activities: int | None = None,
     max_duration_minutes: float | None = None,
     conflict_pairs: list[list[str]] | None = None,
+    available: list[tuple[str, str]] | None = None,
+    previous_plan: dict[str, Any] | None = None,
+    keep_requests: list[dict[str, str]] | None = None,
     request_id: str = "synthetic-request",
 ) -> dict[str, Any]:
+    """A section 7 planner_input; availability defaults to the whole planning window."""
+    if available is None:
+        available = [(DEFAULT_CONTEXT["window_start"], DEFAULT_CONTEXT["window_end"])]
     return {
-        "contract_version": "sp3-planner/0.1",
+        "contract_version": CONTRACT_VERSION,
         "request_id": request_id,
         "context": dict(DEFAULT_CONTEXT),
         "baseline": {
@@ -189,6 +249,9 @@ def make_planner_input(
         "limits": {"max_activities": max_activities, "max_duration_minutes": max_duration_minutes},
         "candidates": candidates,
         "conflict_pairs": [list(pair) for pair in (conflict_pairs or [])],
+        "available_intervals": [{"start": start, "end": end} for start, end in available],
+        "previous_plan": previous_plan,
+        "keep_requests": list(keep_requests or []),
     }
 
 

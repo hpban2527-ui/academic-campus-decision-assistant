@@ -1,11 +1,11 @@
 {
   "label": "SYNTHETIC-DEMO",
-  "source": "docs/SP3_PLANNER_CONTRACT_V0_1.md section 9 (Examples 1-3); static mock scores, not SP2 results",
+  "source": "docs/SP3_PLANNER_CONTRACT_V0_1.md section 9 (Examples 1-3), converted to sp3-planner/0.2 as fixed-schedule regression cases (section 12 of docs/SP3_PLANNER_CONTRACT_V0_2.md); static mock scores, not SP2 results",
   "examples": [
     {
       "name": "example_1_target_met",
       "planner_input": {
-        "contract_version": "sp3-planner/0.1",
+        "contract_version": "sp3-planner/0.2",
         "request_id": "demo-01",
         "context": {
           "student_id": "synthetic-student",
@@ -70,13 +70,34 @@
               "completion_requirements": "Complete the session and satisfy the mock evidence check."
             },
             "score_binding_ref": "mock-binding-A",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            },
             "feasibility": {
               "status": "FEASIBLE",
               "reason_codes": []
             }
           }
         ],
-        "conflict_pairs": []
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-01T00:00:00+07:00",
+            "end": "2026-11-04T00:00:00+07:00"
+          }
+        ],
+        "previous_plan": null,
+        "keep_requests": []
       },
       "score_table": [
         {
@@ -122,6 +143,15 @@
         "selected": [
           {
             "activity_id": "A",
+            "schedule_type": "FIXED",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T09:00:00+07:00",
+                "end": "2026-11-02T10:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
             "reasons": [
               {
                 "code": "GOAL_CONTRIBUTION",
@@ -161,13 +191,24 @@
         "warning_codes": [
           "DEMO_ONLY",
           "TRAVEL_NOT_MODELED"
-        ]
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [],
+        "keep_conflicts": [],
+        "score_comparison": null,
+        "based_on": {
+          "calendar_version": "mock-calendar-01",
+          "dataset_version": "mock-data-01",
+          "ruleset_version": "mock-rules-01",
+          "baseline_ref": "mock-baseline-01",
+          "previous_plan_version": null
+        }
       }
     },
     {
       "name": "example_2_conflict_and_preference",
       "planner_input": {
-        "contract_version": "sp3-planner/0.1",
+        "contract_version": "sp3-planner/0.2",
         "request_id": "demo-02",
         "context": {
           "student_id": "synthetic-student",
@@ -234,6 +275,19 @@
               "completion_requirements": "Complete the session and satisfy the mock evidence check."
             },
             "score_binding_ref": "mock-binding-A",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            },
             "feasibility": {
               "status": "FEASIBLE",
               "reason_codes": []
@@ -264,6 +318,19 @@
               "completion_requirements": "Complete the session and satisfy the mock evidence check."
             },
             "score_binding_ref": "mock-binding-B",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            },
             "feasibility": {
               "status": "FEASIBLE",
               "reason_codes": []
@@ -275,7 +342,15 @@
             "A",
             "B"
           ]
-        ]
+        ],
+        "available_intervals": [
+          {
+            "start": "2026-11-01T00:00:00+07:00",
+            "end": "2026-11-04T00:00:00+07:00"
+          }
+        ],
+        "previous_plan": null,
+        "keep_requests": []
       },
       "score_table": [
         {
@@ -344,6 +419,15 @@
         "selected": [
           {
             "activity_id": "B",
+            "schedule_type": "FIXED",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T09:00:00+07:00",
+                "end": "2026-11-02T10:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
             "reasons": [
               {
                 "code": "GOAL_CONTRIBUTION",
@@ -393,13 +477,24 @@
         "warning_codes": [
           "DEMO_ONLY",
           "TRAVEL_NOT_MODELED"
-        ]
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [],
+        "keep_conflicts": [],
+        "score_comparison": null,
+        "based_on": {
+          "calendar_version": "mock-calendar-01",
+          "dataset_version": "mock-data-02",
+          "ruleset_version": "mock-rules-02",
+          "baseline_ref": "mock-baseline-02",
+          "previous_plan_version": null
+        }
       }
     },
     {
       "name": "example_3_unreachable_target_and_cap",
       "planner_input": {
-        "contract_version": "sp3-planner/0.1",
+        "contract_version": "sp3-planner/0.2",
         "request_id": "demo-03",
         "context": {
           "student_id": "synthetic-student",
@@ -464,6 +559,19 @@
               "completion_requirements": "Complete the session and satisfy the mock evidence check."
             },
             "score_binding_ref": "mock-binding-A",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            },
             "feasibility": {
               "status": "FEASIBLE",
               "reason_codes": []
@@ -494,13 +602,34 @@
               "completion_requirements": "Complete the session and satisfy the mock evidence check."
             },
             "score_binding_ref": "mock-binding-B",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-03T09:00:00+07:00",
+                  "end": "2026-11-03T10:30:00+07:00"
+                }
+              ]
+            },
             "feasibility": {
               "status": "FEASIBLE",
               "reason_codes": []
             }
           }
         ],
-        "conflict_pairs": []
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-01T00:00:00+07:00",
+            "end": "2026-11-04T00:00:00+07:00"
+          }
+        ],
+        "previous_plan": null,
+        "keep_requests": []
       },
       "score_table": [
         {
@@ -599,6 +728,15 @@
         "selected": [
           {
             "activity_id": "A",
+            "schedule_type": "FIXED",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T09:00:00+07:00",
+                "end": "2026-11-02T10:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
             "reasons": [
               {
                 "code": "GOAL_CONTRIBUTION",
@@ -646,7 +784,18 @@
         "warning_codes": [
           "DEMO_ONLY",
           "TRAVEL_NOT_MODELED"
-        ]
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [],
+        "keep_conflicts": [],
+        "score_comparison": null,
+        "based_on": {
+          "calendar_version": "mock-calendar-01",
+          "dataset_version": "mock-data-03",
+          "ruleset_version": "mock-rules-03",
+          "baseline_ref": "mock-baseline-03",
+          "previous_plan_version": null
+        }
       }
     }
   ]

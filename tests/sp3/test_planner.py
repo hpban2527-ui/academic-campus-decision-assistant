@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import hashlib
 import json
 from pathlib import Path
 import random
@@ -16,6 +17,7 @@ from planner_doubles import (
     CappedAdditiveScorer,
     StaticTableScorer,
     at,
+    flexible_schedule,
     make_activity,
     make_candidate,
     make_planner_input,
@@ -34,7 +36,7 @@ def scenario(specs, *, scores=None, caps=None, **input_kwargs):
     """Build planner_input plus a CappedAdditiveScorer from compact specs.
 
     Each spec: (id, points, start, end) with optional keys in a trailing dict:
-    category, domain, mode, status.
+    category, domain, mode, status. Schedules are FIXED [start, end).
     """
     candidates, model = [], {}
     for spec in specs:
@@ -42,7 +44,7 @@ def scenario(specs, *, scores=None, caps=None, **input_kwargs):
         options = rest[0] if rest else {}
         activity = make_activity(activity_id, start, end, domain=options.get("domain", "academic"), mode=options.get("mode", "online"))
         candidates.append(make_candidate(activity, options.get("status", "FEASIBLE")))
-        model[activity_id] = (options.get("category", "C1"), points, start or at(7, 0))
+        model[activity_id] = (options.get("category", "C1"), points)
     planner_input = make_planner_input(
         candidates, scores=scores or {"C1": 20}, caps=caps or {"C1": 30}, **input_kwargs,
     )
@@ -71,6 +73,19 @@ def warning_codes(output):
     return [warning["code"] for warning in output["warnings"]]
 
 
+def expected_plan_version(based_on, selected):
+    """Section 10.2 plan_version, computed here independently of the implementation."""
+    payload = {
+        "based_on": based_on,
+        "selected_activities": sorted(
+            ({"activity_id": e["activity_id"], "scheduled_blocks": e["scheduled_blocks"]} for e in selected),
+            key=lambda item: item["activity_id"],
+        ),
+    }
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return "sp3plan-" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
 # 1. Contract section 9 examples ------------------------------------------
 
 @pytest.mark.parametrize("example", CONTRACT_EXAMPLES, ids=[e["name"] for e in CONTRACT_EXAMPLES])
@@ -82,9 +97,10 @@ def test_contract_examples_reproduce_expected_projection(example):
 
     assert output["status"] == expected["status"]
     assert [
-        {"activity_id": entry["activity_id"], "reasons": [
-            {key: reason[key] for key in ("code", "category_id", "projected_added")} for reason in entry["reasons"]
-        ]}
+        {
+            **{key: entry[key] for key in ("activity_id", "schedule_type", "scheduled_blocks", "registration", "change")},
+            "reasons": [{key: reason[key] for key in ("code", "category_id", "projected_added")} for reason in entry["reasons"]],
+        }
         for entry in output["selected_activities"]
     ] == expected["selected"]
     assert [{"activity_id": e["activity_id"], "code": e["code"]} for e in output["excluded_candidates"]] == expected["excluded"]
@@ -93,6 +109,9 @@ def test_contract_examples_reproduce_expected_projection(example):
     assert output["search"] == expected["search"]
     assert output["proof"] == expected["proof"]
     assert warning_codes(output) == expected["warning_codes"]
+    for field in ("dropped_activities", "pending_confirmation", "keep_conflicts", "score_comparison", "based_on"):
+        assert output[field] == expected[field], field
+    assert output["plan_version"] == expected_plan_version(expected["based_on"], expected["selected"])
     assert scorer.call_count == expected["search"]["evaluated_subsets"]
     assert len(set(scorer.calls)) == scorer.call_count
     assert output["errors"] == []
@@ -101,8 +120,8 @@ def test_contract_examples_reproduce_expected_projection(example):
         planner_input["contract_version"], planner_input["request_id"], planner_input["context"],
     )
     for entry in output["selected_activities"]:
-        activity = next(c["activity"] for c in planner_input["candidates"] if c["activity"]["activity_id"] == entry["activity_id"])
-        assert (entry["title"], entry["start"], entry["end"]) == (activity["title"], activity["start"], activity["end"])
+        candidate = next(c for c in planner_input["candidates"] if c["activity"]["activity_id"] == entry["activity_id"])
+        assert (entry["title"], entry["scheduled_blocks"]) == (candidate["activity"]["title"], candidate["schedule"]["fixed_blocks"])
     assert check_plan(planner_input, output, scorer, input_snapshot=example["planner_input"]) == []
 
 
@@ -154,7 +173,7 @@ def test_pre_search_exclusions_follow_contract_order_and_warn_about_pending_revi
         # R and I are also listed as counted: review/feasibility codes still win.
         included=["C", "I", "R"], category_targets={"C1": 25},
     )
-    scorer = CappedAdditiveScorer({"U": ("C1", 5, at(4, 9))})
+    scorer = CappedAdditiveScorer({"U": ("C1", 5)})
     output = plan(planner_input, scorer)
     assert exclusions(output) == {"R": "NEEDS_REVIEW", "I": "NOT_FEASIBLE", "C": "ALREADY_COUNTED"}
     assert selected_ids(output) == ["U"]
@@ -437,7 +456,8 @@ def test_dominance_pruning_keeps_optimality_and_matches_unpruned_best():
     by_id = {s[0]: s for s in specs}
 
     def rank(ids):
-        result = scorer({**{k: planner_input[k] for k in ("contract_version", "request_id", "context", "baseline")}, "selected_activity_ids": list(ids)})["result"]
+        request = {k: planner_input[k] for k in ("contract_version", "request_id", "context", "baseline")}
+        result = scorer({**request, "selected_activity_ids": list(ids), "attribution_order": list(ids)})["result"]
         gap = max(0, 28 - result["category_after"]["C1"])
         preference = sum(1 for i in ids if len(by_id[i]) > 4 and by_id[i][4].get("domain") == "skills")
         minutes = sum((int(by_id[i][3][11:13]) - int(by_id[i][2][11:13])) * 60 for i in ids)
@@ -478,6 +498,7 @@ def assert_failure(output, status, evaluated):
     assert output["excluded_candidates"] == []
     assert output["score_summary"] is None
     assert output["proof"] is None
+    assert (output["dropped_activities"], output["keep_conflicts"], output["score_comparison"], output["plan_version"]) == ([], [], None, None)
     assert output["feasibility_conclusion"] == "UNDETERMINED"
     assert output["search"] == {"complete": False, "optimality_proven": False, "evaluated_subsets": evaluated, "limit_reason": "SP2_FAILURE"}
     assert warning_codes(output)[:2] == ["DEMO_ONLY", "TRAVEL_NOT_MODELED"]
@@ -573,6 +594,10 @@ def _candidate(data, activity_id):
     return next(c for c in data["candidates"] if c["activity"]["activity_id"] == activity_id)
 
 
+def _block(data, activity_id):
+    return _candidate(data, activity_id)["schedule"]["fixed_blocks"][0]
+
+
 INVALID_INPUTS = {
     "unexpected_top_level_field": lambda d: d.update(extra=True),
     "missing_goals": lambda d: d.pop("goals"),
@@ -582,12 +607,40 @@ INVALID_INPUTS = {
     "feasible_without_binding": lambda d: _candidate(d, "A").update(score_binding_ref=None),
     "review_without_reason_codes": lambda d: _candidate(d, "R")["feasibility"].update(reason_codes=[]),
     "lowercase_reason_code": lambda d: _candidate(d, "R")["feasibility"].update(reason_codes=["missing"]),
-    "feasible_starts_before_as_of": lambda d: _candidate(d, "A")["activity"].update(start=at(1, 7)),
-    "feasible_outside_window": lambda d: _candidate(d, "A")["activity"].update(end=at(9, 10)),
+    "feasible_starts_before_as_of": lambda d: _block(d, "A").update(start=at(1, 7)),
+    "feasible_outside_window": lambda d: _block(d, "A").update(end=at(9, 10)),
     "feasible_with_passed_deadline": lambda d: _candidate(d, "A")["activity"].update(registration_deadline=at(1, 8)),
     "feasible_without_deadline": lambda d: _candidate(d, "A")["activity"].update(registration_deadline=None),
-    "feasible_end_before_start": lambda d: _candidate(d, "A")["activity"].update(end=at(2, 8)),
+    "feasible_end_before_start": lambda d: _block(d, "A").update(end=at(2, 8)),
     "timestamp_without_offset": lambda d: _candidate(d, "A")["activity"].update(start="2026-11-02T09:00:00"),
+    "block_timestamp_without_offset": lambda d: _block(d, "A").update(start="2026-11-02T09:00:00"),
+    "feasible_outside_availability": lambda d: d.update(available_intervals=[{"start": at(2, 9, 30), "end": at(3, 0)}]),
+    "feasible_without_schedule": lambda d: _candidate(d, "A").update(schedule=None),
+    "feasible_flexible_without_contiguous_slot": lambda d: (
+        _candidate(d, "A").update(schedule=flexible_schedule(at(2, 8), at(2, 12), 60)),
+        _candidate(d, "B").update(schedule=flexible_schedule(at(2, 8), at(2, 12), 30)),
+        d.update(available_intervals=[{"start": at(2, 8), "end": at(2, 8, 30)}, {"start": at(2, 10), "end": at(2, 10, 30)}]),
+    ),
+    "flexible_duration_longer_than_window": lambda d: _candidate(d, "R").update(schedule=flexible_schedule(at(2, 9), at(2, 10), 61)),
+    "unknown_schedule_type": lambda d: _candidate(d, "R").update(schedule={"type": "ASYNCHRONOUS", "duration_minutes": 30}),
+    "unsorted_fixed_blocks": lambda d: _candidate(d, "R").update(schedule={"type": "FIXED", "fixed_blocks": [
+        {"start": at(3, 9), "end": at(3, 10)}, {"start": at(2, 9), "end": at(2, 10)}]}),
+    "missing_participation": lambda d: _candidate(d, "A").pop("participation"),
+    "in_progress_participation": lambda d: _candidate(d, "A")["participation"].update(progress="IN_PROGRESS"),
+    "v0_1_candidate_shape": lambda d: [_candidate(d, a).pop(k) for a in "ABR" for k in ("participation", "schedule")],
+    "missing_available_intervals": lambda d: d.pop("available_intervals"),
+    "reversed_available_interval": lambda d: d.update(available_intervals=[{"start": at(3, 0), "end": at(2, 0)}]),
+    "missing_overlap_conflict_for_review_candidate": lambda d: _candidate(d, "R").update(
+        schedule={"type": "FIXED", "fixed_blocks": [{"start": at(2, 9, 45), "end": at(2, 10, 15)}]},
+    ),
+    "previous_plan_without_version": lambda d: d.update(previous_plan={"based_on": {}, "selected_activities": []}),
+    "keep_without_previous_plan": lambda d: d.update(keep_requests=[{"activity_id": "A", "mode": "KEEP_TIME"}]),
+    "keep_activity_mode": lambda d: d.update(
+        previous_plan={"plan_version": "sp3plan-00000000000000aa", "based_on": {
+            "calendar_version": "c", "dataset_version": "d", "ruleset_version": "r", "baseline_ref": "b", "previous_plan_version": None,
+        }, "selected_activities": [{"activity_id": "A", "scheduled_blocks": [{"start": at(2, 9), "end": at(2, 10)}]}]},
+        keep_requests=[{"activity_id": "A", "mode": "KEEP_ACTIVITY"}],
+    ),
     "activity_extra_field": lambda d: _candidate(d, "A")["activity"].update(planner_note="x"),
     "unsupported_mode": lambda d: _candidate(d, "A")["activity"].update(mode="remote"),
     "unsorted_conflict_pair": lambda d: d.update(conflict_pairs=[["B", "A"]]),
@@ -640,13 +693,13 @@ def test_invalid_input_messages_do_not_echo_payload_values():
 
 def test_valid_input_fixture_is_actually_valid():
     data = _valid_input()
-    scorer = CappedAdditiveScorer({"A": ("C1", 5, at(2, 9)), "B": ("C1", 5, at(2, 9, 30))})
+    scorer = CappedAdditiveScorer({"A": ("C1", 5), "B": ("C1", 5)})
     assert plan(data, scorer)["status"] == "TARGET_MET"
 
 
 UNUSABLE_CONTEXTS = {
     "not_an_object": lambda d: [],
-    "unsupported_version": lambda d: {**d, "contract_version": "sp3-planner/0.2"},
+    "unsupported_version": lambda d: {**d, "contract_version": "sp3-planner/0.1"},
     "missing_version": lambda d: {k: v for k, v in d.items() if k != "contract_version"},
     "blank_request_id": lambda d: {**d, "request_id": " "},
     "missing_context": lambda d: {k: v for k, v in d.items() if k != "context"},
