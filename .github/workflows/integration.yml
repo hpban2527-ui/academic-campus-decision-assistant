@@ -40,6 +40,12 @@ jobs:
           tests/sp3/test_plan_checker.py
           tests/sp3/test_projected_scorer.py
           tests/sp3/test_projected_scorer_integration.py
+          tests/sp3/test_main_flow_integration.py
+          tests/sp3/test_planner_contract.py
+          tests/sp3/test_scheduler.py
+          tests/sp3/test_scheduler_properties.py
+          tests/sp3/test_planner_cases.py
+          tests/sp3/test_planner_replan.py
       - name: Check SP2 ten expected cases
         env:
           PYTHONPATH: src

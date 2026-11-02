@@ -243,14 +243,31 @@ For a set `S` of eligible candidates:
 
 **Placement is deterministic and exact.**
 
-- Flexible activities are placed in `(usable window end, activity_id)` order.
-- The first candidate start is the previous block, when it is still valid.
-- The remaining candidate starts are left-shifted positions: the start of a
-  free interval inside the usable window, or the end of another placed block.
-- The scheduler backtracks over these positions. It either returns a schedule
-  or proves that none exists.
-- If its step budget is exhausted, the set counts as not schedulable for this
-  run, and the planner reports `search.complete = false`.
+- A single placement order is not enough: with free time 07:00–13:00, A
+  (window 09:00–12:00, 120 min) placed first leaves no gap for B (window
+  07:00–13:00, 180 min), yet B 07:00–10:00 then A 10:00–12:00 is valid.
+- Left-shift lemma: ordering the flexible blocks of any valid schedule by
+  start and moving each to its earliest feasible start at or after the
+  previous block's end keeps the schedule valid; no block ends later.
+- `earliest_fit(a, t)` (earliest feasible start `>= t` inside one free
+  interval and the usable window) has an end that is non-decreasing in `t`, so
+  `dp[T]`, the minimal completion time of a sequence placing exactly the
+  flexible subset `T`, is exact:
+  `dp[T] = min over a in T of end(earliest_fit(a, dp[T - {a}]))`. The set is
+  schedulable if and only if `dp[all]` is finite. Ties on completion time
+  place the smaller `activity_id` last.
+- Cost is `O(2^k · k)` earliest-fit calls for `k` flexible activities. Above
+  16 flexible activities in one set the result is undetermined, never
+  unschedulable: the subset is not scored or extended, and the planner
+  reports `search.complete = false`, `optimality_proven = false`,
+  `limit_reason = SCHEDULING_LIMIT` and `SEARCH_INCOMPLETE`.
+- Replan placement minimizes time changes (section 9, item 4), then prefers
+  left-shifted blocks. A retained flexible activity can stay only if its
+  previous block is still valid. Subsets of those activities are held at
+  their previous blocks, largest first (ties: smallest sorted ID list), while
+  the DP places the rest; the first success is minimal. This enumeration may
+  spend at most the work of one DP at the cap; if it stops early, minimality
+  is not claimed (same search flags as above).
 
 Schedulability is monotone: every subset of a schedulable set is schedulable.
 The planner therefore uses it as a pruning constraint while it enumerates
@@ -276,6 +293,8 @@ The planner prefers the lowest tuple:
 
 `P` is the set of `previous_plan` activities whose progress is not
 `COMPLETED`. Without a previous plan, items 3 and 4 are always 0.
+`P` also excludes activities in `baseline.included_activity_ids`;
+already-counted activities are not changes.
 
 Pruning:
 
@@ -318,6 +337,19 @@ New top-level fields:
 | `score_comparison` | `null` without a previous plan; otherwise SP2's projection for the still-usable part of the previous plan (`P` ∩ eligible, uncounted candidates) next to the new projection |
 | `based_on` | `{calendar_version, dataset_version, ruleset_version, baseline_ref, previous_plan_version}` |
 | `plan_version` | `"sp3plan-"` + the first 16 hex characters of SHA-256 over the canonical JSON of `based_on` and the selected `planned_activity` list |
+
+`score_comparison`, when a previous plan exists:
+
+```json
+{"basis": "PREVIOUS_ACTIVITY_SET_RESCORED", "previous_activity_ids": [], "previous_projected_by_category": {}, "previous_projected_total": 0, "new_projected_total": 0}
+```
+
+- `previous_activity_ids`: sorted IDs of `P` ∩ eligible candidates.
+- `previous_projected_by_category` and `previous_projected_total`: one extra
+  `score_plan` call for that set (outside the search budget), attributed in
+  previous-block order. It is the hypothetical score of that activity set
+  only; it never implies that the old schedule is still usable.
+- `new_projected_total`: `score_summary.projected_total` of the new plan.
 
 ### 10.3 Exclusion codes
 
@@ -415,3 +447,71 @@ The v0.1 examples are kept as regression cases, converted to v0.2 shape.
   integrated on one branch.
 - Backend: schedule evidence and participation sources, plan storage and the
   apply rule in section 11, case E2.
+
+## 14. Planner v0.2 implementation handoff
+
+This handoff implements the planner side of `sp3-planner/0.2`: whole-set
+scheduling, participation state, keep requests, replan, attribution in
+scheduled order, and the matching scorer and checker changes. It does not
+import the availability or feasibility modules. All scoring remains
+`DEMO_ONLY` and unverified.
+
+### 14.1 Modules and entry points
+
+| Module | Entry points |
+| --- | --- |
+| `src/sp3/contract.py` | `CONTRACT_VERSION`; validators for intervals, schedules, participation, previous plans and keep requests; the status and code enums (keep-conflict, change, dropped, warning codes, limit reasons); `plan_version` |
+| `src/sp3/scheduler.py` | `schedule_set(...)` returning `SCHEDULED`, `UNSCHEDULABLE` or `UNDETERMINED` with blocks; `MAX_FLEXIBLE_PER_SET = 16` |
+| `src/sp3/planner.py` | `build_plan(planner_input, score_plan)`; `what_if_skip(planner_input, activity_id, score_plan)` |
+| `src/sp3/scorer_adapter.py` | `ScorerAdapter(backend).score_plan` |
+| `src/sp3/projected_scorer.py` | `ProjectedScorer(InMemoryScoringData(payload))`, the SP2-backed backend |
+| `src/sp3/plan_checker.py` | `check_plan(planner_input, planner_output, score_plan)` |
+
+### 14.2 Required test modules
+
+| Test module under `tests/sp3` | Coverage | Scores from |
+| --- | --- | --- |
+| `test_planner_contract.py` | Version string, schedule, participation, previous-plan and keep validators, `plan_version` | None |
+| `test_scheduler.py` | Placement, clipping, adjacency, kept blocks, replan, cap, determinism | None |
+| `test_scheduler_properties.py` | 200 seeded grid instances against an independent brute force, including minimal time changes | None |
+| `test_scorer_adapter.py` | Request validation including `attribution_order`, delegation, isolation | Static doubles |
+| `test_projected_scorer.py` | Trusted data, bindings, caps, attribution order | Fake engine |
+| `test_projected_scorer_integration.py` | Full planner run and attribution by schedule | Real SP2 engine and `data/drl_rules.json` on synthetic data |
+| `test_main_flow_integration.py` | Main flow on stored availability/feasibility v0.2 output: first plan, replan after new busy time, `what_if_skip`, keep conflicts; upstream drift check after integration | Real SP2 engine and `data/drl_rules.json` on synthetic data |
+| `test_planner.py` | v0.1 examples as fixed-schedule regressions, ranking, limits, failures, invalid input | Static tables, toy model |
+| `test_planner_cases.py` | Cases P1–P9 from section 12 | Static tables |
+| `test_planner_replan.py` | Replan, keep conflicts, scheduling limit, `what_if_skip`, determinism | Static tables, toy model |
+| `test_planner_properties.py` | 130 fixed-schedule and 100 replan instances against brute-force oracles | Toy model |
+| `test_plan_checker.py` | Detection of inconsistent plans, schedules, changes, scores and search claims | Static tables, toy model |
+
+Keep `tests/sp3/planner_doubles.py` and the fixtures `contract_examples.json`,
+`synthetic_scoring_data.json`, `v0_2_planner_cases.json` and
+`main_flow_integration.json` with these tests.
+The P1–P9 candidates are unchanged feasibility output; the fixture records the
+feasibility commit in `derived_from`. `main_flow_integration.json` stores the
+real availability and feasibility outputs for its inputs, with the producing
+commit in `upstream.commit`; its drift check re-runs those modules and is
+skipped until they are on the same branch. Only the two integration modules
+use the real engine; no test uses real student records.
+
+### 14.3 Reproduce the checks
+
+From the repository root, with Python 3.12 and `requirements.txt` installed:
+
+```text
+python -m pytest -q tests/sp3/test_planner_contract.py tests/sp3/test_scheduler.py tests/sp3/test_scheduler_properties.py tests/sp3/test_scorer_adapter.py tests/sp3/test_projected_scorer.py tests/sp3/test_projected_scorer_integration.py tests/sp3/test_main_flow_integration.py tests/sp3/test_planner.py tests/sp3/test_planner_cases.py tests/sp3/test_planner_replan.py tests/sp3/test_planner_properties.py tests/sp3/test_plan_checker.py
+python -m pytest -q tests/sp3
+```
+
+The first command names every required module, so a missing file fails
+collection. Tests set up the `src` imports; CI also sets `PYTHONPATH=src`.
+
+### 14.4 Waiting for integration
+
+- Case E1 live on one branch with availability and feasibility v0.2: the drift
+  check in `test_main_flow_integration.py` then runs instead of being skipped;
+  feasibility imports `CONTRACT_VERSION` from `sp3.contract` (section 13).
+- Backend: `/api/sp3/plan`, plan storage, apply with the `STALE_PLAN` check
+  (case E2), and a `what_if_skip` endpoint.
+- UI for availability, participation, keep requests and plan changes.
+- Trusted schedule evidence, bindings and baseline facts for real students.
