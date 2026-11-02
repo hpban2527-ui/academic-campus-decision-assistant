@@ -5,6 +5,7 @@ from copy import deepcopy
 import pytest
 
 from sp3 import (
+    AVAILABILITY_VERSION,
     AvailabilityContractError,
     FeasibilityEvidence,
     assess_feasibility,
@@ -18,7 +19,7 @@ WINDOW_END = "2026-11-17T00:00:00+07:00"
 
 def availability(**changes):
     value = {
-        "availability_version": "sp3-availability/0.1",
+        "availability_version": "sp3-availability/0.2",
         "timezone": "Asia/Ho_Chi_Minh",
         "week_start": "2026-11-02",
         "apply_scope": "WEEK_ONLY",
@@ -32,6 +33,7 @@ def availability(**changes):
         "effective_from": None,
         "effective_until": None,
         "exceptions": [],
+        "busy_intervals": [],
     }
     value.update(changes)
     return value
@@ -39,6 +41,10 @@ def availability(**changes):
 
 def resolve(payload, *, start=WINDOW_START, end=WINDOW_END):
     return resolve_availability(payload, window_start=start, window_end=end)
+
+
+def test_availability_version_is_v0_2():
+    assert AVAILABILITY_VERSION == "sp3-availability/0.2"
 
 
 def test_week_only_expands_the_selected_week_once():
@@ -154,6 +160,47 @@ def test_resolver_clips_intervals_to_the_planning_window():
     ]
 
 
+def test_busy_interval_only_removes_the_time_it_covers():
+    payload = availability(
+        busy_intervals=[
+            {
+                "start": "2026-11-02T09:00:00+07:00",
+                "end": "2026-11-02T10:00:00+07:00",
+            }
+        ]
+    )
+
+    assert resolve(payload)["available_intervals"] == [
+        {
+            "start": "2026-11-02T08:00:00+07:00",
+            "end": "2026-11-02T09:00:00+07:00",
+        },
+        {
+            "start": "2026-11-02T10:00:00+07:00",
+            "end": "2026-11-02T11:30:00+07:00",
+        },
+    ]
+
+
+def test_busy_interval_on_one_day_does_not_change_other_repeated_days():
+    payload = availability(
+        apply_scope="SEMESTER_WEEKLY",
+        effective_from="2026-11-01",
+        effective_until="2026-11-30",
+        busy_intervals=[
+            {
+                "start": "2026-11-09T09:00:00+07:00",
+                "end": "2026-11-09T10:00:00+07:00",
+            }
+        ],
+    )
+
+    starts = [item["start"] for item in resolve(payload)["available_intervals"]]
+    assert "2026-11-02T08:00:00+07:00" in starts
+    assert "2026-11-09T08:00:00+07:00" in starts
+    assert "2026-11-16T08:00:00+07:00" in starts
+
+
 @pytest.mark.parametrize(
     ("changes", "message"),
     [
@@ -190,6 +237,17 @@ def test_resolver_clips_intervals_to_the_planning_window():
             },
             "inside the selected apply scope",
         ),
+        (
+            {
+                "busy_intervals": [
+                    {
+                        "start": "2026-11-02T10:00:00+07:00",
+                        "end": "2026-11-02T09:00:00+07:00",
+                    }
+                ]
+            },
+            "start must be earlier than end",
+        ),
     ],
 )
 def test_invalid_or_ambiguous_recurrence_inputs_are_rejected(changes, message):
@@ -207,6 +265,28 @@ def test_calendar_version_is_deterministic_and_input_is_not_mutated():
     assert first["calendar_version"] == second["calendar_version"]
     assert first["calendar_version"].startswith("availability-")
     assert payload == original
+
+
+def test_calendar_version_changes_with_busy_intervals_and_planning_window():
+    base = resolve(availability())
+    busy = resolve(
+        availability(
+            busy_intervals=[
+                {
+                    "start": "2026-11-02T09:00:00+07:00",
+                    "end": "2026-11-02T10:00:00+07:00",
+                }
+            ]
+        )
+    )
+    other_window = resolve(
+        availability(),
+        start="2026-11-02T00:00:00+07:00",
+        end=WINDOW_END,
+    )
+
+    assert base["calendar_version"] != busy["calendar_version"]
+    assert base["calendar_version"] != other_window["calendar_version"]
 
 
 def test_resolved_intervals_feed_the_existing_feasibility_contract():
@@ -233,7 +313,7 @@ def test_resolved_intervals_feed_the_existing_feasibility_contract():
         "completion_requirements": "Attend the fixture.",
     }
     request = {
-        "contract_version": "sp3-planner/0.1",
+        "contract_version": "sp3-planner/0.2",
         "request_id": "availability-integration",
         "context": {
             "student_id": "synthetic-student",
@@ -248,7 +328,16 @@ def test_resolved_intervals_feed_the_existing_feasibility_contract():
             "calendar_version": resolved["calendar_version"],
         },
         "available_intervals": resolved["available_intervals"],
-        "activities": [{"activity": activity, "score_binding_ref": "binding-A"}],
+        "activities": [
+            {
+                "activity": activity,
+                "score_binding_ref": "binding-A",
+                "participation": {
+                    "registration": "NOT_REGISTERED",
+                    "progress": "NOT_STARTED",
+                },
+            }
+        ],
     }
 
     result = assess_feasibility(
@@ -256,12 +345,18 @@ def test_resolved_intervals_feed_the_existing_feasibility_contract():
         evidence=FeasibilityEvidence(
             term_verified=True,
             eligibility_by_activity={"ACT-MONDAY": "ELIGIBLE"},
-                schedule_by_activity={
-                    "ACT-MONDAY": {
-                        "schedule_type": "FIXED",
-                        "required_duration_minutes": None,
-                    }
-                },
+            source_review_by_activity={"ACT-MONDAY": True},
+            schedule_by_activity={
+                "ACT-MONDAY": {
+                    "type": "FIXED",
+                    "fixed_blocks": [
+                        {
+                            "start": activity["start"],
+                            "end": activity["end"],
+                        }
+                    ],
+                }
+            },
         ),
     )
 

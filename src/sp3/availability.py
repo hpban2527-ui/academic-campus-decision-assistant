@@ -15,7 +15,7 @@ import json
 from typing import Any, Mapping, Sequence
 
 
-AVAILABILITY_VERSION = "sp3-availability/0.1"
+AVAILABILITY_VERSION = "sp3-availability/0.2"
 TIMEZONE = "Asia/Ho_Chi_Minh"
 
 _REQUEST_FIELDS = {
@@ -27,10 +27,12 @@ _REQUEST_FIELDS = {
     "effective_from",
     "effective_until",
     "exceptions",
+    "busy_intervals",
 }
 _BLOCK_FIELDS = {"day_of_week", "start_time", "end_time"}
 _EXCEPTION_FIELDS = {"date", "blocks"}
 _EXCEPTION_BLOCK_FIELDS = {"start_time", "end_time"}
+_INTERVAL_FIELDS = {"start", "end"}
 _DAY_INDEX = {
     "MONDAY": 0,
     "TUESDAY": 1,
@@ -146,8 +148,52 @@ def _merge_intervals(
     return merged
 
 
-def _calendar_version(payload: Mapping[str, Any]) -> str:
-    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+def _subtract_intervals(
+    free_intervals: Sequence[tuple[datetime, datetime]],
+    busy_intervals: Sequence[tuple[datetime, datetime]],
+) -> list[tuple[datetime, datetime]]:
+    """Subtract merged busy intervals without affecting unrelated free time."""
+
+    remaining: list[tuple[datetime, datetime]] = []
+    merged_busy = _merge_intervals(busy_intervals)
+    for free_start, free_end in free_intervals:
+        cursor = free_start
+        for busy_start, busy_end in merged_busy:
+            if busy_end <= cursor:
+                continue
+            if busy_start >= free_end:
+                break
+            if cursor < busy_start:
+                remaining.append((cursor, min(busy_start, free_end)))
+            cursor = max(cursor, busy_end)
+            if cursor >= free_end:
+                break
+        if cursor < free_end:
+            remaining.append((cursor, free_end))
+    return remaining
+
+
+def _calendar_version(
+    payload: Mapping[str, Any],
+    *,
+    planning_start: datetime,
+    planning_end: datetime,
+) -> str:
+    # The planning window is part of the resolved calendar even though the API
+    # keeps it outside the availability object.
+    version_input = {
+        "availability": payload,
+        "planning_window": {
+            "start": planning_start.isoformat(),
+            "end": planning_end.isoformat(),
+        },
+    }
+    canonical = json.dumps(
+        version_input,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
     digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
     return f"availability-{digest}"
 
@@ -249,6 +295,20 @@ def resolve_availability(
             blocks.append((start, end))
         exceptions[exception_date] = blocks
 
+    raw_busy = payload["busy_intervals"]
+    if not isinstance(raw_busy, list):
+        _fail("availability.busy_intervals", "must be an array")
+    busy_intervals: list[tuple[datetime, datetime]] = []
+    for index, raw_interval in enumerate(raw_busy):
+        path = f"availability.busy_intervals[{index}]"
+        interval = _mapping(raw_interval, path)
+        _exact_fields(interval, _INTERVAL_FIELDS, path)
+        busy_start = _parse_timestamp(interval["start"], f"{path}.start")
+        busy_end = _parse_timestamp(interval["end"], f"{path}.end")
+        if busy_start >= busy_end:
+            _fail(path, "start must be earlier than end")
+        busy_intervals.append((busy_start, busy_end))
+
     planning_start = _parse_timestamp(window_start, "window_start")
     planning_end = _parse_timestamp(window_end, "window_end")
     if planning_start >= planning_end:
@@ -273,10 +333,14 @@ def resolve_availability(
                 intervals.append((clipped_start, clipped_end))
         day += timedelta(days=1)
 
-    merged = _merge_intervals(intervals)
+    merged = _subtract_intervals(_merge_intervals(intervals), busy_intervals)
     return {
         "availability_version": AVAILABILITY_VERSION,
-        "calendar_version": _calendar_version(payload),
+        "calendar_version": _calendar_version(
+            payload,
+            planning_start=planning_start,
+            planning_end=planning_end,
+        ),
         "apply_scope": apply_scope.value,
         "timezone": TIMEZONE,
         "effective_from": effective_from.isoformat(),

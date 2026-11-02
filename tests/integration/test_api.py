@@ -110,7 +110,7 @@ def _availability_payload(apply_scope="WEEK_ONLY"):
     semester = apply_scope == "SEMESTER_WEEKLY"
     return {
         "availability": {
-            "availability_version": "sp3-availability/0.1",
+            "availability_version": "sp3-availability/0.2",
             "timezone": "Asia/Ho_Chi_Minh",
             "week_start": "2026-11-02",
             "apply_scope": apply_scope,
@@ -124,6 +124,7 @@ def _availability_payload(apply_scope="WEEK_ONLY"):
             "effective_from": "2026-11-01" if semester else None,
             "effective_until": "2026-11-30" if semester else None,
             "exceptions": [],
+            "busy_intervals": [],
         },
         "window_start": "2026-11-01T00:00:00+07:00",
         "window_end": "2026-11-17T00:00:00+07:00",
@@ -146,6 +147,30 @@ def test_sp3_availability_endpoint_resolves_ui_week_without_persisting_it():
             "start": "2026-11-02T08:00:00+07:00",
             "end": "2026-11-02T11:30:00+07:00",
         }
+    ]
+
+
+def test_sp3_availability_endpoint_subtracts_ad_hoc_busy_intervals():
+    payload = _availability_payload()
+    payload["availability"]["busy_intervals"] = [
+        {
+            "start": "2026-11-02T09:00:00+07:00",
+            "end": "2026-11-02T10:00:00+07:00",
+        }
+    ]
+
+    response = client.post("/api/sp3/availability/resolve", json=payload)
+
+    assert response.status_code == 200, response.text
+    assert response.json()["available_intervals"] == [
+        {
+            "start": "2026-11-02T08:00:00+07:00",
+            "end": "2026-11-02T09:00:00+07:00",
+        },
+        {
+            "start": "2026-11-02T10:00:00+07:00",
+            "end": "2026-11-02T11:30:00+07:00",
+        },
     ]
 
 
