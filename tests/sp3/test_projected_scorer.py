@@ -102,15 +102,17 @@ def payload(**overrides):
     return data
 
 
-def request(selected, **baseline_overrides):
+def request(selected, order=None, **baseline_overrides):
+    """A score_request; ``order`` is the planner's attribution order (default: ID order)."""
     baseline = {
         "category_scores": {"C1": 5, "C2": 0}, "category_caps": {"C1": 30, "C2": 20},
         "total_score": 5, "max_total_score": 100, "included_activity_ids": [],
     }
     baseline.update(baseline_overrides)
     return {
-        "contract_version": "sp3-planner/0.1", "request_id": "synthetic-request",
+        "contract_version": "sp3-planner/0.2", "request_id": "synthetic-request",
         "context": deepcopy(CONTEXT), "baseline": baseline, "selected_activity_ids": sorted(selected),
+        "attribution_order": list(sorted(selected) if order is None else order),
     }
 
 
@@ -141,13 +143,13 @@ def test_empty_set_returns_the_baseline():
 
 
 def test_whole_set_is_scored_with_rule_categories():
-    response = scorer()(request(["X", "Y", "Z"]))
+    response = scorer()(request(["X", "Y", "Z"], ["Y", "Z", "X"]))
     assert_status(response, "OK")
     result = response["result"]
     assert result["category_after"] == {"C1": 13, "C2": 4}
     assert result["category_gain"] == {"C1": 8, "C2": 4}
     assert (result["total_after"], result["total_gain"]) == (17, 12)
-    # Start order: Y (Nov 2) and Z (Nov 2) before X (Nov 3); Y < Z by ID.
+    # Contributions follow the requested attribution order.
     assert result["contributions"] == [
         {"activity_id": "Y", "category_id": "C2", "rule_id": "RB", "projected_added": 4},
         {"activity_id": "Z", "category_id": "C1", "rule_id": "RS", "projected_added": 3},
@@ -155,20 +157,71 @@ def test_whole_set_is_scored_with_rule_categories():
     ]
 
 
-def test_prefix_attribution_follows_start_time_not_id_under_a_cap():
-    data = payload(
+def capped_pair_data():
+    # A's record starts after B's; attribution must ignore record start times.
+    return payload(
         baselines=[{"student_id": "synthetic-student", "baseline_ref": "baseline-1", "facts": {"a_count": 5}}],
-        activities=[activity("A", "2026-11-04T09:00:00+07:00"), activity("B", "2026-11-02T09:00:00+07:00")],
+        activities=[activity("A", "2026-11-02T09:00:00+07:00"), activity("B", "2026-11-04T09:00:00+07:00")],
         bindings=[binding("A", "RA", "a_count"), binding("B", "RA", "a_count")],
     )
-    response = ProjectedScorer(InMemoryScoringData(data), engine=FakeEngine())(
-        request(["A", "B"], category_scores={"C1": 25, "C2": 0}, total_score=25),
+
+
+def test_prefix_attribution_follows_attribution_order_not_id_or_start_under_a_cap():
+    response = ProjectedScorer(InMemoryScoringData(capped_pair_data()), engine=FakeEngine())(
+        request(["A", "B"], ["B", "A"], category_scores={"C1": 25, "C2": 0}, total_score=25),
     )
     assert_status(response, "OK")
     assert response["result"]["contributions"] == [
         {"activity_id": "B", "category_id": "C1", "rule_id": "RA", "projected_added": 5},
         {"activity_id": "A", "category_id": "C1", "rule_id": "RA", "projected_added": 0},
     ]
+
+
+def test_two_orders_give_identical_totals_and_different_attributions():
+    instance = ProjectedScorer(InMemoryScoringData(capped_pair_data()), engine=FakeEngine())
+    baseline = {"category_scores": {"C1": 25, "C2": 0}, "total_score": 25}
+    first = instance(request(["A", "B"], ["A", "B"], **baseline))
+    second = instance(request(["A", "B"], ["B", "A"], **baseline))
+    assert_status(first, "OK")
+    assert_status(second, "OK")
+    totals = ("category_after", "category_gain", "total_after", "total_gain")
+    assert {key: first["result"][key] for key in totals} == {key: second["result"][key] for key in totals}
+    attributed = lambda response: {c["activity_id"]: c["projected_added"] for c in response["result"]["contributions"]}
+    assert attributed(first) == {"A": 5, "B": 0}
+    assert attributed(second) == {"A": 0, "B": 5}
+    # The same instance answers both orders: no response is reused across orders.
+    assert first["result"]["contributions"] != second["result"]["contributions"]
+
+
+def test_activity_without_start_is_scored_in_the_requested_order():
+    # A multi-session FIXED activity may have no start/end in its SP1 record.
+    response = scorer(activities=[activity("X", None), activity("Y"), activity("Z")])(request(["X", "Y"], ["X", "Y"]))
+    assert_status(response, "OK")
+    assert [c["activity_id"] for c in response["result"]["contributions"]] == ["X", "Y"]
+
+
+def test_order_dependent_set_bindings_need_review():
+    data = payload(
+        activities=[activity("Z"), activity("W")],
+        bindings=[binding("Z", "RS", "flag", "SET", True), binding("W", "RS", "flag", "SET", False)],
+    )
+    engine = FakeEngine()
+    response = ProjectedScorer(InMemoryScoringData(data), engine=engine)(request(["W", "Z"]))
+    assert_status(response, "NEEDS_REVIEW")
+    assert error_codes(response) == [("ORDER_DEPENDENT_BINDINGS", "W"), ("ORDER_DEPENDENT_BINDINGS", "Z")]
+    assert engine.calls == []
+
+
+def test_equal_set_bindings_are_order_independent():
+    data = payload(
+        activities=[activity("Z"), activity("W")],
+        bindings=[binding("Z", "RS", "flag", "SET", True), binding("W", "RS", "flag", "SET", True)],
+    )
+    instance = ProjectedScorer(InMemoryScoringData(data), engine=FakeEngine())
+    first, second = instance(request(["W", "Z"], ["W", "Z"])), instance(request(["W", "Z"], ["Z", "W"]))
+    assert first["result"]["category_after"] == second["result"]["category_after"] == {"C1": 8, "C2": 0}
+    assert {c["activity_id"]: c["projected_added"] for c in first["result"]["contributions"]} == {"W": 3, "Z": 0}
+    assert {c["activity_id"]: c["projected_added"] for c in second["result"]["contributions"]} == {"W": 0, "Z": 3}
 
 
 def test_adapter_accepts_the_projected_envelope():
@@ -185,8 +238,8 @@ def test_engine_runs_are_memoized_within_one_instance():
     instance(request(["X"]))
     assert instance.engine_calls == len(engine.calls) == 2  # baseline, +X
     instance(request(["X"]))
-    instance(request(["X", "Y"]))
-    # Start order Y then X: the prefix {Y} and the set {X, Y} are new states.
+    instance(request(["X", "Y"], ["Y", "X"]))
+    # Order Y then X: the prefix {Y} and the set {X, Y} are new states.
     assert instance.engine_calls == len(engine.calls) == 4
 
 
@@ -222,10 +275,17 @@ def test_scoring_does_not_mutate_requests_or_data():
     assert engine.calls[0] == original["baselines"][0]["facts"]
 
 
-def test_invalid_request_raises_before_any_engine_call():
+@pytest.mark.parametrize("field,value", [
+    ("selected_activity_ids", ["Y", "X"]),
+    ("attribution_order", ["X", "X"]),
+    ("attribution_order", ["X"]),
+    ("attribution_order", ["X", "Y", "Z"]),
+    ("contract_version", "sp3-planner/0.1"),
+])
+def test_invalid_request_raises_before_any_engine_call(field, value):
     engine = FakeEngine()
-    bad = request(["X"])
-    bad["selected_activity_ids"] = ["Y", "X"]
+    bad = request(["X", "Y"])
+    bad[field] = value
     with pytest.raises(ContractError):
         scorer(engine)(bad)
     assert engine.calls == []
@@ -242,7 +302,6 @@ def _without(items, activity_id):
     ({"baselines": []}, ["X"], [("MISSING_BASELINE_FACTS", None)]),
     ({"dataset_version": "dataset-other"}, ["X"], [("MISSING_ACTIVITY", "X")]),
     ({"activities": [activity("Y")]}, ["X"], [("MISSING_ACTIVITY", "X")]),
-    ({"activities": [activity("X", None)]}, ["X"], [("MISSING_SCHEDULE", "X")]),
     ({"bindings": [binding("Y", "RB", "b_count")]}, ["X", "Z"], [("MISSING_BINDING", "X"), ("MISSING_BINDING", "Z")]),
     ({"bindings": [binding("X", "R404", "a_count")]}, ["X"], [("UNKNOWN_RULE", "X")]),
     ({"bindings": [binding("X", "RU", "u_count")]}, ["X"], [("UNVERIFIED_RULE", "X")]),

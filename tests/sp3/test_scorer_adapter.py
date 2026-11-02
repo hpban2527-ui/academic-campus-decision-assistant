@@ -17,7 +17,7 @@ from sp3.scorer_adapter import ScorerAdapter, ScorerContractError
 @pytest.fixture
 def request_data():
     return {
-        "contract_version": "sp3-planner/0.1",
+        "contract_version": "sp3-planner/0.2",
         "request_id": "synthetic-request",
         "context": {
             "student_id": "synthetic-student",
@@ -39,6 +39,7 @@ def request_data():
             "included_activity_ids": ["OLD"],
         },
         "selected_activity_ids": ["A"],
+        "attribution_order": ["A"],
     }
 
 
@@ -64,6 +65,12 @@ def response_for(request, *, result=None, status="OK", errors=None):
         "errors": [] if errors is None else deepcopy(errors),
         "mode": "DEMO_ONLY", "official_award_verified": False,
     }
+
+
+def select(request, *order):
+    """Select ``order`` (the planner's attribution order) in a request."""
+    request["selected_activity_ids"] = sorted(order)
+    request["attribution_order"] = list(order)
 
 
 def assign(value, path, replacement):
@@ -95,7 +102,7 @@ def test_single_activity_delegates_once_and_preserves_envelope(request_data):
 
 
 def test_empty_set_is_still_validated_by_the_backend(request_data):
-    request_data["selected_activity_ids"] = []
+    select(request_data)
     expected = response_for(request_data, result={
         "category_after": {"C1": 20, "C2": 10},
         "category_gain": {"C1": 0, "C2": 0},
@@ -107,7 +114,7 @@ def test_empty_set_is_still_validated_by_the_backend(request_data):
 
 
 def test_whole_set_capped_result_is_preserved_without_rescoring(request_data):
-    request_data["selected_activity_ids"] = ["A", "B"]
+    select(request_data, "A", "B")
     # Nominal +8 each; the backend allocates only +10 after the category cap.
     expected = response_for(request_data, result={
         "category_after": {"C1": 30, "C2": 10},
@@ -123,7 +130,7 @@ def test_whole_set_capped_result_is_preserved_without_rescoring(request_data):
 
 
 def test_overall_cap_can_make_total_gain_less_than_category_gains(request_data):
-    request_data["selected_activity_ids"] = ["A", "B"]
+    select(request_data, "A", "B")
     request_data["baseline"].update(
         category_scores={"C1": 28, "C2": 18}, total_score=46, max_total_score=47,
     )
@@ -140,17 +147,19 @@ def test_overall_cap_can_make_total_gain_less_than_category_gains(request_data):
 
 
 def test_zero_gain_activity_and_backend_attribution_order_are_retained(request_data):
-    request_data["selected_activity_ids"] = ["A", "B"]
-    # Backend may know B starts before A; IDs alone do not encode that order.
+    # The planner scheduled B before A; IDs alone do not encode that order.
+    select(request_data, "B", "A")
     expected = response_for(request_data)
     expected["result"]["contributions"] = [
         contribution("B", "C1", 5), contribution("A", "C1", 0),
     ]
-    assert ScorerAdapter(Mock(return_value=expected)).score_plan(request_data) == expected
+    backend = Mock(return_value=expected)
+    assert ScorerAdapter(backend).score_plan(request_data) == expected
+    assert backend.call_args.args[0]["attribution_order"] == ["B", "A"]
 
 
 @pytest.mark.parametrize("path,value", [
-    (("contract_version",), "sp3-planner/0.2"),
+    (("contract_version",), "sp3-planner/0.1"),
     (("request_id",), " "),
     (("context", "student_id"), None),
     (("context", "baseline_ref"), ""),
@@ -166,6 +175,13 @@ def test_zero_gain_activity_and_backend_attribution_order_are_retained(request_d
     (("selected_activity_ids",), [""]),
     (("selected_activity_ids",), [1]),
     (("selected_activity_ids",), "A"),
+    (("attribution_order",), ["A", "A"]),
+    (("attribution_order",), []),
+    (("attribution_order",), ["A", "B"]),
+    (("attribution_order",), ["B"]),
+    (("attribution_order",), "A"),
+    (("attribution_order",), None),
+    (("attribution_order",), [""]),
     (("baseline", "included_activity_ids"), None),
     (("baseline", "included_activity_ids"), ["OLD", "OLD"]),
     (("baseline", "category_scores"), {}),
@@ -184,7 +200,7 @@ def test_bad_requests_fail_before_backend_call(request_data, path, value):
     backend.assert_not_called()
 
 
-@pytest.mark.parametrize("field", ["context", "baseline", "selected_activity_ids"])
+@pytest.mark.parametrize("field", ["context", "baseline", "selected_activity_ids", "attribution_order"])
 def test_missing_request_fields_are_not_invented(request_data, field):
     del request_data[field]
     backend = Mock()
@@ -234,7 +250,7 @@ def test_unresolved_binding_is_not_converted_into_a_score(request_data):
 
 
 @pytest.mark.parametrize("path,value", [
-    (("contract_version",), "sp3-planner/0.2"),
+    (("contract_version",), "sp3-planner/0.1"),
     (("request_id",), "another-request"),
     (("context", "student_id"), "another-student"),
     (("context", "term_id"), "another-term"),
@@ -414,7 +430,7 @@ def test_large_scores_do_not_enable_large_relative_tolerance(request_data):
 
 
 def test_empty_plan_cannot_invent_even_a_tiny_gain(request_data):
-    request_data["selected_activity_ids"] = []
+    select(request_data)
     backend_response = response_for(request_data, result={
         "category_after": {"C1": 20 + 5e-10, "C2": 10},
         "category_gain": {"C1": 5e-10, "C2": 0},

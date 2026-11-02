@@ -1,22 +1,27 @@
-"""Planner-side boundary for the sp3-planner/0.1 projected scorer.
+"""Planner-side boundary for the sp3-planner/0.2 projected scorer.
 
 Usage: ``score_plan = ScorerAdapter(projected_backend).score_plan``.
 The synchronous backend receives the complete score_request and returns the
-complete score_response from section 5 of SP3_PLANNER_CONTRACT_V0_1.md.
-It must resolve trusted snapshots/bindings, verify student/ruleset scope and
-baseline history, and score the whole set without persistent writes. This
-module checks consistency, NOT the authenticity of references or rule math.
+complete score_response (sections 5 of SP3_PLANNER_CONTRACT_V0_1.md and 10.1
+of SP3_PLANNER_CONTRACT_V0_2.md). It must resolve trusted snapshots/bindings,
+verify student/ruleset scope and baseline history, and score the whole set
+without persistent writes. This module checks consistency, NOT the
+authenticity of references or rule math.
 
-Malformed requests raise ScorerContractError before calling the backend.
-Backend failures/malformed responses become ERROR envelopes without exception
-text. Structured backend error messages must already be safe for display.
-NEEDS_DATA is the only extra backend status accepted: it becomes NEEDS_REVIEW.
+Malformed requests raise ScorerContractError before calling the backend; this
+includes an ``attribution_order`` that is not an exact permutation of
+``selected_activity_ids``. Backend failures/malformed responses become ERROR
+envelopes without exception text. Structured backend error messages must
+already be safe for display. NEEDS_DATA is the only extra backend status
+accepted: it becomes NEEDS_REVIEW.
 
-Contribution attribution (start time, then ID) belongs to SP2: this request
-contains no activity schedules. The adapter preserves that ordering and checks
-coverage and sums. No search, caching, single-activity scoring, or score writes
-occur here. Requests and responses are detached copies; the injected backend
-must itself honor the read-only contract for any external state it accesses.
+The planner fixes the attribution order from its scheduled blocks; the backend
+attributes contributions in that order. Category and total results do not
+depend on the order, so the adapter checks coverage and sums, not the order of
+the contribution list. No search, caching, single-activity scoring, or score
+writes occur here. Requests and responses are detached copies; the injected
+backend must itself honor the read-only contract for any external state it
+accesses.
 
 JSON numbers only (int/float, never bool), finite and non-negative. Bounds are
 strict; arithmetic equalities allow only an absolute 1e-9-point float error
@@ -30,6 +35,7 @@ from typing import Any, Protocol
 from sp3.contract import (
     CONTRACT_VERSION,
     ContractError,
+    copy_json,
     validate_score_request,
     validate_score_response,
 )
@@ -66,7 +72,7 @@ def _validate_response(response: Any, request: dict[str, Any]) -> None:
 
 def _failure(request: dict[str, Any], code: str, message: str) -> dict[str, Any]:
     return {
-        **{key: deepcopy(request[key]) for key in ("contract_version", "request_id", "context", "selected_activity_ids")},
+        **{key: copy_json(request[key]) for key in ("contract_version", "request_id", "context", "selected_activity_ids")},
         "evaluation_status": "ERROR",
         "result": None,
         "errors": [{"code": code, "message": message, "activity_id": None}],
@@ -78,10 +84,11 @@ def _failure(request: dict[str, Any], code: str, message: str) -> dict[str, Any]
 class ScorerAdapter:
     """Inject a trusted synchronous projected backend; no default/fake scorer.
 
-    ``adapter.score_plan`` is the callback for the future planner. The backend
-    must resolve baseline_ref and selected IDs to trusted state, enforce scope,
-    and return the section-5 envelope, including attribution. A match of echoed
-    version strings does not establish the validity of a baseline or binding.
+    ``adapter.score_plan`` is the planner's scoring callback. The backend must
+    resolve baseline_ref and selected IDs to trusted state, enforce scope, and
+    return the section-5 envelope, attributing contributions in the requested
+    ``attribution_order``. A match of echoed version strings does not establish
+    the validity of a baseline or binding.
     """
 
     def __init__(self, projected_backend: ProjectedScorer) -> None:
@@ -98,9 +105,10 @@ class ScorerAdapter:
         snapshot, and returned objects do not alias the backend or the caller.
         """
         _validate_request(request)
-        snapshot = deepcopy(request)
+        # A validated request holds only JSON values, so the fast JSON copy is a full copy.
+        snapshot = copy_json(request)
         try:
-            raw_response = self._backend(deepcopy(snapshot))
+            raw_response = self._backend(copy_json(snapshot))
         except Exception:
             # Exception text may contain credentials, URLs, or private records.
             return _failure(snapshot, "SP2_BACKEND_FAILURE", "Projected scorer failed; check backend diagnostics.")

@@ -1,4 +1,4 @@
-"""Projected whole-set scorer backed by the SP2 rule engine (contract section 5).
+"""Projected whole-set scorer backed by the SP2 rule engine (contract sections 5 and 10.1).
 
 Usage::
 
@@ -7,10 +7,15 @@ Usage::
 
 Given a score_request, the scorer resolves trusted data by context (ruleset,
 confirmed baseline facts, activity records and activity-to-rule bindings),
-applies the selected bindings to a copy of the facts in (start, activity_id)
-order, and runs the SP2 engine on every prefix. Each activity's contribution
-is the marginal change in its rule's category, so per-category contributions
-sum to the category gains by construction.
+applies the selected bindings to a copy of the facts in the request's
+``attribution_order``, and runs the SP2 engine on every prefix. Each
+activity's contribution is the marginal change in its rule's category, so
+per-category contributions sum to the category gains by construction.
+
+Category and total results come from the engine run on the final fact set.
+That set does not depend on the order: increments commute, and bindings that
+would set one fact to different values (so that the last one wins) produce
+NEEDS_REVIEW instead of an order-dependent result.
 
 The scorer is read-only: it never writes to a ledger, session or review queue.
 Missing or unverifiable data produce NEEDS_REVIEW; inconsistencies between the
@@ -19,14 +24,15 @@ result is always DEMO_ONLY and unverified.
 
 One instance serves one planning context. Engine evaluations are memoized
 inside the instance, keyed by ruleset version and canonical facts; there is
-no module-level cache, and a request for another context is rejected.
+no module-level cache, and a request for another context is rejected. There
+is no whole-response cache; one keyed by the selected set alone would be
+wrong, because attribution depends on ``attribution_order``.
 """
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Mapping
 from copy import deepcopy
 from dataclasses import dataclass
-from datetime import datetime
 from enum import Enum
 import json
 import math
@@ -38,10 +44,10 @@ from sp3.contract import (
     DEMO_MODE,
     ContractError,
     EvaluationStatus,
+    copy_json,
     exact_object,
     non_empty_string,
     require,
-    timestamp,
     validate_score_request,
     within_tolerance,
 )
@@ -222,7 +228,6 @@ class _ContextData:
 @dataclass(frozen=True)
 class _Selected:
     activity_id: str
-    start: datetime
     binding: ScoreBinding
     category_id: str
 
@@ -301,7 +306,7 @@ class ProjectedScorer:
     @staticmethod
     def _envelope(request: Mapping[str, Any], status: EvaluationStatus, result: Any, errors: list[dict[str, Any]]) -> dict[str, Any]:
         return {
-            **{key: deepcopy(request[key]) for key in _ECHO_FIELDS},
+            **{key: copy_json(request[key]) for key in _ECHO_FIELDS},
             "evaluation_status": status.value,
             "result": result,
             "errors": errors,
@@ -317,6 +322,7 @@ class ProjectedScorer:
         baseline = request["baseline"]
         self._check_caps(data, baseline)
         selected = self._resolve_selected(request, data)
+        self._check_order_independent(selected)
         base_run = self._run(data.ruleset, dict(data.facts), activity_id=None)
         self._check_baseline(base_run, baseline)
         contributions, final_run = self._attribute(data, selected, base_run, baseline)
@@ -392,16 +398,15 @@ class ProjectedScorer:
             selected.append(item)
         if issues:
             raise _Outcome(EvaluationStatus.NEEDS_REVIEW, issues)
-        return sorted(selected, key=lambda item: (item.start, item.activity_id))
+        by_id = {item.activity_id: item for item in selected}
+        return [by_id[activity_id] for activity_id in request["attribution_order"]]
 
     def _resolve_one(self, context: Mapping[str, Any], activity_id: str, data: _ContextData, categories: Mapping[str, Any]) -> _Selected:
+        # The record must exist, but its start/end are not used: the planner
+        # supplies the order, and a multi-session activity may have no start.
         activity = self._data.activity(context, activity_id)
         if activity is None or activity.get("activity_id") != activity_id:
             raise _review("MISSING_ACTIVITY", "No trusted activity record is available.", activity_id)
-        try:
-            start = timestamp(activity.get("start"), "activity.start")
-        except ContractError:
-            raise _review("MISSING_SCHEDULE", "The activity has no usable start time.", activity_id) from None
         binding = self._data.binding(context, activity_id)
         if binding is None:
             raise _review("MISSING_BINDING", "No trusted activity-to-rule binding is available.", activity_id)
@@ -421,7 +426,31 @@ class ProjectedScorer:
             raise _review("UNSUPPORTED_CATEGORY", f"Rule {binding.rule_id} scores a category outside the baseline.", activity_id)
         if binding.operation is BindingOperation.INCREMENT and not _is_number(data.facts.get(binding.field)):
             raise _review("MISSING_BASELINE_FACT", f"Baseline fact {binding.field} is missing or not numeric.", activity_id)
-        return _Selected(activity_id, start, binding, category_id)
+        return _Selected(activity_id, binding, category_id)
+
+    @staticmethod
+    def _check_order_independent(selected: list[_Selected]) -> None:
+        """Reject bindings whose final fact value would depend on the attribution order.
+
+        Increments commute. A SET is order-independent only when every other
+        binding on the same field is a SET to the same value.
+        """
+        by_field: dict[str, list[_Selected]] = {}
+        for item in selected:
+            by_field.setdefault(item.binding.field, []).append(item)
+        issues = []
+        for field, items in sorted(by_field.items()):
+            operations = {item.binding.operation for item in items}
+            if BindingOperation.SET not in operations or len(items) == 1:
+                continue
+            values = {_canonical({"value": item.binding.value}) for item in items}
+            if operations != {BindingOperation.SET} or len(values) > 1:
+                issues.extend(
+                    _issue("ORDER_DEPENDENT_BINDINGS", f"Bindings on fact {field} conflict, so the result would depend on the attribution order.", item.activity_id)
+                    for item in sorted(items, key=lambda item: item.activity_id)
+                )
+        if issues:
+            raise _Outcome(EvaluationStatus.NEEDS_REVIEW, issues)
 
     # Engine runs
 
