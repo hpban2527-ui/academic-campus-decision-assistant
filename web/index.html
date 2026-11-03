@@ -75,28 +75,33 @@
   <!-- ======================================================================== -->
   <!-- 1. TOP STATUS BAR (THANH TRẠNG THÁI TRÊN CÙNG)                           -->
   <!-- ======================================================================== -->
-  <header class="h-16 bg-white border-b border-slate-200 px-6 lg:px-8 flex items-center justify-between shrink-0 z-30">
+  <header class="h-16 bg-white/95 backdrop-blur-xs border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between shrink-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
     
-    <!-- Left: App Identity & Mode Switcher -->
-    <div class="flex items-center gap-6">
+    <!-- Left: Mobile Menu Toggle + App Identity & Mode Switcher -->
+    <div class="flex items-center gap-3 sm:gap-5">
+      <!-- Mobile Sidebar Toggle Button -->
+      <button id="btnMobileMenuToggle" onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-1 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition" aria-label="Mở danh mục điều hướng">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-lg shadow-xs">
+        <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-base shadow-xs tracking-tight">
           U
         </div>
         <div>
-          <span class="font-extrabold text-lg text-slate-900 tracking-tight block leading-tight">UniLife ĐRL</span>
-          <span class="text-[11px] font-medium text-slate-400 block">Đại học Khoa học Tự nhiên — ĐHQG-HCM</span>
+          <span class="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight block leading-tight">UniLife ĐRL</span>
+          <span class="text-[10px] sm:text-[11px] font-medium text-slate-400 block truncate max-w-[140px] sm:max-w-none">ĐH Khoa học Tự nhiên — ĐHQG-HCM</span>
         </div>
       </div>
 
-      <div class="h-6 w-px bg-slate-200"></div>
+      <div class="hidden sm:block h-5 w-px bg-slate-200"></div>
 
       <!-- USER vs DEVELOPER MODE SWITCHER -->
-      <div class="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200">
-        <button id="btnModeUser" onclick="setViewMode('user')" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition">
+      <div class="inline-flex p-0.5 sm:p-1 rounded-xl bg-slate-100/90 border border-slate-200/80">
+        <button id="btnModeUser" onclick="setViewMode('user')" class="px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition">
           Người dùng
         </button>
-        <button id="btnModeDev" onclick="setViewMode('dev')" class="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition">
+        <button id="btnModeDev" onclick="setViewMode('dev')" class="px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition">
           Developer
         </button>
       </div>
@@ -104,7 +109,7 @@
       <!-- Developer-Only Status Controls in Top Bar -->
       <div class="dev-only hidden xl:flex items-center gap-3">
         <div id="backendStatusPill" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="backendStatusText">API Online</span>
         </div>
 
@@ -117,28 +122,30 @@
 
     <!-- Right: User Profile Pill -->
     <div class="relative">
-      <button onclick="toggleUserDropdown()" class="flex items-center gap-3 pl-2.5 pr-4 py-1.5 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200 transition">
-        <div id="headerAvatar" class="w-8 h-8 rounded-full bg-brand-600 text-white font-bold text-xs flex items-center justify-center">
+      <button onclick="toggleUserDropdown()" class="flex items-center gap-2.5 sm:gap-3 pl-2 pr-3 sm:pr-4 py-1 sm:py-1.5 rounded-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 transition">
+        <div id="headerAvatar" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-brand-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
           MT
         </div>
-        <div class="text-left">
-          <div id="headerUserName" class="text-sm font-bold text-slate-800 leading-tight">Lê Minh Tiến</div>
-          <div id="headerUserMssv" class="text-xs text-slate-500">25127242</div>
+        <div class="text-left hidden sm:block">
+          <div id="headerUserName" class="text-xs sm:text-sm font-bold text-slate-800 leading-tight">Lê Minh Tiến</div>
+          <div id="headerUserMssv" class="text-[11px] text-slate-500">25127242</div>
         </div>
-        <svg class="w-4 h-4 text-slate-400 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
       </button>
 
       <!-- User Dropdown Menu -->
-      <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50">
+      <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50">
         <div class="px-4 py-2.5 border-b border-slate-100">
-          <p class="text-xs font-semibold text-slate-400">Sinh viên đang chọn</p>
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Sinh viên đang chọn</p>
           <p class="text-sm font-bold text-slate-800 mt-0.5">Khoa Công nghệ Thông tin</p>
         </div>
         <div class="py-1">
-          <button onclick="openLoginModal()" class="w-full px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50 font-medium">
+          <button onclick="openLoginModal()" class="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 font-medium transition flex items-center gap-2">
+            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             Đổi tài khoản sinh viên
           </button>
-          <button onclick="resetSessionData()" class="w-full px-4 py-2.5 text-left text-sm text-rose-600 hover:bg-rose-50 font-medium">
+          <button onclick="resetSessionData()" class="w-full px-4 py-2 text-left text-sm text-rose-600 hover:bg-rose-50 font-medium transition flex items-center gap-2">
+            <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Khôi phục dữ liệu gốc
           </button>
         </div>
@@ -150,64 +157,75 @@
   <!-- ======================================================================== -->
   <!-- BODY CONTAINER: LEFT SIDEBAR + FULL-WIDTH EXPANDED WORKSPACE            -->
   <!-- ======================================================================== -->
-  <div class="flex-1 flex overflow-hidden">
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- Mobile Drawer Backdrop Overlay -->
+    <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/30 backdrop-blur-xs z-30 hidden lg:hidden transition-opacity duration-200"></div>
 
     <!-- ====================================================================== -->
-    <!-- 2. LEFT SIDEBAR NAVIGATION (ĐÃ LOẠI BỎ THÔNG BÁO MẪU THEO YÊU CẦU)     -->
+    <!-- 2. LEFT SIDEBAR NAVIGATION (RESPONSIVE OFF-CANVAS TRÊN MOBILE)         -->
     <!-- ====================================================================== -->
-    <aside class="w-80 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 overflow-y-auto p-5 select-none">
+    <aside id="sidebarNav" class="fixed inset-y-0 left-0 z-40 w-72 sm:w-80 bg-white border-r border-slate-200/80 flex flex-col justify-between shrink-0 overflow-y-auto p-5 select-none transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-250 ease-out shadow-2xl lg:shadow-none">
       
       <div class="space-y-6">
         <div>
-          <div class="px-2 mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">
+          <!-- Mobile Drawer Header with Close Button -->
+          <div class="flex items-center justify-between lg:hidden pb-3 border-b border-slate-100 mb-4">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Menu điều hướng</span>
+            <button onclick="toggleMobileSidebar(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" aria-label="Đóng menu">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <div class="px-2 mb-2.5 text-xs font-bold uppercase tracking-wider text-slate-400">
             Không gian làm việc
           </div>
-          <nav class="space-y-2.5">
+          <nav class="space-y-2">
             
-            <button id="tabBtnDashboard" onclick="switchTab('dashboard')" class="nav-btn-active w-full px-4 py-3.5 rounded-xl border text-left transition flex items-start gap-3.5">
+            <button id="tabBtnDashboard" onclick="switchTab('dashboard')" class="nav-btn-active w-full px-4 py-3 rounded-xl border text-left transition flex items-start gap-3.5">
               <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
               <div>
-                <div class="text-[15px] font-bold leading-tight">Tính điểm hoạt động</div>
+                <div class="text-[14px] font-bold leading-tight">Tính điểm hoạt động</div>
                 <div class="text-xs text-slate-400 font-normal mt-0.5">Nhập thông báo &amp; ước tính ĐRL</div>
               </div>
             </button>
 
-            <button id="tabBtnActivities" onclick="switchTab('activities')" class="nav-btn-inactive w-full px-4 py-3.5 rounded-xl border text-left transition flex items-start justify-between">
+            <button id="tabBtnActivities" onclick="switchTab('activities')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-start justify-between">
               <div class="flex items-start gap-3.5">
                 <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                 <div>
-                  <div class="text-[15px] font-bold leading-tight">Kho hoạt động</div>
+                  <div class="text-[14px] font-bold leading-tight">Kho hoạt động</div>
                   <div class="text-xs text-slate-400 font-normal mt-0.5">Danh sách &amp; hàng đợi duyệt</div>
                 </div>
               </div>
-              <span id="sidebarActCount" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">20</span>
+              <span id="sidebarActCount" class="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">20</span>
             </button>
 
-            <button id="tabBtnSnapshot" onclick="switchTab('snapshot')" class="nav-btn-inactive w-full px-4 py-3.5 rounded-xl border text-left transition flex items-start gap-3.5">
+            <button id="tabBtnSnapshot" onclick="switchTab('snapshot')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-start gap-3.5">
               <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
               <div>
-                <div class="text-[15px] font-bold leading-tight">Điểm học vụ</div>
+                <div class="text-[14px] font-bold leading-tight">Điểm học vụ</div>
                 <div class="text-xs text-slate-400 font-normal mt-0.5">Dự tính theo GPA &amp; vi phạm</div>
               </div>
             </button>
 
             <!-- Developer-Only Workspaces -->
-            <button id="tabBtnTestSuites" onclick="switchTab('testSuites')" class="dev-only nav-btn-inactive w-full px-4 py-3.5 rounded-xl border text-left transition flex items-start justify-between">
+            <button id="tabBtnTestSuites" onclick="switchTab('testSuites')" class="dev-only nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-start justify-between">
               <div class="flex items-start gap-3.5">
                 <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                 <div>
-                  <div class="text-[15px] font-bold leading-tight">Kiểm thử 5 Ca E2E</div>
+                  <div class="text-[14px] font-bold leading-tight">Kiểm thử 5 Ca E2E</div>
                   <div class="text-xs text-slate-400 font-normal mt-0.5">Bộ test tự động cho giảng viên</div>
                 </div>
               </div>
               <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-100 text-brand-700">Dev</span>
             </button>
 
-            <button id="tabBtnInspector" onclick="switchTab('inspector')" class="dev-only nav-btn-inactive w-full px-4 py-3.5 rounded-xl border text-left transition flex items-start justify-between">
+            <button id="tabBtnInspector" onclick="switchTab('inspector')" class="dev-only nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-start justify-between">
               <div class="flex items-start gap-3.5">
                 <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
                 <div>
-                  <div class="text-[15px] font-bold leading-tight">Hợp đồng 14 Trường</div>
+                  <div class="text-[14px] font-bold leading-tight">Hợp đồng 14 Trường</div>
                   <div class="text-xs text-slate-400 font-normal mt-0.5">Kiểm tra schema JSON</div>
                 </div>
               </div>
@@ -218,7 +236,7 @@
         </div>
 
         <!-- Clean Info Card for User (Fills vertical sidebar space elegantly) -->
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+        <div class="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2">
           <div class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span>Học kỳ 1 / 2026-2027</span>
@@ -439,18 +457,18 @@
           </div>
 
           <!-- CỘT PHẢI (5/12): BIỂU ĐỒ TRÒN & 5 THANH TIẾN ĐỘ RỘNG RÃI, ĐẸP MẮT -->
-          <div class="xl:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 lg:p-7 space-y-6 sticky top-6">
+          <div class="xl:col-span-5 bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 lg:p-7 space-y-6 sticky top-6">
             
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
               <div>
-                <h2 class="text-xl font-extrabold text-slate-900">Điểm rèn luyện của bạn</h2>
+                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">Điểm rèn luyện của bạn</h2>
                 <p class="text-xs text-slate-400 mt-0.5">Tiến độ 5 nhóm tiêu chí theo quy chế trường</p>
               </div>
               <div class="flex items-center gap-2">
                 <button id="btnResetScoreBaseline" onclick="resetScoreBaselineToDefault()" class="hidden px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition" title="Khôi phục về điểm gốc (69đ)">
                   Khôi phục gốc (69đ)
                 </button>
-                <span id="overallGradeBadge" class="px-3.5 py-1 rounded-full text-xs font-bold bg-brand-50 text-brand-700 border border-brand-200">
+                <span id="overallGradeBadge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-brand-50 text-brand-700 border border-brand-200/80 shadow-2xs">
                   Xếp loại: Khá
                 </span>
               </div>
@@ -458,16 +476,16 @@
 
             <!-- DONUT CHART (RỘNG RÃI, THOÁNG ĐÃNG, KHÔNG CHẠM CHỮ) -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-6 py-2">
-              <div class="relative w-48 h-48 flex items-center justify-center shrink-0">
-                <svg id="drlDonutSvg" viewBox="0 0 42 42" class="w-48 h-48 -rotate-90">
+              <div class="relative w-44 h-44 sm:w-48 sm:h-48 flex items-center justify-center shrink-0">
+                <svg id="drlDonutSvg" viewBox="0 0 42 42" class="w-44 h-44 sm:w-48 sm:h-48 -rotate-90">
                   <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#f1f5f9" stroke-width="4.2"></circle>
                   <g id="drlDonutSegments"></g>
                 </svg>
                 <!-- Clean center score badge -->
                 <div class="absolute inset-5 rounded-full flex flex-col items-center justify-center text-center pointer-events-none">
-                  <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Tổng điểm</span>
+                  <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tổng điểm</span>
                   <div class="flex items-baseline justify-center mt-0.5">
-                    <span id="totalConfirmedScoreText" class="text-4xl font-black text-slate-900 leading-none">69</span>
+                    <span id="totalConfirmedScoreText" class="text-4xl font-black text-slate-900 leading-none tracking-tight">69</span>
                     <span class="text-sm font-bold text-slate-400 ml-1">/100</span>
                   </div>
                 </div>
@@ -475,19 +493,19 @@
 
               <!-- Side Summary Card -->
               <div class="space-y-3 text-sm w-full sm:w-auto flex-1">
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                  <span class="text-xs font-semibold text-slate-500 block">Trạng thái điểm học kỳ</span>
-                  <span id="totalProjectedSubtext" class="text-base font-extrabold text-brand-700 block">Hiện có: 69 / 100 điểm</span>
+                <div class="p-3.5 sm:p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-1">
+                  <span class="text-xs font-semibold text-slate-400 block">Trạng thái điểm học kỳ</span>
+                  <span id="totalProjectedSubtext" class="text-sm sm:text-base font-extrabold text-brand-700 block leading-tight">Hiện có: 69 / 100 điểm</span>
                   <span id="devTotalMissingText" class="dev-only text-xs font-mono text-rose-600 block mt-1">[Dev] Còn thiếu: 31đ</span>
                 </div>
                 <div class="space-y-2 text-xs text-slate-600 px-1">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-3.5 h-3.5 rounded-sm bg-brand-600 inline-block shadow-xs"></span>
-                    <span class="font-medium">Điểm đã xác nhận</span>
+                    <span class="w-3 h-3 rounded-sm bg-brand-600 inline-block shadow-2xs"></span>
+                    <span class="font-medium text-slate-700">Điểm đã lưu chính thức</span>
                   </div>
                   <div class="flex items-center gap-2.5">
-                    <span class="w-3.5 h-3.5 rounded-sm bg-sky-300 inline-block shadow-xs"></span>
-                    <span class="font-medium">Điểm dự kiến cộng thêm</span>
+                    <span class="w-3 h-3 rounded-sm bg-sky-300 inline-block shadow-2xs"></span>
+                    <span class="font-medium text-slate-700">Điểm dự kiến cộng thêm</span>
                   </div>
                 </div>
               </div>
@@ -495,7 +513,7 @@
 
             <!-- 5 CATEGORY BARS (TĂNG ĐỘ CAO & KHÔNG GIAN, KHÔNG CÓ DÒNG THIẾU ĐIỂM) -->
             <div class="space-y-4 pt-4 border-t border-slate-100">
-              <div id="categoryBarsContainer" class="space-y-3.5">
+              <div id="categoryBarsContainer" class="space-y-3">
                 <!-- Populated by JS -->
               </div>
             </div>
@@ -1158,20 +1176,27 @@
                <span>[Dev] Thiếu ${missing}đ</span>
              </div>`;
 
+        const isMaxCapped = cur >= max;
+        const capBadge = isMaxCapped && proj === 0
+          ? `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">Đạt trần</span>`
+          : "";
+
         return `
-          <div class="p-4 rounded-xl border transition ${isHighlighted ? 'bg-brand-50/40 border-brand-300 ring-2 ring-brand-100' : 'bg-slate-50/70 border-slate-200'}">
-            <div class="flex items-center justify-between text-sm mb-2.5">
-              <div class="font-bold text-slate-800 flex items-center">
-                <span class="w-3 h-3 rounded-full mr-2.5 shrink-0" style="background-color: ${FIELD_COLORS[cid]}"></span>
-                <span class="text-[15px]">${info.name}</span>
+          <div class="p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 ${isHighlighted ? 'bg-brand-50/50 border-brand-300 ring-2 ring-brand-100 shadow-sm' : 'bg-slate-50/70 hover:bg-slate-50 border-slate-200/80'}">
+            <div class="flex items-center justify-between text-sm mb-2 gap-2">
+              <div class="font-bold text-slate-800 flex items-center min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full mr-2.5 shrink-0" style="background-color: ${FIELD_COLORS[cid]}"></span>
+                <span class="text-xs font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-white border border-slate-200 mr-2 text-slate-600 shrink-0">${cid}</span>
+                <span class="text-[13px] sm:text-sm truncate text-slate-800 font-bold">${info.name}</span>
+                ${capBadge}
                 ${deltaTag}
               </div>
-              <div class="font-extrabold text-slate-900 text-base shrink-0">
-                ${cur}${proj > 0 ? `<span class="text-sky-600">+${proj}</span>` : ''} / ${max}đ
+              <div class="font-black text-slate-900 text-sm sm:text-base shrink-0 tracking-tight">
+                ${cur}${proj > 0 ? `<span class="text-sky-600 font-extrabold">+${proj}</span>` : ''} <span class="text-xs font-medium text-slate-400">/ ${max}đ</span>
               </div>
             </div>
 
-            <div class="w-full h-3 bg-slate-200 rounded-full overflow-hidden flex">
+            <div class="w-full h-2.5 bg-slate-200/80 rounded-full overflow-hidden flex">
               <div class="bar-transition h-full" style="width: ${curPct}%; background-color: ${FIELD_COLORS[cid]}"></div>
               <div class="bar-transition h-full bg-sky-300" style="width: ${projPct}%"></div>
             </div>
@@ -1545,6 +1570,24 @@
     }
 
     // ========================================================================
+    // MOBILE SIDEBAR DRAWER TOGGLE
+    // ========================================================================
+    function toggleMobileSidebar(force) {
+      const sidebar = document.getElementById('sidebarNav');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (!sidebar || !backdrop) return;
+      const isCurrentlyOpen = !sidebar.classList.contains('-translate-x-full');
+      const shouldOpen = force !== undefined ? force : !isCurrentlyOpen;
+      if (shouldOpen) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    // ========================================================================
     // TAB SWITCHER
     // ========================================================================
     function switchTab(tab) {
@@ -1555,12 +1598,15 @@
         const devClass = (t === 'testSuites' || t === 'inspector') ? 'dev-only ' : '';
         if (t === tab) {
           view.classList.remove('hidden');
-          btn.className = devClass + "nav-btn-active w-full px-4 py-3.5 rounded-xl border text-left transition flex items-start gap-3.5";
+          btn.className = devClass + "nav-btn-active w-full px-4 py-3 rounded-xl border text-left transition flex items-start gap-3.5";
         } else {
           view.classList.add('hidden');
-          btn.className = devClass + "nav-btn-inactive w-full px-4 py-3.5 rounded-xl border text-left transition flex items-start gap-3.5";
+          btn.className = devClass + "nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-start gap-3.5";
         }
       });
+      // Auto-close mobile drawer when tab selected
+      toggleMobileSidebar(false);
+
       if (tab === 'activities') {
         loadActivitiesFromApi();
         loadLeadAuditFromApi();
