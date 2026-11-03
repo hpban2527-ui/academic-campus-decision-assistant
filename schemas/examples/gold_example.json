@@ -1,0 +1,48 @@
+[
+  {
+    "post_id": "lis-2026",
+    "activities": [
+      {
+        "source": {
+          "URL_registration": "https://go.sabies.vn/lis26_dangky"
+        },
+        "title": "LET IT SHINE 2026  - KHÚC KHẢI HOÀN MÙA ĐÔNG",
+        "start": "2026-11-01T00:00:00+07:00",
+        "end": "2026-11-22T20:30:00+07:00",
+        "registration_deadline": "2026-10-30T23:59:00+07:00",
+        "mode": "offline",
+        "location": "cơ sở phường Chợ Quán",
+        "points": null,
+        "drl_recognized": null,
+        "mandatory": null,
+        "audience": [
+          "Tất cả sinh viên đang theo học tại Khoa Công nghệ thông tin, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM"
+        ],
+        "fee": null,
+        "completion_requirements": null
+      }
+    ]
+  },
+  {
+    "post_id": "khtn-zero-2026",
+    "activities": [
+      {
+        "source": {
+          "URL_registration": "https://courses.hcmus.edu.vn/course/view.php?id=25541"
+        },
+        "title": "KHTN ZERO+ 2026 | SINH VIÊN KHTN ƠI, CÙNG THAM GIA THI TRỰC TUYẾN!",
+        "start": "2026-10-19T08:00:00+07:00",
+        "end": "2026-10-23T23:59:00+07:00",
+        "registration_deadline": null,
+        "mode": "online",
+        "location": null,
+        "points": null,
+        "drl_recognized": true,
+        "mandatory": null,
+        "audience": null,
+        "fee": null,
+        "completion_requirements": "Sinh viên hoàn thành 70% bài thi: được ghi nhận tham gia hoạt động tại học kỳ 1/2026-2027"
+      }
+    ]
+  }
+]
