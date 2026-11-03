@@ -26,7 +26,7 @@ jobs:
       - name: Execute backend unit + integration tests
         env:
           PYTHONPATH: src
-        run: python -m pytest -q tests/sp1 tests/sp2 tests/integration
+        run: python -m pytest -q tests/sp1 tests/sp2 tests/sp3 tests/integration
       - name: Check SP2 ten expected cases
         env:
           PYTHONPATH: src

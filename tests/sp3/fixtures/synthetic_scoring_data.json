@@ -1,0 +1,268 @@
+{
+  "label": "SYNTHETIC-DEMO",
+  "description": "Synthetic student, activities and bindings to real verified rules in data/drl_rules.json. Not real student data and not university-verified scores.",
+  "ruleset_source": "data/drl_rules.json",
+  "derivation": [
+    "Baseline facts: R11 academic_exam_violations=0 -> C1 +10; R19 eligible_academic_seminars=2 -> C1 5x2=10; C1=20.",
+    "R21 school_rule_violations_excluding_academic_exam=0 -> C2 +15; C2=15.",
+    "R37 social_evil_violations_or_coverups=0 -> C3 +10; R33 school_faculty_mobilization_activities=1 -> C3 5x1=5; C3=15.",
+    "R41 legal_violations=0 -> C4 +10; R46 legal_health_communication_activities=0 does not match (0 > 0 is false); C4=10.",
+    "No C5 fact is present; C5=0. Total = min(20+15+15+10+0, 100) = 60.",
+    "Each seminar adds 1 to eligible_academic_seminars (R19, 5 points per activity, C1 cap 30): 2->3 gives C1 25, 3->4 gives C1 30, 4->5 stays capped at 30.",
+    "MOB-1 adds 1 to school_faculty_mobilization_activities (R33): C3 15->20. LAW-1 adds 1 to legal_health_communication_activities (R46, 10 per activity): C4 10->20.",
+    "Targets C1 30, C4 20, total 80 need LAW-1 plus two seminars, so no plan of size 1 or 2 meets them.",
+    "Size-3 plans meeting all targets: {LAW-1,SEM-1,SEM-2} (1 online match, 240 min), {LAW-1,SEM-1,SEM-3} (1 match, 180 min), {LAW-1,SEM-2,SEM-3} (2 matches, 240 min). Preference ranks before duration, so {LAW-1,SEM-2,SEM-3} wins.",
+    "Start order SEM-2 (Nov 2 14:00), SEM-3 (Nov 3 09:00), LAW-1 (Nov 3 13:00): SEM-2 C1 +5, SEM-3 C1 +5, LAW-1 C4 +10. Projected total 30+15+15+20+0 = 80.",
+    "Eligible: LAW-1, MOB-1, SEM-1, SEM-2, SEM-3; MOB-1 overlaps SEM-3. Valid subsets scored: 1 + 5 + (10-1) + (10-3) = 22. Size-4 {LAW-1,SEM-1,SEM-2,SEM-3} is valid but dominated, so it is not scored.",
+    "Distinct fact states (seminars added s, MOB m, LAW l) with s+m+l <= 3: 4 + 4 + 3 + 1 = 12 engine runs.",
+    "v0.2: every planner candidate has a FIXED schedule equal to its activity interval (VOL-1 too, although it needs review) and NOT_REGISTERED/NOT_STARTED participation; availability is the whole planning window and there is no previous plan, so the plan, scores and engine runs above are unchanged.",
+    "flexible_attribution: FLEX-SEM is a 60-minute sitting in the window 2026-11-02 08:00 to 2026-11-04 00:00 (R19 +1 seminar). Free time is Nov 2 09:00-10:00, Nov 3 09:00-10:00 and Nov 3 14:00-17:00, taken by SEM-1 (Nov 2 09:00-10:00) and SEM-3 (Nov 3 09:00-10:00), so FLEX-SEM can only sit at Nov 3 14:00-15:00.",
+    "The previous plan holds SEM-1, SEM-3 and FLEX-SEM (at Nov 2 08:00-09:00, now outside free time). Target C1 30 needs two seminars; every 2-seminar set has 1 activity-set change, the 3-seminar set has 0, so it wins with SEM-1 and SEM-3 KEPT and FLEX-SEM MOVED.",
+    "Attribution follows the scheduled order SEM-1, SEM-3, FLEX-SEM: C1 20->25->30->30 gives +5, +5, +0. Window-opening order would put FLEX-SEM first (+5) and SEM-3 last (+0). Totals do not depend on the order: C1 30, total 70.",
+    "All 8 subsets of the three seminars are schedulable and scored (no dominance pruning with a previous plan). Fact states are 0-3 added seminars: 4 engine runs, the comparison rescore reuses them."
+  ],
+  "scoring_data": {
+    "label": "SYNTHETIC-DEMO",
+    "dataset_version": "synthetic-dataset-b1",
+    "ruleset_version": "drl-rules-1028-synthetic-check",
+    "baselines": [
+      {
+        "student_id": "synthetic-student-b1",
+        "baseline_ref": "synthetic-baseline-b1",
+        "facts": {
+          "academic_exam_violations": 0,
+          "eligible_academic_seminars": 2,
+          "school_rule_violations_excluding_academic_exam": 0,
+          "social_evil_violations_or_coverups": 0,
+          "school_faculty_mobilization_activities": 1,
+          "legal_violations": 0,
+          "legal_health_communication_activities": 0
+        }
+      }
+    ],
+    "activities": [
+      {
+        "activity_id": "SEM-1",
+        "source": {"publisher": "Synthetic fixture", "platform": "fixture", "URL_post": "https://example.invalid/activity/SEM-1", "URL_registration": null},
+        "title": "Synthetic academic seminar 1",
+        "domain": "academic",
+        "start": "2026-11-02T09:00:00+07:00",
+        "end": "2026-11-02T10:00:00+07:00",
+        "registration_deadline": "2026-11-01T18:00:00+07:00",
+        "mode": "offline",
+        "location": "Synthetic hall",
+        "points": 5,
+        "mandatory": false,
+        "audience": ["Synthetic students"],
+        "fee": 0,
+        "completion_requirements": "Synthetic attendance check."
+      },
+      {
+        "activity_id": "SEM-2",
+        "source": {"publisher": "Synthetic fixture", "platform": "fixture", "URL_post": "https://example.invalid/activity/SEM-2", "URL_registration": null},
+        "title": "Synthetic academic seminar 2",
+        "domain": "academic",
+        "start": "2026-11-02T14:00:00+07:00",
+        "end": "2026-11-02T16:00:00+07:00",
+        "registration_deadline": "2026-11-01T18:00:00+07:00",
+        "mode": "online",
+        "location": null,
+        "points": 5,
+        "mandatory": false,
+        "audience": ["Synthetic students"],
+        "fee": 0,
+        "completion_requirements": "Synthetic attendance check."
+      },
+      {
+        "activity_id": "SEM-3",
+        "source": {"publisher": "Synthetic fixture", "platform": "fixture", "URL_post": "https://example.invalid/activity/SEM-3", "URL_registration": null},
+        "title": "Synthetic academic seminar 3",
+        "domain": "academic",
+        "start": "2026-11-03T09:00:00+07:00",
+        "end": "2026-11-03T10:00:00+07:00",
+        "registration_deadline": "2026-11-01T18:00:00+07:00",
+        "mode": "online",
+        "location": null,
+        "points": 5,
+        "mandatory": false,
+        "audience": ["Synthetic students"],
+        "fee": 0,
+        "completion_requirements": "Synthetic attendance check."
+      },
+      {
+        "activity_id": "MOB-1",
+        "source": {"publisher": "Synthetic fixture", "platform": "fixture", "URL_post": "https://example.invalid/activity/MOB-1", "URL_registration": null},
+        "title": "Synthetic faculty mobilization",
+        "domain": "culture_sports",
+        "start": "2026-11-03T09:30:00+07:00",
+        "end": "2026-11-03T11:00:00+07:00",
+        "registration_deadline": "2026-11-01T18:00:00+07:00",
+        "mode": "offline",
+        "location": "Synthetic yard",
+        "points": 5,
+        "mandatory": false,
+        "audience": ["Synthetic students"],
+        "fee": 0,
+        "completion_requirements": "Synthetic attendance check."
+      },
+      {
+        "activity_id": "LAW-1",
+        "source": {"publisher": "Synthetic fixture", "platform": "fixture", "URL_post": "https://example.invalid/activity/LAW-1", "URL_registration": null},
+        "title": "Synthetic legal communication programme",
+        "domain": "other",
+        "start": "2026-11-03T13:00:00+07:00",
+        "end": "2026-11-03T14:00:00+07:00",
+        "registration_deadline": "2026-11-01T18:00:00+07:00",
+        "mode": "offline",
+        "location": "Synthetic room",
+        "points": 10,
+        "mandatory": false,
+        "audience": ["Synthetic students"],
+        "fee": 0,
+        "completion_requirements": "Synthetic attendance check."
+      },
+      {
+        "activity_id": "VOL-1",
+        "source": {"publisher": "Synthetic fixture", "platform": "fixture", "URL_post": "https://example.invalid/activity/VOL-1", "URL_registration": null},
+        "title": "Synthetic volunteer day",
+        "domain": "volunteer",
+        "start": "2026-11-04T08:00:00+07:00",
+        "end": "2026-11-04T12:00:00+07:00",
+        "registration_deadline": "2026-11-01T18:00:00+07:00",
+        "mode": "offline",
+        "location": "Synthetic park",
+        "points": null,
+        "mandatory": false,
+        "audience": ["Synthetic students"],
+        "fee": 0,
+        "completion_requirements": "Synthetic attendance check."
+      },
+      {
+        "activity_id": "FLEX-SEM",
+        "source": {"publisher": "Synthetic fixture", "platform": "fixture", "URL_post": "https://example.invalid/activity/FLEX-SEM", "URL_registration": null},
+        "title": "Synthetic self-paced academic seminar",
+        "domain": "academic",
+        "start": "2026-11-02T08:00:00+07:00",
+        "end": "2026-11-04T00:00:00+07:00",
+        "registration_deadline": "2026-11-01T18:00:00+07:00",
+        "mode": "online",
+        "location": null,
+        "points": 5,
+        "mandatory": false,
+        "audience": ["Synthetic students"],
+        "fee": 0,
+        "completion_requirements": "Synthetic attendance check."
+      }
+    ],
+    "bindings": [
+      {"activity_id": "SEM-1", "binding_ref": "synthetic-binding-SEM-1", "rule_id": "R19", "field": "eligible_academic_seminars", "operation": "INCREMENT", "value": 1},
+      {"activity_id": "SEM-2", "binding_ref": "synthetic-binding-SEM-2", "rule_id": "R19", "field": "eligible_academic_seminars", "operation": "INCREMENT", "value": 1},
+      {"activity_id": "SEM-3", "binding_ref": "synthetic-binding-SEM-3", "rule_id": "R19", "field": "eligible_academic_seminars", "operation": "INCREMENT", "value": 1},
+      {"activity_id": "MOB-1", "binding_ref": "synthetic-binding-MOB-1", "rule_id": "R33", "field": "school_faculty_mobilization_activities", "operation": "INCREMENT", "value": 1},
+      {"activity_id": "LAW-1", "binding_ref": "synthetic-binding-LAW-1", "rule_id": "R46", "field": "legal_health_communication_activities", "operation": "INCREMENT", "value": 1},
+      {"activity_id": "FLEX-SEM", "binding_ref": "synthetic-binding-FLEX-SEM", "rule_id": "R19", "field": "eligible_academic_seminars", "operation": "INCREMENT", "value": 1}
+    ]
+  },
+  "planner": {
+    "context": {
+      "student_id": "synthetic-student-b1",
+      "term_id": "SYNTHETIC-DEMO",
+      "window_start": "2026-11-01T00:00:00+07:00",
+      "window_end": "2026-11-08T00:00:00+07:00",
+      "as_of": "2026-11-01T08:00:00+07:00",
+      "timezone": "Asia/Ho_Chi_Minh",
+      "baseline_ref": "synthetic-baseline-b1",
+      "dataset_version": "synthetic-dataset-b1",
+      "ruleset_version": "drl-rules-1028-synthetic-check",
+      "calendar_version": "synthetic-calendar-b1"
+    },
+    "baseline": {
+      "category_scores": {"C1": 20, "C2": 15, "C3": 15, "C4": 10, "C5": 0},
+      "category_caps": {"C1": 30, "C2": 20, "C3": 25, "C4": 25, "C5": 30},
+      "total_score": 60,
+      "max_total_score": 100,
+      "included_activity_ids": []
+    },
+    "goals": {"total_target": 80, "category_targets": {"C1": 30, "C4": 20}},
+    "preferences": {"preferred_domains": [], "preferred_modes": ["online"]},
+    "limits": {"max_activities": null, "max_duration_minutes": null},
+    "candidates": [
+      {"activity_id": "SEM-1", "score_binding_ref": "synthetic-binding-SEM-1", "participation": {"registration": "NOT_REGISTERED", "progress": "NOT_STARTED"}, "schedule": {"type": "FIXED", "fixed_blocks": [{"start": "2026-11-02T09:00:00+07:00", "end": "2026-11-02T10:00:00+07:00"}]}, "feasibility": {"status": "FEASIBLE", "reason_codes": []}},
+      {"activity_id": "SEM-2", "score_binding_ref": "synthetic-binding-SEM-2", "participation": {"registration": "NOT_REGISTERED", "progress": "NOT_STARTED"}, "schedule": {"type": "FIXED", "fixed_blocks": [{"start": "2026-11-02T14:00:00+07:00", "end": "2026-11-02T16:00:00+07:00"}]}, "feasibility": {"status": "FEASIBLE", "reason_codes": []}},
+      {"activity_id": "SEM-3", "score_binding_ref": "synthetic-binding-SEM-3", "participation": {"registration": "NOT_REGISTERED", "progress": "NOT_STARTED"}, "schedule": {"type": "FIXED", "fixed_blocks": [{"start": "2026-11-03T09:00:00+07:00", "end": "2026-11-03T10:00:00+07:00"}]}, "feasibility": {"status": "FEASIBLE", "reason_codes": []}},
+      {"activity_id": "MOB-1", "score_binding_ref": "synthetic-binding-MOB-1", "participation": {"registration": "NOT_REGISTERED", "progress": "NOT_STARTED"}, "schedule": {"type": "FIXED", "fixed_blocks": [{"start": "2026-11-03T09:30:00+07:00", "end": "2026-11-03T11:00:00+07:00"}]}, "feasibility": {"status": "FEASIBLE", "reason_codes": []}},
+      {"activity_id": "LAW-1", "score_binding_ref": "synthetic-binding-LAW-1", "participation": {"registration": "NOT_REGISTERED", "progress": "NOT_STARTED"}, "schedule": {"type": "FIXED", "fixed_blocks": [{"start": "2026-11-03T13:00:00+07:00", "end": "2026-11-03T14:00:00+07:00"}]}, "feasibility": {"status": "FEASIBLE", "reason_codes": []}},
+      {"activity_id": "VOL-1", "score_binding_ref": null, "participation": {"registration": "NOT_REGISTERED", "progress": "NOT_STARTED"}, "schedule": {"type": "FIXED", "fixed_blocks": [{"start": "2026-11-04T08:00:00+07:00", "end": "2026-11-04T12:00:00+07:00"}]}, "feasibility": {"status": "NEEDS_REVIEW", "reason_codes": ["MISSING_SCORE_BINDING"]}}
+    ],
+    "conflict_pairs": [["MOB-1", "SEM-3"]],
+    "available_intervals": [{"start": "2026-11-01T00:00:00+07:00", "end": "2026-11-08T00:00:00+07:00"}],
+    "previous_plan": null,
+    "keep_requests": []
+  },
+  "flexible_attribution": {
+    "candidates": [
+      {"activity_id": "SEM-1", "score_binding_ref": "synthetic-binding-SEM-1", "participation": {"registration": "NOT_REGISTERED", "progress": "NOT_STARTED"}, "schedule": {"type": "FIXED", "fixed_blocks": [{"start": "2026-11-02T09:00:00+07:00", "end": "2026-11-02T10:00:00+07:00"}]}, "feasibility": {"status": "FEASIBLE", "reason_codes": []}},
+      {"activity_id": "SEM-3", "score_binding_ref": "synthetic-binding-SEM-3", "participation": {"registration": "NOT_REGISTERED", "progress": "NOT_STARTED"}, "schedule": {"type": "FIXED", "fixed_blocks": [{"start": "2026-11-03T09:00:00+07:00", "end": "2026-11-03T10:00:00+07:00"}]}, "feasibility": {"status": "FEASIBLE", "reason_codes": []}},
+      {"activity_id": "FLEX-SEM", "score_binding_ref": "synthetic-binding-FLEX-SEM", "participation": {"registration": "NOT_REGISTERED", "progress": "NOT_STARTED"}, "schedule": {"type": "FLEXIBLE_WINDOW", "window_start": "2026-11-02T08:00:00+07:00", "window_end": "2026-11-04T00:00:00+07:00", "duration_minutes": 60}, "feasibility": {"status": "FEASIBLE", "reason_codes": []}}
+    ],
+    "conflict_pairs": [],
+    "available_intervals": [
+      {"start": "2026-11-02T09:00:00+07:00", "end": "2026-11-02T10:00:00+07:00"},
+      {"start": "2026-11-03T09:00:00+07:00", "end": "2026-11-03T10:00:00+07:00"},
+      {"start": "2026-11-03T14:00:00+07:00", "end": "2026-11-03T17:00:00+07:00"}
+    ],
+    "goals": {"total_target": null, "category_targets": {"C1": 30}},
+    "previous_plan": {
+      "plan_version": "sp3plan-0000000000000b01",
+      "based_on": {"calendar_version": "synthetic-calendar-b0", "dataset_version": "synthetic-dataset-b1", "ruleset_version": "drl-rules-1028-synthetic-check", "baseline_ref": "synthetic-baseline-b1", "previous_plan_version": null},
+      "selected_activities": [
+        {"activity_id": "FLEX-SEM", "scheduled_blocks": [{"start": "2026-11-02T08:00:00+07:00", "end": "2026-11-02T09:00:00+07:00"}]},
+        {"activity_id": "SEM-1", "scheduled_blocks": [{"start": "2026-11-02T09:00:00+07:00", "end": "2026-11-02T10:00:00+07:00"}]},
+        {"activity_id": "SEM-3", "scheduled_blocks": [{"start": "2026-11-03T09:00:00+07:00", "end": "2026-11-03T10:00:00+07:00"}]}
+      ]
+    },
+    "expected": {
+      "status": "TARGET_MET",
+      "selected": [
+        {"activity_id": "SEM-1", "change": "KEPT", "scheduled_blocks": [{"start": "2026-11-02T09:00:00+07:00", "end": "2026-11-02T10:00:00+07:00"}], "projected_added": 5},
+        {"activity_id": "SEM-3", "change": "KEPT", "scheduled_blocks": [{"start": "2026-11-03T09:00:00+07:00", "end": "2026-11-03T10:00:00+07:00"}], "projected_added": 5},
+        {"activity_id": "FLEX-SEM", "change": "MOVED", "scheduled_blocks": [{"start": "2026-11-03T14:00:00+07:00", "end": "2026-11-03T15:00:00+07:00"}], "projected_added": 0}
+      ],
+      "projected_by_category": {"C1": 30, "C2": 15, "C3": 15, "C4": 10, "C5": 0},
+      "projected_total": 70,
+      "search": {"complete": true, "optimality_proven": true, "evaluated_subsets": 8, "limit_reason": null},
+      "score_comparison": {"basis": "PREVIOUS_ACTIVITY_SET_RESCORED", "previous_activity_ids": ["FLEX-SEM", "SEM-1", "SEM-3"], "previous_projected_by_category": {"C1": 30, "C2": 15, "C3": 15, "C4": 10, "C5": 0}, "previous_projected_total": 70, "new_projected_total": 70},
+      "engine_calls": 4,
+      "window_opening_order_contributions": {"FLEX-SEM": 5, "SEM-1": 5, "SEM-3": 0},
+      "scheduled_order_contributions": {"SEM-1": 5, "SEM-3": 5, "FLEX-SEM": 0}
+    }
+  },
+  "expected": {
+    "status": "TARGET_MET",
+    "feasibility_conclusion": "REACHABLE",
+    "selected": [
+      {"activity_id": "SEM-2", "category_id": "C1", "projected_added": 5, "preference_matches": 1},
+      {"activity_id": "SEM-3", "category_id": "C1", "projected_added": 5, "preference_matches": 1},
+      {"activity_id": "LAW-1", "category_id": "C4", "projected_added": 10, "preference_matches": 0}
+    ],
+    "excluded": {"SEM-1": "LOWER_PRIORITY", "MOB-1": "CONFLICT", "VOL-1": "NEEDS_REVIEW"},
+    "score_summary": {
+      "baseline_by_category": {"C1": 20, "C2": 15, "C3": 15, "C4": 10, "C5": 0},
+      "projected_by_category": {"C1": 30, "C2": 15, "C3": 15, "C4": 20, "C5": 0},
+      "gain_by_category": {"C1": 10, "C2": 0, "C3": 0, "C4": 10, "C5": 0},
+      "baseline_total": 60,
+      "projected_total": 80,
+      "gain_total": 20,
+      "remaining_by_category": {"C1": 0, "C4": 0},
+      "remaining_total": 0
+    },
+    "search": {"complete": false, "optimality_proven": true, "evaluated_subsets": 22, "limit_reason": null},
+    "proof": null,
+    "warning_codes": ["DEMO_ONLY", "TRAVEL_NOT_MODELED", "PENDING_CANDIDATES", "SEARCH_INCOMPLETE"],
+    "changes": ["ADDED", "ADDED", "ADDED"],
+    "dropped_activities": [],
+    "score_comparison": null,
+    "engine_calls": 12,
+    "capped_three_seminars": {"selected_activity_ids": ["SEM-1", "SEM-2", "SEM-3"], "C1_after": 30, "contributions": {"SEM-1": 5, "SEM-2": 5, "SEM-3": 0}}
+  }
+}

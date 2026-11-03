@@ -1387,6 +1387,28 @@ def lead_data_audit():
 
 
 # Serve Frontend static files if web directory exists
+from api.sp3_service import demo_plan as _sp3_demo_plan, sp1_catalog as _sp3_catalog
+
+
+class SP3DemoPlanRequest(BaseModel):
+    scenario: str = "first_plan"
+
+
+@app.get("/api/sp3/catalog")
+def get_sp3_catalog():
+    """Read SP1 activity records and QA without awarding points."""
+    return _sp3_catalog()
+
+
+@app.post("/api/sp3/demo/plan")
+def run_sp3_demo_plan(req: SP3DemoPlanRequest):
+    """Read-only complete SP1-format -> feasibility -> planner -> SP2 demo."""
+    try:
+        return _sp3_demo_plan(req.scenario)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 @app.get("/favicon.ico", include_in_schema=False)
 def serve_favicon():
     svg = (
