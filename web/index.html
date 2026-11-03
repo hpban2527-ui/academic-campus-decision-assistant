@@ -273,30 +273,30 @@
 
               <!-- Developer-Only Metadata Drawer -->
               <details class="dev-only group rounded-xl border border-[#223046] bg-[#080d18] px-4 py-2.5">
-                <summary class="cursor-pointer list-none flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-800">
+                <summary class="cursor-pointer list-none flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-200">
                   <span>[Dev] Thông số nguồn &amp; Ghi đè quy tắc (Metadata)</span>
                   <span class="group-open:rotate-180 transition-transform">▼</span>
                 </summary>
-                <div class="pt-4 pb-2 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-200 mt-2.5 text-sm">
+                <div class="pt-4 pb-2 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-[#1b2537] mt-2.5 text-sm">
                   <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Đơn vị đăng (Publisher)</label>
-                    <input id="inputPublisher" type="text" value="Phòng Công tác Sinh viên HCMUS" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-sm" />
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Đơn vị đăng (Publisher)</label>
+                    <input id="inputPublisher" type="text" value="Phòng Công tác Sinh viên HCMUS" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition" />
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Ngày đăng</label>
-                    <input id="inputDatePosted" type="date" value="2026-10-25" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-sm" />
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Ngày đăng</label>
+                    <input id="inputDatePosted" type="date" value="2026-10-25" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition" />
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">URL bài viết</label>
-                    <input id="inputUrl" type="text" value="https://www.facebook.com/ctsv.hcmus/posts/101" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-sm font-mono" />
+                    <label class="block text-xs font-bold text-slate-400 mb-1">URL bài viết</label>
+                    <input id="inputUrl" type="text" value="https://www.facebook.com/ctsv.hcmus/posts/101" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-indigo-300 text-sm font-mono focus:border-indigo-500 outline-none transition" />
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Post ID</label>
-                    <input id="inputPostId" type="text" value="pfbid01customPost2026" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-sm font-mono" />
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Post ID</label>
+                    <input id="inputPostId" type="text" value="pfbid01customPost2026" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-indigo-300 text-sm font-mono focus:border-indigo-500 outline-none transition" />
                   </div>
                   <div class="sm:col-span-2">
-                    <label class="block text-xs font-bold text-slate-600 mb-1">Quy tắc ĐRL (Rule Override)</label>
-                    <select id="inputRuleOverride" class="w-full px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-sm">
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Quy tắc ĐRL (Rule Override)</label>
+                    <select id="inputRuleOverride" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition">
                       <option value="auto">Tự động nhận diện (Auto)</option>
                       <option value="R19">R19 — Mục 1.9: Học thuật, kỹ năng (+5đ, C1)</option>
                       <option value="R31">R31 — Mục 3.1: Sự kiện chính trị - xã hội (+5đ, C3)</option>
@@ -351,7 +351,7 @@
                   <div class="p-4 rounded-xl bg-indigo-950/40 border border-indigo-700/50">
                     <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider block">Điểm cộng hoạt động</span>
                     <div id="resAddedPoints" class="text-3xl font-black text-indigo-300 mt-1.5">+0 điểm</div>
-                    <div id="resAnnouncedVsRule" class="dev-only text-xs font-mono text-brand-800 mt-1">—</div>
+                    <div id="resAnnouncedVsRule" class="dev-only text-xs font-mono text-indigo-400 mt-1">—</div>
                   </div>
 
                   <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046]">
@@ -372,7 +372,7 @@
                   <p id="resExplanation" class="text-base text-slate-200 leading-relaxed font-medium">—</p>
                   
                   <!-- Developer-only Citation & Dedup Diagnostics -->
-                  <div class="dev-only pt-2.5 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-500">
+                  <div class="dev-only pt-2.5 border-t border-[#1b2537] flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-400">
                     <span id="resCitation">—</span>
                     <span id="resDedupPill">—</span>
                   </div>
@@ -399,7 +399,7 @@
                 <div>
                   <h2 class="text-xl font-extrabold text-white">Thông tin sự kiện</h2>
                 </div>
-                <button onclick="switchTab('inspector')" class="dev-only text-xs font-mono font-bold text-brand-600 hover:underline">
+                <button onclick="switchTab('inspector')" class="dev-only text-xs font-mono font-bold text-indigo-400 hover:text-indigo-300 hover:underline">
                   [Dev] Xem 14 trường JSON &rarr;
                 </button>
               </div>
@@ -430,9 +430,9 @@
                   <input id="sp1ReqInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: Điểm danh cuối buổi" class="w-full bg-transparent font-semibold text-slate-100 mt-1 outline-none" />
                 </div>
 
-                <div class="dev-only p-4 rounded-xl bg-slate-50 border border-slate-200 sm:col-span-2">
+                <div class="dev-only p-4 rounded-xl bg-[#080d18] border border-[#223046] sm:col-span-2">
                   <span class="text-xs font-mono text-slate-400 block">[Dev] Trạng thái &amp; Cờ kiểm duyệt SP1</span>
-                  <span id="sp1StatusFlags" class="font-mono text-xs font-semibold text-slate-800 mt-1 block">—</span>
+                  <span id="sp1StatusFlags" class="font-mono text-xs font-semibold text-indigo-300 mt-1 block">—</span>
                 </div>
               </div>
             </div>
@@ -447,7 +447,7 @@
                 <h2 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Điểm rèn luyện của bạn</h2>
               </div>
               <div class="flex items-center gap-2">
-                <button id="btnResetScoreBaseline" onclick="resetScoreBaselineToDefault()" class="hidden px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition" title="Khôi phục về điểm gốc (69đ)">
+                <button id="btnResetScoreBaseline" onclick="resetScoreBaselineToDefault()" class="hidden px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 border border-[#223046] transition" title="Khôi phục về điểm gốc (69đ)">
                   Khôi phục gốc (69đ)
                 </button>
                 <span id="overallGradeBadge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40 shadow-xs">
@@ -560,12 +560,12 @@
             <div class="lg:col-span-5 space-y-6">
               
               <!-- Hàng đợi chờ duyệt -->
-              <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
                   <div>
-                    <h3 class="text-base font-extrabold text-slate-900">Hàng đợi chờ duyệt (Review Queue)</h3>
-                                      </div>
-                  <span id="reviewQueueTabBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                    <h3 class="text-base font-extrabold text-white">Hàng đợi chờ duyệt (Review Queue)</h3>
+                  </div>
+                  <span id="reviewQueueTabBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
                     Chờ duyệt
                   </span>
                 </div>
@@ -573,28 +573,28 @@
               </div>
 
               <!-- Thư mục lưu trữ tạm thời trên máy -->
-              <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-3">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                  <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+              <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-3">
+                <div class="flex items-center justify-between border-b border-[#1b2537] pb-2.5">
+                  <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
                     <span>💾 Thư mục lưu trữ phiên (Local Session Folder)</span>
                   </h3>
-                  <span class="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Tự động ghi</span>
+                  <span class="text-[11px] font-mono text-emerald-300 bg-emerald-950/60 border border-emerald-500/40 px-2 py-0.5 rounded">Tự động ghi</span>
                 </div>
-                <p class="text-xs text-slate-600 leading-relaxed">
+                <p class="text-xs text-slate-400 leading-relaxed">
                   Mỗi khi bạn chạy kiểm tra hoạt động hoặc nạp ca mới, hệ thống tự động ghi nhật ký phiên vào thư mục cục bộ:
                 </p>
-                <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046] font-mono text-xs text-slate-800 break-all select-all">
+                <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046] font-mono text-xs text-indigo-300 break-all select-all">
                   academic-campus-decision-assistant/data/sessions/current_session.json
                 </div>
-                <div class="text-[11px] text-slate-400">
+                <div class="text-[11px] text-slate-500">
                   Dữ liệu được bảo toàn tự động và có thể đọc trực tiếp bằng bất kỳ trình xem JSON nào.
                 </div>
               </div>
 
               <!-- Lead Audit (Báo cáo quy chế) -->
-              <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-3">
-                <h3 class="text-sm font-extrabold text-slate-900 border-b border-slate-100 pb-2.5">Kiểm toán quy chế &amp; trùng lặp (/api/lead/audit)</h3>
-                <div id="leadAuditContainer" class="text-xs text-slate-600 space-y-2"></div>
+              <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-3">
+                <h3 class="text-sm font-extrabold text-white border-b border-[#1b2537] pb-2.5">Kiểm toán quy chế &amp; trùng lặp (/api/lead/audit)</h3>
+                <div id="leadAuditContainer" class="text-xs text-slate-300 space-y-2"></div>
               </div>
 
             </div>
@@ -607,46 +607,46 @@
         <!-- WORKSPACE 3: ĐIỂM HỌC VỤ (SNAPSHOT SIMULATOR)                      -->
         <!-- ================================================================== -->
         <div id="viewSnapshot" class="hidden space-y-6">
-          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-            <h2 class="text-xl font-extrabold text-slate-900">Ước tính điểm từ kết quả học tập</h2>
-                      </div>
+          <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl">
+            <h2 class="text-xl font-extrabold text-white">Ước tính điểm từ kết quả học tập</h2>
+          </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
+            <div class="lg:col-span-5 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-5">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1.5">Điểm TB Học kỳ (Thang 10)</label>
-                  <input id="snapGpa" type="number" step="0.1" min="0" max="10" value="8.5" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-base text-slate-900" />
+                  <label class="block text-xs font-bold text-slate-400 mb-1.5">Điểm TB Học kỳ (Thang 10)</label>
+                  <input id="snapGpa" type="number" step="0.1" min="0" max="10" value="8.5" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] font-bold text-base text-white focus:bg-[#0c1220] focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1.5">Số lần vi phạm thi cử</label>
-                  <input id="snapExamViolations" type="number" min="0" max="10" value="0" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-base text-slate-900" />
+                  <label class="block text-xs font-bold text-slate-400 mb-1.5">Số lần vi phạm thi cử</label>
+                  <input id="snapExamViolations" type="number" min="0" max="10" value="0" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] font-bold text-base text-white focus:bg-[#0c1220] focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1.5">Số cảnh báo học vụ</label>
-                  <input id="snapAcademicWarnings" type="number" min="0" max="5" value="0" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-base text-slate-900" />
+                  <label class="block text-xs font-bold text-slate-400 mb-1.5">Số cảnh báo học vụ</label>
+                  <input id="snapAcademicWarnings" type="number" min="0" max="5" value="0" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] font-bold text-base text-white focus:bg-[#0c1220] focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1.5">Mục tiêu điểm Mục 1</label>
-                  <input id="snapTargetC1" type="number" min="0" max="30" value="30" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-base text-slate-900" />
+                  <label class="block text-xs font-bold text-slate-400 mb-1.5">Mục tiêu điểm Mục 1</label>
+                  <input id="snapTargetC1" type="number" min="0" max="30" value="30" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] font-bold text-base text-white focus:bg-[#0c1220] focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
                 </div>
                 <div class="dev-only sm:col-span-2">
-                  <label class="block text-xs font-bold text-slate-600 mb-1.5">[Dev] Trạng thái xác thực Snapshot</label>
-                  <select id="snapStatus" class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 font-semibold text-slate-800">
+                  <label class="block text-xs font-bold text-slate-400 mb-1.5">[Dev] Trạng thái xác thực Snapshot</label>
+                  <select id="snapStatus" class="w-full px-3.5 py-2 rounded-xl bg-[#080d18] border border-[#223046] font-semibold text-slate-200 focus:border-indigo-500 outline-none transition">
                     <option value="CONFIRMED">CONFIRMED (Đã xác nhận)</option>
                     <option value="PENDING">PENDING (Chờ duyệt &rarr; +0đ)</option>
                   </select>
                 </div>
               </div>
 
-              <button onclick="runSnapshotEvaluation()" class="w-full py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base shadow-sm transition">
+              <button onclick="runSnapshotEvaluation()" class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-base shadow-lg shadow-indigo-600/30 transition">
                 Tính điểm học vụ
               </button>
             </div>
 
-            <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
-              <h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3">Kết quả điểm học vụ</h3>
-              <div id="snapResultContainer" class="text-sm text-slate-600 space-y-4"></div>
+            <div class="lg:col-span-7 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
+              <h3 class="text-base font-extrabold text-white border-b border-[#1b2537] pb-3">Kết quả điểm học vụ</h3>
+              <div id="snapResultContainer" class="text-sm text-slate-300 space-y-4"></div>
             </div>
           </div>
         </div>
@@ -655,19 +655,19 @@
         <!-- WORKSPACE 4 (DEV ONLY): KIỂM THỬ 5 CA E2E                          -->
         <!-- ================================================================== -->
         <div id="viewTestSuites" class="hidden space-y-6">
-          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 class="text-xl font-extrabold text-slate-900">[Developer] Kiểm thử tự động 5 Ca E2E</h2>
-                          </div>
-            <button onclick="runBatchAllTests()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition">
+              <h2 class="text-xl font-extrabold text-white">[Developer] Kiểm thử tự động 5 Ca E2E</h2>
+            </div>
+            <button onclick="runBatchAllTests()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition">
               ▶ Chạy tự động cả 5 ca
             </button>
           </div>
 
           <div id="batchResultsBox" class="hidden bg-[#0e1524] rounded-2xl p-6 border-2 border-emerald-500/40 space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-              <span class="text-base font-extrabold text-slate-900">Kết quả Assertions</span>
-              <span id="batchSummaryBadge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">5/5 PASS</span>
+            <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
+              <span class="text-base font-extrabold text-white">Kết quả Assertions</span>
+              <span id="batchSummaryBadge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">5/5 PASS</span>
             </div>
             <div id="batchLogRows" class="space-y-2 text-xs font-mono"></div>
           </div>
@@ -700,11 +700,11 @@
               </div>
               <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046]">
                 <span class="text-xs text-slate-500 font-bold block">routed_to</span>
-                <span id="inspMetaRouted" class="font-mono font-bold text-slate-800">—</span>
+                <span id="inspMetaRouted" class="font-mono font-bold text-slate-200">—</span>
               </div>
               <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046]">
                 <span class="text-xs text-slate-500 font-bold block">MinHash Dedup</span>
-                <span id="inspMetaDedup" class="font-mono font-bold text-slate-800">—</span>
+                <span id="inspMetaDedup" class="font-mono font-bold text-slate-200">—</span>
               </div>
             </div>
 
@@ -719,17 +719,17 @@
               </div>
             </div>
 
-            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+            <div class="overflow-x-auto border border-[#1b2537] rounded-xl">
               <table class="w-full text-left border-collapse text-xs font-mono">
                 <thead>
-                  <tr class="bg-slate-50 text-slate-700 border-b border-slate-200 font-sans">
+                  <tr class="bg-[#080d18] text-slate-300 border-b border-[#1b2537] font-sans">
                     <th class="py-3 px-4 font-bold w-14 text-center">#</th>
                     <th class="py-3 px-4 font-bold w-52">Trường</th>
                     <th class="py-3 px-4 font-bold">Giá trị</th>
                     <th class="py-3 px-4 font-bold w-72">Bằng chứng (Evidence)</th>
                   </tr>
                 </thead>
-                <tbody id="inspectorTableBody" class="divide-y divide-slate-100"></tbody>
+                <tbody id="inspectorTableBody" class="divide-y divide-[#1b2537]"></tbody>
               </table>
             </div>
           </div>
@@ -923,9 +923,9 @@
   <!-- ======================================================================== -->
   <div id="loginModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-[#0e1524] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#1b2537] space-y-5">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
         <h3 class="text-lg font-extrabold text-white">Đổi tài khoản sinh viên</h3>
-        <button onclick="closeLoginModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">✕</button>
+        <button onclick="closeLoginModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#1b2537] transition">✕</button>
       </div>
 
       <div class="grid grid-cols-2 gap-2.5">
@@ -955,17 +955,17 @@
         </button>
       </div>
 
-      <form onsubmit="submitCustomLogin(event)" class="space-y-3 pt-3 border-t border-slate-100">
+      <form onsubmit="submitCustomLogin(event)" class="space-y-3 pt-3 border-t border-[#1b2537]">
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Mã số sinh viên</label>
-          <input id="loginInputMssv" type="text" required placeholder="VD: 25127999" class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm" />
+          <label class="block text-xs font-bold text-slate-400 mb-1">Mã số sinh viên</label>
+          <input id="loginInputMssv" type="text" required placeholder="VD: 25127999" class="w-full px-3.5 py-2 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 outline-none transition" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Họ và tên</label>
-          <input id="loginInputName" type="text" required placeholder="VD: Nguyễn Văn A" class="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm" />
+          <label class="block text-xs font-bold text-slate-400 mb-1">Họ và tên</label>
+          <input id="loginInputName" type="text" required placeholder="VD: Nguyễn Văn A" class="w-full px-3.5 py-2 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 outline-none transition" />
         </div>
         <input id="loginInputClass" type="hidden" value="25CTT3" />
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm transition">
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition">
           Sử dụng tài khoản này
         </button>
       </form>
@@ -1070,7 +1070,7 @@
       const saveBar = document.getElementById("saveToProfileBar");
       if (saveBar) saveBar.classList.add("hidden");
       document.getElementById("resDecisionBadge").innerText = "Chưa kiểm tra";
-      document.getElementById("resDecisionBadge").className = "px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-slate-100 text-slate-600";
+      document.getElementById("resDecisionBadge").className = "px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-[#162032] text-slate-300 border border-[#223046]";
       renderCategoryBars(studentCategoryScores);
     }
 
@@ -1408,11 +1408,13 @@
       listEl.innerHTML = savedActivitiesForStudent.map((item, idx) => {
         const isConf = Number(item.confirmed_added || 0) > 0;
         const pts = isConf ? `+${item.confirmed_added}đ` : `+${item.projected_added}đ dự kiến`;
-        const badgeCls = isConf ? "bg-emerald-100 text-emerald-800" : "bg-sky-100 text-sky-800";
+        const badgeCls = isConf
+          ? "bg-emerald-950/60 text-emerald-300 border border-emerald-500/40"
+          : "bg-sky-950/60 text-sky-300 border border-sky-500/40";
         return `
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2 text-xs">
-            <div class="truncate font-semibold text-slate-800">
-              <span class="font-mono text-slate-400 mr-1">#${idx + 1}</span>
+          <div class="p-2.5 rounded-xl bg-[#080d18] border border-[#223046] flex items-center justify-between gap-2 text-xs">
+            <div class="truncate font-semibold text-slate-200">
+              <span class="font-mono text-indigo-400 mr-1">#${idx + 1}</span>
               <span>${escapeHTML(item.title || item.commit_id)}</span>
             </div>
             <span class="px-2 py-0.5 rounded font-bold shrink-0 ${badgeCls}">${pts} (${escapeHTML(item.category_id)})</span>
@@ -1558,16 +1560,16 @@
       const cases = Object.values(e2eCasesMap);
       if (cases.length === 0) return;
       container.innerHTML = cases.map(c => `
-        <div class="bg-white rounded-2xl p-5 space-y-4 flex flex-col justify-between border border-slate-200 shadow-xs">
+        <div class="bg-[#0e1524] rounded-2xl p-5 space-y-4 flex flex-col justify-between border border-[#1b2537] shadow-xl">
           <div class="space-y-2">
             <div class="flex justify-between items-start gap-2">
-              <span class="text-base font-extrabold text-slate-900">${escapeHTML(c.name)}</span>
-              <span class="px-2 py-0.5 rounded-md text-xs font-bold whitespace-nowrap ${escapeHTML(c.badge_class || 'bg-blue-100 text-blue-800')}">${escapeHTML(c.badge)}</span>
+              <span class="text-base font-extrabold text-white">${escapeHTML(c.name)}</span>
+              <span class="px-2 py-0.5 rounded-md text-xs font-bold whitespace-nowrap bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">${escapeHTML(c.badge)}</span>
             </div>
-            <div class="text-xs font-mono text-brand-700 font-bold">${escapeHTML(c.rule_label || c.rule_override)}</div>
-            <p class="text-sm text-slate-600 leading-relaxed">${escapeHTML(c.description)}</p>
+            <div class="text-xs font-mono text-indigo-400 font-bold">${escapeHTML(c.rule_label || c.rule_override)}</div>
+            <p class="text-sm text-slate-300 leading-relaxed">${escapeHTML(c.description)}</p>
           </div>
-          <button onclick="loadAndRunPreset(${safeNumber(c.id)})" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-brand-600 text-slate-800 hover:text-white font-bold text-sm transition">
+          <button onclick="loadAndRunPreset(${safeNumber(c.id)})" class="w-full py-2.5 rounded-xl bg-[#080d18] hover:bg-indigo-600 border border-[#223046] hover:border-indigo-500 text-slate-200 hover:text-white font-bold text-sm transition">
             Chạy kịch bản này &rarr;
           </button>
         </div>
@@ -1718,37 +1720,37 @@
         const matchedHtml = matched.length === 0
           ? `<div class="text-slate-400">Chưa có tiêu chí nào đạt điểm.</div>`
           : matched.map(r => `
-              <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex justify-between items-center">
-                <span class="font-semibold text-slate-800">${escapeHTML(r.title)}</span>
-                <span class="font-extrabold text-emerald-700 text-base">+${r.points} điểm</span>
+              <div class="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-600/50 flex justify-between items-center">
+                <span class="font-semibold text-emerald-200">${escapeHTML(r.title)}</span>
+                <span class="font-extrabold text-emerald-300 text-base">+${r.points} điểm</span>
               </div>
             `).join("");
 
         const critHtml = criteria.filter(c => c.score > 0 || c.target != null).map(c => `
-          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center">
-            <span class="font-bold text-slate-800">Mục ${escapeHTML(String(c.code).replace('C', ''))} (Tối đa ${c.max_score}đ)</span>
+          <div class="p-3.5 rounded-xl bg-[#080d18] border border-[#223046] flex justify-between items-center">
+            <span class="font-bold text-slate-200">Mục ${escapeHTML(String(c.code).replace('C', ''))} (Tối đa ${c.max_score}đ)</span>
             <div>
-              <span class="font-extrabold text-brand-700 text-base">${c.score} / ${c.max_score} điểm</span>
+              <span class="font-extrabold text-indigo-400 text-base">${c.score} / ${c.max_score} điểm</span>
             </div>
           </div>
         `).join("");
 
         container.innerHTML = `
-          <div class="p-4 rounded-xl bg-brand-50 border border-brand-200 flex items-center justify-between">
-            <span class="text-sm font-bold text-brand-800">Tổng điểm học vụ đạt được</span>
-            <span class="text-2xl font-black text-brand-900">${sp2.confirmed_total ?? 0} điểm</span>
+          <div class="p-4 rounded-xl bg-indigo-950/40 border border-indigo-700/50 flex items-center justify-between">
+            <span class="text-sm font-bold text-indigo-300">Tổng điểm học vụ đạt được</span>
+            <span class="text-2xl font-black text-indigo-200">${sp2.confirmed_total ?? 0} điểm</span>
           </div>
           <div class="space-y-2">
-            <div class="font-bold text-slate-800">Các mục được cộng điểm:</div>
+            <div class="font-bold text-slate-200">Các mục được cộng điểm:</div>
             <div class="space-y-2">${matchedHtml}</div>
           </div>
           <div class="space-y-2">
-            <div class="font-bold text-slate-800">Điểm đạt theo mục:</div>
+            <div class="font-bold text-slate-200">Điểm đạt theo mục:</div>
             <div class="space-y-2">${critHtml}</div>
           </div>
         `;
       } catch (e) {
-        container.innerHTML = `<div class="p-4 rounded-xl bg-rose-50 text-rose-700">Không thể kết nối máy chủ.</div>`;
+        container.innerHTML = `<div class="p-4 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300">Không thể kết nối máy chủ.</div>`;
       }
     }
 
@@ -1822,11 +1824,11 @@
         const btn = document.getElementById(`presetBtn${p}`);
         if (!btn) return;
         if (p === score) {
-          btn.className = "px-2.5 py-2 rounded-xl border-2 border-brand-500 bg-brand-50/70 text-xs font-bold text-brand-700 transition text-center";
-          if (btn.children[1]) btn.children[1].className = "text-[10px] text-brand-600 font-normal";
+          btn.className = "px-2.5 py-2 rounded-xl border-2 border-indigo-500 bg-indigo-950/60 text-xs font-bold text-indigo-300 shadow-md shadow-indigo-500/20 transition text-center";
+          if (btn.children[1]) btn.children[1].className = "text-[10px] text-indigo-400 font-normal";
         } else {
-          btn.className = "px-2.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:border-brand-500 hover:bg-brand-50 transition text-center";
-          if (btn.children[1]) btn.children[1].className = "text-[10px] text-slate-400 font-normal";
+          btn.className = "px-2.5 py-2 rounded-xl border border-[#223046] bg-[#080d18] text-xs font-bold text-slate-300 hover:border-indigo-500/60 hover:bg-[#0c1220] transition text-center";
+          if (btn.children[1]) btn.children[1].className = "text-[10px] text-slate-500 font-normal";
         }
       });
     }
@@ -1879,10 +1881,10 @@
         if (emptyState) {
           emptyState.classList.remove('hidden');
           emptyState.innerHTML = `
-            <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto text-xl">⚠️</div>
-            <h4 class="text-base font-extrabold text-slate-900 mt-2">Không thể lập kế hoạch</h4>
-            <p class="text-xs text-rose-600 mt-1">${escapeHTML(err.message)}</p>
-            <button onclick="runSp3Planner()" class="mt-3 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition">Thử lại</button>
+            <div class="w-12 h-12 rounded-xl bg-rose-950/40 text-rose-400 border border-rose-500/40 flex items-center justify-center mx-auto text-xl">⚠️</div>
+            <h4 class="text-base font-extrabold text-white mt-2">Không thể lập kế hoạch</h4>
+            <p class="text-xs text-rose-400 mt-1">${escapeHTML(err.message)}</p>
+            <button onclick="runSp3Planner()" class="mt-3 px-4 py-2 rounded-xl bg-[#080d18] hover:bg-[#162032] border border-[#223046] text-xs font-bold text-slate-200 transition">Thử lại</button>
           `;
         }
       } finally {
@@ -2007,7 +2009,7 @@
       if (warnContainer) {
         const warnings = plan.warnings || [];
         warnContainer.innerHTML = warnings.map(w => `
-          <div class="flex items-start gap-2 text-amber-800 bg-amber-50/80 p-2 rounded-lg border border-amber-200/70">
+          <div class="flex items-start gap-2 text-amber-300 bg-amber-950/40 p-2 rounded-lg border border-amber-500/30">
             <span class="font-bold shrink-0">[${escapeHTML(w.code || 'WARN')}]:</span>
             <span>${escapeHTML(w.message || '')}</span>
           </div>
@@ -2017,9 +2019,9 @@
       if (exclContainer) {
         const excluded = plan.excluded_candidates || [];
         exclContainer.innerHTML = excluded.slice(0, 5).map(e => `
-          <div class="flex items-start justify-between gap-2 text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
-            <span class="font-mono font-bold text-slate-800">${escapeHTML(e.activity_id)}:</span>
-            <span class="text-slate-500 text-right">${escapeHTML(e.message || e.code || '')}</span>
+          <div class="flex items-start justify-between gap-2 text-slate-300 bg-[#080d18] p-2 rounded-lg border border-[#223046]">
+            <span class="font-mono font-bold text-indigo-300">${escapeHTML(e.activity_id)}:</span>
+            <span class="text-slate-400 text-right">${escapeHTML(e.message || e.code || '')}</span>
           </div>
         `).join('');
       }
@@ -2047,7 +2049,7 @@
           const data = await res.json();
           backendAvailable = true;
           window.serverSupportsCommit = ("saved_activities" in data);
-          document.getElementById('backendStatusPill').className = "flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200";
+          document.getElementById('backendStatusPill').className = "flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40";
           document.getElementById('backendStatusText').innerText = `API Online (${data.total_rules} rules)`;
           return true;
         }
@@ -2171,10 +2173,10 @@
       const addedEl = document.getElementById("resAddedPoints");
       if (sp2.confirmed_added > 0) {
         addedEl.innerText = `+${sp2.confirmed_added} điểm`;
-        addedEl.className = "text-3xl font-black text-emerald-700 mt-1.5";
+        addedEl.className = "text-3xl font-black text-emerald-400 mt-1.5";
       } else if (sp2.projected_added > 0) {
         addedEl.innerText = `+${sp2.projected_added} điểm (Dự kiến)`;
-        addedEl.className = "text-3xl font-black text-brand-700 mt-1.5";
+        addedEl.className = "text-3xl font-black text-indigo-400 mt-1.5";
       } else {
         addedEl.innerText = `+0 điểm`;
         addedEl.className = "text-3xl font-black text-slate-400 mt-1.5";
@@ -2229,7 +2231,7 @@
       if (saveBar && btnSave && saveText) {
         if (effectiveKind === "score" && effectiveDelta > 0 && catId) {
           saveBar.classList.remove("hidden");
-          saveBar.className = "flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 p-4 rounded-xl bg-emerald-50/90 border border-emerald-200 transition";
+          saveBar.className = "flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 p-4 rounded-xl bg-emerald-950/50 border border-emerald-600/50 text-emerald-200 transition";
           btnSave.disabled = false;
           btnSave.className = "px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-xs transition flex items-center justify-center gap-2 shrink-0 cursor-pointer";
           if (commitInfo.upgrade_of) {
@@ -2253,7 +2255,7 @@
           }
         } else if (effectiveKind === "review") {
           saveBar.classList.remove("hidden");
-          saveBar.className = "flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 p-4 rounded-xl bg-amber-50/90 border border-amber-200 transition";
+          saveBar.className = "flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 p-4 rounded-xl bg-amber-950/50 border border-amber-600/50 text-amber-200 transition";
           btnSave.disabled = false;
           btnSave.className = "px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-xs transition flex items-center justify-center gap-2 shrink-0 cursor-pointer";
           btnSave.innerHTML = `<span>Gửi vào hàng đợi duyệt</span>`;
@@ -2300,11 +2302,11 @@
         const val = rec[field];
         const ev = evidence[field] || ((field === "start" || field === "end") ? evidence.time : "—") || "—";
         return `
-          <tr class="hover:bg-slate-50">
-            <td class="py-2.5 px-4 text-center text-slate-400">${idx + 1}</td>
-            <td class="py-2.5 px-4 font-bold text-brand-700">${escapeHTML(field)}</td>
-            <td class="py-2.5 px-4 text-slate-800 break-all">${escapeHTML(typeof val === 'object' ? JSON.stringify(val) : String(val ?? 'null'))}</td>
-            <td class="py-2.5 px-4 text-slate-500">${escapeHTML(typeof ev === 'object' ? JSON.stringify(ev) : String(ev))}</td>
+          <tr class="hover:bg-[#0c1220]">
+            <td class="py-2.5 px-4 text-center text-slate-500">${idx + 1}</td>
+            <td class="py-2.5 px-4 font-bold text-indigo-400">${escapeHTML(field)}</td>
+            <td class="py-2.5 px-4 text-slate-200 break-all">${escapeHTML(typeof val === 'object' ? JSON.stringify(val) : String(val ?? 'null'))}</td>
+            <td class="py-2.5 px-4 text-slate-400">${escapeHTML(typeof ev === 'object' ? JSON.stringify(ev) : String(ev))}</td>
           </tr>
         `;
       }).join("");
@@ -2394,8 +2396,8 @@
         if (commitData.kind === "review") {
           renderCategoryBars(studentCategoryScores);
           if (btnSave) {
-            btnSave.className = "px-5 py-2.5 rounded-xl bg-slate-200 text-slate-500 font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2 shrink-0";
-            btnSave.innerHTML = `<span class="text-amber-800 font-bold">Đã gửi vào hàng đợi duyệt ✓</span>`;
+            btnSave.className = "px-5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-amber-300 font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2 shrink-0";
+            btnSave.innerHTML = `<span class="text-amber-300 font-bold">Đã gửi vào hàng đợi duyệt ✓</span>`;
           }
           if (saveText) {
             saveText.innerHTML = `<b>Đã ghi nhận!</b> Bài đăng đã được chuyển vào Hàng đợi rà soát trong Kho hoạt động.`;
@@ -2411,10 +2413,10 @@
           }
 
           if (btnSave) {
-            btnSave.className = "px-5 py-2.5 rounded-xl bg-slate-200 text-slate-500 font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2 shrink-0";
+            btnSave.className = "px-5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-emerald-300 font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2 shrink-0";
             btnSave.innerHTML = `
-              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-              <span class="text-emerald-700 font-bold">Đã lưu vào bảng điểm ✓</span>
+              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span class="text-emerald-300 font-bold">Đã lưu vào bảng điểm ✓</span>
             `;
           }
           if (saveText && catId && studentCategoryScores[catId]) {
@@ -2475,39 +2477,39 @@
               const locDisplay = a.location || (a.mode === 'online' ? 'Trực tuyến' : 'Cơ sở trường');
               const ptsDisplay = a.points_awarded || (a.points != null ? `+${a.points} điểm` : 'Hợp lệ');
               return `
-                <div class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100/70 border border-slate-200 transition space-y-2">
+                <div class="p-4 rounded-xl bg-[#080d18] hover:bg-[#0c1220] border border-[#223046] transition space-y-2">
                   <div class="flex items-start justify-between gap-3">
                     <div class="font-bold text-sm text-white leading-snug">
-                      <span class="text-xs font-mono font-bold text-slate-400 mr-1.5">#${idx + 1}</span>
+                      <span class="text-xs font-mono font-bold text-indigo-400 mr-1.5">#${idx + 1}</span>
                       <span>${escapeHTML(a.title || a.activity_id)}</span>
                     </div>
-                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-100 text-emerald-800 whitespace-nowrap shrink-0">
+                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 whitespace-nowrap shrink-0">
                       ${escapeHTML(ptsDisplay)}
                     </span>
                   </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-500 pt-1 border-t border-slate-200/60">
-                    <div><b>Đơn vị:</b> <span class="text-slate-700">${escapeHTML(a.source?.publisher || a.organizer || 'Trường ĐH KHTN')}</span></div>
-                    <div><b>Thời gian:</b> <span class="text-slate-700 font-mono">${escapeHTML(timeDisplay)}</span></div>
-                    <div class="sm:col-span-2"><b>Địa điểm:</b> <span class="text-slate-700">${escapeHTML(locDisplay)}</span></div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-400 pt-1.5 border-t border-[#1b2537]">
+                    <div><b>Đơn vị:</b> <span class="text-slate-200">${escapeHTML(a.source?.publisher || a.organizer || 'Trường ĐH KHTN')}</span></div>
+                    <div><b>Thời gian:</b> <span class="text-slate-200 font-mono">${escapeHTML(timeDisplay)}</span></div>
+                    <div class="sm:col-span-2"><b>Địa điểm:</b> <span class="text-slate-200">${escapeHTML(locDisplay)}</span></div>
                   </div>
                 </div>
               `;
             }).join("");
 
         document.getElementById("reviewQueueList").innerHTML = reviewList.length === 0
-          ? `<div class="p-6 text-center text-slate-400 text-sm bg-slate-50 rounded-xl border border-dashed border-slate-200">
+          ? `<div class="p-6 text-center text-slate-400 text-sm bg-[#080d18] rounded-xl border border-dashed border-[#223046]">
                Hiện không có bài đăng nào cần duyệt.
              </div>`
           : reviewList.map((item, idx) => `
-              <div class="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 space-y-1.5">
+              <div class="p-3.5 rounded-xl bg-[#080d18] border border-amber-500/40 space-y-1.5">
                 <div class="flex items-start justify-between gap-2">
-                  <div class="font-bold text-sm text-amber-900 leading-snug">
-                    <span class="text-xs font-mono text-amber-600 mr-1">#${idx + 1}</span>
+                  <div class="font-bold text-sm text-amber-300 leading-snug">
+                    <span class="text-xs font-mono text-amber-400 mr-1">#${idx + 1}</span>
                     ${escapeHTML(item.record?.title || item.title || 'Bài đăng cần rà soát')}
                   </div>
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-900 shrink-0">Chờ duyệt</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40 shrink-0">Chờ duyệt</span>
                 </div>
-                <div class="text-xs font-mono text-amber-800">
+                <div class="text-xs font-mono text-amber-400">
                   <b>Cờ:</b> ${escapeHTML((item.meta?.flags || item.flags || []).join(", ") || 'REVIEW_REQUIRED')}
                 </div>
               </div>
@@ -2527,16 +2529,16 @@
 
         container.innerHTML = `
           <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-              <span class="text-slate-500 block">Bản ghi kiểm toán</span>
-              <span class="text-base font-bold text-slate-900">${ds.record_count ?? 20}</span>
+            <div class="p-2.5 rounded-lg bg-[#080d18] border border-[#223046]">
+              <span class="text-slate-400 block">Bản ghi kiểm toán</span>
+              <span class="text-base font-bold text-white">${ds.record_count ?? 20}</span>
             </div>
-            <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-              <span class="text-slate-500 block">Lỗi Schema</span>
-              <span class="text-base font-bold text-emerald-700">${(ds.schema_errors || []).length}</span>
+            <div class="p-2.5 rounded-lg bg-[#080d18] border border-[#223046]">
+              <span class="text-slate-400 block">Lỗi Schema</span>
+              <span class="text-base font-bold text-emerald-400">${(ds.schema_errors || []).length}</span>
             </div>
           </div>
-          <div class="text-[11px] font-mono text-slate-500 pt-1">
+          <div class="text-[11px] font-mono text-slate-400 pt-1">
             Quy chế: ${escapeHTML(data.regulation_id)} • Trùng chéo: ${dups.length} nhóm
           </div>
         `;
