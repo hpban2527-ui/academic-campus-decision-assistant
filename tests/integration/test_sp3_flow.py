@@ -23,6 +23,9 @@ def test_sp1_catalog_preserves_review_status():
     assert all(item["publication_status"] == "REVIEW_REQUIRED" for item in body["activities"])
     assert all(item["score_binding_verified"] is False for item in body["activities"])
     assert all(item["data_qa"]["activity_id"] == item["activity"]["activity_id"] for item in body["activities"])
+    assert body["new_post_drafts"]
+    assert all(item["publication_status"] == "REVIEW_REQUIRED" for item in body["new_post_drafts"])
+    assert all(item["score_binding_verified"] is False for item in body["new_post_drafts"])
 
 
 def test_demo_planning_calls_real_sp2_and_sp3():
@@ -53,4 +56,33 @@ def test_demo_replan_and_skip_are_read_only():
 
 def test_demo_scenario_is_explicit():
     response = client.post("/api/sp3/demo/plan", json={"scenario": "official"})
+    assert response.status_code == 422
+
+
+def test_custom_goal_and_busy_time_recompute_preview():
+    response = client.post("/api/sp3/demo/plan", json={
+        "scenario": "first_plan",
+        "total_target": 100,
+        "busy_intervals": [{
+            "start": "2026-11-11T07:00:00+07:00",
+            "end": "2026-11-11T08:00:00+07:00",
+        }],
+    })
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["requested_total_target"] == 100
+    assert body["mode"] == "DEMO_ONLY"
+    assert body["official_award_verified"] is False
+    assert body["plan"]["score_summary"] is not None
+    assert body["availability"]["calendar_version"] == body["feasibility"]["context"]["calendar_version"]
+
+
+def test_replan_rejects_unscoped_busy_override():
+    response = client.post("/api/sp3/demo/plan", json={
+        "scenario": "replan",
+        "busy_intervals": [{
+            "start": "2026-11-11T07:00:00+07:00",
+            "end": "2026-11-11T08:00:00+07:00",
+        }],
+    })
     assert response.status_code == 422

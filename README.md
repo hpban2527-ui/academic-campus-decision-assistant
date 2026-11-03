@@ -112,7 +112,7 @@ Chưa merge `main` khi chưa được approval theo ruleset và xác minh điề
 Start the existing API with `python run_server.py`. The SP3 endpoints are:
 
 - `GET /api/sp3/catalog`: SP1's 20 structured activities with Trí's QA status. An additional 18 collected posts are **raw source**, not approved 14-field activities.
-- `POST /api/sp3/demo/plan`: JSON body `{"scenario":"first_plan"}`, `{"scenario":"replan"}`, or `{"scenario":"what_if_skip"}`. Output has `availability`, `feasibility`, and `plan` for Tiến's UI.
+- `POST /api/sp3/demo/plan`: JSON body `{"scenario":"first_plan"}`, `{"scenario":"replan"}`, or `{"scenario":"what_if_skip"}`. For the first plan, `total_target` (0–100) and `busy_intervals` are optional UI inputs. Output has `availability`, `feasibility`, and `plan` for Tiến's UI. The catalog also provides unapproved extraction drafts from the extra source posts; these are not score-eligible.
 - The demo recomputes availability and feasibility from Ngọc's code, plans with Duyên's code and invokes the real SP2 engine. The student, dates and activity bindings are synthetic fixture data; output is **DEMO_ONLY**, not a university-confirmed DRL award.
 
 Run `PYTHONPATH=src python -m pytest -q tests/sp3 tests/integration/test_sp3_flow.py` for the complete SP3 checks. The live HK3 planner remains review-gated until source activity records and point bindings are verified; do not turn unknown points into zero or claim official credit.

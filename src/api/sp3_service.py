@@ -6,6 +6,8 @@ from copy import deepcopy
 import json
 from pathlib import Path
 
+from api.lead_contract import prepare_publication
+from sp1.extractor import extract_post
 from sp3.availability import resolve_availability
 from sp3.feasibility import FeasibilityEvidence, assess_feasibility
 from sp3.plan_checker import check_plan
@@ -40,12 +42,28 @@ def sp1_catalog() -> dict:
         for item in activities
     ]
     extra = [post for post in source_posts if post["post_id"] not in original_ids]
+    drafts = []
+    errors = []
+    for post in extra:
+        try:
+            for raw_draft in extract_post(post)["drafts"]:
+                reviewed = prepare_publication(raw_draft)
+                drafts.append({
+                    "activity": reviewed["record"],
+                    "review_flags": reviewed["meta"]["flags"],
+                    "publication_status": "REVIEW_REQUIRED",
+                    "score_binding_verified": False,
+                })
+        except (TypeError, ValueError, KeyError) as exc:
+            errors.append({"post_id": post["post_id"], "reason": type(exc).__name__})
     return {
         "mode": "DEMO_ONLY",
         "official_award_verified": False,
         "term": {"id": "HK3_2025_2026", "start": "2026-05-18", "end": "2026-08-17"},
         "activity_count": len(rows),
         "unstructured_new_posts": len(extra),
+        "new_post_drafts": drafts,
+        "new_post_errors": errors,
         "activities": rows,
         "note": "New posts need 14-field extraction and human source review before planning.",
     }
@@ -57,12 +75,21 @@ def _score_callback(fixture: dict):
     return ScorerAdapter(ProjectedScorer(InMemoryScoringData(scoring_data))).score_plan
 
 
-def _step(fixture: dict, name: str, previous: dict | None = None) -> dict:
+def _step(
+    fixture: dict,
+    name: str,
+    previous: dict | None = None,
+    *,
+    target_total: int | None = None,
+    busy_intervals: list[dict[str, str]] | None = None,
+) -> dict:
     stored = fixture["steps"][name]
     feasibility_request = deepcopy(stored["feasibility_request"])
     context = feasibility_request["context"]
+    availability_request = deepcopy(stored["availability_request"])
+    availability_request["busy_intervals"].extend(busy_intervals or [])
     availability = resolve_availability(
-        deepcopy(stored["availability_request"]),
+        availability_request,
         window_start=context["window_start"],
         window_end=context["window_end"],
     )
@@ -73,7 +100,9 @@ def _step(fixture: dict, name: str, previous: dict | None = None) -> dict:
     )
 
     # A fixture is evidence of an interface, not a substitute for running upstream code.
-    if availability != stored["availability_response"] or feasibility != stored["feasibility_response"]:
+    if not busy_intervals and (
+        availability != stored["availability_response"] or feasibility != stored["feasibility_response"]
+    ):
         raise RuntimeError("SP3 upstream contract drift; review the fixture before publishing a demo.")
 
     previous_plan = None
@@ -86,11 +115,14 @@ def _step(fixture: dict, name: str, previous: dict | None = None) -> dict:
                 for item in previous["selected_activities"]
             ],
         }
+    planning_options = deepcopy(fixture["planner"])
+    if target_total is not None:
+        planning_options["goals"]["total_target"] = target_total
     planner_input = {
         "contract_version": feasibility["contract_version"],
         "request_id": "api-demo-" + name,
         "context": deepcopy(feasibility["context"]),
-        **deepcopy(fixture["planner"]),
+        **planning_options,
         "candidates": deepcopy(feasibility["candidates"]),
         "conflict_pairs": deepcopy(feasibility["conflict_pairs"]),
         "available_intervals": deepcopy(availability["available_intervals"]),
@@ -109,16 +141,27 @@ def _step(fixture: dict, name: str, previous: dict | None = None) -> dict:
     }
 
 
-def demo_plan(scenario: str) -> dict:
-    """Exercise all SP3 modules and the real SP2 engine on synthetic data only."""
+def demo_plan(
+    scenario: str,
+    *,
+    target_total: int | None = None,
+    busy_intervals: list[dict[str, str]] | None = None,
+) -> dict:
+    """Exercise the full pipeline on synthetic data with optional UI constraints."""
     if scenario not in {"first_plan", "replan", "what_if_skip"}:
         raise ValueError("scenario must be first_plan, replan, or what_if_skip")
+    if target_total is not None and (
+        type(target_total) is not int or not 0 <= target_total <= 100
+    ):
+        raise ValueError("target_total must be an integer from 0 to 100")
+    if busy_intervals and scenario != "first_plan":
+        raise ValueError("busy_intervals can only be customized in first_plan")
     fixture = _json(DEMO)
-    first = _step(fixture, "step1")
+    first = _step(fixture, "step1", target_total=target_total, busy_intervals=busy_intervals)
     if scenario == "first_plan":
         output = first
     else:
-        second = _step(fixture, "step2", previous=first["plan"])
+        second = _step(fixture, "step2", previous=first["plan"], target_total=target_total)
         if scenario == "replan":
             output = second
         else:
@@ -144,6 +187,7 @@ def demo_plan(scenario: str) -> dict:
         "data_source": "SYNTHETIC-DEMO",
         "scenario": scenario,
         "term": output["feasibility"]["context"]["term_id"],
+        "requested_total_target": target_total if target_total is not None else fixture["planner"]["goals"]["total_target"],
         "availability": output["availability"],
         "feasibility": output["feasibility"],
         "plan": output["plan"],
