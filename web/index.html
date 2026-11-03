@@ -35,8 +35,8 @@
   </script>
   <style>
     body {
-      background-color: #f8fafc;
-      color: #0f172a;
+      background-color: #080c14;
+      color: #f8fafc;
       font-size: 15px;
       line-height: 1.6;
     }
@@ -44,77 +44,76 @@
       transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .nav-btn-active {
-      background-color: #eff6ff;
-      color: #1d4ed8;
-      border-color: #bfdbfe;
+      background-color: #1e1b4b;
+      color: #a5b4fc;
+      border-color: #6366f1;
       font-weight: 700;
-      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.25);
     }
     .nav-btn-inactive {
-      background-color: #ffffff;
-      color: #475569;
-      border-color: #e2e8f0;
+      background-color: #0b101b;
+      color: #94a3b8;
+      border-color: #1b2537;
       font-weight: 600;
     }
     .nav-btn-inactive:hover {
-      background-color: #f8fafc;
-      color: #0f172a;
-      border-color: #cbd5e1;
+      background-color: #11192b;
+      color: #f8fafc;
+      border-color: #2b3a54;
     }
     body:not(.dev-mode) .dev-only {
       display: none !important;
     }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    ::-webkit-scrollbar-track { background: #080c14; }
+    ::-webkit-scrollbar-thumb { background: #1b2537; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2b3a54; }
   </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden antialiased selection:bg-brand-100 selection:text-brand-900">
+<body class="h-screen flex flex-col overflow-hidden antialiased bg-[#080c14] text-slate-100 selection:bg-indigo-900 selection:text-white">
 
   <!-- ======================================================================== -->
   <!-- 1. TOP STATUS BAR (THANH TRẠNG THÁI TRÊN CÙNG)                           -->
   <!-- ======================================================================== -->
-  <header class="h-16 bg-white/95 backdrop-blur-xs border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 flex items-center justify-between shrink-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+  <header class="h-16 bg-[#0b101b]/95 backdrop-blur-md border-b border-[#1b2537] px-4 sm:px-6 lg:px-8 flex items-center justify-between shrink-0 z-30 shadow-lg shadow-black/20">
     
     <!-- Left: Mobile Menu Toggle + App Identity & Mode Switcher -->
     <div class="flex items-center gap-3 sm:gap-5">
       <!-- Mobile Sidebar Toggle Button -->
-      <button id="btnMobileMenuToggle" onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-1 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition" aria-label="Mở danh mục điều hướng">
+      <button id="btnMobileMenuToggle" onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-1 rounded-xl text-slate-400 hover:text-white hover:bg-[#11192b] transition" aria-label="Mở danh mục điều hướng">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
 
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-base shadow-xs tracking-tight">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold text-base shadow-md shadow-indigo-600/40 tracking-tight">
           U
         </div>
         <div>
-          <span class="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight block leading-tight">UniLife ĐRL</span>
-          <span class="text-[10px] sm:text-[11px] font-medium text-slate-400 block truncate max-w-[140px] sm:max-w-none">ĐH Khoa học Tự nhiên — ĐHQG-HCM</span>
+          <span class="font-extrabold text-base sm:text-lg text-white tracking-tight block leading-tight">UniLife ĐRL</span>
         </div>
       </div>
 
-      <div class="hidden sm:block h-5 w-px bg-slate-200"></div>
+      <div class="hidden sm:block h-5 w-px bg-[#1b2537]"></div>
 
       <!-- USER vs DEVELOPER MODE SWITCHER -->
-      <div class="inline-flex p-0.5 sm:p-1 rounded-xl bg-slate-100/90 border border-slate-200/80">
-        <button id="btnModeUser" onclick="setViewMode('user')" class="px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition">
+      <div class="inline-flex p-0.5 sm:p-1 rounded-xl bg-[#0e1524] border border-[#1b2537]">
+        <button id="btnModeUser" onclick="setViewMode('user')" class="px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs transition">
           Người dùng
         </button>
-        <button id="btnModeDev" onclick="setViewMode('dev')" class="px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition">
+        <button id="btnModeDev" onclick="setViewMode('dev')" class="px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">
           Developer
         </button>
       </div>
 
       <!-- Developer-Only Status Controls in Top Bar -->
       <div class="dev-only hidden xl:flex items-center gap-3">
-        <div id="backendStatusPill" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <div id="backendStatusPill" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse"></span>
           <span id="backendStatusText">API Online</span>
         </div>
 
-        <label class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 cursor-pointer hover:bg-slate-200/70 transition">
-          <input id="inputSimulateDemo" type="checkbox" checked onchange="onToggleDemoMode()" class="w-3.5 h-3.5 rounded text-brand-600 cursor-pointer" />
+        <label class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-[#11192b] text-slate-300 border border-[#1b2537] cursor-pointer hover:bg-[#162032] transition">
+          <input id="inputSimulateDemo" type="checkbox" checked onchange="onToggleDemoMode()" class="w-3.5 h-3.5 rounded text-indigo-500 cursor-pointer" />
           <span id="modeLabelText">Engine: Mô phỏng SP2</span>
         </label>
       </div>
@@ -122,29 +121,29 @@
 
     <!-- Right: User Profile Pill -->
     <div class="relative">
-      <button onclick="toggleUserDropdown()" class="flex items-center gap-2.5 sm:gap-3 pl-2 pr-3 sm:pr-4 py-1 sm:py-1.5 rounded-full bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 transition">
-        <div id="headerAvatar" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-brand-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+      <button onclick="toggleUserDropdown()" class="flex items-center gap-2.5 sm:gap-3 pl-2 pr-3 sm:pr-4 py-1 sm:py-1.5 rounded-full bg-[#0e1524] hover:bg-[#11192b] border border-[#1b2537] transition">
+        <div id="headerAvatar" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
           MT
         </div>
         <div class="text-left hidden sm:block">
-          <div id="headerUserName" class="text-xs sm:text-sm font-bold text-slate-800 leading-tight">Lưu Minh Tiến</div>
-          <div id="headerUserMssv" class="text-[11px] text-slate-500">25127242</div>
+          <div id="headerUserName" class="text-xs sm:text-sm font-bold text-white leading-tight">Lưu Minh Tiến</div>
+          <div id="headerUserMssv" class="text-[11px] text-slate-400">25127242</div>
         </div>
         <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
       </button>
 
       <!-- User Dropdown Menu -->
-      <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200/90 py-2 z-50">
-        <div class="px-4 py-2.5 border-b border-slate-100">
+      <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-[#0e1524] rounded-2xl shadow-2xl border border-[#1b2537] py-2 z-50">
+        <div class="px-4 py-2.5 border-b border-[#1b2537]">
           <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Sinh viên đang chọn</p>
-          <p class="text-sm font-bold text-slate-800 mt-0.5">Khoa Công nghệ Thông tin</p>
+          <p class="text-sm font-bold text-white mt-0.5">Khoa Công nghệ Thông tin</p>
         </div>
         <div class="py-1">
-          <button onclick="openLoginModal()" class="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 font-medium transition flex items-center gap-2">
+          <button onclick="openLoginModal()" class="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-[#11192b] font-medium transition flex items-center gap-2">
             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             Đổi tài khoản sinh viên
           </button>
-          <button onclick="resetSessionData()" class="w-full px-4 py-2 text-left text-sm text-rose-600 hover:bg-rose-50 font-medium transition flex items-center gap-2">
+          <button onclick="resetSessionData()" class="w-full px-4 py-2 text-left text-sm text-rose-400 hover:bg-rose-950/30 font-medium transition flex items-center gap-2">
             <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Khôi phục dữ liệu gốc
           </button>
@@ -165,14 +164,14 @@
     <!-- ====================================================================== -->
     <!-- 2. LEFT SIDEBAR NAVIGATION (RESPONSIVE OFF-CANVAS TRÊN MOBILE)         -->
     <!-- ====================================================================== -->
-    <aside id="sidebarNav" class="fixed inset-y-0 left-0 z-40 w-72 sm:w-80 bg-white border-r border-slate-200/80 flex flex-col justify-between shrink-0 overflow-y-auto p-5 select-none transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-250 ease-out shadow-2xl lg:shadow-none">
+    <aside id="sidebarNav" class="fixed inset-y-0 left-0 z-40 w-72 sm:w-80 bg-[#0b101b] border-r border-[#1b2537] flex flex-col justify-between shrink-0 overflow-y-auto p-5 select-none transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-250 ease-out shadow-2xl lg:shadow-none">
       
       <div class="space-y-6">
         <div>
           <!-- Mobile Drawer Header with Close Button -->
-          <div class="flex items-center justify-between lg:hidden pb-3 border-b border-slate-100 mb-4">
+          <div class="flex items-center justify-between lg:hidden pb-3 border-b border-[#1b2537] mb-4">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Menu điều hướng</span>
-            <button onclick="toggleMobileSidebar(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" aria-label="Đóng menu">
+            <button onclick="toggleMobileSidebar(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#11192b] transition" aria-label="Đóng menu">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
           </div>
@@ -182,80 +181,67 @@
           </div>
           <nav class="space-y-2">
             
-            <button id="tabBtnDashboard" onclick="switchTab('dashboard')" class="nav-btn-active w-full px-4 py-3 rounded-xl border text-left transition flex items-start gap-3.5">
-              <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              <div>
-                <div class="text-[14px] font-bold leading-tight">Tính điểm hoạt động</div>
-                <div class="text-xs text-slate-400 font-normal mt-0.5">Nhập thông báo &amp; ước tính ĐRL</div>
-              </div>
+            <button id="tabBtnDashboard" onclick="switchTab('dashboard')" class="nav-btn-active w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span class="text-sm font-bold">Tính điểm hoạt động</span>
             </button>
 
-            <button id="tabBtnActivities" onclick="switchTab('activities')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-start justify-between">
-              <div class="flex items-start gap-3.5">
-                <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                <div>
-                  <div class="text-[14px] font-bold leading-tight">Kho hoạt động</div>
-                  <div class="text-xs text-slate-400 font-normal mt-0.5">Danh sách &amp; hàng đợi duyệt</div>
-                </div>
+            <button id="tabBtnActivities" onclick="switchTab('activities')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                <span class="text-sm font-bold">Kho hoạt động</span>
               </div>
-              <span id="sidebarActCount" class="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">20</span>
+              <span id="sidebarActCount" class="text-xs font-bold px-2 py-0.5 rounded-full bg-[#162032] text-slate-300 border border-[#223046]">20</span>
             </button>
 
-            <button id="tabBtnSnapshot" onclick="switchTab('snapshot')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-start gap-3.5">
-              <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-              <div>
-                <div class="text-[14px] font-bold leading-tight">Điểm học vụ</div>
-                <div class="text-xs text-slate-400 font-normal mt-0.5">Dự tính theo GPA &amp; vi phạm</div>
+            <button id="tabBtnSnapshot" onclick="switchTab('snapshot')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              <span class="text-sm font-bold">Điểm học vụ</span>
+            </button>
+
+            <button id="tabBtnPlan" onclick="switchTab('plan')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                <span class="text-sm font-bold">Kế hoạch ĐRL (SP3)</span>
               </div>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-950/70 text-indigo-300 border border-indigo-700/60">SP3</span>
             </button>
 
             <!-- Developer-Only Workspaces -->
-            <button id="tabBtnTestSuites" onclick="switchTab('testSuites')" class="dev-only nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-start justify-between">
-              <div class="flex items-start gap-3.5">
-                <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                <div>
-                  <div class="text-[14px] font-bold leading-tight">Kiểm thử 5 Ca E2E</div>
-                  <div class="text-xs text-slate-400 font-normal mt-0.5">Bộ test tự động cho giảng viên</div>
-                </div>
+            <button id="tabBtnTestSuites" onclick="switchTab('testSuites')" class="dev-only nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                <span class="text-sm font-bold">Kiểm thử 5 Ca E2E</span>
               </div>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-100 text-brand-700">Dev</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-[#162032] text-slate-300 border border-[#223046]">Dev</span>
             </button>
 
-            <button id="tabBtnInspector" onclick="switchTab('inspector')" class="dev-only nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-start justify-between">
-              <div class="flex items-start gap-3.5">
-                <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                <div>
-                  <div class="text-[14px] font-bold leading-tight">Hợp đồng 14 Trường</div>
-                  <div class="text-xs text-slate-400 font-normal mt-0.5">Kiểm tra schema JSON</div>
-                </div>
+            <button id="tabBtnInspector" onclick="switchTab('inspector')" class="dev-only nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                <span class="text-sm font-bold">Hợp đồng 14 Trường</span>
               </div>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-100 text-brand-700">Dev</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-[#162032] text-slate-300 border border-[#223046]">Dev</span>
             </button>
 
           </nav>
         </div>
 
-        <!-- Clean Info Card for User (Fills vertical sidebar space elegantly) -->
-        <div class="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2">
-          <div class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <!-- Clean Info Card for User -->
+        <div class="p-3.5 rounded-xl bg-[#0e1524] border border-[#1b2537]">
+          <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
             <span>Học kỳ 1 / 2026-2027</span>
           </div>
-          <p class="text-xs text-slate-500 leading-relaxed">
-            Hệ thống áp dụng theo Quy định đánh giá Điểm Rèn Luyện sinh viên chính quy trường ĐH Khoa học Tự nhiên.
-          </p>
         </div>
       </div>
 
       <!-- Developer Footer Info -->
-      <div class="dev-only mt-6 p-3.5 rounded-xl bg-slate-900 text-slate-300 text-xs space-y-1">
+      <div class="dev-only mt-6 p-3.5 rounded-xl bg-[#080d18] border border-[#1b2537] text-slate-300 text-xs space-y-1">
         <div class="font-bold text-white flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
           <span>Developer Mode Active</span>
         </div>
-        <p class="leading-relaxed text-slate-400">
-          Hiển thị đầy đủ mã quy tắc, hợp đồng 14 trường, MinHash-LSH và kiểm toán dữ liệu.
-        </p>
       </div>
 
     </aside>
@@ -272,22 +258,21 @@
         <div id="viewDashboard" class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
           
           <!-- CỘT TRÁI (7/12): KHÔNG GIAN NHẬP LIỆU & BÓC TÁCH TO RÕ -->
-          <div class="xl:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-xs divide-y divide-slate-200 overflow-hidden">
+          <div class="xl:col-span-7 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl divide-y divide-[#1b2537] overflow-hidden">
             
             <!-- TẦNG 1: NHẬP THÔNG BÁO HOẠT ĐỘNG -->
             <div class="p-6 lg:p-7 space-y-4">
               <div class="flex items-center justify-between">
                 <div>
-                  <h2 class="text-xl font-extrabold text-slate-900">Thông báo hoạt động</h2>
-                  <p class="text-sm text-slate-500 mt-0.5">Dán thông báo hoạt động từ Fanpage/Web trường hoặc chỉnh sửa thông tin bên dưới</p>
+                  <h2 class="text-xl font-extrabold text-white">Thông báo hoạt động</h2>
                 </div>
               </div>
 
               <!-- Large, comfortable Textarea -->
-              <textarea id="inputRawContent" oninput="onRawContentManualEdit()" rows="5" placeholder="Dán nội dung bài đăng thông báo hoạt động vào đây..." class="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-50 text-base text-slate-800 leading-relaxed outline-none transition resize-y"></textarea>
+              <textarea id="inputRawContent" oninput="onRawContentManualEdit()" rows="5" placeholder="Dán nội dung bài đăng thông báo hoạt động vào đây..." class="w-full p-4 rounded-xl bg-[#080d18] border border-[#223046] focus:bg-[#0c1220] focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 text-base text-slate-100 placeholder-slate-500 outline-none transition resize-y"></textarea>
 
               <!-- Developer-Only Metadata Drawer -->
-              <details class="dev-only group rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5">
+              <details class="dev-only group rounded-xl border border-[#223046] bg-[#080d18] px-4 py-2.5">
                 <summary class="cursor-pointer list-none flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-800">
                   <span>[Dev] Thông số nguồn &amp; Ghi đè quy tắc (Metadata)</span>
                   <span class="group-open:rotate-180 transition-transform">▼</span>
@@ -326,18 +311,17 @@
               <!-- Action Row: Evidence Checkbox + Single Reset + Big Action Button -->
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
                 <label class="flex items-center gap-3 cursor-pointer select-none">
-                  <input id="inputEvidence" type="checkbox" onchange="onEvidenceToggle()" class="w-5 h-5 rounded text-brand-600 focus:ring-brand-500 cursor-pointer" />
+                  <input id="inputEvidence" type="checkbox" onchange="onEvidenceToggle()" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
                   <div>
-                    <span class="text-sm font-bold text-slate-800 block">Đã tham gia &amp; có minh chứng hoàn thành</span>
-                    <span class="text-xs text-slate-400">Check-in hoặc giấy chứng nhận hoàn thành</span>
+                    <span class="text-sm font-bold text-slate-200 block">Đã tham gia &amp; có minh chứng hoàn thành</span>
                   </div>
                 </label>
 
                 <div class="flex items-center gap-3">
-                  <button onclick="resetForm()" class="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold text-sm transition" title="Xóa nội dung đang nhập để kiểm tra hoạt động khác (không mất điểm đã lưu)">
+                  <button onclick="resetForm()" class="px-4 py-2.5 rounded-xl border border-[#223046] hover:bg-[#162032] text-slate-300 font-semibold text-sm transition" title="Xóa nội dung đang nhập để kiểm tra hoạt động khác (không mất điểm đã lưu)">
                     Đặt lại
                   </button>
-                  <button id="btnRunPipeline" onclick="runAnalysisPipeline()" class="px-7 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base shadow-sm hover:shadow transition flex items-center gap-2">
+                  <button id="btnRunPipeline" onclick="runAnalysisPipeline()" class="px-7 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-base shadow-lg shadow-indigo-600/30 transition flex items-center gap-2">
                     <span>Kiểm tra điểm</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                   </button>
@@ -348,14 +332,14 @@
             <!-- TẦNG 2: KẾT QUẢ DỰ TÍNH (TO RÕ, RỰC RỠ, DỄ NHÌN) -->
             <div class="p-6 lg:p-7 space-y-4">
               <div class="flex items-center justify-between">
-                <h2 class="text-xl font-extrabold text-slate-900">Kết quả dự tính</h2>
-                <span id="resDecisionBadge" class="px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-slate-100 text-slate-600">
+                <h2 class="text-xl font-extrabold text-white">Kết quả dự tính</h2>
+                <span id="resDecisionBadge" class="px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-[#162032] text-slate-300 border border-[#223046]">
                   Chưa kiểm tra
                 </span>
               </div>
 
               <!-- Empty State -->
-              <div id="sp2EmptyState" class="py-10 text-center text-slate-400 text-sm bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+              <div id="sp2EmptyState" class="py-10 text-center text-slate-400 text-sm bg-[#080d18] rounded-2xl border border-dashed border-[#223046]">
                 Dán thông báo hoạt động ở trên rồi bấm <b>"Kiểm tra điểm"</b> để xem kết quả.
               </div>
 
@@ -364,28 +348,28 @@
                 
                 <!-- 3 Big Metric Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div class="p-4 rounded-xl bg-brand-50/80 border border-brand-200">
-                    <span class="text-xs font-bold text-brand-700 uppercase tracking-wider block">Điểm cộng hoạt động</span>
-                    <div id="resAddedPoints" class="text-3xl font-black text-brand-700 mt-1.5">+0 điểm</div>
+                  <div class="p-4 rounded-xl bg-indigo-950/40 border border-indigo-700/50">
+                    <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider block">Điểm cộng hoạt động</span>
+                    <div id="resAddedPoints" class="text-3xl font-black text-indigo-300 mt-1.5">+0 điểm</div>
                     <div id="resAnnouncedVsRule" class="dev-only text-xs font-mono text-brand-800 mt-1">—</div>
                   </div>
 
-                  <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Nhóm tiêu chí</span>
-                    <div id="resCategoryName" class="text-lg font-extrabold text-slate-900 mt-1.5 truncate">—</div>
+                  <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046]">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Nhóm tiêu chí</span>
+                    <div id="resCategoryName" class="text-lg font-extrabold text-white mt-1.5 truncate">—</div>
                     <div id="resRuleCode" class="dev-only text-xs font-mono text-slate-500 mt-0.5">—</div>
                   </div>
 
-                  <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Điểm nhóm này</span>
-                    <div id="resCatBeforeAfter" class="text-2xl font-extrabold text-slate-900 mt-1.5">—</div>
+                  <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046]">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Điểm nhóm này</span>
+                    <div id="resCatBeforeAfter" class="text-2xl font-extrabold text-white mt-1.5">—</div>
                     <div id="resCatMissing" class="dev-only text-xs font-mono text-rose-600 mt-0.5">—</div>
                   </div>
                 </div>
 
                 <!-- Clean, Human-Friendly Explanation Box -->
-                <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                  <p id="resExplanation" class="text-base text-slate-800 leading-relaxed font-medium">—</p>
+                <div class="p-5 rounded-xl bg-[#080d18] border border-[#223046] space-y-2">
+                  <p id="resExplanation" class="text-base text-slate-200 leading-relaxed font-medium">—</p>
                   
                   <!-- Developer-only Citation & Dedup Diagnostics -->
                   <div class="dev-only pt-2.5 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-500">
@@ -395,12 +379,12 @@
                 </div>
 
                 <!-- NÚT LƯU VÀO HỒ SƠ KỲ NÀY -->
-                <div id="saveToProfileBar" class="hidden flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 p-4 rounded-xl bg-emerald-50/90 border border-emerald-200 transition">
-                  <div class="flex items-center gap-2.5 text-emerald-950 text-sm">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                <div id="saveToProfileBar" class="hidden flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 p-4 rounded-xl bg-emerald-950/50 border border-emerald-600/50 transition">
+                  <div class="flex items-center gap-2.5 text-emerald-200 text-sm">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] shrink-0"></span>
                     <span id="saveToProfileText" class="font-medium">Hoạt động hợp lệ. Bạn có muốn lưu kết quả này vào bảng điểm học kỳ không?</span>
                   </div>
-                  <button id="btnSaveToProfile" onclick="saveCurrentEvaluationToProfile()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-xs transition flex items-center justify-center gap-2 shrink-0">
+                  <button id="btnSaveToProfile" onclick="saveCurrentEvaluationToProfile()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     <span>Lưu vào bảng điểm</span>
                   </button>
@@ -413,8 +397,7 @@
             <div class="p-6 lg:p-7 space-y-4">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <h2 class="text-xl font-extrabold text-slate-900">Thông tin sự kiện</h2>
-                  <p class="text-sm text-slate-500 mt-0.5">Thông tin được bóc tách tự động từ bài đăng (bạn có thể chỉnh sửa trực tiếp các ô dưới đây)</p>
+                  <h2 class="text-xl font-extrabold text-white">Thông tin sự kiện</h2>
                 </div>
                 <button onclick="switchTab('inspector')" class="dev-only text-xs font-mono font-bold text-brand-600 hover:underline">
                   [Dev] Xem 14 trường JSON &rarr;
@@ -422,29 +405,29 @@
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 focus-within:bg-white focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-50 transition sm:col-span-2">
+                <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046] focus-within:bg-[#0c1220] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition sm:col-span-2">
                   <label for="sp1TitleInput" class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Tên hoạt động</label>
-                  <input id="sp1TitleInput" oninput="markEventFieldsDirty()" type="text" placeholder="Nhập tên hoạt động..." class="w-full bg-transparent text-base font-bold text-slate-900 mt-1 outline-none" />
+                  <input id="sp1TitleInput" oninput="markEventFieldsDirty()" type="text" placeholder="Nhập tên hoạt động..." class="w-full bg-transparent text-base font-bold text-white mt-1 outline-none" />
                 </div>
 
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 focus-within:bg-white focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-50 transition">
+                <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046] focus-within:bg-[#0c1220] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition">
                   <label for="sp1TimeInput" class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Thời gian</label>
-                  <input id="sp1TimeInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: 14:00 - 16:30 ngày 28/10/2026" class="w-full bg-transparent font-semibold text-slate-800 mt-1 outline-none" />
+                  <input id="sp1TimeInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: 14:00 - 16:30 ngày 28/10/2026" class="w-full bg-transparent font-semibold text-slate-100 mt-1 outline-none" />
                 </div>
 
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 focus-within:bg-white focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-50 transition">
+                <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046] focus-within:bg-[#0c1220] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition">
                   <label for="sp1LocationInput" class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Địa điểm / Hình thức</label>
-                  <input id="sp1LocationInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: Hội trường I, Cơ sở 227 Nguyễn Văn Cừ" class="w-full bg-transparent font-semibold text-slate-800 mt-1 outline-none" />
+                  <input id="sp1LocationInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: Hội trường I, Cơ sở 227 Nguyễn Văn Cừ" class="w-full bg-transparent font-semibold text-slate-100 mt-1 outline-none" />
                 </div>
 
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 focus-within:bg-white focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-50 transition">
+                <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046] focus-within:bg-[#0c1220] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition">
                   <label for="sp1PointsInput" class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Điểm rèn luyện công bố</label>
-                  <input id="sp1PointsInput" oninput="markEventFieldsDirty()" type="number" min="0" max="100" placeholder="VD: 5" class="w-full bg-transparent font-bold text-brand-700 text-base mt-1 outline-none" />
+                  <input id="sp1PointsInput" oninput="markEventFieldsDirty()" type="number" min="0" max="100" placeholder="VD: 5" class="w-full bg-transparent font-bold text-indigo-400 text-base mt-1 outline-none" />
                 </div>
 
-                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 focus-within:bg-white focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-50 transition">
+                <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046] focus-within:bg-[#0c1220] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition">
                   <label for="sp1ReqInput" class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Điều kiện ghi nhận điểm</label>
-                  <input id="sp1ReqInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: Điểm danh cuối buổi" class="w-full bg-transparent font-semibold text-slate-800 mt-1 outline-none" />
+                  <input id="sp1ReqInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: Điểm danh cuối buổi" class="w-full bg-transparent font-semibold text-slate-100 mt-1 outline-none" />
                 </div>
 
                 <div class="dev-only p-4 rounded-xl bg-slate-50 border border-slate-200 sm:col-span-2">
@@ -457,18 +440,17 @@
           </div>
 
           <!-- CỘT PHẢI (5/12): BIỂU ĐỒ TRÒN & 5 THANH TIẾN ĐỘ RỘNG RÃI, ĐẸP MẮT -->
-          <div class="xl:col-span-5 bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-5 sm:p-6 lg:p-7 space-y-6 sticky top-6">
+          <div class="xl:col-span-5 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 sm:p-6 lg:p-7 space-y-6 sticky top-6">
             
-            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#1b2537] pb-4">
               <div>
-                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">Điểm rèn luyện của bạn</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Tiến độ 5 nhóm tiêu chí theo quy chế trường</p>
+                <h2 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Điểm rèn luyện của bạn</h2>
               </div>
               <div class="flex items-center gap-2">
                 <button id="btnResetScoreBaseline" onclick="resetScoreBaselineToDefault()" class="hidden px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition" title="Khôi phục về điểm gốc (69đ)">
                   Khôi phục gốc (69đ)
                 </button>
-                <span id="overallGradeBadge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-brand-50 text-brand-700 border border-brand-200/80 shadow-2xs">
+                <span id="overallGradeBadge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40 shadow-xs">
                   Xếp loại: Khá
                 </span>
               </div>
@@ -478,14 +460,14 @@
             <div class="flex flex-col sm:flex-row items-center justify-center gap-6 py-2">
               <div class="relative w-44 h-44 sm:w-48 sm:h-48 flex items-center justify-center shrink-0">
                 <svg id="drlDonutSvg" viewBox="0 0 42 42" class="w-44 h-44 sm:w-48 sm:h-48 -rotate-90">
-                  <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#f1f5f9" stroke-width="4.2"></circle>
+                  <circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="#162032" stroke-width="4.2"></circle>
                   <g id="drlDonutSegments"></g>
                 </svg>
                 <!-- Clean center score badge -->
                 <div class="absolute inset-5 rounded-full flex flex-col items-center justify-center text-center pointer-events-none">
                   <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tổng điểm</span>
                   <div class="flex items-baseline justify-center mt-0.5">
-                    <span id="totalConfirmedScoreText" class="text-4xl font-black text-slate-900 leading-none tracking-tight">69</span>
+                    <span id="totalConfirmedScoreText" class="text-4xl font-black text-white leading-none tracking-tight">69</span>
                     <span class="text-sm font-bold text-slate-400 ml-1">/100</span>
                   </div>
                 </div>
@@ -493,33 +475,36 @@
 
               <!-- Side Summary Card -->
               <div class="space-y-3 text-sm w-full sm:w-auto flex-1">
-                <div class="p-3.5 sm:p-4 rounded-xl bg-slate-50/80 border border-slate-200/70 space-y-1">
-                  <span class="text-xs font-semibold text-slate-400 block">Trạng thái điểm học kỳ</span>
-                  <span id="totalProjectedSubtext" class="text-sm sm:text-base font-extrabold text-brand-700 block leading-tight">Hiện có: 69 / 100 điểm</span>
-                  <span id="devTotalMissingText" class="dev-only text-xs font-mono text-rose-600 block mt-1">[Dev] Còn thiếu: 31đ</span>
+                <div class="p-3.5 sm:p-4 rounded-xl bg-[#080d18] border border-[#223046] space-y-1.5">
+                  <span id="totalProjectedSubtext" class="text-sm sm:text-base font-extrabold text-indigo-300 block leading-tight">Hiện có: 69 / 100 điểm</span>
+                  <span id="devTotalMissingText" class="dev-only text-xs font-mono text-rose-400 block mt-1">[Dev] Còn thiếu: 31đ</span>
+                  <button type="button" onclick="switchTab('plan')" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1.5 pt-1.5 transition">
+                    <span>🎯 Đặt mục tiêu &amp; Lập kế hoạch SP3</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                  </button>
                 </div>
-                <div class="space-y-2 text-xs text-slate-600 px-1">
+                <div class="space-y-2 text-xs text-slate-400 px-1">
                   <div class="flex items-center gap-2.5">
-                    <span class="w-3 h-3 rounded-sm bg-brand-600 inline-block shadow-2xs"></span>
-                    <span class="font-medium text-slate-700">Điểm đã lưu chính thức</span>
+                    <span class="w-3 h-3 rounded-sm bg-blue-500 inline-block shadow-xs"></span>
+                    <span class="font-medium text-slate-300">Điểm đã lưu chính thức</span>
                   </div>
                   <div class="flex items-center gap-2.5">
-                    <span class="w-3 h-3 rounded-sm bg-sky-300 inline-block shadow-2xs"></span>
-                    <span class="font-medium text-slate-700">Điểm dự kiến cộng thêm</span>
+                    <span class="w-3 h-3 rounded-sm bg-sky-400 inline-block shadow-xs"></span>
+                    <span class="font-medium text-slate-300">Điểm dự kiến cộng thêm</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- 5 CATEGORY BARS (TĂNG ĐỘ CAO & KHÔNG GIAN, KHÔNG CÓ DÒNG THIẾU ĐIỂM) -->
-            <div class="space-y-4 pt-4 border-t border-slate-100">
+            <div class="space-y-4 pt-4 border-t border-[#1b2537]">
               <div id="categoryBarsContainer" class="space-y-3">
                 <!-- Populated by JS -->
               </div>
             </div>
 
             <!-- DANH SÁCH HOẠT ĐỘNG ĐÃ LƯU TRONG KỲ -->
-            <div id="savedActivitiesSection" class="hidden pt-4 border-t border-slate-100 space-y-2.5">
+            <div id="savedActivitiesSection" class="hidden pt-4 border-t border-[#1b2537] space-y-2.5">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Hoạt động đã lưu vào bảng điểm</span>
                 <span id="savedActivitiesCountBadge" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">0 hoạt động</span>
@@ -536,24 +521,23 @@
         <!-- ================================================================== -->
         <div id="viewActivities" class="hidden space-y-6">
           
-          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div class="flex items-center gap-3">
-                <h2 class="text-xl font-extrabold text-slate-900">Kho Hoạt Động &amp; Hàng Đợi Rà Soát</h2>
-                <span id="validCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <h2 class="text-xl font-extrabold text-white">Kho Hoạt Động &amp; Hàng Đợi Rà Soát</h2>
+                <span id="validCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">
                   20 hoạt động
                 </span>
-                <span id="reviewCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                <span id="reviewCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
                   0 bài chờ duyệt
                 </span>
               </div>
-              <p class="text-sm text-slate-500 mt-1">Dữ liệu được lưu trữ tự động trong thư mục cục bộ <code class="px-1.5 py-0.5 rounded bg-slate-100 font-mono text-slate-700 font-semibold">data/sessions/current_session.json</code></p>
             </div>
             <div class="flex items-center gap-2">
-              <button onclick="loadActivitiesFromApi()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1.5">
+              <button onclick="loadActivitiesFromApi()" class="px-4 py-2 rounded-xl bg-[#162032] hover:bg-[#1f2d46] text-slate-200 border border-[#223046] text-xs font-bold transition flex items-center gap-1.5">
                 <span>↻ Đồng bộ</span>
               </button>
-              <button onclick="copySessionJsonPath()" class="px-4 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-bold transition flex items-center gap-1.5">
+              <button onclick="copySessionJsonPath()" class="px-4 py-2 rounded-xl bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-1.5">
                 <span>📁 Copy đường dẫn file lưu tạm</span>
               </button>
             </div>
@@ -562,11 +546,10 @@
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             <!-- CỘT 1 (7/12): DANH SÁCH HOẠT ĐỘNG ĐÃ CÔNG NHẬN -->
-            <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
-              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="lg:col-span-7 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
                 <div>
-                  <h3 class="text-base font-extrabold text-slate-900">Hoạt động đã công nhận</h3>
-                  <p class="text-xs text-slate-500">20 hoạt động gốc từ trường + các hoạt động vừa duyệt thành công</p>
+                  <h3 class="text-base font-extrabold text-white">Hoạt động đã công nhận</h3>
                 </div>
                 <span class="text-xs font-semibold text-slate-400">activities.json</span>
               </div>
@@ -581,8 +564,7 @@
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div>
                     <h3 class="text-base font-extrabold text-slate-900">Hàng đợi chờ duyệt (Review Queue)</h3>
-                    <p class="text-xs text-slate-500">Các bài đăng cần bổ sung minh chứng hoặc điều kiện</p>
-                  </div>
+                                      </div>
                   <span id="reviewQueueTabBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
                     Chờ duyệt
                   </span>
@@ -601,7 +583,7 @@
                 <p class="text-xs text-slate-600 leading-relaxed">
                   Mỗi khi bạn chạy kiểm tra hoạt động hoặc nạp ca mới, hệ thống tự động ghi nhật ký phiên vào thư mục cục bộ:
                 </p>
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 font-mono text-xs text-slate-800 break-all select-all">
+                <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046] font-mono text-xs text-slate-800 break-all select-all">
                   academic-campus-decision-assistant/data/sessions/current_session.json
                 </div>
                 <div class="text-[11px] text-slate-400">
@@ -627,8 +609,7 @@
         <div id="viewSnapshot" class="hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
             <h2 class="text-xl font-extrabold text-slate-900">Ước tính điểm từ kết quả học tập</h2>
-            <p class="text-sm text-slate-500 mt-0.5">Nhập điểm trung bình học kỳ (GPA) và các tiêu chí học vụ để xem điểm cộng tương ứng</p>
-          </div>
+                      </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
@@ -677,14 +658,13 @@
           <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 class="text-xl font-extrabold text-slate-900">[Developer] Kiểm thử tự động 5 Ca E2E</h2>
-              <p class="text-sm text-slate-500 mt-0.5">Kiểm chứng đường ống SP1 &rarr; 14-Field Contract &rarr; MinHash Dedup &rarr; SP2 Engine</p>
-            </div>
+                          </div>
             <button onclick="runBatchAllTests()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition">
               ▶ Chạy tự động cả 5 ca
             </button>
           </div>
 
-          <div id="batchResultsBox" class="hidden bg-white rounded-2xl p-6 border-2 border-emerald-500/40 space-y-3">
+          <div id="batchResultsBox" class="hidden bg-[#0e1524] rounded-2xl p-6 border-2 border-emerald-500/40 space-y-3">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
               <span class="text-base font-extrabold text-slate-900">Kết quả Assertions</span>
               <span id="batchSummaryBadge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">5/5 PASS</span>
@@ -699,42 +679,41 @@
         <!-- WORKSPACE 5 (DEV ONLY): HỢP ĐỒNG 14 TRƯỜNG (INSPECTOR)             -->
         <!-- ================================================================== -->
         <div id="viewInspector" class="hidden space-y-6">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-5">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-5">
+            <div class="flex items-center justify-between border-b border-[#1b2537] pb-4">
               <div>
-                <h2 class="text-xl font-extrabold text-slate-900">[Developer] Hợp đồng Dữ liệu 14 Trường (SP1 &rarr; SP2)</h2>
-                <p class="text-sm text-slate-500 mt-0.5">Schema chuẩn: <code class="text-slate-700">schemas/activity.schema.json</code></p>
+                <h2 class="text-xl font-extrabold text-white">[Developer] Hợp đồng Dữ liệu 14 Trường (SP1 &rarr; SP2)</h2>
               </div>
-              <button onclick="copyRawJson()" class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700">
+              <button onclick="copyRawJson()" class="px-4 py-2 rounded-xl border border-[#223046] hover:bg-[#162032] text-xs font-bold text-slate-200">
                 Sao chép JSON
               </button>
             </div>
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046]">
                 <span class="text-xs text-slate-500 font-bold block">meta.status</span>
                 <span id="inspMetaStatus" class="font-mono font-bold text-emerald-700">—</span>
               </div>
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046]">
                 <span class="text-xs text-slate-500 font-bold block">publication_status</span>
                 <span id="inspPubStatus" class="font-mono font-bold text-amber-700">REVIEW_REQUIRED</span>
               </div>
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046]">
                 <span class="text-xs text-slate-500 font-bold block">routed_to</span>
                 <span id="inspMetaRouted" class="font-mono font-bold text-slate-800">—</span>
               </div>
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046]">
                 <span class="text-xs text-slate-500 font-bold block">MinHash Dedup</span>
                 <span id="inspMetaDedup" class="font-mono font-bold text-slate-800">—</span>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046]">
                 <span class="text-slate-400 font-sans font-bold block mb-1">meta.flags</span>
                 <div id="inspMetaFlags">[]</div>
               </div>
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046]">
                 <span class="text-slate-400 font-sans font-bold block mb-1">meta.derived</span>
                 <div id="inspMetaDerived">{}</div>
               </div>
@@ -756,6 +735,184 @@
           </div>
         </div>
 
+        <!-- ================================================================== -->
+        <!-- WORKSPACE 6: KẾ HOẠCH RÈN LUYỆN SP3 (PLANNER & ĐẶT MỤC TIÊU)       -->
+        <!-- ================================================================== -->
+        <div id="viewPlan" class="hidden space-y-6">
+          
+          <!-- Header Banner -->
+          <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-3">
+                <h2 class="text-xl font-extrabold text-white tracking-tight">Kế hoạch Rèn luyện Cá nhân (SP3)</h2>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
+                  Lộ trình tối ưu
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
+                  DEMO_ONLY
+                </span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-xs text-slate-400 font-medium">Học kỳ 1 / 2026-2027</span>
+            </div>
+          </div>
+
+          <!-- Main Layout: 2 Columns -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Column: Input Target & Scenario (4/12) -->
+            <div class="lg:col-span-4 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-5">
+              <div>
+                <h3 class="text-base font-extrabold text-white">1. Thiết lập Mục tiêu</h3>
+              </div>
+
+              <!-- Preset Rank Buttons -->
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Mức xếp loại chuẩn</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button type="button" onclick="setPlannerPreset(90)" id="presetBtn90" class="px-2.5 py-2.5 rounded-xl border border-[#223046] bg-[#080d18] text-xs font-bold text-slate-200 hover:border-indigo-500 hover:bg-indigo-950/40 transition text-center">
+                    <div>Xuất sắc (≥90)</div>
+                  </button>
+                  <button type="button" onclick="setPlannerPreset(80)" id="presetBtn80" class="px-2.5 py-2.5 rounded-xl border-2 border-indigo-500 bg-indigo-950/60 text-xs font-bold text-indigo-300 transition text-center shadow-[0_0_12px_rgba(99,102,241,0.25)]">
+                    <div>Tốt (≥80)</div>
+                  </button>
+                  <button type="button" onclick="setPlannerPreset(65)" id="presetBtn65" class="px-2.5 py-2.5 rounded-xl border border-[#223046] bg-[#080d18] text-xs font-bold text-slate-200 hover:border-indigo-500 hover:bg-indigo-950/40 transition text-center">
+                    <div>Khá (≥65)</div>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Custom Target Number Input -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="inputPlanTarget" class="text-xs font-bold uppercase tracking-wider text-slate-400">Điểm mục tiêu cụ thể</label>
+                  <span id="targetEchoBadge" class="text-xs font-extrabold text-indigo-400 font-mono">80 / 100đ</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <input id="inputPlanTarget" type="number" min="0" max="100" value="80" oninput="onPlannerTargetInput(this.value)" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-base font-extrabold text-white focus:bg-[#0c1220] focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
+                </div>
+              </div>
+
+              <!-- Scenario Selection -->
+              <div>
+                <label for="selectPlanScenario" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Kịch bản lập lịch (Scenario)</label>
+                <select id="selectPlanScenario" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-sm font-semibold text-slate-200 focus:bg-[#0c1220] focus:border-indigo-500 outline-none transition">
+                  <option value="first_plan">first_plan — Lập lộ trình mới tối ưu</option>
+                  <option value="replan">replan — Tái lập lịch khi có thay đổi</option>
+                  <option value="what_if_skip">what_if_skip — Giả định bỏ bớt hoạt động</option>
+                </select>
+              </div>
+
+              <!-- Action Button -->
+              <button id="btnRunPlanner" onclick="runSp3Planner()" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <span id="btnRunPlannerText">Lập kế hoạch đề xuất (SP3)</span>
+              </button>
+            </div>
+
+            <!-- Right Column: Planner Results (8/12) -->
+            <div class="lg:col-span-8 space-y-6">
+              
+              <!-- Empty State before running -->
+              <div id="plannerEmptyState" class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-12 text-center space-y-4">
+                <div class="w-16 h-16 rounded-2xl bg-indigo-950/60 text-indigo-400 border border-indigo-500/40 flex items-center justify-center mx-auto text-2xl font-black">
+                  🎯
+                </div>
+                <div class="max-w-md mx-auto">
+                  <h4 class="text-base font-extrabold text-white">Chưa có kế hoạch nào được tạo</h4>
+                </div>
+              </div>
+
+              <!-- Loading State -->
+              <div id="plannerLoadingState" class="hidden bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-12 text-center space-y-3">
+                <div class="inline-block w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-sm font-bold text-white">Đang chạy thuật toán tối ưu SP3...</p>
+                              </div>
+
+              <!-- Active Results Container -->
+              <div id="plannerActiveResult" class="hidden space-y-6">
+                <!-- Summary Metrics Card -->
+                <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-5">
+                  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#1b2537] pb-4">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span id="planStatusBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">
+                          TARGET_MET
+                        </span>
+                        <span id="planFeasibilityBadge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#162032] text-slate-300 border border-[#223046]">
+                          Khả thi: REACHABLE
+                        </span>
+                      </div>
+                      <h3 class="text-lg font-black text-white mt-2 tracking-tight">Tổng quan Lộ trình Điểm Rèn Luyện</h3>
+                    </div>
+                    <div class="text-right">
+                      <span class="text-xs text-slate-400 block">Dự kiến đạt</span>
+                      <div class="text-2xl font-black text-indigo-400 mt-0.5 tracking-tight" id="planScoreOverview">
+                        60 → 80 / 100đ
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 3 Metric Boxes -->
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="p-3.5 rounded-xl bg-[#080d18] border border-[#223046]">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Điểm nền hiện tại</span>
+                      <span id="planBaselineScoreText" class="text-xl font-black text-slate-200 mt-0.5 block">60đ</span>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-600/50">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-300 block">Điểm cộng dự kiến</span>
+                      <span id="planGainScoreText" class="text-xl font-black text-emerald-300 mt-0.5 block">+20đ</span>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-700/50">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-300 block">Mục tiêu đặt ra</span>
+                      <span id="planTargetScoreText" class="text-xl font-black text-indigo-300 mt-0.5 block">80đ</span>
+                    </div>
+                  </div>
+
+                  <!-- Category Gain Breakdown -->
+                  <div class="pt-2">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400 block mb-2.5">Chi tiết đóng góp theo nhóm tiêu chí</span>
+                    <div id="planCategoryBreakdown" class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs"></div>
+                  </div>
+                </div>
+
+                <!-- Selected Activities List -->
+                <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
+                  <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
+                    <div>
+                      <h4 class="text-base font-extrabold text-white">Hoạt động được đề xuất tham gia</h4>
+                    </div>
+                    <span id="planSelectedCountBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">
+                      0 hoạt động
+                    </span>
+                  </div>
+                  <div id="planSelectedActivitiesList" class="space-y-3"></div>
+                </div>
+
+                <!-- Excluded Candidates & Warnings Accordion -->
+                <details class="group bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5">
+                  <summary class="cursor-pointer list-none flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-white">
+                    <span class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                      <span>Hoạt động bị loại trừ &amp; Cảnh báo thuật toán</span>
+                    </span>
+                    <span class="group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <div class="pt-4 mt-3 border-t border-[#1b2537] space-y-3 text-xs">
+                    <div id="planWarningsContainer" class="space-y-1.5"></div>
+                    <div id="planExcludedContainer" class="space-y-1.5"></div>
+                  </div>
+                </details>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
     </main>
 
@@ -764,36 +921,36 @@
   <!-- ======================================================================== -->
   <!-- MODAL: ĐỔI TÀI KHOẢN SINH VIÊN                                           -->
   <!-- ======================================================================== -->
-  <div id="loginModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-5">
+  <div id="loginModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#0e1524] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#1b2537] space-y-5">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 class="text-lg font-extrabold text-slate-900">Đổi tài khoản sinh viên</h3>
+        <h3 class="text-lg font-extrabold text-white">Đổi tài khoản sinh viên</h3>
         <button onclick="closeLoginModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">✕</button>
       </div>
 
       <div class="grid grid-cols-2 gap-2.5">
-        <button onclick="loginQuickStudent('25127242')" class="p-3 rounded-xl border border-slate-200 hover:border-brand-400 hover:bg-brand-50/40 text-left transition">
-          <div class="font-bold text-sm text-slate-900">Lưu Minh Tiến</div>
+        <button onclick="loginQuickStudent('25127242')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
+          <div class="font-bold text-sm text-white">Lưu Minh Tiến</div>
           <div class="text-xs text-slate-500 mt-0.5">25127242 • 25C09</div>
         </button>
-        <button onclick="loginQuickStudent('25127257')" class="p-3 rounded-xl border border-slate-200 hover:border-brand-400 hover:bg-brand-50/40 text-left transition">
-          <div class="font-bold text-sm text-slate-900">Nguyễn Thị Ngọc Tuyền</div>
+        <button onclick="loginQuickStudent('25127257')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
+          <div class="font-bold text-sm text-white">Nguyễn Thị Ngọc Tuyền</div>
           <div class="text-xs text-slate-500 mt-0.5">25127257 • 25C09</div>
         </button>
-        <button onclick="loginQuickStudent('25127214')" class="p-3 rounded-xl border border-slate-200 hover:border-brand-400 hover:bg-brand-50/40 text-left transition">
-          <div class="font-bold text-sm text-slate-900">Lâm Như Ngọc</div>
+        <button onclick="loginQuickStudent('25127214')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
+          <div class="font-bold text-sm text-white">Lâm Như Ngọc</div>
           <div class="text-xs text-slate-500 mt-0.5">25127214 • 25C09</div>
         </button>
-        <button onclick="loginQuickStudent('25127316')" class="p-3 rounded-xl border border-slate-200 hover:border-brand-400 hover:bg-brand-50/40 text-left transition">
-          <div class="font-bold text-sm text-slate-900">Bùi Thảo Duyên</div>
+        <button onclick="loginQuickStudent('25127316')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
+          <div class="font-bold text-sm text-white">Bùi Thảo Duyên</div>
           <div class="text-xs text-slate-500 mt-0.5">25127316 • 25C09</div>
         </button>
-        <button onclick="loginQuickStudent('25127244')" class="p-3 rounded-xl border border-slate-200 hover:border-brand-400 hover:bg-brand-50/40 text-left transition">
-          <div class="font-bold text-sm text-slate-900">Nguyễn Minh Trí</div>
+        <button onclick="loginQuickStudent('25127244')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
+          <div class="font-bold text-sm text-white">Nguyễn Minh Trí</div>
           <div class="text-xs text-slate-500 mt-0.5">25127244 • 25C09</div>
         </button>
-        <button onclick="loginQuickStudent('25127009')" class="p-3 rounded-xl border border-slate-200 hover:border-brand-400 hover:bg-brand-50/40 text-left transition">
-          <div class="font-bold text-sm text-slate-900">Huỳnh Phương Bình An</div>
+        <button onclick="loginQuickStudent('25127009')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
+          <div class="font-bold text-sm text-white">Huỳnh Phương Bình An</div>
           <div class="text-xs text-slate-500 mt-0.5">25127009 • 25C09</div>
         </button>
       </div>
@@ -1027,12 +1184,12 @@
 
       if (mode === "dev") {
         document.body.classList.add("dev-mode");
-        btnDev.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-xs transition";
-        btnUser.className = "px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition";
+        btnDev.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs transition";
+        btnUser.className = "px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition";
       } else {
         document.body.classList.remove("dev-mode");
-        btnUser.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs transition";
-        btnDev.className = "px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition";
+        btnUser.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs transition";
+        btnDev.className = "px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition";
         const activeView = ["testSuites", "inspector"].find(
           t => !document.getElementById("view" + capitalize(t)).classList.contains("hidden")
         );
@@ -1171,11 +1328,11 @@
         let deltaTag = "";
         if (isHighlighted && lastDelta > 0) {
           if (isPreview) {
-            deltaTag = `<span class="ml-2 px-2 py-0.5 rounded-md text-xs font-bold bg-amber-100 text-amber-800">+${lastDelta}đ chờ lưu</span>`;
+            deltaTag = `<span class="ml-2 px-2 py-0.5 rounded-md text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">+${lastDelta}đ chờ lưu</span>`;
           } else if (lastDecision === "PROJECTED") {
-            deltaTag = `<span class="ml-2 px-2 py-0.5 rounded-md text-xs font-bold bg-sky-100 text-sky-800">+${lastDelta}đ dự kiến</span>`;
+            deltaTag = `<span class="ml-2 px-2 py-0.5 rounded-md text-xs font-bold bg-sky-950/60 text-sky-300 border border-sky-500/40">+${lastDelta}đ dự kiến</span>`;
           } else {
-            deltaTag = `<span class="ml-2 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-100 text-emerald-800">+${lastDelta}đ đã lưu</span>`;
+            deltaTag = `<span class="ml-2 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">+${lastDelta}đ đã lưu</span>`;
           }
         }
 
@@ -1190,27 +1347,27 @@
 
         const isMaxCapped = cur >= max;
         const capBadge = isMaxCapped && proj === 0
-          ? `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">Đạt trần</span>`
+          ? `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">Đạt trần</span>`
           : "";
 
         return `
-          <div class="p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 ${isHighlighted ? 'bg-brand-50/50 border-brand-300 ring-2 ring-brand-100 shadow-sm' : 'bg-slate-50/70 hover:bg-slate-50 border-slate-200/80'}">
+          <div class="p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 ${isHighlighted ? 'bg-indigo-950/50 border-indigo-500/60 ring-2 ring-indigo-500/20 shadow-md' : 'bg-[#080d18] hover:bg-[#0c1220] border-[#1b2537]'}">
             <div class="flex items-center justify-between text-sm mb-2 gap-2">
-              <div class="font-bold text-slate-800 flex items-center min-w-0">
+              <div class="font-bold text-slate-100 flex items-center min-w-0">
                 <span class="w-2.5 h-2.5 rounded-full mr-2.5 shrink-0" style="background-color: ${FIELD_COLORS[cid]}"></span>
-                <span class="text-xs font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-white border border-slate-200 mr-2 text-slate-600 shrink-0">${cid}</span>
-                <span class="text-[13px] sm:text-sm truncate text-slate-800 font-bold">${escapeHTML(info.name)}</span>
+                <span class="text-xs font-mono font-extrabold px-1.5 py-0.5 rounded-md bg-[#162032] border border-[#223046] mr-2 text-slate-300 shrink-0">${cid}</span>
+                <span class="text-[13px] sm:text-sm truncate text-slate-200 font-bold">${escapeHTML(info.name)}</span>
                 ${capBadge}
                 ${deltaTag}
               </div>
-              <div class="font-black text-slate-900 text-sm sm:text-base shrink-0 tracking-tight">
-                ${cur}${proj > 0 ? `<span class="text-sky-600 font-extrabold">+${proj}</span>` : ''} <span class="text-xs font-medium text-slate-400">/ ${max}đ</span>
+              <div class="font-black text-white text-sm sm:text-base shrink-0 tracking-tight">
+                ${cur}${proj > 0 ? `<span class="text-sky-400 font-extrabold">+${proj}</span>` : ''} <span class="text-xs font-medium text-slate-400">/ ${max}đ</span>
               </div>
             </div>
 
-            <div class="w-full h-2.5 bg-slate-200/80 rounded-full overflow-hidden flex">
+            <div class="w-full h-2.5 bg-[#162032] rounded-full overflow-hidden flex">
               <div class="bar-transition h-full" style="width: ${curPct}%; background-color: ${FIELD_COLORS[cid]}"></div>
-              <div class="bar-transition h-full bg-sky-300" style="width: ${projPct}%"></div>
+              <div class="bar-transition h-full bg-sky-400 animate-pulse" style="width: ${projPct}%"></div>
             </div>
             ${subLineHtml}
           </div>
@@ -1617,17 +1774,17 @@
     // TAB SWITCHER
     // ========================================================================
     function switchTab(tab) {
-      const tabs = ['dashboard', 'activities', 'snapshot', 'testSuites', 'inspector'];
+      const tabs = ['dashboard', 'activities', 'snapshot', 'plan', 'testSuites', 'inspector'];
       tabs.forEach(t => {
         const view = document.getElementById('view' + capitalize(t));
         const btn = document.getElementById('tabBtn' + capitalize(t));
         const devClass = (t === 'testSuites' || t === 'inspector') ? 'dev-only ' : '';
         if (t === tab) {
           view.classList.remove('hidden');
-          btn.className = devClass + "nav-btn-active w-full px-4 py-3 rounded-xl border text-left transition flex items-start gap-3.5";
+          btn.className = devClass + "nav-btn-active w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between";
         } else {
           view.classList.add('hidden');
-          btn.className = devClass + "nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-start gap-3.5";
+          btn.className = devClass + "nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between";
         }
       });
       // Auto-close mobile drawer when tab selected
@@ -1640,10 +1797,244 @@
       if (tab === 'snapshot') {
         runSnapshotEvaluation();
       }
+      if (tab === 'plan' && !currentPlannerData) {
+        // Auto-run first plan with default 80 on first view for seamless experience
+        runSp3Planner();
+      }
     }
 
     function capitalize(s) {
       return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    // ========================================================================
+    // SP3 PLANNER MODULE
+    // ========================================================================
+    let currentPlannerData = null;
+
+    function setPlannerPreset(score) {
+      const input = document.getElementById('inputPlanTarget');
+      if (input) input.value = score;
+      onPlannerTargetInput(score);
+
+      const presets = [90, 80, 65];
+      presets.forEach(p => {
+        const btn = document.getElementById(`presetBtn${p}`);
+        if (!btn) return;
+        if (p === score) {
+          btn.className = "px-2.5 py-2 rounded-xl border-2 border-brand-500 bg-brand-50/70 text-xs font-bold text-brand-700 transition text-center";
+          if (btn.children[1]) btn.children[1].className = "text-[10px] text-brand-600 font-normal";
+        } else {
+          btn.className = "px-2.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:border-brand-500 hover:bg-brand-50 transition text-center";
+          if (btn.children[1]) btn.children[1].className = "text-[10px] text-slate-400 font-normal";
+        }
+      });
+    }
+
+    function onPlannerTargetInput(val) {
+      let num = parseInt(val, 10);
+      if (isNaN(num)) num = 0;
+      num = Math.max(0, Math.min(100, num));
+      const badge = document.getElementById('targetEchoBadge');
+      if (badge) badge.innerText = `${num} / 100đ`;
+    }
+
+    async function runSp3Planner() {
+      const targetInput = document.getElementById('inputPlanTarget');
+      const scenarioSelect = document.getElementById('selectPlanScenario');
+      const emptyState = document.getElementById('plannerEmptyState');
+      const loadingState = document.getElementById('plannerLoadingState');
+      const activeResult = document.getElementById('plannerActiveResult');
+      const btn = document.getElementById('btnRunPlanner');
+      const btnText = document.getElementById('btnRunPlannerText');
+
+      const targetTotal = parseInt(targetInput ? targetInput.value : "80", 10) || 80;
+      const scenario = scenarioSelect ? scenarioSelect.value : "first_plan";
+
+      // Show loading
+      if (emptyState) emptyState.classList.add('hidden');
+      if (activeResult) activeResult.classList.add('hidden');
+      if (loadingState) loadingState.classList.remove('hidden');
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.innerText = "Đang tối ưu lộ trình...";
+
+      try {
+        const res = await fetch(`${API_BASE}/api/sp3/demo/plan`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scenario, total_target: targetTotal })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `Máy chủ phản hồi mã lỗi ${res.status}`);
+        }
+
+        const data = await res.json();
+        currentPlannerData = data;
+        renderSp3PlanResult(data);
+      } catch (err) {
+        console.error("SP3 Planner error:", err);
+        if (loadingState) loadingState.classList.add('hidden');
+        if (emptyState) {
+          emptyState.classList.remove('hidden');
+          emptyState.innerHTML = `
+            <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto text-xl">⚠️</div>
+            <h4 class="text-base font-extrabold text-slate-900 mt-2">Không thể lập kế hoạch</h4>
+            <p class="text-xs text-rose-600 mt-1">${escapeHTML(err.message)}</p>
+            <button onclick="runSp3Planner()" class="mt-3 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition">Thử lại</button>
+          `;
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.innerText = "Lập kế hoạch đề xuất (SP3)";
+      }
+    }
+
+    function renderSp3PlanResult(data) {
+      const loadingState = document.getElementById('plannerLoadingState');
+      const activeResult = document.getElementById('plannerActiveResult');
+      if (loadingState) loadingState.classList.add('hidden');
+      if (activeResult) activeResult.classList.remove('hidden');
+
+      const plan = data.plan || {};
+      const summary = plan.score_summary || {};
+      const statusBadge = document.getElementById('planStatusBadge');
+      const feasibilityBadge = document.getElementById('planFeasibilityBadge');
+      const overviewText = document.getElementById('planScoreOverview');
+      const baselineText = document.getElementById('planBaselineScoreText');
+      const gainText = document.getElementById('planGainScoreText');
+      const targetText = document.getElementById('planTargetScoreText');
+
+      if (statusBadge) {
+        const met = plan.status === 'TARGET_MET';
+        statusBadge.innerText = plan.status || 'PROCESSED';
+        statusBadge.className = met
+          ? 'px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200'
+          : 'px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-200';
+      }
+
+      if (feasibilityBadge) {
+        feasibilityBadge.innerText = `Khả thi: ${plan.feasibility_conclusion || 'COMPUTED'}`;
+      }
+
+      const baseTotal = summary.baseline_total ?? 0;
+      const projTotal = summary.projected_total ?? 0;
+      const gainTotal = summary.gain_total ?? (projTotal - baseTotal);
+      const reqTarget = data.requested_total_target ?? 80;
+
+      if (overviewText) overviewText.innerText = `${baseTotal} → ${projTotal} / 100đ`;
+      if (baselineText) baselineText.innerText = `${baseTotal}đ`;
+      if (gainText) gainText.innerText = `+${gainTotal}đ`;
+      if (targetText) targetText.innerText = `${reqTarget}đ`;
+
+      // Category breakdown (C1..C5)
+      const catContainer = document.getElementById('planCategoryBreakdown');
+      if (catContainer) {
+        const baseByCat = summary.baseline_by_category || {};
+        const projByCat = summary.projected_by_category || {};
+        const gainByCat = summary.gain_by_category || {};
+        const cats = ['C1', 'C2', 'C3', 'C4', 'C5'];
+        catContainer.innerHTML = cats.map(cid => {
+          const b = baseByCat[cid] ?? 0;
+          const p = projByCat[cid] ?? b;
+          const g = gainByCat[cid] ?? (p - b);
+          const hasGain = g > 0;
+          return `
+            <div class="p-2.5 rounded-xl border ${hasGain ? 'bg-emerald-950/40 border-emerald-600/50 text-emerald-200' : 'bg-[#080d18] border-[#223046] text-slate-300'}">
+              <div class="flex items-center justify-between font-bold">
+                <span>${cid}</span>
+                ${hasGain ? `<span class="text-emerald-400 font-extrabold">+${g}đ</span>` : `<span class="text-slate-500">0đ</span>`}
+              </div>
+              <div class="text-[11px] text-slate-400 mt-1">${b} → <b class="text-white">${p}đ</b></div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Selected activities list
+      const actList = document.getElementById('planSelectedActivitiesList');
+      const countBadge = document.getElementById('planSelectedCountBadge');
+      const acts = plan.selected_activities || [];
+      if (countBadge) countBadge.innerText = `${acts.length} hoạt động`;
+
+      if (actList) {
+        if (acts.length === 0) {
+          actList.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs">Không có hoạt động nào cần thêm để đạt mục tiêu này.</div>`;
+        } else {
+          actList.innerHTML = acts.map((item, idx) => {
+            const blocks = item.scheduled_blocks || [];
+            const timeStr = blocks.length > 0
+              ? `${formatPlanDate(blocks[0].start)} — ${formatPlanDate(blocks[0].end)}`
+              : 'Thời gian linh hoạt';
+            const reasons = item.reasons || [];
+            const reasonBadges = reasons.map(r => `
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
+                +${r.projected_added ?? 0}đ vào ${escapeHTML(r.category_id || '')}
+              </span>
+            `).join('');
+
+            return `
+              <div class="p-4 rounded-xl border border-[#223046] bg-[#080d18] hover:bg-[#0c1220] transition space-y-2">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-start gap-2.5">
+                    <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                      ${idx + 1}
+                    </span>
+                    <div>
+                      <h5 class="text-sm font-extrabold text-white leading-snug">${escapeHTML(item.title || item.activity_id)}</h5>
+                      <span class="text-xs font-mono text-slate-400 block mt-0.5">Mã: ${escapeHTML(item.activity_id)}</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    ${reasonBadges}
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-400 pl-8.5">
+                  <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>${escapeHTML(timeStr)}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      // Warnings & Excluded candidates
+      const warnContainer = document.getElementById('planWarningsContainer');
+      const exclContainer = document.getElementById('planExcludedContainer');
+
+      if (warnContainer) {
+        const warnings = plan.warnings || [];
+        warnContainer.innerHTML = warnings.map(w => `
+          <div class="flex items-start gap-2 text-amber-800 bg-amber-50/80 p-2 rounded-lg border border-amber-200/70">
+            <span class="font-bold shrink-0">[${escapeHTML(w.code || 'WARN')}]:</span>
+            <span>${escapeHTML(w.message || '')}</span>
+          </div>
+        `).join('');
+      }
+
+      if (exclContainer) {
+        const excluded = plan.excluded_candidates || [];
+        exclContainer.innerHTML = excluded.slice(0, 5).map(e => `
+          <div class="flex items-start justify-between gap-2 text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
+            <span class="font-mono font-bold text-slate-800">${escapeHTML(e.activity_id)}:</span>
+            <span class="text-slate-500 text-right">${escapeHTML(e.message || e.code || '')}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    function formatPlanDate(isoStr) {
+      if (!isoStr) return "";
+      try {
+        const d = new Date(isoStr);
+        if (isNaN(d.getTime())) return isoStr;
+        const pad = n => String(n).padStart(2, '0');
+        return `${pad(d.getHours())}:${pad(d.getMinutes())} ngày ${pad(d.getDate())}/${pad(d.getMonth() + 1)}`;
+      } catch {
+        return isoStr;
+      }
     }
 
     // ========================================================================
@@ -2086,7 +2477,7 @@
               return `
                 <div class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100/70 border border-slate-200 transition space-y-2">
                   <div class="flex items-start justify-between gap-3">
-                    <div class="font-bold text-sm text-slate-900 leading-snug">
+                    <div class="font-bold text-sm text-white leading-snug">
                       <span class="text-xs font-mono font-bold text-slate-400 mr-1.5">#${idx + 1}</span>
                       <span>${escapeHTML(a.title || a.activity_id)}</span>
                     </div>

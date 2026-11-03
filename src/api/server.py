@@ -1429,5 +1429,8 @@ if WEB_DIR.exists():
     def serve_index():
         index_file = WEB_DIR / "index.html"
         if index_file.exists():
-            return FileResponse(index_file)
+            return FileResponse(
+                index_file,
+                headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+            )
         return JSONResponse({"message": "Web UI index.html not found"}, status_code=404)
