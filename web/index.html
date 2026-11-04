@@ -202,9 +202,9 @@
             <button id="tabBtnPlan" onclick="switchTab('plan')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <svg class="w-5 h-5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                <span class="text-sm font-bold">Kế hoạch ĐRL (SP3)</span>
+                <span class="text-sm font-bold">Kế hoạch rèn luyện <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP3)</span></span>
               </div>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-950/70 text-indigo-300 border border-indigo-700/60">SP3</span>
+              <span class="dev-only text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-950/70 text-indigo-300 border border-indigo-700/60">SP3</span>
             </button>
 
             <!-- Developer-Only Workspaces -->
@@ -479,7 +479,7 @@
                   <span id="totalProjectedSubtext" class="text-sm sm:text-base font-extrabold text-indigo-300 block leading-tight">Hiện có: 69 / 100 điểm</span>
                   <span id="devTotalMissingText" class="dev-only text-xs font-mono text-rose-400 block mt-1">[Dev] Còn thiếu: 31đ</span>
                   <button type="button" onclick="switchTab('plan')" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1.5 pt-1.5 transition">
-                    <span>🎯 Đặt mục tiêu &amp; Lập kế hoạch SP3</span>
+                    <span>🎯 Đặt mục tiêu &amp; Lập kế hoạch <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP3)</span></span>
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                   </button>
                 </div>
@@ -765,7 +765,7 @@
           <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl space-y-3">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div class="flex flex-wrap items-center gap-2.5">
-                <h2 class="text-xl font-extrabold text-white tracking-tight">Kế hoạch Rèn luyện Cá nhân</h2>
+                <h2 class="text-xl font-extrabold text-white tracking-tight">Kế hoạch Rèn luyện Cá nhân <span class="dev-only font-mono text-sm text-indigo-300 font-normal">(SP3)</span></h2>
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
                   Lộ trình tối ưu
                 </span>
@@ -864,7 +864,7 @@
               <!-- Action Button -->
               <button id="btnRunPlanner" onclick="runSp3Planner()" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                <span id="btnRunPlannerText">Lập kế hoạch đề xuất (SP3)</span>
+                <span id="btnRunPlannerText">Lập kế hoạch đề xuất <span class="dev-only font-mono text-xs">(SP3)</span></span>
               </button>
             </div>
 
@@ -884,7 +884,7 @@
               <!-- Loading State -->
               <div id="plannerLoadingState" class="hidden bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-12 text-center space-y-3">
                 <div class="inline-block w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-sm font-bold text-white">Đang chạy thuật toán tối ưu SP3...</p>
+                <p class="text-sm font-bold text-white">Đang tối ưu lộ trình đề xuất... <span class="dev-only font-mono text-xs text-slate-400 font-normal">(SP3)</span></p>
               </div>
 
               <!-- Active Results Container -->
@@ -2013,7 +2013,7 @@
         }
       } finally {
         if (btn) btn.disabled = false;
-        if (btnText) btnText.innerText = "Lập kế hoạch đề xuất (SP3)";
+        if (btnText) btnText.innerHTML = 'Lập kế hoạch đề xuất <span class="dev-only font-mono text-xs">(SP3)</span>';
       }
     }
 
