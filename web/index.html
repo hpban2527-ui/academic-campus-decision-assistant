@@ -521,59 +521,80 @@
         <!-- ================================================================== -->
         <div id="viewActivities" class="hidden space-y-6">
           
-          <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div class="flex items-center gap-3">
-                <h2 class="text-xl font-extrabold text-white">Kho Hoạt Động &amp; Hàng Đợi Rà Soát</h2>
+          <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex flex-wrap items-center gap-2.5">
+                <h2 class="text-xl font-extrabold text-white">Kho Hoạt Động &amp; Hàng Đợi Rà Soát <span class="dev-only font-mono text-xs text-slate-500 font-normal">(/api/sp3/catalog)</span></h2>
                 <span id="validCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">
                   20 hoạt động
                 </span>
-                <span id="reviewCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
+                <span id="sp3DraftCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
+                  18 bài chờ duyệt
+                </span>
+                <span id="reviewCountBadge" class="dev-only px-3 py-1 rounded-full text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
                   0 bài chờ duyệt
                 </span>
               </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button onclick="loadActivitiesFromApi()" class="px-4 py-2 rounded-xl bg-[#162032] hover:bg-[#1f2d46] text-slate-200 border border-[#223046] text-xs font-bold transition flex items-center gap-1.5">
+                  <span>↻ Đồng bộ</span>
+                </button>
+                <button onclick="copySessionJsonPath()" class="dev-only px-4 py-2 rounded-xl bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-1.5">
+                  <span>📁 Copy đường dẫn file lưu tạm</span>
+                </button>
+              </div>
             </div>
-            <div class="flex items-center gap-2">
-              <button onclick="loadActivitiesFromApi()" class="px-4 py-2 rounded-xl bg-[#162032] hover:bg-[#1f2d46] text-slate-200 border border-[#223046] text-xs font-bold transition flex items-center gap-1.5">
-                <span>↻ Đồng bộ</span>
-              </button>
-              <button onclick="copySessionJsonPath()" class="px-4 py-2 rounded-xl bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-1.5">
-                <span>📁 Copy đường dẫn file lưu tạm</span>
-              </button>
+            <div class="dev-only flex flex-wrap items-center gap-2 pt-2 border-t border-[#1b2537] text-xs">
+              <span class="px-2.5 py-0.5 rounded-md font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">DEMO_ONLY</span>
+              <span class="px-2.5 py-0.5 rounded-md font-mono font-bold bg-rose-950/60 text-rose-300 border border-rose-500/40">official_award_verified: false</span>
+              <span id="sp3CatalogNoteText" class="text-slate-400">Tất cả bản ghi nguồn SP1 (14 trường + Data QA) và 18 bài đăng mới đều giữ trạng thái REVIEW_REQUIRED.</span>
             </div>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            <!-- CỘT 1 (7/12): DANH SÁCH HOẠT ĐỘNG ĐÃ CÔNG NHẬN -->
+            <!-- CỘT 1 (7/12): DANH SÁCH HOẠT ĐỘNG ĐÃ CÔNG NHẬN + DATA QA -->
             <div class="lg:col-span-7 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
               <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
                 <div>
-                  <h3 class="text-base font-extrabold text-white">Hoạt động đã công nhận</h3>
+                  <h3 class="text-base font-extrabold text-white">Hoạt động đã công nhận <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP1 14 trường + Data QA)</span></h3>
                 </div>
-                <span class="text-xs font-semibold text-slate-400">activities.json</span>
+                <span class="dev-only text-xs font-mono font-semibold text-indigo-400">activities.json + QA20.json</span>
               </div>
-              <div id="validActivitiesList" class="space-y-3.5 max-h-[600px] overflow-y-auto pr-1"></div>
+              <div id="validActivitiesList" class="space-y-3.5 max-h-[680px] overflow-y-auto pr-1"></div>
             </div>
 
-            <!-- CỘT 2 (5/12): HÀNG ĐỢI CHỜ DUYỆT & THÔNG TIN LƯU TRỮ -->
+            <!-- CỘT 2 (5/12): BẢN NHÁP NGUỒN MỚI, HÀNG ĐỢI CHỜ DUYỆT & THÔNG TIN LƯU TRỮ -->
             <div class="lg:col-span-5 space-y-6">
               
-              <!-- Hàng đợi chờ duyệt -->
+              <!-- 18 Bài đăng nguồn mới (new_post_drafts — REVIEW_REQUIRED) -->
               <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
                   <div>
-                    <h3 class="text-base font-extrabold text-white">Hàng đợi chờ duyệt (Review Queue)</h3>
+                    <h3 class="text-base font-extrabold text-white">Bản nháp bài đăng mới <span class="dev-only font-mono text-xs text-slate-500 font-normal">(new_post_drafts[])</span></h3>
                   </div>
-                  <span id="reviewQueueTabBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
+                  <span id="sp3DraftsTabBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
+                    18 bài chờ duyệt
+                  </span>
+                </div>
+                <div id="sp3NewDraftsList" class="space-y-3 max-h-[340px] overflow-y-auto pr-1"></div>
+              </div>
+
+              <!-- Hàng đợi chờ duyệt trong phiên -->
+              <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
+                  <div>
+                    <h3 class="text-base font-extrabold text-white">Hàng đợi chờ duyệt trong phiên (Session Queue)</h3>
+                  </div>
+                  <span id="reviewQueueTabBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
                     Chờ duyệt
                   </span>
                 </div>
-                <div id="reviewQueueList" class="space-y-3 max-h-[320px] overflow-y-auto pr-1"></div>
+                <div id="reviewQueueList" class="space-y-3 max-h-[240px] overflow-y-auto pr-1"></div>
               </div>
 
               <!-- Thư mục lưu trữ tạm thời trên máy -->
-              <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-3">
+              <div class="dev-only bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-3">
                 <div class="flex items-center justify-between border-b border-[#1b2537] pb-2.5">
                   <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
                     <span>💾 Thư mục lưu trữ phiên (Local Session Folder)</span>
@@ -592,7 +613,7 @@
               </div>
 
               <!-- Lead Audit (Báo cáo quy chế) -->
-              <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-3">
+              <div class="dev-only bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-3">
                 <h3 class="text-sm font-extrabold text-white border-b border-[#1b2537] pb-2.5">Kiểm toán quy chế &amp; trùng lặp (/api/lead/audit)</h3>
                 <div id="leadAuditContainer" class="text-xs text-slate-300 space-y-2"></div>
               </div>
@@ -741,30 +762,41 @@
         <div id="viewPlan" class="hidden space-y-6">
           
           <!-- Header Banner -->
-          <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div class="flex items-center gap-3">
-                <h2 class="text-xl font-extrabold text-white tracking-tight">Kế hoạch Rèn luyện Cá nhân (SP3)</h2>
+          <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl space-y-3">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex flex-wrap items-center gap-2.5">
+                <h2 class="text-xl font-extrabold text-white tracking-tight">Kế hoạch Rèn luyện Cá nhân</h2>
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
                   Lộ trình tối ưu
                 </span>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
+                <span id="planHeaderModeBadge" class="dev-only px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
                   DEMO_ONLY
                 </span>
+                <span id="planHeaderVerifiedBadge" class="dev-only px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-rose-950/60 text-rose-300 border border-rose-500/40">
+                  official_award_verified: false
+                </span>
+                <span class="dev-only px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
+                  SYNTHETIC-DEMO
+                </span>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="text-xs text-slate-400 font-medium">Học kỳ 1 / 2026-2027</span>
+                <span id="planTermLabel" class="dev-only text-xs font-mono text-indigo-300">Fixture Tháng 11/2026</span>
               </div>
             </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <span class="text-xs text-slate-400 font-medium">Học kỳ 1 / 2026-2027</span>
+            <div class="dev-only p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-200 flex items-center gap-2">
+              <span class="font-bold shrink-0">⚠️ Lưu ý minh bạch:</span>
+              <span>Chế độ <b>DEMO_ONLY</b> (<code class="font-mono">official_award_verified: false</code>) sử dụng bộ dữ liệu giả lập tháng 11/2026 để kiểm chứng thuật toán SP3 — tuyệt đối không trình bày như kết quả ĐRL chính thức của HK3 thực tế.</span>
             </div>
           </div>
 
           <!-- Main Layout: 2 Columns -->
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            <!-- Left Column: Input Target & Scenario (4/12) -->
+            <!-- Left Column: Input Target, Scenario & Busy Intervals (4/12) -->
             <div class="lg:col-span-4 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-5">
               <div>
-                <h3 class="text-base font-extrabold text-white">1. Thiết lập Mục tiêu</h3>
+                <h3 class="text-base font-extrabold text-white">1. Thiết lập Mục tiêu <span class="dev-only text-slate-400 font-normal">&amp; Lịch bận</span></h3>
               </div>
 
               <!-- Preset Rank Buttons -->
@@ -786,7 +818,7 @@
               <!-- Custom Target Number Input -->
               <div>
                 <div class="flex items-center justify-between mb-1.5">
-                  <label for="inputPlanTarget" class="text-xs font-bold uppercase tracking-wider text-slate-400">Điểm mục tiêu cụ thể</label>
+                  <label for="inputPlanTarget" class="text-xs font-bold uppercase tracking-wider text-slate-400">Điểm mục tiêu cụ thể <span class="dev-only font-mono text-[11px] text-slate-500 lowercase">(total_target)</span></label>
                   <span id="targetEchoBadge" class="text-xs font-extrabold text-indigo-400 font-mono">80 / 100đ</span>
                 </div>
                 <div class="flex items-center gap-3">
@@ -796,12 +828,37 @@
 
               <!-- Scenario Selection -->
               <div>
-                <label for="selectPlanScenario" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Kịch bản lập lịch (Scenario)</label>
-                <select id="selectPlanScenario" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-sm font-semibold text-slate-200 focus:bg-[#0c1220] focus:border-indigo-500 outline-none transition">
-                  <option value="first_plan">first_plan — Lập lộ trình mới tối ưu</option>
-                  <option value="replan">replan — Tái lập lịch khi có thay đổi</option>
-                  <option value="what_if_skip">what_if_skip — Giả định bỏ bớt hoạt động</option>
+                <label for="selectPlanScenario" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Kịch bản lập lịch <span class="dev-only font-mono text-[11px] text-slate-500 lowercase">(scenario)</span></label>
+                <select id="selectPlanScenario" onchange="onScenarioChange(this.value)" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-sm font-semibold text-slate-200 focus:bg-[#0c1220] focus:border-indigo-500 outline-none transition">
+                  <option value="first_plan">Lập lộ trình mới tối ưu</option>
+                  <option value="replan">Tái lập lịch khi có thay đổi</option>
+                  <option value="what_if_skip">Giả định bỏ bớt hoạt động</option>
                 </select>
+              </div>
+
+              <!-- Busy Intervals (Custom busy time supported only for first_plan) -->
+              <div class="p-3.5 rounded-xl bg-[#080d18] border border-[#223046] space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Khung giờ bận cá nhân <span class="dev-only font-mono text-[11px] text-slate-500 lowercase">(busy_intervals)</span></span>
+                  <span class="dev-only text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">Chỉ first_plan</span>
+                </div>
+                <div id="busySlotsInputs" class="space-y-2 text-xs text-slate-300">
+                  <label class="flex items-center gap-2 cursor-pointer hover:text-white">
+                    <input type="checkbox" id="busySlot1" data-start="2026-11-09T09:00:00+07:00" data-end="2026-11-09T10:30:00+07:00" class="rounded border-[#223046] text-indigo-600 focus:ring-indigo-500" />
+                    <span>Bận T2 (09/11 09:00–10:30) — trùng SEM-A/B</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer hover:text-white">
+                    <input type="checkbox" id="busySlot2" data-start="2026-11-11T07:00:00+07:00" data-end="2026-11-11T08:00:00+07:00" class="rounded border-[#223046] text-indigo-600 focus:ring-indigo-500" />
+                    <span>Bận T4 (11/11 07:00–08:00) — đầu ca sáng</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer hover:text-white">
+                    <input type="checkbox" id="busySlot3" data-start="2026-11-12T14:00:00+07:00" data-end="2026-11-12T15:30:00+07:00" class="rounded border-[#223046] text-indigo-600 focus:ring-indigo-500" />
+                    <span>Bận T5 (12/11 14:00–15:30) — trùng SEM-C</span>
+                  </label>
+                </div>
+                <div id="busyLockedNotice" class="hidden dev-only text-[11px] text-amber-300 bg-amber-950/40 p-2 rounded-lg border border-amber-500/30">
+                  Kịch bản <b>replan</b> &amp; <b>what_if_skip</b> sử dụng luồng synthetic cố định (tùy chỉnh <code class="font-mono">busy_intervals</code> chỉ áp dụng cho <code class="font-mono">first_plan</code>).
+                </div>
               </div>
 
               <!-- Action Button -->
@@ -828,23 +885,29 @@
               <div id="plannerLoadingState" class="hidden bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-12 text-center space-y-3">
                 <div class="inline-block w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
                 <p class="text-sm font-bold text-white">Đang chạy thuật toán tối ưu SP3...</p>
-                              </div>
+              </div>
 
               <!-- Active Results Container -->
               <div id="plannerActiveResult" class="hidden space-y-6">
-                <!-- Summary Metrics Card -->
+                <!-- 1. Summary Metrics Card (plan.score_summary) -->
                 <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-5">
                   <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#1b2537] pb-4">
                     <div>
-                      <div class="flex items-center gap-2">
+                      <div class="flex flex-wrap items-center gap-2">
                         <span id="planStatusBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">
-                          TARGET_MET
+                          Đã đạt mục tiêu
                         </span>
-                        <span id="planFeasibilityBadge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#162032] text-slate-300 border border-[#223046]">
+                        <span id="planFeasibilityBadge" class="dev-only px-2.5 py-1 rounded-full text-xs font-bold bg-[#162032] text-slate-300 border border-[#223046]">
                           Khả thi: REACHABLE
                         </span>
+                        <span id="planModeBadge" class="dev-only px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
+                          DEMO_ONLY
+                        </span>
+                        <span id="planVerifiedBadge" class="dev-only px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-rose-950/60 text-rose-300 border border-rose-500/40">
+                          official_award_verified: false
+                        </span>
                       </div>
-                      <h3 class="text-lg font-black text-white mt-2 tracking-tight">Tổng quan Lộ trình Điểm Rèn Luyện</h3>
+                      <h3 class="text-lg font-black text-white mt-2 tracking-tight">Tổng quan Lộ trình Điểm Rèn Luyện <span class="dev-only font-mono text-xs text-slate-500 font-normal">(plan.score_summary)</span></h3>
                     </div>
                     <div class="text-right">
                       <span class="text-xs text-slate-400 block">Dự kiến đạt</span>
@@ -877,11 +940,32 @@
                   </div>
                 </div>
 
-                <!-- Selected Activities List -->
+                <!-- 2. Availability & Feasibility Grid (availability.available_intervals & feasibility.candidates) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- Available Intervals Card -->
+                  <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 space-y-3">
+                    <div class="flex items-center justify-between border-b border-[#1b2537] pb-2.5">
+                      <h4 class="text-sm font-extrabold text-white">Khung giờ rảnh cá nhân <span class="dev-only font-mono text-xs text-slate-500 font-normal">(available_intervals)</span></h4>
+                      <span id="planAvailCountBadge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">0 khung giờ</span>
+                    </div>
+                    <div id="planAvailableIntervalsList" class="space-y-2 max-h-[240px] overflow-y-auto pr-1 text-xs"></div>
+                  </div>
+
+                  <!-- Feasibility Candidates Card -->
+                  <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 space-y-3">
+                    <div class="flex items-center justify-between border-b border-[#1b2537] pb-2.5">
+                      <h4 class="text-sm font-extrabold text-white">Hoạt động thẩm định khả thi <span class="dev-only font-mono text-xs text-slate-500 font-normal">(feasibility.candidates)</span></h4>
+                      <span id="planFeasCandidatesBadge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">0 hoạt động</span>
+                    </div>
+                    <div id="planFeasibilityCandidatesList" class="space-y-2 max-h-[240px] overflow-y-auto pr-1 text-xs"></div>
+                  </div>
+                </div>
+
+                <!-- 3. Selected Activities List (plan.selected_activities) -->
                 <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
                   <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
                     <div>
-                      <h4 class="text-base font-extrabold text-white">Hoạt động được đề xuất tham gia</h4>
+                      <h4 class="text-base font-extrabold text-white">Hoạt động được đề xuất tham gia <span class="dev-only font-mono text-xs text-slate-500 font-normal">(plan.selected_activities)</span></h4>
                     </div>
                     <span id="planSelectedCountBadge" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">
                       0 hoạt động
@@ -890,12 +974,12 @@
                   <div id="planSelectedActivitiesList" class="space-y-3"></div>
                 </div>
 
-                <!-- Excluded Candidates & Warnings Accordion -->
-                <details class="group bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5">
-                  <summary class="cursor-pointer list-none flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-white">
+                <!-- 4. Excluded Candidates & Warnings (plan.excluded_candidates & plan.warnings) -->
+                <details open class="group bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5">
+                  <summary class="cursor-pointer list-none flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-300 hover:text-white">
                     <span class="flex items-center gap-2">
-                      <span class="w-2 h-2 rounded-full bg-slate-400"></span>
-                      <span>Hoạt động bị loại trừ &amp; Cảnh báo thuật toán</span>
+                      <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                      <span>Cảnh báo &amp; Hoạt động chưa xếp lịch <span class="dev-only font-mono text-xs text-slate-500 font-normal">(warnings &amp; excluded_candidates)</span></span>
                     </span>
                     <span class="group-open:rotate-180 transition-transform">▼</span>
                   </summary>
@@ -1199,6 +1283,9 @@
       if (lastRawResponse) {
         const studentId = currentStudent ? currentStudent.student_id : "25127242";
         renderEvaluationResult(lastRawResponse, studentId);
+      }
+      if (currentPlannerData) {
+        renderSp3PlanResult(currentPlannerData);
       }
     }
 
@@ -1841,6 +1928,37 @@
       if (badge) badge.innerText = `${num} / 100đ`;
     }
 
+    function onScenarioChange(scenario) {
+      const inputsBox = document.getElementById('busySlotsInputs');
+      const notice = document.getElementById('busyLockedNotice');
+      const isFirst = scenario === 'first_plan';
+      if (inputsBox) {
+        inputsBox.classList.toggle('opacity-40', !isFirst);
+        inputsBox.classList.toggle('pointer-events-none', !isFirst);
+        inputsBox.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+          cb.disabled = !isFirst;
+        });
+      }
+      if (notice) {
+        notice.classList.toggle('hidden', isFirst);
+      }
+    }
+
+    function collectBusyIntervals(scenario) {
+      if (scenario !== 'first_plan') return [];
+      const intervals = [];
+      ['busySlot1', 'busySlot2', 'busySlot3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.checked) {
+          intervals.push({
+            start: el.getAttribute('data-start'),
+            end: el.getAttribute('data-end')
+          });
+        }
+      });
+      return intervals;
+    }
+
     async function runSp3Planner() {
       const targetInput = document.getElementById('inputPlanTarget');
       const scenarioSelect = document.getElementById('selectPlanScenario');
@@ -1850,8 +1968,10 @@
       const btn = document.getElementById('btnRunPlanner');
       const btnText = document.getElementById('btnRunPlannerText');
 
-      const targetTotal = parseInt(targetInput ? targetInput.value : "80", 10) || 80;
+      const rawTarget = parseInt(targetInput ? targetInput.value : "80", 10);
+      const targetTotal = isNaN(rawTarget) ? 80 : Math.max(0, Math.min(100, rawTarget));
       const scenario = scenarioSelect ? scenarioSelect.value : "first_plan";
+      const busyIntervals = collectBusyIntervals(scenario);
 
       // Show loading
       if (emptyState) emptyState.classList.add('hidden');
@@ -1864,7 +1984,11 @@
         const res = await fetch(`${API_BASE}/api/sp3/demo/plan`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ scenario, total_target: targetTotal })
+          body: JSON.stringify({
+            scenario,
+            total_target: targetTotal,
+            busy_intervals: busyIntervals
+          })
         });
 
         if (!res.ok) {
@@ -1900,24 +2024,38 @@
       if (activeResult) activeResult.classList.remove('hidden');
 
       const plan = data.plan || {};
+      const availability = data.availability || {};
+      const feasibility = data.feasibility || {};
       const summary = plan.score_summary || {};
+
       const statusBadge = document.getElementById('planStatusBadge');
       const feasibilityBadge = document.getElementById('planFeasibilityBadge');
+      const modeBadge = document.getElementById('planModeBadge');
+      const verifiedBadge = document.getElementById('planVerifiedBadge');
       const overviewText = document.getElementById('planScoreOverview');
       const baselineText = document.getElementById('planBaselineScoreText');
       const gainText = document.getElementById('planGainScoreText');
       const targetText = document.getElementById('planTargetScoreText');
 
+      const modeVal = data.mode || plan.mode || 'DEMO_ONLY';
+      const verifiedVal = Boolean(data.official_award_verified ?? plan.official_award_verified ?? false);
+      if (modeBadge) modeBadge.innerText = modeVal;
+      if (verifiedBadge) verifiedBadge.innerText = `official_award_verified: ${verifiedVal}`;
+
       if (statusBadge) {
         const met = plan.status === 'TARGET_MET';
-        statusBadge.innerText = plan.status || 'PROCESSED';
+        statusBadge.innerText = currentViewMode === 'dev'
+          ? (plan.status || 'PROCESSED')
+          : (met ? 'Đã đạt mục tiêu' : 'Đạt một phần');
         statusBadge.className = met
-          ? 'px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200'
-          : 'px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-200';
+          ? 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-emerald-950/60 text-emerald-300 border border-emerald-500/40'
+          : 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-amber-950/60 text-amber-300 border border-amber-500/40';
       }
 
       if (feasibilityBadge) {
-        feasibilityBadge.innerText = `Khả thi: ${plan.feasibility_conclusion || 'COMPUTED'}`;
+        feasibilityBadge.innerText = currentViewMode === 'dev'
+          ? `Khả thi: ${plan.feasibility_conclusion || 'COMPUTED'}`
+          : 'Lộ trình khả thi';
       }
 
       const baseTotal = summary.baseline_total ?? 0;
@@ -1930,7 +2068,7 @@
       if (gainText) gainText.innerText = `+${gainTotal}đ`;
       if (targetText) targetText.innerText = `${reqTarget}đ`;
 
-      // Category breakdown (C1..C5)
+      // 1. Category breakdown (C1..C5 from plan.score_summary)
       const catContainer = document.getElementById('planCategoryBreakdown');
       if (catContainer) {
         const baseByCat = summary.baseline_by_category || {};
@@ -1954,7 +2092,62 @@
         }).join('');
       }
 
-      // Selected activities list
+      // 2. Read availability.available_intervals
+      const availIntervals = availability.available_intervals || [];
+      const availCountBadge = document.getElementById('planAvailCountBadge');
+      const availListEl = document.getElementById('planAvailableIntervalsList');
+      if (availCountBadge) {
+        availCountBadge.innerText = currentViewMode === 'dev'
+          ? `${availIntervals.length} khung giờ (${availability.calendar_version || 'cal'})`
+          : `${availIntervals.length} khung giờ rảnh`;
+      }
+      if (availListEl) {
+        availListEl.innerHTML = availIntervals.length === 0
+          ? `<div class="p-3 text-center text-slate-400">Không có khung giờ rảnh.</div>`
+          : availIntervals.map((slot, i) => `
+              <div class="p-2.5 rounded-xl bg-[#080d18] border border-[#223046] flex items-center justify-between gap-2">
+                <span class="font-mono font-bold text-indigo-400">#${i + 1}</span>
+                <span class="font-mono text-slate-200">${escapeHTML(formatPlanDate(slot.start))} → ${escapeHTML(formatPlanDate(slot.end))}</span>
+              </div>
+            `).join('');
+      }
+
+      // 3. Read feasibility.candidates
+      const feasCandidates = feasibility.candidates || [];
+      const feasBadge = document.getElementById('planFeasCandidatesBadge');
+      const feasListEl = document.getElementById('planFeasibilityCandidatesList');
+      const feasOkCount = feasCandidates.filter(c => c.feasibility?.status === 'FEASIBLE').length;
+      if (feasBadge) {
+        feasBadge.innerText = currentViewMode === 'dev'
+          ? `${feasOkCount}/${feasCandidates.length} FEASIBLE`
+          : `${feasOkCount}/${feasCandidates.length} khả thi`;
+      }
+      if (feasListEl) {
+        feasListEl.innerHTML = feasCandidates.length === 0
+          ? `<div class="p-3 text-center text-slate-400">Không có ứng viên.</div>`
+          : feasCandidates.map(c => {
+              const act = c.activity || {};
+              const st = c.feasibility?.status || 'UNKNOWN';
+              const stCls = st === 'FEASIBLE'
+                ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
+                : (st === 'NEEDS_REVIEW' ? 'bg-amber-950/60 text-amber-300 border-amber-500/40' : 'bg-rose-950/60 text-rose-300 border-rose-500/40');
+              const stLabel = st === 'FEASIBLE' ? 'Khả thi' : (st === 'NEEDS_REVIEW' ? 'Cần duyệt' : 'Trùng lịch');
+              return `
+                <div class="p-2.5 rounded-xl bg-[#080d18] border border-[#223046] flex items-center justify-between gap-2">
+                  <div class="truncate">
+                    <span class="dev-only font-mono font-bold text-indigo-300 mr-1.5">${escapeHTML(act.activity_id)}</span>
+                    <span class="text-slate-200">${escapeHTML(act.title || act.activity_id)}</span>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold border shrink-0 ${stCls}">
+                    <span>${stLabel}</span>
+                    <span class="dev-only font-mono ml-1 opacity-75">(${escapeHTML(st)})</span>
+                  </span>
+                </div>
+              `;
+            }).join('');
+      }
+
+      // 4. Selected activities list (plan.selected_activities)
       const actList = document.getElementById('planSelectedActivitiesList');
       const countBadge = document.getElementById('planSelectedCountBadge');
       const acts = plan.selected_activities || [];
@@ -1967,7 +2160,7 @@
           actList.innerHTML = acts.map((item, idx) => {
             const blocks = item.scheduled_blocks || [];
             const timeStr = blocks.length > 0
-              ? `${formatPlanDate(blocks[0].start)} — ${formatPlanDate(blocks[0].end)}`
+              ? blocks.map(b => `${formatPlanDate(b.start)} — ${formatPlanDate(b.end)}`).join(' | ')
               : 'Thời gian linh hoạt';
             const reasons = item.reasons || [];
             const reasonBadges = reasons.map(r => `
@@ -2002,7 +2195,7 @@
         }
       }
 
-      // Warnings & Excluded candidates
+      // 5. Warnings (plan.warnings) & Excluded candidates (plan.excluded_candidates)
       const warnContainer = document.getElementById('planWarningsContainer');
       const exclContainer = document.getElementById('planExcludedContainer');
 
@@ -2018,7 +2211,7 @@
 
       if (exclContainer) {
         const excluded = plan.excluded_candidates || [];
-        exclContainer.innerHTML = excluded.slice(0, 5).map(e => `
+        exclContainer.innerHTML = excluded.map(e => `
           <div class="flex items-start justify-between gap-2 text-slate-300 bg-[#080d18] p-2 rounded-lg border border-[#223046]">
             <span class="font-mono font-bold text-indigo-300">${escapeHTML(e.activity_id)}:</span>
             <span class="text-slate-400 text-right">${escapeHTML(e.message || e.code || '')}</span>
@@ -2457,25 +2650,50 @@
     // ========================================================================
     async function loadActivitiesFromApi() {
       try {
-        const res = await fetch(`${API_BASE}/api/activities`);
-        if (!res.ok) return;
-        const data = await res.json();
-        const validList = data.activities || data.valid_activities || [];
-        const reviewList = data.review_queue || [];
+        const [actRes, catRes] = await Promise.all([
+          fetch(`${API_BASE}/api/activities`),
+          fetch(`${API_BASE}/api/sp3/catalog`).catch(() => null)
+        ]);
 
-        document.getElementById("validCountBadge").innerText = `${validList.length} hoạt động`;
-        document.getElementById("sidebarActCount").innerText = validList.length;
+        const actData = (actRes && actRes.ok) ? await actRes.json() : {};
+        const catData = (catRes && catRes.ok) ? await catRes.json() : null;
+
+        const catalogRows = catData?.activities || [];
+        const newPostDrafts = catData?.new_post_drafts || [];
+        const validList = catalogRows.length > 0
+          ? catalogRows
+          : (actData.activities || actData.valid_activities || []).map(a => ({ activity: a, publication_status: "REVIEW_REQUIRED", score_binding_verified: false }));
+        const reviewList = actData.review_queue || [];
+
+        const actCount = catData?.activity_count ?? validList.length;
+        const draftCount = catData?.unstructured_new_posts ?? newPostDrafts.length;
+
+        document.getElementById("validCountBadge").innerText = `${actCount} hoạt động (Catalog)`;
+        document.getElementById("sidebarActCount").innerText = actCount;
+        const draftBadge = document.getElementById("sp3DraftCountBadge");
+        if (draftBadge) draftBadge.innerText = `${draftCount} bản nháp (REVIEW_REQUIRED)`;
+        const draftsTabBadge = document.getElementById("sp3DraftsTabBadge");
+        if (draftsTabBadge) draftsTabBadge.innerText = `${newPostDrafts.length} REVIEW_REQUIRED`;
+
         document.getElementById("reviewCountBadge").innerText = `${reviewList.length} bài chờ duyệt`;
         const qBadge = document.getElementById("reviewQueueTabBadge");
         if (qBadge) qBadge.innerText = `${reviewList.length} bài`;
 
         document.getElementById("validActivitiesList").innerHTML = validList.length === 0
           ? `<div class="p-6 text-center text-slate-400 text-sm">Chưa có hoạt động nào trong kho.</div>`
-          : validList.map((a, idx) => {
+          : validList.map((row, idx) => {
+              const a = row.activity || row;
+              const qa = row.data_qa || null;
+              const pubStatus = row.publication_status || "REVIEW_REQUIRED";
               const dt = a["4_datetimes"] || {};
               const timeDisplay = a.start ? formatIsoToVietnamese(a.start) : (dt.start_datetime || 'Chưa rõ');
               const locDisplay = a.location || (a.mode === 'online' ? 'Trực tuyến' : 'Cơ sở trường');
-              const ptsDisplay = a.points_awarded || (a.points != null ? `+${a.points} điểm` : 'Hợp lệ');
+              const ptsDisplay = a.points_awarded || (a.points != null ? `+${a.points} điểm` : 'Chờ rà soát điểm');
+              const qaHtml = qa
+                ? `<div class="dev-only text-[11px] font-mono text-indigo-300 bg-indigo-950/40 border border-indigo-500/30 rounded-lg px-2.5 py-1.5">
+                     <b>Data QA (${escapeHTML(qa.status || 'checked')} • ${escapeHTML(qa.semester || '')}):</b> ${escapeHTML(qa.notes || '')}
+                   </div>`
+                : '';
               return `
                 <div class="p-4 rounded-xl bg-[#080d18] hover:bg-[#0c1220] border border-[#223046] transition space-y-2">
                   <div class="flex items-start justify-between gap-3">
@@ -2483,22 +2701,57 @@
                       <span class="text-xs font-mono font-bold text-indigo-400 mr-1.5">#${idx + 1}</span>
                       <span>${escapeHTML(a.title || a.activity_id)}</span>
                     </div>
-                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 whitespace-nowrap shrink-0">
-                      ${escapeHTML(ptsDisplay)}
-                    </span>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <span class="dev-only px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
+                        ${escapeHTML(pubStatus)}
+                      </span>
+                      <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 whitespace-nowrap">
+                        ${escapeHTML(ptsDisplay)}
+                      </span>
+                    </div>
                   </div>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-400 pt-1.5 border-t border-[#1b2537]">
                     <div><b>Đơn vị:</b> <span class="text-slate-200">${escapeHTML(a.source?.publisher || a.organizer || 'Trường ĐH KHTN')}</span></div>
                     <div><b>Thời gian:</b> <span class="text-slate-200 font-mono">${escapeHTML(timeDisplay)}</span></div>
                     <div class="sm:col-span-2"><b>Địa điểm:</b> <span class="text-slate-200">${escapeHTML(locDisplay)}</span></div>
                   </div>
+                  ${qaHtml}
                 </div>
               `;
             }).join("");
 
+        const draftsEl = document.getElementById("sp3NewDraftsList");
+        if (draftsEl) {
+          draftsEl.innerHTML = newPostDrafts.length === 0
+            ? `<div class="p-6 text-center text-slate-400 text-sm bg-[#080d18] rounded-xl border border-dashed border-[#223046]">Không có bản nháp mới.</div>`
+            : newPostDrafts.map((d, idx) => {
+                const rec = d.activity || {};
+                const flags = d.review_flags || [];
+                const pubSt = d.publication_status || "REVIEW_REQUIRED";
+                return `
+                  <div class="p-3.5 rounded-xl bg-[#080d18] border border-amber-500/40 space-y-1.5">
+                    <div class="flex items-start justify-between gap-2">
+                      <div class="font-bold text-xs text-white leading-snug">
+                        <span class="font-mono text-amber-400 mr-1">#${idx + 1}</span>
+                        ${escapeHTML(rec.title || rec.activity_id || 'Bản nháp bài đăng mới')}
+                      </div>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40 shrink-0">${escapeHTML(pubSt)}</span>
+                    </div>
+                    <div class="text-[11px] font-mono text-slate-400 flex flex-wrap items-center justify-between gap-2">
+                      <span>ID: ${escapeHTML(rec.activity_id || '—')}</span>
+                      <span class="dev-only text-rose-300">score_binding_verified: ${String(Boolean(d.score_binding_verified))}</span>
+                    </div>
+                    <div class="text-[11px] font-mono text-amber-300">
+                      <b>Cờ rà soát:</b> ${escapeHTML(flags.join(", ") || 'Chờ duyệt nội dung')}
+                    </div>
+                  </div>
+                `;
+              }).join("");
+        }
+
         document.getElementById("reviewQueueList").innerHTML = reviewList.length === 0
           ? `<div class="p-6 text-center text-slate-400 text-sm bg-[#080d18] rounded-xl border border-dashed border-[#223046]">
-               Hiện không có bài đăng nào cần duyệt.
+               Hiện không có bài đăng nào cần duyệt trong phiên.
              </div>`
           : reviewList.map((item, idx) => `
               <div class="p-3.5 rounded-xl bg-[#080d18] border border-amber-500/40 space-y-1.5">
