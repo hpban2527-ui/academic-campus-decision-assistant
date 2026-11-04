@@ -526,10 +526,10 @@
               <div class="flex flex-wrap items-center gap-2.5">
                 <h2 class="text-xl font-extrabold text-white">Kho Hoạt Động &amp; Hàng Đợi Rà Soát <span class="dev-only font-mono text-xs text-slate-500 font-normal">(/api/sp3/catalog)</span></h2>
                 <span id="validCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">
-                  20 hoạt động
+                  <span>20 hoạt động</span> <span class="dev-only font-mono text-[11px] opacity-80">(Catalog)</span>
                 </span>
                 <span id="sp3DraftCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
-                  18 bài chờ duyệt
+                  <span>18 bản nháp</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>
                 </span>
                 <span id="reviewCountBadge" class="dev-only px-3 py-1 rounded-full text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
                   0 bài chờ duyệt
@@ -574,7 +574,7 @@
                     <h3 class="text-base font-extrabold text-white">Bản nháp bài đăng mới <span class="dev-only font-mono text-xs text-slate-500 font-normal">(new_post_drafts[])</span></h3>
                   </div>
                   <span id="sp3DraftsTabBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
-                    18 bài chờ duyệt
+                    <span>18 bản nháp</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>
                   </span>
                 </div>
                 <div id="sp3NewDraftsList" class="space-y-3 max-h-[340px] overflow-y-auto pr-1"></div>
@@ -584,7 +584,7 @@
               <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
                   <div>
-                    <h3 class="text-base font-extrabold text-white">Hàng đợi chờ duyệt trong phiên (Session Queue)</h3>
+                    <h3 class="text-base font-extrabold text-white">Hàng đợi chờ duyệt trong phiên <span class="dev-only font-mono text-xs text-slate-500 font-normal">(Session Queue)</span></h3>
                   </div>
                   <span id="reviewQueueTabBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
                     Chờ duyệt
@@ -2668,12 +2668,12 @@
         const actCount = catData?.activity_count ?? validList.length;
         const draftCount = catData?.unstructured_new_posts ?? newPostDrafts.length;
 
-        document.getElementById("validCountBadge").innerText = `${actCount} hoạt động (Catalog)`;
+        document.getElementById("validCountBadge").innerHTML = `<span>${actCount} hoạt động</span> <span class="dev-only font-mono text-[11px] opacity-80">(Catalog)</span>`;
         document.getElementById("sidebarActCount").innerText = actCount;
         const draftBadge = document.getElementById("sp3DraftCountBadge");
-        if (draftBadge) draftBadge.innerText = `${draftCount} bản nháp (REVIEW_REQUIRED)`;
+        if (draftBadge) draftBadge.innerHTML = `<span>${draftCount} bản nháp</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>`;
         const draftsTabBadge = document.getElementById("sp3DraftsTabBadge");
-        if (draftsTabBadge) draftsTabBadge.innerText = `${newPostDrafts.length} REVIEW_REQUIRED`;
+        if (draftsTabBadge) draftsTabBadge.innerHTML = `<span>${newPostDrafts.length} bản nháp</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>`;
 
         document.getElementById("reviewCountBadge").innerText = `${reviewList.length} bài chờ duyệt`;
         const qBadge = document.getElementById("reviewQueueTabBadge");
@@ -2729,20 +2729,26 @@
                 const flags = d.review_flags || [];
                 const pubSt = d.publication_status || "REVIEW_REQUIRED";
                 return `
-                  <div class="p-3.5 rounded-xl bg-[#080d18] border border-amber-500/40 space-y-1.5">
+                  <div class="p-3.5 rounded-xl bg-[#080d18] border border-amber-500/40 space-y-2">
                     <div class="flex items-start justify-between gap-2">
                       <div class="font-bold text-xs text-white leading-snug">
                         <span class="font-mono text-amber-400 mr-1">#${idx + 1}</span>
                         ${escapeHTML(rec.title || rec.activity_id || 'Bản nháp bài đăng mới')}
                       </div>
-                      <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40 shrink-0">${escapeHTML(pubSt)}</span>
+                      <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40 shrink-0">
+                        <span>Chờ rà soát</span>
+                        <span class="dev-only font-mono text-[9px] ml-1">(${escapeHTML(pubSt)})</span>
+                      </span>
                     </div>
-                    <div class="text-[11px] font-mono text-slate-400 flex flex-wrap items-center justify-between gap-2">
-                      <span>ID: ${escapeHTML(rec.activity_id || '—')}</span>
-                      <span class="dev-only text-rose-300">score_binding_verified: ${String(Boolean(d.score_binding_verified))}</span>
+                    <div class="dev-only text-[11px] font-mono text-slate-400 flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#1b2537]">
+                      <span>Mã: ${escapeHTML(rec.activity_id || '—')}</span>
+                      <span class="text-rose-300">score_binding_verified: ${String(Boolean(d.score_binding_verified))}</span>
                     </div>
-                    <div class="text-[11px] font-mono text-amber-300">
-                      <b>Cờ rà soát:</b> ${escapeHTML(flags.join(", ") || 'Chờ duyệt nội dung')}
+                    <div class="dev-only text-[11px] font-mono text-amber-300">
+                      <b>Cờ kỹ thuật:</b> ${escapeHTML(flags.join(", ") || 'Chờ duyệt nội dung')}
+                    </div>
+                    <div class="text-xs text-slate-400">
+                      Hoạt động mới đang chờ ban tổ chức và CTSV duyệt minh chứng &amp; điểm ĐRL.
                     </div>
                   </div>
                 `;
