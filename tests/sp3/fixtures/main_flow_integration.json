@@ -1,0 +1,2412 @@
+{
+  "label": "SYNTHETIC-DEMO",
+  "description": "Main-flow integration fixture: availability -> feasibility -> planner -> adapter -> projected scorer -> real SP2 engine, then replan, what_if_skip and a keep conflict. Student, activities, evidence and bindings are synthetic; rules are the real data/drl_rules.json. Not real student data and not university-verified scores.",
+  "upstream": {
+    "branch": "origin/Nhu_Ngoc",
+    "commit": "cfa42ba966158ff544678efffe7d3b85e384144f",
+    "how": "availability_response and feasibility_response were produced by running the real resolve_availability and assess_feasibility at this commit on availability_request / feasibility_request with this trusted evidence. They are stored unchanged and are consumed verbatim by the planner."
+  },
+  "ruleset_source": "data/drl_rules.json",
+  "evidence": {
+    "eligibility_by_activity": {
+      "SEM-A": "ELIGIBLE",
+      "SEM-B": "ELIGIBLE",
+      "SEM-C": "ELIGIBLE",
+      "QUIZ-M": "ELIGIBLE",
+      "QUIZ-L": "ELIGIBLE",
+      "MOB-W": "ELIGIBLE",
+      "REG-Z": "ELIGIBLE",
+      "NEWS-X": "ELIGIBLE",
+      "DONE-Y": "ELIGIBLE"
+    },
+    "term_scope_by_activity": {
+      "SEM-A": "IN_SCOPE",
+      "SEM-B": "IN_SCOPE",
+      "SEM-C": "IN_SCOPE",
+      "QUIZ-M": "IN_SCOPE",
+      "QUIZ-L": "IN_SCOPE",
+      "MOB-W": "IN_SCOPE",
+      "REG-Z": "IN_SCOPE",
+      "NEWS-X": "IN_SCOPE",
+      "DONE-Y": "IN_SCOPE"
+    },
+    "source_review_by_activity": {
+      "SEM-A": true,
+      "SEM-B": true,
+      "SEM-C": true,
+      "QUIZ-M": true,
+      "QUIZ-L": true,
+      "MOB-W": true,
+      "REG-Z": true,
+      "NEWS-X": true,
+      "DONE-Y": true
+    },
+    "term_verified": true,
+    "schedule_by_activity": {
+      "QUIZ-M": {
+        "type": "FLEXIBLE_WINDOW",
+        "duration_minutes": 180
+      },
+      "QUIZ-L": {
+        "type": "FLEXIBLE_WINDOW",
+        "duration_minutes": 90
+      },
+      "MOB-W": {
+        "type": "FIXED",
+        "fixed_blocks": [
+          {
+            "start": "2026-11-12T13:00:00+07:00",
+            "end": "2026-11-12T14:00:00+07:00"
+          },
+          {
+            "start": "2026-11-14T08:00:00+07:00",
+            "end": "2026-11-14T09:00:00+07:00"
+          }
+        ]
+      }
+    }
+  },
+  "steps": {
+    "step1": {
+      "availability_request": {
+        "availability_version": "sp3-availability/0.2",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "week_start": "2026-11-09",
+        "apply_scope": "WEEK_ONLY",
+        "weekly_blocks": [
+          {
+            "day_of_week": "MONDAY",
+            "start_time": "08:00",
+            "end_time": "12:00"
+          },
+          {
+            "day_of_week": "WEDNESDAY",
+            "start_time": "07:00",
+            "end_time": "13:00"
+          },
+          {
+            "day_of_week": "THURSDAY",
+            "start_time": "13:00",
+            "end_time": "17:00"
+          },
+          {
+            "day_of_week": "SATURDAY",
+            "start_time": "08:00",
+            "end_time": "12:00"
+          }
+        ],
+        "effective_from": null,
+        "effective_until": null,
+        "exceptions": [],
+        "busy_intervals": []
+      },
+      "feasibility_request": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "main-flow-step1",
+        "context": {
+          "student_id": "synthetic-student-mf1",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-09T00:00:00+07:00",
+          "window_end": "2026-11-16T00:00:00+07:00",
+          "as_of": "2026-11-08T20:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-mf1",
+          "dataset_version": "synthetic-dataset-mf1",
+          "ruleset_version": "drl-rules-1028-synthetic-check",
+          "calendar_version": "availability-dd13dec79aadee26"
+        },
+        "available_intervals": [
+          {
+            "start": "2026-11-09T08:00:00+07:00",
+            "end": "2026-11-09T12:00:00+07:00"
+          },
+          {
+            "start": "2026-11-11T07:00:00+07:00",
+            "end": "2026-11-11T13:00:00+07:00"
+          },
+          {
+            "start": "2026-11-12T13:00:00+07:00",
+            "end": "2026-11-12T17:00:00+07:00"
+          },
+          {
+            "start": "2026-11-14T08:00:00+07:00",
+            "end": "2026-11-14T12:00:00+07:00"
+          }
+        ],
+        "activities": [
+          {
+            "activity": {
+              "activity_id": "SEM-A",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-A",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar A",
+              "domain": "academic",
+              "start": "2026-11-09T09:00:00+07:00",
+              "end": "2026-11-09T10:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-A",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "SEM-B",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-B",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar B",
+              "domain": "academic",
+              "start": "2026-11-09T09:30:00+07:00",
+              "end": "2026-11-09T11:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-B",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "SEM-C",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-C",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar C",
+              "domain": "academic",
+              "start": "2026-11-12T14:00:00+07:00",
+              "end": "2026-11-12T15:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-C",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "QUIZ-M",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/QUIZ-M",
+                "URL_registration": null
+              },
+              "title": "Synthetic online seminar quiz M",
+              "domain": "academic",
+              "start": "2026-11-11T07:00:00+07:00",
+              "end": "2026-11-11T13:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-QUIZ-M",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "QUIZ-L",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/QUIZ-L",
+                "URL_registration": null
+              },
+              "title": "Synthetic online law quiz L",
+              "domain": "skills",
+              "start": "2026-11-11T09:00:00+07:00",
+              "end": "2026-11-11T12:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-QUIZ-L",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "MOB-W",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/MOB-W",
+                "URL_registration": null
+              },
+              "title": "Synthetic two-session mobilization W",
+              "domain": "volunteer",
+              "start": "2026-11-12T13:00:00+07:00",
+              "end": "2026-11-14T09:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-MOB-W",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "REG-Z",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/REG-Z",
+                "URL_registration": null
+              },
+              "title": "Synthetic registered mobilization Z",
+              "domain": "volunteer",
+              "start": "2026-11-12T15:00:00+07:00",
+              "end": "2026-11-12T16:00:00+07:00",
+              "registration_deadline": "2026-11-05T23:59:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-REG-Z",
+            "participation": {
+              "registration": "REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "NEWS-X",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/NEWS-X",
+                "URL_registration": null
+              },
+              "title": "Synthetic online newsletter X",
+              "domain": "other",
+              "start": "2026-11-12T08:00:00+07:00",
+              "end": "2026-11-13T23:59:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-NEWS-X",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "DONE-Y",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/DONE-Y",
+                "URL_registration": null
+              },
+              "title": "Synthetic completed volunteering Y",
+              "domain": "volunteer",
+              "start": "2026-11-09T11:00:00+07:00",
+              "end": "2026-11-09T12:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-DONE-Y",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "COMPLETED"
+            }
+          }
+        ]
+      },
+      "availability_response": {
+        "availability_version": "sp3-availability/0.2",
+        "calendar_version": "availability-dd13dec79aadee26",
+        "apply_scope": "WEEK_ONLY",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "effective_from": "2026-11-09",
+        "effective_until": "2026-11-15",
+        "available_intervals": [
+          {
+            "start": "2026-11-09T08:00:00+07:00",
+            "end": "2026-11-09T12:00:00+07:00"
+          },
+          {
+            "start": "2026-11-11T07:00:00+07:00",
+            "end": "2026-11-11T13:00:00+07:00"
+          },
+          {
+            "start": "2026-11-12T13:00:00+07:00",
+            "end": "2026-11-12T17:00:00+07:00"
+          },
+          {
+            "start": "2026-11-14T08:00:00+07:00",
+            "end": "2026-11-14T12:00:00+07:00"
+          }
+        ]
+      },
+      "feasibility_response": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "main-flow-step1",
+        "context": {
+          "student_id": "synthetic-student-mf1",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-09T00:00:00+07:00",
+          "window_end": "2026-11-16T00:00:00+07:00",
+          "as_of": "2026-11-08T20:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-mf1",
+          "dataset_version": "synthetic-dataset-mf1",
+          "ruleset_version": "drl-rules-1028-synthetic-check",
+          "calendar_version": "availability-dd13dec79aadee26"
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "SEM-A",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-A",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar A",
+              "domain": "academic",
+              "start": "2026-11-09T09:00:00+07:00",
+              "end": "2026-11-09T10:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-A",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-09T09:00:00+07:00",
+                  "end": "2026-11-09T10:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "SEM-B",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-B",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar B",
+              "domain": "academic",
+              "start": "2026-11-09T09:30:00+07:00",
+              "end": "2026-11-09T11:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-B",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-09T09:30:00+07:00",
+                  "end": "2026-11-09T11:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "SEM-C",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-C",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar C",
+              "domain": "academic",
+              "start": "2026-11-12T14:00:00+07:00",
+              "end": "2026-11-12T15:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-C",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-12T14:00:00+07:00",
+                  "end": "2026-11-12T15:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "QUIZ-M",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/QUIZ-M",
+                "URL_registration": null
+              },
+              "title": "Synthetic online seminar quiz M",
+              "domain": "academic",
+              "start": "2026-11-11T07:00:00+07:00",
+              "end": "2026-11-11T13:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-QUIZ-M",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-11T07:00:00+07:00",
+              "window_end": "2026-11-11T13:00:00+07:00",
+              "duration_minutes": 180
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "QUIZ-L",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/QUIZ-L",
+                "URL_registration": null
+              },
+              "title": "Synthetic online law quiz L",
+              "domain": "skills",
+              "start": "2026-11-11T09:00:00+07:00",
+              "end": "2026-11-11T12:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-QUIZ-L",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-11T09:00:00+07:00",
+              "window_end": "2026-11-11T12:00:00+07:00",
+              "duration_minutes": 90
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "MOB-W",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/MOB-W",
+                "URL_registration": null
+              },
+              "title": "Synthetic two-session mobilization W",
+              "domain": "volunteer",
+              "start": "2026-11-12T13:00:00+07:00",
+              "end": "2026-11-14T09:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-MOB-W",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-12T13:00:00+07:00",
+                  "end": "2026-11-12T14:00:00+07:00"
+                },
+                {
+                  "start": "2026-11-14T08:00:00+07:00",
+                  "end": "2026-11-14T09:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "REG-Z",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/REG-Z",
+                "URL_registration": null
+              },
+              "title": "Synthetic registered mobilization Z",
+              "domain": "volunteer",
+              "start": "2026-11-12T15:00:00+07:00",
+              "end": "2026-11-12T16:00:00+07:00",
+              "registration_deadline": "2026-11-05T23:59:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-REG-Z",
+            "participation": {
+              "registration": "REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-12T15:00:00+07:00",
+                  "end": "2026-11-12T16:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "NEWS-X",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/NEWS-X",
+                "URL_registration": null
+              },
+              "title": "Synthetic online newsletter X",
+              "domain": "other",
+              "start": "2026-11-12T08:00:00+07:00",
+              "end": "2026-11-13T23:59:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-NEWS-X",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": null,
+            "feasibility": {
+              "status": "NEEDS_REVIEW",
+              "reason_codes": [
+                "MISSING_SCHEDULE_TYPE"
+              ]
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "DONE-Y",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/DONE-Y",
+                "URL_registration": null
+              },
+              "title": "Synthetic completed volunteering Y",
+              "domain": "volunteer",
+              "start": "2026-11-09T11:00:00+07:00",
+              "end": "2026-11-09T12:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-DONE-Y",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "COMPLETED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-09T11:00:00+07:00",
+                  "end": "2026-11-09T12:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "INFEASIBLE",
+              "reason_codes": [
+                "ALREADY_COMPLETED"
+              ]
+            }
+          }
+        ],
+        "conflict_pairs": [
+          [
+            "SEM-A",
+            "SEM-B"
+          ]
+        ]
+      }
+    },
+    "step2": {
+      "availability_request": {
+        "availability_version": "sp3-availability/0.2",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "week_start": "2026-11-09",
+        "apply_scope": "WEEK_ONLY",
+        "weekly_blocks": [
+          {
+            "day_of_week": "MONDAY",
+            "start_time": "08:00",
+            "end_time": "12:00"
+          },
+          {
+            "day_of_week": "WEDNESDAY",
+            "start_time": "07:00",
+            "end_time": "13:00"
+          },
+          {
+            "day_of_week": "THURSDAY",
+            "start_time": "13:00",
+            "end_time": "17:00"
+          },
+          {
+            "day_of_week": "SATURDAY",
+            "start_time": "08:00",
+            "end_time": "12:00"
+          }
+        ],
+        "effective_from": null,
+        "effective_until": null,
+        "exceptions": [],
+        "busy_intervals": [
+          {
+            "start": "2026-11-09T09:00:00+07:00",
+            "end": "2026-11-09T10:00:00+07:00"
+          },
+          {
+            "start": "2026-11-11T10:00:00+07:00",
+            "end": "2026-11-11T10:30:00+07:00"
+          }
+        ]
+      },
+      "feasibility_request": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "main-flow-step2",
+        "context": {
+          "student_id": "synthetic-student-mf1",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-09T00:00:00+07:00",
+          "window_end": "2026-11-16T00:00:00+07:00",
+          "as_of": "2026-11-08T20:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-mf1",
+          "dataset_version": "synthetic-dataset-mf1",
+          "ruleset_version": "drl-rules-1028-synthetic-check",
+          "calendar_version": "availability-4609ccb138524620"
+        },
+        "available_intervals": [
+          {
+            "start": "2026-11-09T08:00:00+07:00",
+            "end": "2026-11-09T09:00:00+07:00"
+          },
+          {
+            "start": "2026-11-09T10:00:00+07:00",
+            "end": "2026-11-09T12:00:00+07:00"
+          },
+          {
+            "start": "2026-11-11T07:00:00+07:00",
+            "end": "2026-11-11T10:00:00+07:00"
+          },
+          {
+            "start": "2026-11-11T10:30:00+07:00",
+            "end": "2026-11-11T13:00:00+07:00"
+          },
+          {
+            "start": "2026-11-12T13:00:00+07:00",
+            "end": "2026-11-12T17:00:00+07:00"
+          },
+          {
+            "start": "2026-11-14T08:00:00+07:00",
+            "end": "2026-11-14T12:00:00+07:00"
+          }
+        ],
+        "activities": [
+          {
+            "activity": {
+              "activity_id": "SEM-A",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-A",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar A",
+              "domain": "academic",
+              "start": "2026-11-09T09:00:00+07:00",
+              "end": "2026-11-09T10:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-A",
+            "participation": {
+              "registration": "REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "SEM-B",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-B",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar B",
+              "domain": "academic",
+              "start": "2026-11-09T09:30:00+07:00",
+              "end": "2026-11-09T11:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-B",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "SEM-C",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-C",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar C",
+              "domain": "academic",
+              "start": "2026-11-12T14:00:00+07:00",
+              "end": "2026-11-12T15:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-C",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "QUIZ-M",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/QUIZ-M",
+                "URL_registration": null
+              },
+              "title": "Synthetic online seminar quiz M",
+              "domain": "academic",
+              "start": "2026-11-11T07:00:00+07:00",
+              "end": "2026-11-11T13:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-QUIZ-M",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "QUIZ-L",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/QUIZ-L",
+                "URL_registration": null
+              },
+              "title": "Synthetic online law quiz L",
+              "domain": "skills",
+              "start": "2026-11-11T09:00:00+07:00",
+              "end": "2026-11-11T12:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-QUIZ-L",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "MOB-W",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/MOB-W",
+                "URL_registration": null
+              },
+              "title": "Synthetic two-session mobilization W",
+              "domain": "volunteer",
+              "start": "2026-11-12T13:00:00+07:00",
+              "end": "2026-11-14T09:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-MOB-W",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "REG-Z",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/REG-Z",
+                "URL_registration": null
+              },
+              "title": "Synthetic registered mobilization Z",
+              "domain": "volunteer",
+              "start": "2026-11-12T15:00:00+07:00",
+              "end": "2026-11-12T16:00:00+07:00",
+              "registration_deadline": "2026-11-05T23:59:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-REG-Z",
+            "participation": {
+              "registration": "REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "NEWS-X",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/NEWS-X",
+                "URL_registration": null
+              },
+              "title": "Synthetic online newsletter X",
+              "domain": "other",
+              "start": "2026-11-12T08:00:00+07:00",
+              "end": "2026-11-13T23:59:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-NEWS-X",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "DONE-Y",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/DONE-Y",
+                "URL_registration": null
+              },
+              "title": "Synthetic completed volunteering Y",
+              "domain": "volunteer",
+              "start": "2026-11-09T11:00:00+07:00",
+              "end": "2026-11-09T12:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-DONE-Y",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "COMPLETED"
+            }
+          }
+        ]
+      },
+      "availability_response": {
+        "availability_version": "sp3-availability/0.2",
+        "calendar_version": "availability-4609ccb138524620",
+        "apply_scope": "WEEK_ONLY",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "effective_from": "2026-11-09",
+        "effective_until": "2026-11-15",
+        "available_intervals": [
+          {
+            "start": "2026-11-09T08:00:00+07:00",
+            "end": "2026-11-09T09:00:00+07:00"
+          },
+          {
+            "start": "2026-11-09T10:00:00+07:00",
+            "end": "2026-11-09T12:00:00+07:00"
+          },
+          {
+            "start": "2026-11-11T07:00:00+07:00",
+            "end": "2026-11-11T10:00:00+07:00"
+          },
+          {
+            "start": "2026-11-11T10:30:00+07:00",
+            "end": "2026-11-11T13:00:00+07:00"
+          },
+          {
+            "start": "2026-11-12T13:00:00+07:00",
+            "end": "2026-11-12T17:00:00+07:00"
+          },
+          {
+            "start": "2026-11-14T08:00:00+07:00",
+            "end": "2026-11-14T12:00:00+07:00"
+          }
+        ]
+      },
+      "feasibility_response": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "main-flow-step2",
+        "context": {
+          "student_id": "synthetic-student-mf1",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-09T00:00:00+07:00",
+          "window_end": "2026-11-16T00:00:00+07:00",
+          "as_of": "2026-11-08T20:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-mf1",
+          "dataset_version": "synthetic-dataset-mf1",
+          "ruleset_version": "drl-rules-1028-synthetic-check",
+          "calendar_version": "availability-4609ccb138524620"
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "SEM-A",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-A",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar A",
+              "domain": "academic",
+              "start": "2026-11-09T09:00:00+07:00",
+              "end": "2026-11-09T10:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-A",
+            "participation": {
+              "registration": "REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-09T09:00:00+07:00",
+                  "end": "2026-11-09T10:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "INFEASIBLE",
+              "reason_codes": [
+                "OUTSIDE_AVAILABILITY"
+              ]
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "SEM-B",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-B",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar B",
+              "domain": "academic",
+              "start": "2026-11-09T09:30:00+07:00",
+              "end": "2026-11-09T11:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-B",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-09T09:30:00+07:00",
+                  "end": "2026-11-09T11:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "INFEASIBLE",
+              "reason_codes": [
+                "OUTSIDE_AVAILABILITY"
+              ]
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "SEM-C",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/SEM-C",
+                "URL_registration": null
+              },
+              "title": "Synthetic seminar C",
+              "domain": "academic",
+              "start": "2026-11-12T14:00:00+07:00",
+              "end": "2026-11-12T15:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-SEM-C",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-12T14:00:00+07:00",
+                  "end": "2026-11-12T15:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "QUIZ-M",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/QUIZ-M",
+                "URL_registration": null
+              },
+              "title": "Synthetic online seminar quiz M",
+              "domain": "academic",
+              "start": "2026-11-11T07:00:00+07:00",
+              "end": "2026-11-11T13:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-QUIZ-M",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-11T07:00:00+07:00",
+              "window_end": "2026-11-11T13:00:00+07:00",
+              "duration_minutes": 180
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "QUIZ-L",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/QUIZ-L",
+                "URL_registration": null
+              },
+              "title": "Synthetic online law quiz L",
+              "domain": "skills",
+              "start": "2026-11-11T09:00:00+07:00",
+              "end": "2026-11-11T12:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-QUIZ-L",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-11T09:00:00+07:00",
+              "window_end": "2026-11-11T12:00:00+07:00",
+              "duration_minutes": 90
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "MOB-W",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/MOB-W",
+                "URL_registration": null
+              },
+              "title": "Synthetic two-session mobilization W",
+              "domain": "volunteer",
+              "start": "2026-11-12T13:00:00+07:00",
+              "end": "2026-11-14T09:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-MOB-W",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-12T13:00:00+07:00",
+                  "end": "2026-11-12T14:00:00+07:00"
+                },
+                {
+                  "start": "2026-11-14T08:00:00+07:00",
+                  "end": "2026-11-14T09:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "REG-Z",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/REG-Z",
+                "URL_registration": null
+              },
+              "title": "Synthetic registered mobilization Z",
+              "domain": "volunteer",
+              "start": "2026-11-12T15:00:00+07:00",
+              "end": "2026-11-12T16:00:00+07:00",
+              "registration_deadline": "2026-11-05T23:59:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-REG-Z",
+            "participation": {
+              "registration": "REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-12T15:00:00+07:00",
+                  "end": "2026-11-12T16:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "NEWS-X",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/NEWS-X",
+                "URL_registration": null
+              },
+              "title": "Synthetic online newsletter X",
+              "domain": "other",
+              "start": "2026-11-12T08:00:00+07:00",
+              "end": "2026-11-13T23:59:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-NEWS-X",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": null,
+            "feasibility": {
+              "status": "NEEDS_REVIEW",
+              "reason_codes": [
+                "MISSING_SCHEDULE_TYPE"
+              ]
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "DONE-Y",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/DONE-Y",
+                "URL_registration": null
+              },
+              "title": "Synthetic completed volunteering Y",
+              "domain": "volunteer",
+              "start": "2026-11-09T11:00:00+07:00",
+              "end": "2026-11-09T12:00:00+07:00",
+              "registration_deadline": "2026-11-08T23:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic hall",
+              "points": null,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic completion check."
+            },
+            "score_binding_ref": "synthetic-binding-DONE-Y",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "COMPLETED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-09T11:00:00+07:00",
+                  "end": "2026-11-09T12:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "INFEASIBLE",
+              "reason_codes": [
+                "ALREADY_COMPLETED"
+              ]
+            }
+          }
+        ],
+        "conflict_pairs": [
+          [
+            "SEM-A",
+            "SEM-B"
+          ]
+        ]
+      }
+    }
+  },
+  "scoring_data": {
+    "label": "SYNTHETIC-DEMO",
+    "dataset_version": "synthetic-dataset-mf1",
+    "ruleset_version": "drl-rules-1028-synthetic-check",
+    "baselines": [
+      {
+        "student_id": "synthetic-student-mf1",
+        "baseline_ref": "synthetic-baseline-mf1",
+        "facts": {
+          "academic_exam_violations": 0,
+          "eligible_academic_seminars": 2,
+          "school_rule_violations_excluding_academic_exam": 0,
+          "social_evil_violations_or_coverups": 0,
+          "school_faculty_mobilization_activities": 1,
+          "legal_violations": 0,
+          "legal_health_communication_activities": 0
+        }
+      }
+    ],
+    "activities": [
+      {
+        "activity_id": "SEM-A",
+        "source": {
+          "publisher": "Synthetic fixture",
+          "platform": "fixture",
+          "URL_post": "https://example.invalid/activity/SEM-A",
+          "URL_registration": null
+        },
+        "title": "Synthetic seminar A",
+        "domain": "academic",
+        "start": "2026-11-09T09:00:00+07:00",
+        "end": "2026-11-09T10:00:00+07:00",
+        "registration_deadline": "2026-11-08T23:00:00+07:00",
+        "mode": "offline",
+        "location": "Synthetic hall",
+        "points": null,
+        "mandatory": false,
+        "audience": [
+          "Synthetic students"
+        ],
+        "fee": 0,
+        "completion_requirements": "Synthetic completion check."
+      },
+      {
+        "activity_id": "SEM-B",
+        "source": {
+          "publisher": "Synthetic fixture",
+          "platform": "fixture",
+          "URL_post": "https://example.invalid/activity/SEM-B",
+          "URL_registration": null
+        },
+        "title": "Synthetic seminar B",
+        "domain": "academic",
+        "start": "2026-11-09T09:30:00+07:00",
+        "end": "2026-11-09T11:00:00+07:00",
+        "registration_deadline": "2026-11-08T23:00:00+07:00",
+        "mode": "offline",
+        "location": "Synthetic hall",
+        "points": null,
+        "mandatory": false,
+        "audience": [
+          "Synthetic students"
+        ],
+        "fee": 0,
+        "completion_requirements": "Synthetic completion check."
+      },
+      {
+        "activity_id": "SEM-C",
+        "source": {
+          "publisher": "Synthetic fixture",
+          "platform": "fixture",
+          "URL_post": "https://example.invalid/activity/SEM-C",
+          "URL_registration": null
+        },
+        "title": "Synthetic seminar C",
+        "domain": "academic",
+        "start": "2026-11-12T14:00:00+07:00",
+        "end": "2026-11-12T15:00:00+07:00",
+        "registration_deadline": "2026-11-08T23:00:00+07:00",
+        "mode": "offline",
+        "location": "Synthetic hall",
+        "points": null,
+        "mandatory": false,
+        "audience": [
+          "Synthetic students"
+        ],
+        "fee": 0,
+        "completion_requirements": "Synthetic completion check."
+      },
+      {
+        "activity_id": "QUIZ-M",
+        "source": {
+          "publisher": "Synthetic fixture",
+          "platform": "fixture",
+          "URL_post": "https://example.invalid/activity/QUIZ-M",
+          "URL_registration": null
+        },
+        "title": "Synthetic online seminar quiz M",
+        "domain": "academic",
+        "start": "2026-11-11T07:00:00+07:00",
+        "end": "2026-11-11T13:00:00+07:00",
+        "registration_deadline": "2026-11-08T23:00:00+07:00",
+        "mode": "online",
+        "location": null,
+        "points": null,
+        "mandatory": false,
+        "audience": [
+          "Synthetic students"
+        ],
+        "fee": 0,
+        "completion_requirements": "Synthetic completion check."
+      },
+      {
+        "activity_id": "QUIZ-L",
+        "source": {
+          "publisher": "Synthetic fixture",
+          "platform": "fixture",
+          "URL_post": "https://example.invalid/activity/QUIZ-L",
+          "URL_registration": null
+        },
+        "title": "Synthetic online law quiz L",
+        "domain": "skills",
+        "start": "2026-11-11T09:00:00+07:00",
+        "end": "2026-11-11T12:00:00+07:00",
+        "registration_deadline": "2026-11-08T23:00:00+07:00",
+        "mode": "online",
+        "location": null,
+        "points": null,
+        "mandatory": false,
+        "audience": [
+          "Synthetic students"
+        ],
+        "fee": 0,
+        "completion_requirements": "Synthetic completion check."
+      },
+      {
+        "activity_id": "MOB-W",
+        "source": {
+          "publisher": "Synthetic fixture",
+          "platform": "fixture",
+          "URL_post": "https://example.invalid/activity/MOB-W",
+          "URL_registration": null
+        },
+        "title": "Synthetic two-session mobilization W",
+        "domain": "volunteer",
+        "start": "2026-11-12T13:00:00+07:00",
+        "end": "2026-11-14T09:00:00+07:00",
+        "registration_deadline": "2026-11-08T23:00:00+07:00",
+        "mode": "offline",
+        "location": "Synthetic hall",
+        "points": null,
+        "mandatory": false,
+        "audience": [
+          "Synthetic students"
+        ],
+        "fee": 0,
+        "completion_requirements": "Synthetic completion check."
+      },
+      {
+        "activity_id": "REG-Z",
+        "source": {
+          "publisher": "Synthetic fixture",
+          "platform": "fixture",
+          "URL_post": "https://example.invalid/activity/REG-Z",
+          "URL_registration": null
+        },
+        "title": "Synthetic registered mobilization Z",
+        "domain": "volunteer",
+        "start": "2026-11-12T15:00:00+07:00",
+        "end": "2026-11-12T16:00:00+07:00",
+        "registration_deadline": "2026-11-05T23:59:00+07:00",
+        "mode": "offline",
+        "location": "Synthetic hall",
+        "points": null,
+        "mandatory": false,
+        "audience": [
+          "Synthetic students"
+        ],
+        "fee": 0,
+        "completion_requirements": "Synthetic completion check."
+      },
+      {
+        "activity_id": "NEWS-X",
+        "source": {
+          "publisher": "Synthetic fixture",
+          "platform": "fixture",
+          "URL_post": "https://example.invalid/activity/NEWS-X",
+          "URL_registration": null
+        },
+        "title": "Synthetic online newsletter X",
+        "domain": "other",
+        "start": "2026-11-12T08:00:00+07:00",
+        "end": "2026-11-13T23:59:00+07:00",
+        "registration_deadline": "2026-11-08T23:00:00+07:00",
+        "mode": "online",
+        "location": null,
+        "points": null,
+        "mandatory": false,
+        "audience": [
+          "Synthetic students"
+        ],
+        "fee": 0,
+        "completion_requirements": "Synthetic completion check."
+      },
+      {
+        "activity_id": "DONE-Y",
+        "source": {
+          "publisher": "Synthetic fixture",
+          "platform": "fixture",
+          "URL_post": "https://example.invalid/activity/DONE-Y",
+          "URL_registration": null
+        },
+        "title": "Synthetic completed volunteering Y",
+        "domain": "volunteer",
+        "start": "2026-11-09T11:00:00+07:00",
+        "end": "2026-11-09T12:00:00+07:00",
+        "registration_deadline": "2026-11-08T23:00:00+07:00",
+        "mode": "offline",
+        "location": "Synthetic hall",
+        "points": null,
+        "mandatory": false,
+        "audience": [
+          "Synthetic students"
+        ],
+        "fee": 0,
+        "completion_requirements": "Synthetic completion check."
+      }
+    ],
+    "bindings": [
+      {
+        "activity_id": "SEM-A",
+        "binding_ref": "synthetic-binding-SEM-A",
+        "rule_id": "R19",
+        "field": "eligible_academic_seminars",
+        "operation": "INCREMENT",
+        "value": 1
+      },
+      {
+        "activity_id": "SEM-B",
+        "binding_ref": "synthetic-binding-SEM-B",
+        "rule_id": "R19",
+        "field": "eligible_academic_seminars",
+        "operation": "INCREMENT",
+        "value": 1
+      },
+      {
+        "activity_id": "SEM-C",
+        "binding_ref": "synthetic-binding-SEM-C",
+        "rule_id": "R19",
+        "field": "eligible_academic_seminars",
+        "operation": "INCREMENT",
+        "value": 1
+      },
+      {
+        "activity_id": "QUIZ-M",
+        "binding_ref": "synthetic-binding-QUIZ-M",
+        "rule_id": "R19",
+        "field": "eligible_academic_seminars",
+        "operation": "INCREMENT",
+        "value": 1
+      },
+      {
+        "activity_id": "QUIZ-L",
+        "binding_ref": "synthetic-binding-QUIZ-L",
+        "rule_id": "R46",
+        "field": "legal_health_communication_activities",
+        "operation": "INCREMENT",
+        "value": 1
+      },
+      {
+        "activity_id": "MOB-W",
+        "binding_ref": "synthetic-binding-MOB-W",
+        "rule_id": "R33",
+        "field": "school_faculty_mobilization_activities",
+        "operation": "INCREMENT",
+        "value": 1
+      },
+      {
+        "activity_id": "REG-Z",
+        "binding_ref": "synthetic-binding-REG-Z",
+        "rule_id": "R33",
+        "field": "school_faculty_mobilization_activities",
+        "operation": "INCREMENT",
+        "value": 1
+      },
+      {
+        "activity_id": "NEWS-X",
+        "binding_ref": "synthetic-binding-NEWS-X",
+        "rule_id": "R33",
+        "field": "school_faculty_mobilization_activities",
+        "operation": "INCREMENT",
+        "value": 1
+      },
+      {
+        "activity_id": "DONE-Y",
+        "binding_ref": "synthetic-binding-DONE-Y",
+        "rule_id": "R33",
+        "field": "school_faculty_mobilization_activities",
+        "operation": "INCREMENT",
+        "value": 1
+      }
+    ]
+  },
+  "planner": {
+    "baseline": {
+      "category_scores": {
+        "C1": 20,
+        "C2": 15,
+        "C3": 15,
+        "C4": 10,
+        "C5": 0
+      },
+      "category_caps": {
+        "C1": 30,
+        "C2": 20,
+        "C3": 25,
+        "C4": 25,
+        "C5": 30
+      },
+      "total_score": 60,
+      "max_total_score": 100,
+      "included_activity_ids": []
+    },
+    "goals": {
+      "total_target": 80,
+      "category_targets": {
+        "C1": 30,
+        "C4": 20
+      }
+    },
+    "preferences": {
+      "preferred_domains": [],
+      "preferred_modes": [
+        "online"
+      ]
+    },
+    "limits": {
+      "max_activities": null,
+      "max_duration_minutes": null
+    }
+  },
+  "derivation": [
+    "Baseline facts (same as synthetic_scoring_data.json): R11 -> C1 10, R19 2 seminars x5 -> C1 20; R21 -> C2 15; R37 10 + R33 1x5 -> C3 15; R41 -> C4 10; C5 0; total 60.",
+    "Bindings: SEM-A/B/C and QUIZ-M add one R19 seminar (C1 +5 each, cap 30); QUIZ-L adds one R46 activity (C4 +10); MOB-W, REG-Z add one R33 activity (C3 +5 each, cap 25).",
+    "Step 1 free time: Mon 08-12, Wed 07-13, Thu 13-17, Sat 08-12. SEM-A Mon 09-10 and SEM-B Mon 09:30-11 overlap -> conflict pair. NEWS-X is online without evidence -> NEEDS_REVIEW. DONE-Y is COMPLETED -> INFEASIBLE, not in the baseline -> pending_confirmation. REG-Z is REGISTERED, so its passed deadline is ignored.",
+    "Targets C1 30, C4 20, total 80 need two seminars and QUIZ-L, so no plan of size 1 or 2 meets them. Size-3 plans that meet them: {SEM-x, QUIZ-M, QUIZ-L} for x in A, B, C. All have 2 online matches; minutes A 60+180+90 = 330, B 360, C 330; A beats C on the sorted ID list.",
+    "Scheduling (counterexample to a fixed window-end order): QUIZ-L (window Wed 09-12, 90 min) placed first at 09:00 leaves no 180-minute gap for QUIZ-M; the exact schedule is QUIZ-M Wed 07:00-10:00 then QUIZ-L Wed 10:00-11:30.",
+    "Step 1 attribution in scheduled order SEM-A, QUIZ-M, QUIZ-L: C1 20->25->30, C4 10->20. Projected 30/15/15/20/0 = 80, TARGET_MET.",
+    "Step 1 search without a previous plan: 7 eligible (SEM-A, SEM-B, SEM-C, QUIZ-L, QUIZ-M, MOB-W, REG-Z), one conflict pair, every conflict-free set schedulable. Scored subsets 1 + 7 + (21-1) + (35-5) = 58; size 4 is dominated, so complete=false with optimality proven.",
+    "Step 2: the student adds busy Mon 09:00-10:00 and Wed 10:00-10:30 and has registered SEM-A. SEM-A and SEM-B leave available time -> INFEASIBLE. Previous plan P = {SEM-A, QUIZ-M, QUIZ-L}.",
+    "Step 2 eligible: SEM-C, QUIZ-L, QUIZ-M, MOB-W, REG-Z. Only {SEM-C, QUIZ-M, QUIZ-L} (or supersets) meets every target; it has 2 activity-set changes, supersets have 3. QUIZ-M keeps Wed 07-10; QUIZ-L's old block now overlaps busy time and moves to the earliest valid Wed 10:30-12:00; SEM-C is added Thu 14-15. SEM-A is dropped NO_LONGER_FEASIBLE and is registered -> DROPS_REGISTERED.",
+    "Step 2 search with a previous plan has no dominance pruning: all 2^5 = 32 subsets are schedulable and scored. score_comparison rescores P ∩ eligible = {QUIZ-L, QUIZ-M}: C1 25, C4 20, total 75.",
+    "what_if_skip(QUIZ-L) on step 2: no C4 source remains, so the C4 gap of 10 is unavoidable. C1 needs QUIZ-M and SEM-C; total 80 then needs MOB-W and REG-Z (C3 15->25). Unique best {QUIZ-M, MOB-W, SEM-C, REG-Z}; 16 subsets evaluated exhaustively -> PARTIAL, PROVEN_UNREACHABLE. Attribution order QUIZ-M (Wed 07), MOB-W (Thu 13), SEM-C (Thu 14), REG-Z (Thu 15): +5 C1, +5 C3, +5 C1, +5 C3. QUIZ-L dropped CANCELLED, SEM-A dropped NO_LONGER_FEASIBLE. Comparison rescores {QUIZ-M}: C1 25, total 65.",
+    "Keep conflict on step 2: KEEP_TIME for QUIZ-L (old block Wed 10:00-11:30 overlaps busy 10:00-10:30 -> BLOCK_INVALID) and SEM-A (INFEASIBLE -> NOT_ELIGIBLE), listed by activity ID."
+  ],
+  "expected": {
+    "step1": {
+      "status": "TARGET_MET",
+      "feasibility_conclusion": "REACHABLE",
+      "selected": [
+        {
+          "activity_id": "SEM-A",
+          "schedule_type": "FIXED",
+          "scheduled_blocks": [
+            {
+              "start": "2026-11-09T09:00:00+07:00",
+              "end": "2026-11-09T10:00:00+07:00"
+            }
+          ],
+          "registration": "NOT_REGISTERED",
+          "change": "ADDED",
+          "category_id": "C1",
+          "projected_added": 5,
+          "preference_matches": 0
+        },
+        {
+          "activity_id": "QUIZ-M",
+          "schedule_type": "FLEXIBLE_WINDOW",
+          "scheduled_blocks": [
+            {
+              "start": "2026-11-11T07:00:00+07:00",
+              "end": "2026-11-11T10:00:00+07:00"
+            }
+          ],
+          "registration": "NOT_REGISTERED",
+          "change": "ADDED",
+          "category_id": "C1",
+          "projected_added": 5,
+          "preference_matches": 1
+        },
+        {
+          "activity_id": "QUIZ-L",
+          "schedule_type": "FLEXIBLE_WINDOW",
+          "scheduled_blocks": [
+            {
+              "start": "2026-11-11T10:00:00+07:00",
+              "end": "2026-11-11T11:30:00+07:00"
+            }
+          ],
+          "registration": "NOT_REGISTERED",
+          "change": "ADDED",
+          "category_id": "C4",
+          "projected_added": 10,
+          "preference_matches": 1
+        }
+      ],
+      "excluded": {
+        "SEM-B": "CONFLICT",
+        "SEM-C": "LOWER_PRIORITY",
+        "MOB-W": "LOWER_PRIORITY",
+        "REG-Z": "LOWER_PRIORITY",
+        "NEWS-X": "NEEDS_REVIEW",
+        "DONE-Y": "NOT_FEASIBLE"
+      },
+      "score_summary": {
+        "baseline_by_category": {
+          "C1": 20,
+          "C2": 15,
+          "C3": 15,
+          "C4": 10,
+          "C5": 0
+        },
+        "projected_by_category": {
+          "C1": 30,
+          "C2": 15,
+          "C3": 15,
+          "C4": 20,
+          "C5": 0
+        },
+        "gain_by_category": {
+          "C1": 10,
+          "C2": 0,
+          "C3": 0,
+          "C4": 10,
+          "C5": 0
+        },
+        "baseline_total": 60,
+        "projected_total": 80,
+        "gain_total": 20,
+        "remaining_by_category": {
+          "C1": 0,
+          "C4": 0
+        },
+        "remaining_total": 0
+      },
+      "search": {
+        "complete": false,
+        "optimality_proven": true,
+        "evaluated_subsets": 58,
+        "limit_reason": null
+      },
+      "proof": null,
+      "warning_codes": [
+        "DEMO_ONLY",
+        "TRAVEL_NOT_MODELED",
+        "PENDING_CANDIDATES",
+        "PENDING_CONFIRMATION",
+        "SEARCH_INCOMPLETE"
+      ],
+      "pending_confirmation": [
+        "DONE-Y"
+      ],
+      "dropped": {},
+      "score_comparison": null
+    },
+    "step2": {
+      "status": "TARGET_MET",
+      "feasibility_conclusion": "REACHABLE",
+      "selected": [
+        {
+          "activity_id": "QUIZ-M",
+          "schedule_type": "FLEXIBLE_WINDOW",
+          "scheduled_blocks": [
+            {
+              "start": "2026-11-11T07:00:00+07:00",
+              "end": "2026-11-11T10:00:00+07:00"
+            }
+          ],
+          "registration": "NOT_REGISTERED",
+          "change": "KEPT",
+          "category_id": "C1",
+          "projected_added": 5,
+          "preference_matches": 1
+        },
+        {
+          "activity_id": "QUIZ-L",
+          "schedule_type": "FLEXIBLE_WINDOW",
+          "scheduled_blocks": [
+            {
+              "start": "2026-11-11T10:30:00+07:00",
+              "end": "2026-11-11T12:00:00+07:00"
+            }
+          ],
+          "registration": "NOT_REGISTERED",
+          "change": "MOVED",
+          "category_id": "C4",
+          "projected_added": 10,
+          "preference_matches": 1
+        },
+        {
+          "activity_id": "SEM-C",
+          "schedule_type": "FIXED",
+          "scheduled_blocks": [
+            {
+              "start": "2026-11-12T14:00:00+07:00",
+              "end": "2026-11-12T15:00:00+07:00"
+            }
+          ],
+          "registration": "NOT_REGISTERED",
+          "change": "ADDED",
+          "category_id": "C1",
+          "projected_added": 5,
+          "preference_matches": 0
+        }
+      ],
+      "excluded": {
+        "SEM-A": "NOT_FEASIBLE",
+        "SEM-B": "NOT_FEASIBLE",
+        "MOB-W": "LOWER_PRIORITY",
+        "REG-Z": "LOWER_PRIORITY",
+        "NEWS-X": "NEEDS_REVIEW",
+        "DONE-Y": "NOT_FEASIBLE"
+      },
+      "score_summary": {
+        "baseline_by_category": {
+          "C1": 20,
+          "C2": 15,
+          "C3": 15,
+          "C4": 10,
+          "C5": 0
+        },
+        "projected_by_category": {
+          "C1": 30,
+          "C2": 15,
+          "C3": 15,
+          "C4": 20,
+          "C5": 0
+        },
+        "gain_by_category": {
+          "C1": 10,
+          "C2": 0,
+          "C3": 0,
+          "C4": 10,
+          "C5": 0
+        },
+        "baseline_total": 60,
+        "projected_total": 80,
+        "gain_total": 20,
+        "remaining_by_category": {
+          "C1": 0,
+          "C4": 0
+        },
+        "remaining_total": 0
+      },
+      "search": {
+        "complete": true,
+        "optimality_proven": true,
+        "evaluated_subsets": 32,
+        "limit_reason": null
+      },
+      "proof": null,
+      "warning_codes": [
+        "DEMO_ONLY",
+        "TRAVEL_NOT_MODELED",
+        "PENDING_CANDIDATES",
+        "PENDING_CONFIRMATION",
+        "DROPS_REGISTERED"
+      ],
+      "pending_confirmation": [
+        "DONE-Y"
+      ],
+      "dropped": {
+        "SEM-A": {
+          "code": "NO_LONGER_FEASIBLE",
+          "registered": true
+        }
+      },
+      "score_comparison": {
+        "basis": "PREVIOUS_ACTIVITY_SET_RESCORED",
+        "previous_activity_ids": [
+          "QUIZ-L",
+          "QUIZ-M"
+        ],
+        "previous_projected_by_category": {
+          "C1": 25,
+          "C2": 15,
+          "C3": 15,
+          "C4": 20,
+          "C5": 0
+        },
+        "previous_projected_total": 75,
+        "new_projected_total": 80
+      }
+    },
+    "what_if_skip_quiz_l": {
+      "status": "PARTIAL",
+      "feasibility_conclusion": "PROVEN_UNREACHABLE",
+      "selected": [
+        {
+          "activity_id": "QUIZ-M",
+          "schedule_type": "FLEXIBLE_WINDOW",
+          "scheduled_blocks": [
+            {
+              "start": "2026-11-11T07:00:00+07:00",
+              "end": "2026-11-11T10:00:00+07:00"
+            }
+          ],
+          "registration": "NOT_REGISTERED",
+          "change": "KEPT",
+          "category_id": "C1",
+          "projected_added": 5,
+          "preference_matches": 1
+        },
+        {
+          "activity_id": "MOB-W",
+          "schedule_type": "FIXED",
+          "scheduled_blocks": [
+            {
+              "start": "2026-11-12T13:00:00+07:00",
+              "end": "2026-11-12T14:00:00+07:00"
+            },
+            {
+              "start": "2026-11-14T08:00:00+07:00",
+              "end": "2026-11-14T09:00:00+07:00"
+            }
+          ],
+          "registration": "NOT_REGISTERED",
+          "change": "ADDED",
+          "category_id": "C3",
+          "projected_added": 5,
+          "preference_matches": 0
+        },
+        {
+          "activity_id": "SEM-C",
+          "schedule_type": "FIXED",
+          "scheduled_blocks": [
+            {
+              "start": "2026-11-12T14:00:00+07:00",
+              "end": "2026-11-12T15:00:00+07:00"
+            }
+          ],
+          "registration": "NOT_REGISTERED",
+          "change": "ADDED",
+          "category_id": "C1",
+          "projected_added": 5,
+          "preference_matches": 0
+        },
+        {
+          "activity_id": "REG-Z",
+          "schedule_type": "FIXED",
+          "scheduled_blocks": [
+            {
+              "start": "2026-11-12T15:00:00+07:00",
+              "end": "2026-11-12T16:00:00+07:00"
+            }
+          ],
+          "registration": "REGISTERED",
+          "change": "ADDED",
+          "category_id": "C3",
+          "projected_added": 5,
+          "preference_matches": 0
+        }
+      ],
+      "excluded": {
+        "QUIZ-L": "NOT_FEASIBLE",
+        "SEM-A": "NOT_FEASIBLE",
+        "SEM-B": "NOT_FEASIBLE",
+        "NEWS-X": "NEEDS_REVIEW",
+        "DONE-Y": "NOT_FEASIBLE"
+      },
+      "score_summary": {
+        "baseline_by_category": {
+          "C1": 20,
+          "C2": 15,
+          "C3": 15,
+          "C4": 10,
+          "C5": 0
+        },
+        "projected_by_category": {
+          "C1": 30,
+          "C2": 15,
+          "C3": 25,
+          "C4": 10,
+          "C5": 0
+        },
+        "gain_by_category": {
+          "C1": 10,
+          "C2": 0,
+          "C3": 10,
+          "C4": 0,
+          "C5": 0
+        },
+        "baseline_total": 60,
+        "projected_total": 80,
+        "gain_total": 20,
+        "remaining_by_category": {
+          "C1": 0,
+          "C4": 10
+        },
+        "remaining_total": 0
+      },
+      "search": {
+        "complete": true,
+        "optimality_proven": true,
+        "evaluated_subsets": 16,
+        "limit_reason": null
+      },
+      "proof": {
+        "kind": "EXHAUSTIVE_SEARCH",
+        "evaluated_subsets": 16
+      },
+      "warning_codes": [
+        "DEMO_ONLY",
+        "TRAVEL_NOT_MODELED",
+        "PENDING_CANDIDATES",
+        "PENDING_CONFIRMATION",
+        "DROPS_REGISTERED"
+      ],
+      "pending_confirmation": [
+        "DONE-Y"
+      ],
+      "dropped": {
+        "QUIZ-L": {
+          "code": "CANCELLED",
+          "registered": false
+        },
+        "SEM-A": {
+          "code": "NO_LONGER_FEASIBLE",
+          "registered": true
+        }
+      },
+      "score_comparison": {
+        "basis": "PREVIOUS_ACTIVITY_SET_RESCORED",
+        "previous_activity_ids": [
+          "QUIZ-M"
+        ],
+        "previous_projected_by_category": {
+          "C1": 25,
+          "C2": 15,
+          "C3": 15,
+          "C4": 10,
+          "C5": 0
+        },
+        "previous_projected_total": 65,
+        "new_projected_total": 80
+      }
+    },
+    "keep_conflict": {
+      "keep_requests": [
+        {
+          "activity_id": "QUIZ-L",
+          "mode": "KEEP_TIME"
+        },
+        {
+          "activity_id": "SEM-A",
+          "mode": "KEEP_TIME"
+        }
+      ],
+      "keep_conflicts": [
+        {
+          "activity_id": "QUIZ-L",
+          "code": "BLOCK_INVALID"
+        },
+        {
+          "activity_id": "SEM-A",
+          "code": "NOT_ELIGIBLE"
+        }
+      ]
+    }
+  }
+}

@@ -26,7 +26,7 @@ jobs:
       - name: Execute backend unit + integration tests
         env:
           PYTHONPATH: src
-        run: python -m pytest -q tests/sp1 tests/sp2 tests/integration
+        run: python -m pytest -q tests/sp1 tests/sp2 tests/sp3 tests/integration
       - name: Check SP2 ten expected cases
         env:
           PYTHONPATH: src
@@ -52,7 +52,7 @@ jobs:
         run: python -m pytest -q tests/test_e2e_pipeline.py tests/test_session_flow.py
 
   browser_e2e:
-    name: H4 real Chromium 5-case demo + XSS checks
+    name: MVP Chromium E2E - SP1, SP2 and SP3
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -65,7 +65,7 @@ jobs:
         run: |
           python -m pip install -r requirements.txt playwright
           python -m playwright install --with-deps chromium
-      - name: Verify H4 in a real browser
+      - name: Verify complete MVP in Chromium
         env:
           PYTHONPATH: src
         run: python scripts/verify_browser_e2e.py
@@ -73,6 +73,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: project-e-h4-chromium-evidence
+          name: project-e-mvp-chromium-evidence
           path: artifacts/h4_browser/
           if-no-files-found: warn
