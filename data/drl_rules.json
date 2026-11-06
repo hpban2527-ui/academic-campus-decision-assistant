@@ -6,13 +6,12 @@
     "effective_from": "HK1/2020-2021",
     "source": "https://hcmus.edu.vn/wp-content/uploads/2024/03/QD-1028-QC-DRL-2020_20231.pdf",
     "status": "verified",
-    "scope": {
-    "university": "HCMUS",
-    "student_type": "full_time",
-    "faculty": null,
-    "cohort": null,
-    "program": null
-  }
+    "source_review": {
+      "appendix_checked": "https://hcmus.edu.vn/wp-content/uploads/2024/03/QD-1028-QC-DRL-2020_20231.pdf",
+      "base_rule_check": "Appendix p.8: R11=10; p.9: 2.2 course evaluation; p.10: 4.3 24h to below 1 week.",
+      "later_framework_notice": "https://stsv.hcmus.edu.vn/quy-che-diem-ren-luyen",
+      "note": "2026 national student-regulation framework published. School-level applicability of 2020 scoring matrix for current semester requires human confirmation. Internal outputs are demo-only."
+    }
   },
   "scoring_model": {
     "assessment_period": "official_semester",
