@@ -1,6 +1,6 @@
-# PROJECT E — SP1 + SP2 (Điểm rèn luyện)
+# PROJECT E — SP1 + SP2 + SP3 (Điểm rèn luyện)
 
-Lead & Integration: Bình An. SP1: Trí (data), Duyên (extractor). SP2: Tuyền (rules), Ngọc (engine). UI: Tiến. SP3 chưa triển khai.
+Lead & Integration: Bình An. SP1: Trí (data), Duyên (extractor). SP2: Tuyền (rules), Ngọc (engine). SP3: Ngọc (availability/feasibility), Duyên (planner). UI: Tiến.
 
 ## Chạy thử
 
@@ -116,3 +116,13 @@ Start the existing API with `python run_server.py`. The SP3 endpoints are:
 - The demo recomputes availability and feasibility from Ngọc's code, plans with Duyên's code and invokes the real SP2 engine. The student, dates and activity bindings are synthetic fixture data; output is **DEMO_ONLY**, not a university-confirmed DRL award.
 
 Run `PYTHONPATH=src python -m pytest -q tests/sp3 tests/integration/test_sp3_flow.py` for the complete SP3 checks. The live HK3 planner remains review-gated until source activity records and point bindings are verified; do not turn unknown points into zero or claim official credit.
+
+## Phase 2 — MVP acceptance
+
+Start `python run_server.py`. Tiến's SP3 frontend calls the real `GET /api/sp3/catalog` and `POST /api/sp3/demo/plan`. From **Kế hoạch rèn luyện**, set a 0–100 target, optionally mark busy slots and generate a plan. The replan/what-if steps demonstrate fixed sample scenarios, not personalized continuations of arbitrary calendars.
+
+SP1's source catalog and SP3's November 2026 synthetic fixture are separate datasets. Planner results are `DEMO_ONLY` (`official_award_verified=false`); source activities are not officially recognized DRL points.
+
+Acceptance: `PYTHONPATH=src python -m pytest -q tests/sp1 tests/sp2 tests/sp3 tests/integration tests/test_e2e_pipeline.py tests/test_session_flow.py`, `python scripts/check_team_source_integrity.py`, `python scripts/check_sp2_cases.py`, and `python scripts/verify_browser_e2e.py` (requires Playwright Chromium). Browser evidence covers SP1/SP2, SP3 first-plan/replan/what-if, target/busy input changes, catalog labels, and mobile view.
+
+Existing teammate rules, source, and SP3 modules remain unchanged. Do not merge until exact-head CI passes and a valid reviewer approves.

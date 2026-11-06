@@ -529,7 +529,7 @@
                   <span>20 hoạt động</span> <span class="dev-only font-mono text-[11px] opacity-80">(Catalog)</span>
                 </span>
                 <span id="sp3DraftCountBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
-                  <span>18 bản nháp</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>
+                  <span>18 bài nguồn</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>
                 </span>
                 <span id="reviewCountBadge" class="dev-only px-3 py-1 rounded-full text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
                   0 bài chờ duyệt
@@ -557,7 +557,7 @@
             <div class="lg:col-span-7 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
               <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
                 <div>
-                  <h3 class="text-base font-extrabold text-white">Hoạt động đã công nhận <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP1 14 trường + Data QA)</span></h3>
+                  <h3 class="text-base font-extrabold text-white">Hoạt động nguồn · cần xác minh điểm <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP1 14 trường + Data QA)</span></h3>
                 </div>
                 <span class="dev-only text-xs font-mono font-semibold text-indigo-400">activities.json + QA20.json</span>
               </div>
@@ -787,10 +787,10 @@
               </div>
             </div>
 
-            <!-- Transparency Disclaimer in Dev Mode -->
-            <div class="dev-only p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-200 flex items-center gap-2">
-              <span class="font-bold shrink-0">⚠️ Lưu ý minh bạch:</span>
-              <span>Chế độ <b>DEMO_ONLY</b> (<code class="font-mono">official_award_verified: false</code>) sử dụng bộ dữ liệu giả lập tháng 11/2026 để kiểm chứng thuật toán SP3 — tuyệt đối không trình bày như kết quả ĐRL chính thức của HK3 thực tế.</span>
+            <!-- Simulation status stays visible in both modes. -->
+            <div id="planDisclosure" class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-200 flex flex-wrap items-center gap-2">
+              <span class="font-bold shrink-0">Dữ liệu mô phỏng</span>
+              <span>Kế hoạch dùng dữ liệu minh họa, chưa phải điểm rèn luyện được nhà trường xác nhận.</span><span class="dev-only font-mono text-amber-300">DEMO_ONLY · official_award_verified: false · SYNTHETIC-DEMO</span>
             </div>
 
             <!-- Stepper 3 Bước Hành Trình (Kế hoạch ban đầu -> Khi lịch thay đổi -> Khi bỏ hoạt động) -->
@@ -2180,7 +2180,7 @@
             <div class="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <h4 class="text-base font-extrabold text-white">Lịch của bạn có thể thay đổi?</h4>
-                <p class="text-sm text-slate-300 mt-1">Xem kế hoạch được xếp lại thế nào khi lịch rảnh của bạn thay đổi.</p>
+                <p class="text-sm text-slate-300 mt-1">Thử một tình huống đổi lịch mẫu để xem hệ thống xếp lại kế hoạch.</p>
               </div>
               <button type="button" onclick="gotoPlanStage('replan')" class="${btnPrimary}">Mô phỏng thay đổi lịch →</button>
             </div>
@@ -2229,8 +2229,8 @@
           <div class="${cardCls} border-amber-500/30">
             ${errorHtml}
             <div>
-              <h4 class="text-base font-extrabold text-white">Lịch rảnh của bạn vừa thay đổi</h4>
-              <p class="text-sm text-slate-300 mt-1">Đây là tình huống mô phỏng. Lịch của bạn thay đổi như sau:</p>
+              <h4 class="text-base font-extrabold text-white">Tình huống mẫu: lịch rảnh thay đổi</h4>
+              <p class="text-sm text-slate-300 mt-1">Đây là tình huống giả lập để minh họa cách thuật toán xếp lại kế hoạch:</p>
             </div>
             <div class="space-y-2">${scheduleLines || '<div class="text-sm text-slate-300">Không có thay đổi về khung giờ rảnh.</div>'}</div>
             <p class="text-sm text-slate-300">Hệ thống đã xếp lại kế hoạch của bạn:</p>
@@ -3071,7 +3071,7 @@
         document.getElementById("validCountBadge").innerHTML = `<span>${actCount} hoạt động</span> <span class="dev-only font-mono text-[11px] opacity-80">(Catalog)</span>`;
         document.getElementById("sidebarActCount").innerText = actCount;
         const draftBadge = document.getElementById("sp3DraftCountBadge");
-        if (draftBadge) draftBadge.innerHTML = `<span>${draftCount} bản nháp</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>`;
+        if (draftBadge) draftBadge.innerHTML = `<span>${draftCount} bài nguồn</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>`;
         const draftsTabBadge = document.getElementById("sp3DraftsTabBadge");
         if (draftsTabBadge) draftsTabBadge.innerHTML = `<span>${newPostDrafts.length} bản nháp</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>`;
 
@@ -3088,7 +3088,7 @@
               const dt = a["4_datetimes"] || {};
               const timeDisplay = a.start ? formatIsoToVietnamese(a.start) : (dt.start_datetime || 'Chưa rõ');
               const locDisplay = a.location || (a.mode === 'online' ? 'Trực tuyến' : 'Cơ sở trường');
-              const ptsDisplay = a.points_awarded || (a.points != null ? `+${a.points} điểm` : 'Hợp lệ');
+              const ptsDisplay = a.points != null ? `Thông báo: +${a.points}đ` : 'Chưa rõ điểm';
               const qaHtml = qa
                 ? `<div class="dev-only text-[11px] font-mono text-indigo-300 bg-indigo-950/40 border border-indigo-500/30 rounded-lg px-2.5 py-1.5">
                      <b>Data QA (${escapeHTML(qa.status || 'checked')} • ${escapeHTML(qa.semester || '')}):</b> ${escapeHTML(qa.notes || '')}
@@ -3105,7 +3105,7 @@
                       <span class="dev-only px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
                         ${escapeHTML(pubStatus)}
                       </span>
-                      <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 whitespace-nowrap">
+                      <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-amber-950/50 text-amber-200 border border-amber-500/30 whitespace-nowrap">
                         ${escapeHTML(ptsDisplay)}
                       </span>
                     </div>
