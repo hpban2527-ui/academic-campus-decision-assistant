@@ -1414,6 +1414,30 @@ def lead_data_audit():
 
 
 # Serve Frontend static files if web directory exists
+from api.sp3_service import demo_plan as _sp3_demo_plan, sp1_catalog as _sp3_catalog
+
+
+class SP3DemoPlanRequest(BaseModel):
+    scenario: str = "first_plan"
+    total_target: Optional[int] = Field(default=None, ge=0, le=100)
+    busy_intervals: list[dict[str, str]] = Field(default_factory=list)
+
+
+@app.get("/api/sp3/catalog")
+def get_sp3_catalog():
+    """Read SP1 activity records and QA without awarding points."""
+    return _sp3_catalog()
+
+
+@app.post("/api/sp3/demo/plan")
+def run_sp3_demo_plan(req: SP3DemoPlanRequest):
+    """Read-only complete SP1-format -> feasibility -> planner -> SP2 demo."""
+    try:
+        return _sp3_demo_plan(req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 @app.get("/favicon.ico", include_in_schema=False)
 def serve_favicon():
     svg = (
@@ -1432,5 +1456,8 @@ if WEB_DIR.exists():
     def serve_index():
         index_file = WEB_DIR / "index.html"
         if index_file.exists():
-            return FileResponse(index_file)
+            return FileResponse(
+                index_file,
+                headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+            )
         return JSONResponse({"message": "Web UI index.html not found"}, status_code=404)

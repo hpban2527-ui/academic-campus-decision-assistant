@@ -1,0 +1,3086 @@
+{
+  "contract_version": "sp3-planner/0.2",
+  "label": "SYNTHETIC-DEMO",
+  "derived_from": "cfa42ba966158ff544678efffe7d3b85e384144f",
+  "description": "Planner acceptance cases P1-P9 (docs/SP3_PLANNER_CONTRACT_V0_2.md section 12). Candidates and conflict_pairs are the unchanged section 6.5 output of assess_feasibility at derived_from, with synthetic activities and trusted evidence. Score tables are static mock scores, not SP2 results. Expected projections were derived by hand (see each case's derivation), not recorded from the planner.",
+  "cases": [
+    {
+      "id": "P1",
+      "module": "planner",
+      "case": "Two flexible activities, each feasible alone, share one free slot",
+      "derivation": [
+        "Free time is only Nov 2 09:00-10:00. A and B each need one 60-minute sitting in Nov 2 08:00-12:00, so each fits alone but not together.",
+        "Valid subsets: {}, {A}, {B}; {A, B} is unschedulable, so it is pruned and never scored (3 evaluations).",
+        "{A} and {B} both reach C1 25 (gap 5) with equal later components; ID order picks A at 09:00. B is excluded with NO_TIME.",
+        "Every valid subset was scored and none reaches C1 30: PARTIAL, PROVEN_UNREACHABLE with a proof over 3 subsets."
+      ],
+      "input": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "case-P1",
+        "context": {
+          "student_id": "synthetic-student",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-01T00:00:00+07:00",
+          "window_end": "2026-11-08T00:00:00+07:00",
+          "as_of": "2026-11-01T08:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-p",
+          "dataset_version": "synthetic-dataset-p",
+          "ruleset_version": "synthetic-rules-p",
+          "calendar_version": "synthetic-calendar-p"
+        },
+        "baseline": {
+          "category_scores": {
+            "C1": 20
+          },
+          "category_caps": {
+            "C1": 30
+          },
+          "total_score": 20,
+          "max_total_score": 100,
+          "included_activity_ids": []
+        },
+        "goals": {
+          "total_target": null,
+          "category_targets": {
+            "C1": 30
+          }
+        },
+        "preferences": {
+          "preferred_domains": [],
+          "preferred_modes": []
+        },
+        "limits": {
+          "max_activities": null,
+          "max_duration_minutes": null
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "A",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/A",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity A",
+              "domain": "academic",
+              "start": "2026-11-02T08:00:00+07:00",
+              "end": "2026-11-02T12:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-A",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-02T08:00:00+07:00",
+              "window_end": "2026-11-02T12:00:00+07:00",
+              "duration_minutes": 60
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "B",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/B",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity B",
+              "domain": "academic",
+              "start": "2026-11-02T08:00:00+07:00",
+              "end": "2026-11-02T12:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-B",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-02T08:00:00+07:00",
+              "window_end": "2026-11-02T12:00:00+07:00",
+              "duration_minutes": 60
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          }
+        ],
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-02T09:00:00+07:00",
+            "end": "2026-11-02T10:00:00+07:00"
+          }
+        ],
+        "previous_plan": null,
+        "keep_requests": []
+      },
+      "score_table": [
+        {
+          "selected_activity_ids": [],
+          "result": {
+            "category_after": {
+              "C1": 20
+            },
+            "category_gain": {
+              "C1": 0
+            },
+            "total_after": 20,
+            "total_gain": 0,
+            "contributions": []
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "A"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 25,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "A",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_A",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "B"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 25,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "B",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_B",
+                "projected_added": 5
+              }
+            ]
+          }
+        }
+      ],
+      "expected": {
+        "status": "PARTIAL",
+        "feasibility_conclusion": "PROVEN_UNREACHABLE",
+        "selected": [
+          {
+            "activity_id": "A",
+            "schedule_type": "FLEXIBLE_WINDOW",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T09:00:00+07:00",
+                "end": "2026-11-02T10:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          }
+        ],
+        "excluded": [
+          {
+            "activity_id": "B",
+            "code": "NO_TIME"
+          }
+        ],
+        "projected_by_category": {
+          "C1": 25
+        },
+        "remaining_by_category": {
+          "C1": 5
+        },
+        "search": {
+          "complete": true,
+          "optimality_proven": true,
+          "evaluated_subsets": 3,
+          "limit_reason": null
+        },
+        "proof": {
+          "kind": "EXHAUSTIVE_SEARCH",
+          "evaluated_subsets": 3
+        },
+        "warning_codes": [
+          "DEMO_ONLY",
+          "TRAVEL_NOT_MODELED"
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [],
+        "keep_conflicts": [],
+        "score_comparison": null,
+        "scorer_calls": [
+          [],
+          [
+            "A"
+          ],
+          [
+            "B"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "P2",
+      "module": "planner",
+      "case": "Flexible sitting placed around a selected fixed block",
+      "derivation": [
+        "F is fixed at Nov 2 10:00-11:00. X needs 60 minutes in Nov 2 09:30-12:00; with F selected, free time is 09:00-10:00 and 11:00-12:00.",
+        "09:30-10:00 is only 30 minutes, so X takes 11:00-12:00, adjacent to F and not overlapping it.",
+        "Target C1 30 needs both (+5 each): {F, X} reaches 30. Subsets scored: {}, {F}, {X}, {F, X} (4); no larger set exists, so the search is complete.",
+        "Attribution order is F (10:00) then X (11:00)."
+      ],
+      "input": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "case-P2",
+        "context": {
+          "student_id": "synthetic-student",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-01T00:00:00+07:00",
+          "window_end": "2026-11-08T00:00:00+07:00",
+          "as_of": "2026-11-01T08:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-p",
+          "dataset_version": "synthetic-dataset-p",
+          "ruleset_version": "synthetic-rules-p",
+          "calendar_version": "synthetic-calendar-p"
+        },
+        "baseline": {
+          "category_scores": {
+            "C1": 20
+          },
+          "category_caps": {
+            "C1": 30
+          },
+          "total_score": 20,
+          "max_total_score": 100,
+          "included_activity_ids": []
+        },
+        "goals": {
+          "total_target": null,
+          "category_targets": {
+            "C1": 30
+          }
+        },
+        "preferences": {
+          "preferred_domains": [],
+          "preferred_modes": []
+        },
+        "limits": {
+          "max_activities": null,
+          "max_duration_minutes": null
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "F",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/F",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity F",
+              "domain": "academic",
+              "start": "2026-11-02T10:00:00+07:00",
+              "end": "2026-11-02T11:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-F",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T10:00:00+07:00",
+                  "end": "2026-11-02T11:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "X",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/X",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity X",
+              "domain": "academic",
+              "start": "2026-11-02T09:30:00+07:00",
+              "end": "2026-11-02T12:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-X",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-02T09:30:00+07:00",
+              "window_end": "2026-11-02T12:00:00+07:00",
+              "duration_minutes": 60
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          }
+        ],
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-02T09:00:00+07:00",
+            "end": "2026-11-02T12:00:00+07:00"
+          }
+        ],
+        "previous_plan": null,
+        "keep_requests": []
+      },
+      "score_table": [
+        {
+          "selected_activity_ids": [],
+          "result": {
+            "category_after": {
+              "C1": 20
+            },
+            "category_gain": {
+              "C1": 0
+            },
+            "total_after": 20,
+            "total_gain": 0,
+            "contributions": []
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "F"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 25,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "F",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_F",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "X"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 25,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "X",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_X",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "F",
+            "X"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 30
+            },
+            "category_gain": {
+              "C1": 10
+            },
+            "total_after": 30,
+            "total_gain": 10,
+            "contributions": [
+              {
+                "activity_id": "F",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_F",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "X",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_X",
+                "projected_added": 5
+              }
+            ]
+          }
+        }
+      ],
+      "expected": {
+        "status": "TARGET_MET",
+        "feasibility_conclusion": "REACHABLE",
+        "selected": [
+          {
+            "activity_id": "F",
+            "schedule_type": "FIXED",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T10:00:00+07:00",
+                "end": "2026-11-02T11:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          },
+          {
+            "activity_id": "X",
+            "schedule_type": "FLEXIBLE_WINDOW",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T11:00:00+07:00",
+                "end": "2026-11-02T12:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          }
+        ],
+        "excluded": [],
+        "projected_by_category": {
+          "C1": 30
+        },
+        "remaining_by_category": {
+          "C1": 0
+        },
+        "search": {
+          "complete": true,
+          "optimality_proven": true,
+          "evaluated_subsets": 4,
+          "limit_reason": null
+        },
+        "proof": null,
+        "warning_codes": [
+          "DEMO_ONLY",
+          "TRAVEL_NOT_MODELED"
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [],
+        "keep_conflicts": [],
+        "score_comparison": null,
+        "scorer_calls": [
+          [],
+          [
+            "F"
+          ],
+          [
+            "X"
+          ],
+          [
+            "F",
+            "X"
+          ]
+        ],
+        "attribution_orders": [
+          [],
+          [
+            "F"
+          ],
+          [
+            "X"
+          ],
+          [
+            "F",
+            "X"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "P3",
+      "module": "planner",
+      "case": "Blocks ending and starting at 15:00 (and 16:00) do not overlap",
+      "derivation": [
+        "A is fixed at Nov 2 [14:00, 15:00) and B at [15:00, 16:00): half-open intervals touch but do not overlap, so feasibility reports no conflict pair.",
+        "C needs 60 minutes in Nov 2 13:00-17:00 while free time is 14:00-17:00; with A and B selected it takes [16:00, 17:00).",
+        "Target C1 25 from 10 needs all three (+5 each). All 7 non-empty subsets are schedulable: 1 + 3 + 3 + 1 = 8 evaluations."
+      ],
+      "input": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "case-P3",
+        "context": {
+          "student_id": "synthetic-student",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-01T00:00:00+07:00",
+          "window_end": "2026-11-08T00:00:00+07:00",
+          "as_of": "2026-11-01T08:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-p",
+          "dataset_version": "synthetic-dataset-p",
+          "ruleset_version": "synthetic-rules-p",
+          "calendar_version": "synthetic-calendar-p"
+        },
+        "baseline": {
+          "category_scores": {
+            "C1": 10
+          },
+          "category_caps": {
+            "C1": 30
+          },
+          "total_score": 10,
+          "max_total_score": 100,
+          "included_activity_ids": []
+        },
+        "goals": {
+          "total_target": null,
+          "category_targets": {
+            "C1": 25
+          }
+        },
+        "preferences": {
+          "preferred_domains": [],
+          "preferred_modes": []
+        },
+        "limits": {
+          "max_activities": null,
+          "max_duration_minutes": null
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "A",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/A",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity A",
+              "domain": "academic",
+              "start": "2026-11-02T14:00:00+07:00",
+              "end": "2026-11-02T15:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-A",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T14:00:00+07:00",
+                  "end": "2026-11-02T15:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "B",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/B",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity B",
+              "domain": "academic",
+              "start": "2026-11-02T15:00:00+07:00",
+              "end": "2026-11-02T16:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-B",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T15:00:00+07:00",
+                  "end": "2026-11-02T16:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "C",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/C",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity C",
+              "domain": "academic",
+              "start": "2026-11-02T13:00:00+07:00",
+              "end": "2026-11-02T17:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-C",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-02T13:00:00+07:00",
+              "window_end": "2026-11-02T17:00:00+07:00",
+              "duration_minutes": 60
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          }
+        ],
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-02T14:00:00+07:00",
+            "end": "2026-11-02T17:00:00+07:00"
+          }
+        ],
+        "previous_plan": null,
+        "keep_requests": []
+      },
+      "score_table": [
+        {
+          "selected_activity_ids": [],
+          "result": {
+            "category_after": {
+              "C1": 10
+            },
+            "category_gain": {
+              "C1": 0
+            },
+            "total_after": 10,
+            "total_gain": 0,
+            "contributions": []
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "A"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 15
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 15,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "A",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_A",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "B"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 15
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 15,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "B",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_B",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "C"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 15
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 15,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "C",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_C",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "A",
+            "B"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 20
+            },
+            "category_gain": {
+              "C1": 10
+            },
+            "total_after": 20,
+            "total_gain": 10,
+            "contributions": [
+              {
+                "activity_id": "A",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_A",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "B",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_B",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "A",
+            "C"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 20
+            },
+            "category_gain": {
+              "C1": 10
+            },
+            "total_after": 20,
+            "total_gain": 10,
+            "contributions": [
+              {
+                "activity_id": "A",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_A",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "C",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_C",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "B",
+            "C"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 20
+            },
+            "category_gain": {
+              "C1": 10
+            },
+            "total_after": 20,
+            "total_gain": 10,
+            "contributions": [
+              {
+                "activity_id": "C",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_C",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "B",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_B",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "A",
+            "B",
+            "C"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 15
+            },
+            "total_after": 25,
+            "total_gain": 15,
+            "contributions": [
+              {
+                "activity_id": "A",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_A",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "B",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_B",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "C",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_C",
+                "projected_added": 5
+              }
+            ]
+          }
+        }
+      ],
+      "expected": {
+        "status": "TARGET_MET",
+        "feasibility_conclusion": "REACHABLE",
+        "selected": [
+          {
+            "activity_id": "A",
+            "schedule_type": "FIXED",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T14:00:00+07:00",
+                "end": "2026-11-02T15:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          },
+          {
+            "activity_id": "B",
+            "schedule_type": "FIXED",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T15:00:00+07:00",
+                "end": "2026-11-02T16:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          },
+          {
+            "activity_id": "C",
+            "schedule_type": "FLEXIBLE_WINDOW",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T16:00:00+07:00",
+                "end": "2026-11-02T17:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          }
+        ],
+        "excluded": [],
+        "projected_by_category": {
+          "C1": 25
+        },
+        "remaining_by_category": {
+          "C1": 0
+        },
+        "search": {
+          "complete": true,
+          "optimality_proven": true,
+          "evaluated_subsets": 8,
+          "limit_reason": null
+        },
+        "proof": null,
+        "warning_codes": [
+          "DEMO_ONLY",
+          "TRAVEL_NOT_MODELED"
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [],
+        "keep_conflicts": [],
+        "score_comparison": null,
+        "scorer_calls": [
+          [],
+          [
+            "A"
+          ],
+          [
+            "B"
+          ],
+          [
+            "C"
+          ],
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "C"
+          ],
+          [
+            "B",
+            "C"
+          ],
+          [
+            "A",
+            "B",
+            "C"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "P4",
+      "module": "planner",
+      "case": "KEEP_TIME block now covered by an ad-hoc busy interval",
+      "derivation": [
+        "K was planned at Nov 2 09:00-10:00 and is kept with KEEP_TIME. A busy interval now removes 09:00-10:00 from free time.",
+        "K is still FEASIBLE on its own (08:00-09:00 or 10:00-12:00 fit 60 minutes), but its kept block is outside available time: BLOCK_INVALID.",
+        "The planner never releases a keep request: KEEP_CONFLICT before any scoring, with no plan."
+      ],
+      "input": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "case-P4",
+        "context": {
+          "student_id": "synthetic-student",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-01T00:00:00+07:00",
+          "window_end": "2026-11-08T00:00:00+07:00",
+          "as_of": "2026-11-01T08:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-p",
+          "dataset_version": "synthetic-dataset-p",
+          "ruleset_version": "synthetic-rules-p",
+          "calendar_version": "synthetic-calendar-p"
+        },
+        "baseline": {
+          "category_scores": {
+            "C1": 20
+          },
+          "category_caps": {
+            "C1": 30
+          },
+          "total_score": 20,
+          "max_total_score": 100,
+          "included_activity_ids": []
+        },
+        "goals": {
+          "total_target": null,
+          "category_targets": {
+            "C1": 25
+          }
+        },
+        "preferences": {
+          "preferred_domains": [],
+          "preferred_modes": []
+        },
+        "limits": {
+          "max_activities": null,
+          "max_duration_minutes": null
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "K",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/K",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity K",
+              "domain": "academic",
+              "start": "2026-11-02T08:00:00+07:00",
+              "end": "2026-11-02T12:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-K",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-02T08:00:00+07:00",
+              "window_end": "2026-11-02T12:00:00+07:00",
+              "duration_minutes": 60
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "L",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/L",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity L",
+              "domain": "academic",
+              "start": "2026-11-02T10:00:00+07:00",
+              "end": "2026-11-02T11:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-L",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T10:00:00+07:00",
+                  "end": "2026-11-02T11:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          }
+        ],
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-02T08:00:00+07:00",
+            "end": "2026-11-02T09:00:00+07:00"
+          },
+          {
+            "start": "2026-11-02T10:00:00+07:00",
+            "end": "2026-11-02T12:00:00+07:00"
+          }
+        ],
+        "previous_plan": {
+          "plan_version": "sp3plan-00000000000000b0",
+          "based_on": {
+            "calendar_version": "synthetic-calendar-p-previous",
+            "dataset_version": "synthetic-dataset-p",
+            "ruleset_version": "synthetic-rules-p",
+            "baseline_ref": "synthetic-baseline-p",
+            "previous_plan_version": null
+          },
+          "selected_activities": [
+            {
+              "activity_id": "K",
+              "scheduled_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            }
+          ]
+        },
+        "keep_requests": [
+          {
+            "activity_id": "K",
+            "mode": "KEEP_TIME"
+          }
+        ]
+      },
+      "score_table": [],
+      "expected": {
+        "status": "KEEP_CONFLICT",
+        "feasibility_conclusion": "UNDETERMINED",
+        "selected": [],
+        "excluded": [],
+        "keep_conflicts": [
+          {
+            "activity_id": "K",
+            "code": "BLOCK_INVALID"
+          }
+        ],
+        "score_summary": null,
+        "search": {
+          "complete": false,
+          "optimality_proven": false,
+          "evaluated_subsets": 0,
+          "limit_reason": "KEEP_CONFLICT"
+        },
+        "proof": null,
+        "plan_version": null,
+        "warning_codes": [
+          "DEMO_ONLY",
+          "TRAVEL_NOT_MODELED"
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [],
+        "score_comparison": null,
+        "scorer_calls": []
+      }
+    },
+    {
+      "id": "P5",
+      "module": "planner",
+      "case": "Previous plan still valid while an equally scored alternative exists",
+      "derivation": [
+        "Previous plan: A at Nov 2 09:00-10:00 and X at Nov 3 10:00-11:00; both are still valid. B (skills, preferred) scores like A.",
+        "Every pair reaches C1 30. {A, X} has 0 activity-set changes; {A, B} and {B, X} have 2, {A, B, X} has 1. Changes rank before preference, so {A, X} wins.",
+        "X stays at its previous 10:00-11:00 block (0 time changes) instead of moving to the earliest slot 08:00: both activities are KEPT.",
+        "With a previous plan there is no dominance pruning: all 8 subsets are scored, then one extra rescore of {A, X} for score_comparison."
+      ],
+      "input": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "case-P5",
+        "context": {
+          "student_id": "synthetic-student",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-01T00:00:00+07:00",
+          "window_end": "2026-11-08T00:00:00+07:00",
+          "as_of": "2026-11-01T08:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-p",
+          "dataset_version": "synthetic-dataset-p",
+          "ruleset_version": "synthetic-rules-p",
+          "calendar_version": "synthetic-calendar-p"
+        },
+        "baseline": {
+          "category_scores": {
+            "C1": 20
+          },
+          "category_caps": {
+            "C1": 30
+          },
+          "total_score": 20,
+          "max_total_score": 100,
+          "included_activity_ids": []
+        },
+        "goals": {
+          "total_target": null,
+          "category_targets": {
+            "C1": 30
+          }
+        },
+        "preferences": {
+          "preferred_domains": [
+            "skills"
+          ],
+          "preferred_modes": []
+        },
+        "limits": {
+          "max_activities": null,
+          "max_duration_minutes": null
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "A",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/A",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity A",
+              "domain": "academic",
+              "start": "2026-11-02T09:00:00+07:00",
+              "end": "2026-11-02T10:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-A",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "B",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/B",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity B",
+              "domain": "skills",
+              "start": "2026-11-02T14:00:00+07:00",
+              "end": "2026-11-02T15:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-B",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T14:00:00+07:00",
+                  "end": "2026-11-02T15:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "X",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/X",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity X",
+              "domain": "academic",
+              "start": "2026-11-03T08:00:00+07:00",
+              "end": "2026-11-03T12:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-X",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-03T08:00:00+07:00",
+              "window_end": "2026-11-03T12:00:00+07:00",
+              "duration_minutes": 60
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          }
+        ],
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-02T09:00:00+07:00",
+            "end": "2026-11-02T10:00:00+07:00"
+          },
+          {
+            "start": "2026-11-02T14:00:00+07:00",
+            "end": "2026-11-02T15:00:00+07:00"
+          },
+          {
+            "start": "2026-11-03T08:00:00+07:00",
+            "end": "2026-11-03T12:00:00+07:00"
+          }
+        ],
+        "previous_plan": {
+          "plan_version": "sp3plan-00000000000000b0",
+          "based_on": {
+            "calendar_version": "synthetic-calendar-p-previous",
+            "dataset_version": "synthetic-dataset-p",
+            "ruleset_version": "synthetic-rules-p",
+            "baseline_ref": "synthetic-baseline-p",
+            "previous_plan_version": null
+          },
+          "selected_activities": [
+            {
+              "activity_id": "A",
+              "scheduled_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            },
+            {
+              "activity_id": "X",
+              "scheduled_blocks": [
+                {
+                  "start": "2026-11-03T10:00:00+07:00",
+                  "end": "2026-11-03T11:00:00+07:00"
+                }
+              ]
+            }
+          ]
+        },
+        "keep_requests": []
+      },
+      "score_table": [
+        {
+          "selected_activity_ids": [],
+          "result": {
+            "category_after": {
+              "C1": 20
+            },
+            "category_gain": {
+              "C1": 0
+            },
+            "total_after": 20,
+            "total_gain": 0,
+            "contributions": []
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "A"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 25,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "A",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_A",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "B"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 25,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "B",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_B",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "X"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 25,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "X",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_X",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "A",
+            "B"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 30
+            },
+            "category_gain": {
+              "C1": 10
+            },
+            "total_after": 30,
+            "total_gain": 10,
+            "contributions": [
+              {
+                "activity_id": "A",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_A",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "B",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_B",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "A",
+            "X"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 30
+            },
+            "category_gain": {
+              "C1": 10
+            },
+            "total_after": 30,
+            "total_gain": 10,
+            "contributions": [
+              {
+                "activity_id": "A",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_A",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "X",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_X",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "B",
+            "X"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 30
+            },
+            "category_gain": {
+              "C1": 10
+            },
+            "total_after": 30,
+            "total_gain": 10,
+            "contributions": [
+              {
+                "activity_id": "B",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_B",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "X",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_X",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "A",
+            "B",
+            "X"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 30
+            },
+            "category_gain": {
+              "C1": 10
+            },
+            "total_after": 30,
+            "total_gain": 10,
+            "contributions": [
+              {
+                "activity_id": "A",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_A",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "B",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_B",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "X",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_X",
+                "projected_added": 0
+              }
+            ]
+          }
+        }
+      ],
+      "expected": {
+        "status": "TARGET_MET",
+        "feasibility_conclusion": "REACHABLE",
+        "selected": [
+          {
+            "activity_id": "A",
+            "schedule_type": "FIXED",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T09:00:00+07:00",
+                "end": "2026-11-02T10:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "KEPT",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          },
+          {
+            "activity_id": "X",
+            "schedule_type": "FLEXIBLE_WINDOW",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-03T10:00:00+07:00",
+                "end": "2026-11-03T11:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "KEPT",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          }
+        ],
+        "excluded": [
+          {
+            "activity_id": "B",
+            "code": "LOWER_PRIORITY"
+          }
+        ],
+        "projected_by_category": {
+          "C1": 30
+        },
+        "remaining_by_category": {
+          "C1": 0
+        },
+        "search": {
+          "complete": true,
+          "optimality_proven": true,
+          "evaluated_subsets": 8,
+          "limit_reason": null
+        },
+        "proof": null,
+        "warning_codes": [
+          "DEMO_ONLY",
+          "TRAVEL_NOT_MODELED"
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [],
+        "keep_conflicts": [],
+        "score_comparison": {
+          "basis": "PREVIOUS_ACTIVITY_SET_RESCORED",
+          "previous_activity_ids": [
+            "A",
+            "X"
+          ],
+          "previous_projected_by_category": {
+            "C1": 30
+          },
+          "previous_projected_total": 30,
+          "new_projected_total": 30
+        },
+        "scorer_calls": [
+          [],
+          [
+            "A"
+          ],
+          [
+            "B"
+          ],
+          [
+            "X"
+          ],
+          [
+            "A",
+            "B"
+          ],
+          [
+            "A",
+            "X"
+          ],
+          [
+            "B",
+            "X"
+          ],
+          [
+            "A",
+            "B",
+            "X"
+          ],
+          [
+            "A",
+            "X"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "P6",
+      "module": "planner",
+      "case": "Previous flexible block is no longer free",
+      "derivation": [
+        "X was planned at Nov 3 09:00-10:00; that hour is now busy. X is still FEASIBLE (08:00-09:00 or 10:00-12:00).",
+        "{X} keeps the activity set (0 set changes) with 1 time change; {} leaves a gap of 5. X moves to the earliest valid block 08:00-09:00.",
+        "The score is unchanged: the previous set {X} rescored gives C1 25, the same as the new plan."
+      ],
+      "input": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "case-P6",
+        "context": {
+          "student_id": "synthetic-student",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-01T00:00:00+07:00",
+          "window_end": "2026-11-08T00:00:00+07:00",
+          "as_of": "2026-11-01T08:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-p",
+          "dataset_version": "synthetic-dataset-p",
+          "ruleset_version": "synthetic-rules-p",
+          "calendar_version": "synthetic-calendar-p"
+        },
+        "baseline": {
+          "category_scores": {
+            "C1": 20
+          },
+          "category_caps": {
+            "C1": 30
+          },
+          "total_score": 20,
+          "max_total_score": 100,
+          "included_activity_ids": []
+        },
+        "goals": {
+          "total_target": null,
+          "category_targets": {
+            "C1": 25
+          }
+        },
+        "preferences": {
+          "preferred_domains": [],
+          "preferred_modes": []
+        },
+        "limits": {
+          "max_activities": null,
+          "max_duration_minutes": null
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "X",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/X",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity X",
+              "domain": "academic",
+              "start": "2026-11-03T08:00:00+07:00",
+              "end": "2026-11-03T12:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-X",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-03T08:00:00+07:00",
+              "window_end": "2026-11-03T12:00:00+07:00",
+              "duration_minutes": 60
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          }
+        ],
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-03T08:00:00+07:00",
+            "end": "2026-11-03T09:00:00+07:00"
+          },
+          {
+            "start": "2026-11-03T10:00:00+07:00",
+            "end": "2026-11-03T12:00:00+07:00"
+          }
+        ],
+        "previous_plan": {
+          "plan_version": "sp3plan-00000000000000b0",
+          "based_on": {
+            "calendar_version": "synthetic-calendar-p-previous",
+            "dataset_version": "synthetic-dataset-p",
+            "ruleset_version": "synthetic-rules-p",
+            "baseline_ref": "synthetic-baseline-p",
+            "previous_plan_version": null
+          },
+          "selected_activities": [
+            {
+              "activity_id": "X",
+              "scheduled_blocks": [
+                {
+                  "start": "2026-11-03T09:00:00+07:00",
+                  "end": "2026-11-03T10:00:00+07:00"
+                }
+              ]
+            }
+          ]
+        },
+        "keep_requests": []
+      },
+      "score_table": [
+        {
+          "selected_activity_ids": [],
+          "result": {
+            "category_after": {
+              "C1": 20
+            },
+            "category_gain": {
+              "C1": 0
+            },
+            "total_after": 20,
+            "total_gain": 0,
+            "contributions": []
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "X"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 25,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "X",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_X",
+                "projected_added": 5
+              }
+            ]
+          }
+        }
+      ],
+      "expected": {
+        "status": "TARGET_MET",
+        "feasibility_conclusion": "REACHABLE",
+        "selected": [
+          {
+            "activity_id": "X",
+            "schedule_type": "FLEXIBLE_WINDOW",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-03T08:00:00+07:00",
+                "end": "2026-11-03T09:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "MOVED",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          }
+        ],
+        "excluded": [],
+        "projected_by_category": {
+          "C1": 25
+        },
+        "remaining_by_category": {
+          "C1": 0
+        },
+        "search": {
+          "complete": true,
+          "optimality_proven": true,
+          "evaluated_subsets": 2,
+          "limit_reason": null
+        },
+        "proof": null,
+        "warning_codes": [
+          "DEMO_ONLY",
+          "TRAVEL_NOT_MODELED"
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [],
+        "keep_conflicts": [],
+        "score_comparison": {
+          "basis": "PREVIOUS_ACTIVITY_SET_RESCORED",
+          "previous_activity_ids": [
+            "X"
+          ],
+          "previous_projected_by_category": {
+            "C1": 25
+          },
+          "previous_projected_total": 25,
+          "new_projected_total": 25
+        },
+        "scorer_calls": [
+          [],
+          [
+            "X"
+          ],
+          [
+            "X"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "P7",
+      "module": "planner",
+      "case": "Completed activity that is not yet in the baseline",
+      "derivation": [
+        "D is COMPLETED but not in included_activity_ids; feasibility reports INFEASIBLE with ALREADY_COMPLETED.",
+        "D is listed in pending_confirmation (PENDING_CONFIRMATION warning), excluded as NOT_FEASIBLE, and never sent to the scorer.",
+        "D is not in P (completed), so it is not dropped and not rescored; P = {A}. A stays at its fixed block: KEPT."
+      ],
+      "input": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "case-P7",
+        "context": {
+          "student_id": "synthetic-student",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-01T00:00:00+07:00",
+          "window_end": "2026-11-08T00:00:00+07:00",
+          "as_of": "2026-11-01T08:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-p",
+          "dataset_version": "synthetic-dataset-p",
+          "ruleset_version": "synthetic-rules-p",
+          "calendar_version": "synthetic-calendar-p"
+        },
+        "baseline": {
+          "category_scores": {
+            "C1": 20
+          },
+          "category_caps": {
+            "C1": 30
+          },
+          "total_score": 20,
+          "max_total_score": 100,
+          "included_activity_ids": []
+        },
+        "goals": {
+          "total_target": null,
+          "category_targets": {
+            "C1": 25
+          }
+        },
+        "preferences": {
+          "preferred_domains": [],
+          "preferred_modes": []
+        },
+        "limits": {
+          "max_activities": null,
+          "max_duration_minutes": null
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "A",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/A",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity A",
+              "domain": "academic",
+              "start": "2026-11-02T14:00:00+07:00",
+              "end": "2026-11-02T15:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-A",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T14:00:00+07:00",
+                  "end": "2026-11-02T15:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "D",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/D",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity D",
+              "domain": "academic",
+              "start": "2026-11-02T09:00:00+07:00",
+              "end": "2026-11-02T10:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-D",
+            "participation": {
+              "registration": "REGISTERED",
+              "progress": "COMPLETED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "INFEASIBLE",
+              "reason_codes": [
+                "ALREADY_COMPLETED"
+              ]
+            }
+          }
+        ],
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-01T00:00:00+07:00",
+            "end": "2026-11-08T00:00:00+07:00"
+          }
+        ],
+        "previous_plan": {
+          "plan_version": "sp3plan-00000000000000b0",
+          "based_on": {
+            "calendar_version": "synthetic-calendar-p-previous",
+            "dataset_version": "synthetic-dataset-p",
+            "ruleset_version": "synthetic-rules-p",
+            "baseline_ref": "synthetic-baseline-p",
+            "previous_plan_version": null
+          },
+          "selected_activities": [
+            {
+              "activity_id": "D",
+              "scheduled_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            },
+            {
+              "activity_id": "A",
+              "scheduled_blocks": [
+                {
+                  "start": "2026-11-02T14:00:00+07:00",
+                  "end": "2026-11-02T15:00:00+07:00"
+                }
+              ]
+            }
+          ]
+        },
+        "keep_requests": []
+      },
+      "score_table": [
+        {
+          "selected_activity_ids": [],
+          "result": {
+            "category_after": {
+              "C1": 20
+            },
+            "category_gain": {
+              "C1": 0
+            },
+            "total_after": 20,
+            "total_gain": 0,
+            "contributions": []
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "A"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 25,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "A",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_A",
+                "projected_added": 5
+              }
+            ]
+          }
+        }
+      ],
+      "expected": {
+        "status": "TARGET_MET",
+        "feasibility_conclusion": "REACHABLE",
+        "selected": [
+          {
+            "activity_id": "A",
+            "schedule_type": "FIXED",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T14:00:00+07:00",
+                "end": "2026-11-02T15:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "KEPT",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          }
+        ],
+        "excluded": [
+          {
+            "activity_id": "D",
+            "code": "NOT_FEASIBLE"
+          }
+        ],
+        "projected_by_category": {
+          "C1": 25
+        },
+        "remaining_by_category": {
+          "C1": 0
+        },
+        "search": {
+          "complete": true,
+          "optimality_proven": true,
+          "evaluated_subsets": 2,
+          "limit_reason": null
+        },
+        "proof": null,
+        "warning_codes": [
+          "DEMO_ONLY",
+          "TRAVEL_NOT_MODELED",
+          "PENDING_CONFIRMATION"
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [
+          "D"
+        ],
+        "keep_conflicts": [],
+        "score_comparison": {
+          "basis": "PREVIOUS_ACTIVITY_SET_RESCORED",
+          "previous_activity_ids": [
+            "A"
+          ],
+          "previous_projected_by_category": {
+            "C1": 25
+          },
+          "previous_projected_total": 25,
+          "new_projected_total": 25
+        },
+        "scorer_calls": [
+          [],
+          [
+            "A"
+          ],
+          [
+            "A"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "P8",
+      "module": "planner",
+      "case": "Replan drops a registered activity",
+      "derivation": [
+        "R is REGISTERED (its registration deadline has passed, which feasibility ignores for registered activities) and was in the previous plan.",
+        "max_activities is 1. {R} reaches C1 22 (gap 3); {B} reaches 25 (gap 0, 2 activity-set changes). Gaps rank first, so {B} wins.",
+        "R is excluded as LIMIT and dropped as LOWER_PRIORITY with registered = true: DROPS_REGISTERED. The registration is not cancelled.",
+        "Scored: {}, {B}, {R} (3); then {R} is rescored for score_comparison (C1 22 against 25)."
+      ],
+      "input": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "case-P8",
+        "context": {
+          "student_id": "synthetic-student",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-01T00:00:00+07:00",
+          "window_end": "2026-11-08T00:00:00+07:00",
+          "as_of": "2026-11-01T08:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-p",
+          "dataset_version": "synthetic-dataset-p",
+          "ruleset_version": "synthetic-rules-p",
+          "calendar_version": "synthetic-calendar-p"
+        },
+        "baseline": {
+          "category_scores": {
+            "C1": 20
+          },
+          "category_caps": {
+            "C1": 30
+          },
+          "total_score": 20,
+          "max_total_score": 100,
+          "included_activity_ids": []
+        },
+        "goals": {
+          "total_target": null,
+          "category_targets": {
+            "C1": 25
+          }
+        },
+        "preferences": {
+          "preferred_domains": [],
+          "preferred_modes": []
+        },
+        "limits": {
+          "max_activities": 1,
+          "max_duration_minutes": null
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "B",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/B",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity B",
+              "domain": "academic",
+              "start": "2026-11-03T09:00:00+07:00",
+              "end": "2026-11-03T10:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-B",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-03T09:00:00+07:00",
+                  "end": "2026-11-03T10:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "R",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/R",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity R",
+              "domain": "academic",
+              "start": "2026-11-02T09:00:00+07:00",
+              "end": "2026-11-02T10:00:00+07:00",
+              "registration_deadline": "2026-11-01T07:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-R",
+            "participation": {
+              "registration": "REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          }
+        ],
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-01T00:00:00+07:00",
+            "end": "2026-11-08T00:00:00+07:00"
+          }
+        ],
+        "previous_plan": {
+          "plan_version": "sp3plan-00000000000000b0",
+          "based_on": {
+            "calendar_version": "synthetic-calendar-p-previous",
+            "dataset_version": "synthetic-dataset-p",
+            "ruleset_version": "synthetic-rules-p",
+            "baseline_ref": "synthetic-baseline-p",
+            "previous_plan_version": null
+          },
+          "selected_activities": [
+            {
+              "activity_id": "R",
+              "scheduled_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            }
+          ]
+        },
+        "keep_requests": []
+      },
+      "score_table": [
+        {
+          "selected_activity_ids": [],
+          "result": {
+            "category_after": {
+              "C1": 20
+            },
+            "category_gain": {
+              "C1": 0
+            },
+            "total_after": 20,
+            "total_gain": 0,
+            "contributions": []
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "B"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 25
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 25,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "B",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_B",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "R"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 22
+            },
+            "category_gain": {
+              "C1": 2
+            },
+            "total_after": 22,
+            "total_gain": 2,
+            "contributions": [
+              {
+                "activity_id": "R",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_R",
+                "projected_added": 2
+              }
+            ]
+          }
+        }
+      ],
+      "expected": {
+        "status": "TARGET_MET",
+        "feasibility_conclusion": "REACHABLE",
+        "selected": [
+          {
+            "activity_id": "B",
+            "schedule_type": "FIXED",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-03T09:00:00+07:00",
+                "end": "2026-11-03T10:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          }
+        ],
+        "excluded": [
+          {
+            "activity_id": "R",
+            "code": "LIMIT"
+          }
+        ],
+        "projected_by_category": {
+          "C1": 25
+        },
+        "remaining_by_category": {
+          "C1": 0
+        },
+        "search": {
+          "complete": true,
+          "optimality_proven": true,
+          "evaluated_subsets": 3,
+          "limit_reason": null
+        },
+        "proof": null,
+        "warning_codes": [
+          "DEMO_ONLY",
+          "TRAVEL_NOT_MODELED",
+          "DROPS_REGISTERED"
+        ],
+        "dropped_activities": [
+          {
+            "activity_id": "R",
+            "registered": true,
+            "code": "LOWER_PRIORITY"
+          }
+        ],
+        "pending_confirmation": [],
+        "keep_conflicts": [],
+        "score_comparison": {
+          "basis": "PREVIOUS_ACTIVITY_SET_RESCORED",
+          "previous_activity_ids": [
+            "R"
+          ],
+          "previous_projected_by_category": {
+            "C1": 22
+          },
+          "previous_projected_total": 22,
+          "new_projected_total": 25
+        },
+        "scorer_calls": [
+          [],
+          [
+            "B"
+          ],
+          [
+            "R"
+          ],
+          [
+            "R"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "P9",
+      "module": "planner",
+      "case": "Attribution follows the scheduled blocks, not the window opening",
+      "derivation": [
+        "F's window opens at Nov 2 08:00, before G's fixed block at Nov 2 09:00-10:00. With G selected, F's only free slot is Nov 3 09:00-10:00.",
+        "C1 22 of cap 30: the first activity in attribution order adds 5, the second only 3. Both are needed for target 30.",
+        "The scheduled order is G then F, so G gets +5 and F +3. The mock table also answers the window-opening order (F +5, G +3) to show the difference."
+      ],
+      "input": {
+        "contract_version": "sp3-planner/0.2",
+        "request_id": "case-P9",
+        "context": {
+          "student_id": "synthetic-student",
+          "term_id": "SYNTHETIC-DEMO",
+          "window_start": "2026-11-01T00:00:00+07:00",
+          "window_end": "2026-11-08T00:00:00+07:00",
+          "as_of": "2026-11-01T08:00:00+07:00",
+          "timezone": "Asia/Ho_Chi_Minh",
+          "baseline_ref": "synthetic-baseline-p",
+          "dataset_version": "synthetic-dataset-p",
+          "ruleset_version": "synthetic-rules-p",
+          "calendar_version": "synthetic-calendar-p"
+        },
+        "baseline": {
+          "category_scores": {
+            "C1": 22
+          },
+          "category_caps": {
+            "C1": 30
+          },
+          "total_score": 22,
+          "max_total_score": 100,
+          "included_activity_ids": []
+        },
+        "goals": {
+          "total_target": null,
+          "category_targets": {
+            "C1": 30
+          }
+        },
+        "preferences": {
+          "preferred_domains": [],
+          "preferred_modes": []
+        },
+        "limits": {
+          "max_activities": null,
+          "max_duration_minutes": null
+        },
+        "candidates": [
+          {
+            "activity": {
+              "activity_id": "F",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/F",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity F",
+              "domain": "academic",
+              "start": "2026-11-02T08:00:00+07:00",
+              "end": "2026-11-04T00:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "online",
+              "location": null,
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-F",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FLEXIBLE_WINDOW",
+              "window_start": "2026-11-02T08:00:00+07:00",
+              "window_end": "2026-11-04T00:00:00+07:00",
+              "duration_minutes": 60
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          },
+          {
+            "activity": {
+              "activity_id": "G",
+              "source": {
+                "publisher": "Synthetic fixture",
+                "platform": "fixture",
+                "URL_post": "https://example.invalid/activity/G",
+                "URL_registration": null
+              },
+              "title": "Synthetic activity G",
+              "domain": "academic",
+              "start": "2026-11-02T09:00:00+07:00",
+              "end": "2026-11-02T10:00:00+07:00",
+              "registration_deadline": "2026-11-01T18:00:00+07:00",
+              "mode": "offline",
+              "location": "Synthetic room",
+              "points": 5,
+              "mandatory": false,
+              "audience": [
+                "Synthetic students"
+              ],
+              "fee": 0,
+              "completion_requirements": "Synthetic attendance check."
+            },
+            "score_binding_ref": "binding-G",
+            "participation": {
+              "registration": "NOT_REGISTERED",
+              "progress": "NOT_STARTED"
+            },
+            "schedule": {
+              "type": "FIXED",
+              "fixed_blocks": [
+                {
+                  "start": "2026-11-02T09:00:00+07:00",
+                  "end": "2026-11-02T10:00:00+07:00"
+                }
+              ]
+            },
+            "feasibility": {
+              "status": "FEASIBLE",
+              "reason_codes": []
+            }
+          }
+        ],
+        "conflict_pairs": [],
+        "available_intervals": [
+          {
+            "start": "2026-11-02T09:00:00+07:00",
+            "end": "2026-11-02T10:00:00+07:00"
+          },
+          {
+            "start": "2026-11-03T09:00:00+07:00",
+            "end": "2026-11-03T10:00:00+07:00"
+          }
+        ],
+        "previous_plan": null,
+        "keep_requests": []
+      },
+      "score_table": [
+        {
+          "selected_activity_ids": [],
+          "result": {
+            "category_after": {
+              "C1": 22
+            },
+            "category_gain": {
+              "C1": 0
+            },
+            "total_after": 22,
+            "total_gain": 0,
+            "contributions": []
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "F"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 27
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 27,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "F",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_F",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "G"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 27
+            },
+            "category_gain": {
+              "C1": 5
+            },
+            "total_after": 27,
+            "total_gain": 5,
+            "contributions": [
+              {
+                "activity_id": "G",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_G",
+                "projected_added": 5
+              }
+            ]
+          }
+        },
+        {
+          "selected_activity_ids": [
+            "F",
+            "G"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 30
+            },
+            "category_gain": {
+              "C1": 8
+            },
+            "total_after": 30,
+            "total_gain": 8,
+            "contributions": [
+              {
+                "activity_id": "G",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_G",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "F",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_F",
+                "projected_added": 3
+              }
+            ]
+          },
+          "attribution_order": [
+            "G",
+            "F"
+          ]
+        },
+        {
+          "selected_activity_ids": [
+            "F",
+            "G"
+          ],
+          "result": {
+            "category_after": {
+              "C1": 30
+            },
+            "category_gain": {
+              "C1": 8
+            },
+            "total_after": 30,
+            "total_gain": 8,
+            "contributions": [
+              {
+                "activity_id": "F",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_F",
+                "projected_added": 5
+              },
+              {
+                "activity_id": "G",
+                "category_id": "C1",
+                "rule_id": "MOCK_R_G",
+                "projected_added": 3
+              }
+            ]
+          },
+          "attribution_order": [
+            "F",
+            "G"
+          ]
+        }
+      ],
+      "expected": {
+        "status": "TARGET_MET",
+        "feasibility_conclusion": "REACHABLE",
+        "selected": [
+          {
+            "activity_id": "G",
+            "schedule_type": "FIXED",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-02T09:00:00+07:00",
+                "end": "2026-11-02T10:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 5
+              }
+            ]
+          },
+          {
+            "activity_id": "F",
+            "schedule_type": "FLEXIBLE_WINDOW",
+            "scheduled_blocks": [
+              {
+                "start": "2026-11-03T09:00:00+07:00",
+                "end": "2026-11-03T10:00:00+07:00"
+              }
+            ],
+            "registration": "NOT_REGISTERED",
+            "change": "ADDED",
+            "reasons": [
+              {
+                "code": "GOAL_CONTRIBUTION",
+                "category_id": "C1",
+                "projected_added": 3
+              }
+            ]
+          }
+        ],
+        "excluded": [],
+        "projected_by_category": {
+          "C1": 30
+        },
+        "remaining_by_category": {
+          "C1": 0
+        },
+        "search": {
+          "complete": true,
+          "optimality_proven": true,
+          "evaluated_subsets": 4,
+          "limit_reason": null
+        },
+        "proof": null,
+        "warning_codes": [
+          "DEMO_ONLY",
+          "TRAVEL_NOT_MODELED"
+        ],
+        "dropped_activities": [],
+        "pending_confirmation": [],
+        "keep_conflicts": [],
+        "score_comparison": null,
+        "scorer_calls": [
+          [],
+          [
+            "F"
+          ],
+          [
+            "G"
+          ],
+          [
+            "F",
+            "G"
+          ]
+        ],
+        "attribution_orders": [
+          [],
+          [
+            "F"
+          ],
+          [
+            "G"
+          ],
+          [
+            "G",
+            "F"
+          ]
+        ]
+      }
+    }
+  ]
+}

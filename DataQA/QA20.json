@@ -1,0 +1,302 @@
+[
+  {
+    "activity_id": "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Takes place on 2026-10-30 (Semester 1, 2026-2027), outside Semester 3 (2026-05-18 to 2026-08-17). The original post does not specify training points (DRL)."
+  },
+  {
+    "activity_id": "pfbid02EJmkk2oaZJuBw5VqRhEUeSUNqVW6dav9qSV4AZsK661vLikur7U4PPBqJcPDBYHzl",
+    "status": "incomplete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": true,
+    "source_details": {
+      "extracted": "audience: null",
+      "original": "Original post states: 'ALT đang chờ đón K26 với những thử thách mới' (target audience: K26 freshmen / Bản lĩnh IT round 4 contestants)"
+    },
+    "review": [
+      "audience",
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Takes place on 2026-10-17 to 2026-10-18 (Semester 1, 2026-2027). The extractor missed the target audience information (K26 freshmen)."
+  },
+  {
+    "activity_id": "pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "The 'Let IT Shine' competition takes place in November 2026 (Preliminary round on 2026-11-01, Finals on 2026-11-22), belonging to Semester 1, 2026-2027."
+  },
+  {
+    "activity_id": "pfbid0dmRU1XavPQ3rzXsGMSTaL69GEcdsmKnXeVaWA4LYybFFgsJDfg3qtMetBGfn7zKkl",
+    "status": "incomplete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": true,
+    "source_details": {
+      "extracted": "start: 2026-10-03, end: 2026-10-25",
+      "original": "Original post shares CV/Resume Tips & Tricks and club collaborator recruitment for GDGoC term 2026-2027"
+    },
+    "review": [
+      "domain",
+      "mode",
+      "location",
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Article is a blog/knowledge-sharing post (Tips & Tricks) and internal club recruitment, not a student movement event. Missing mandatory activity fields and outside the scope of Semester 3."
+  },
+  {
+    "activity_id": "pfbid02o8CK5Ziex6z2ZjnEhnv49RyHkZwMxEcLkpF49QmVymQp3N2hghbSAcrvzFram89Pl",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "mode",
+      "location",
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Internal club recruitment post rather than a student movement event; missing core activity fields (mode, location, completion_requirements). Outside the scope of Semester 3."
+  },
+  {
+    "activity_id": "pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Unknown",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "start",
+      "end",
+      "registration_deadline",
+      "location",
+      "audience"
+    ],
+    "notes": "Announcement links to external registration site for health check round 2 in 2026 (posted 2026-10-24). The post does not state specific event date/time, belonging to Semester 1, 2026-2027."
+  },
+  {
+    "activity_id": "pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "registration_deadline",
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Avalanche UniHack hackathon takes place from 2026-11-02 to 2026-11-30 (Semester 1, 2026-2027); media support post for an external organization."
+  },
+  {
+    "activity_id": "pfbid02fsjfr4MEtTjN9TpVw3DvfWumQm7Wx2GGE56n7J51Y8sh4brg3p4k1uwhX41h26FFl",
+    "status": "incomplete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": true,
+    "source_details": {
+      "extracted": "start: null, end: null",
+      "original": "Original post states: 'bố trí sinh viên khám vào ngày 26/10/2026' (time slots: 07:30-11:00 and 13:00-16:00) at 'Hội trường B'"
+    },
+    "review": [
+      "start",
+      "end",
+      "audience"
+    ],
+    "notes": "The extractor missed the event date 2026-10-26 mentioned in the original post. The activity takes place in Semester 1, 2026-2027."
+  },
+  {
+    "activity_id": "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "points"
+    ],
+    "notes": "Original post explicitly states activity is recorded for Semester 1, 2026-2027. Takes place from 2026-10-19 to 2026-10-23, outside Semester 3."
+  },
+  {
+    "activity_id": "pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "registration_deadline",
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Traffic safety seminar takes place on 2026-10-17, credited for the academic year 2026-2027 (Semester 1), not belonging to Semester 3."
+  },
+  {
+    "activity_id": "pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl",
+    "status": "incomplete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": true,
+    "source_details": {
+      "extracted": "audience: null",
+      "original": "Original post states: 'Đối tượng tham gia: 40 sinh viên'"
+    },
+    "review": [
+      "audience",
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Mid-Autumn volunteer activity takes place on 2026-09-27 (Semester 1, 2026-2027). The extractor missed the target audience '40 sinh viên'."
+  },
+  {
+    "activity_id": "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
+    "status": "complete",
+    "category": "needs_verification",
+    "semester": "Not in semester 3",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "The 'Hoa Mùa Hè' campaign takes place from 2026-05-16 to 2026-05-17 (ends 1 day before the start of Semester 3 on 2026-05-18). Needs verification whether the university counts this summer activity towards Semester 3 or Semester 2."
+  },
+  {
+    "activity_id": "pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl",
+    "status": "incomplete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": true,
+    "source_details": {
+      "extracted": "audience: null",
+      "original": "Original post states: 'Đối tượng tham gia: 30 - 35 sinh viên'"
+    },
+    "review": [
+      "audience",
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "The 'Hạt Nắng Đêm' activity takes place on 2026-04-12 (Semester 2, 2025-2026, prior to Semester 3). The extractor missed the target audience '30 - 35 sinh viên'."
+  },
+  {
+    "activity_id": "pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "FIT Super League soccer tournament takes place from 202 6-03-14 to 2026-04-04 (Semester 2, 2025-2026), not belonging to Semester 3."
+  },
+  {
+    "activity_id": "pfbid026SJmz8cRXUkDwHvJrZyZv4bsikCC1t4pdDBt46gTuwxaTkBKtSHvCPvwJH1KJ47l",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Unknown",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "start",
+      "end",
+      "location",
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Registration opening post for 'Bản lĩnh IT 14' targeting K26 freshmen (registration deadline 2026-09-24). Does not state specific competition dates in the post text. Takes place in Semester 1, 2026-2027."
+  },
+  {
+    "activity_id": "pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Olympic AI competition takes place at noon on 2026-10-11 (Semester 1, 2026-2027), not belonging to Semester 3."
+  },
+  {
+    "activity_id": "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Not in semester 3",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "University-level Olympic Informatics contest takes place on 2026-10-25 (Semester 1, 2026-2027), not belonging to Semester 3."
+  },
+  {
+    "activity_id": "pfbid02buju6UWyad8k9Z4xH1tR5eNwpWsuaZtnwfesY2o8UQzdFh3p7cHemVx24dkaHSdFl",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Unknown",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "start",
+      "end",
+      "location",
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Introductory post about 'ITogether' activity stations for K26 freshmen (posted 2026-09-16). The post does not contain specific date, time, or venue."
+  },
+  {
+    "activity_id": "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
+    "status": "incomplete",
+    "category": "needs_verification",
+    "semester": "In semester 3",
+    "source_mismatch": true,
+    "source_details": {
+      "extracted": "URL_registration: null",
+      "original": "Original post states: 'Link tham gia: bit.ly/TheoDauChanNguoi2026.'"
+    },
+    "review": [
+      "URL_registration",
+      "points"
+    ],
+    "notes": "The 'Theo dấu chân Người' competition takes place from 2026-06-05 to 2026-06-12 (strictly within Semester 3: 2026-05-18 to 2026-08-17). The original post explicitly states it counts towards Semester 3, 2025-2026 for Advanced/Project program students achieving 23/30 correct answers or more. The extractor missed the registration link. Ready for SP3 handoff."
+  },
+  {
+    "activity_id": "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al",
+    "status": "complete",
+    "category": "out_of_scope",
+    "semester": "Unknown",
+    "source_mismatch": false,
+    "source_details": null,
+    "review": [
+      "start",
+      "end",
+      "location",
+      "points",
+      "completion_requirements"
+    ],
+    "notes": "Media support post for 'Bản lĩnh IT 14' registration form targeting K26 freshmen (deadline 2026-09-25). Does not specify exact competition dates, belonging to Semester 1, 2026-2027."
+  }
+]
