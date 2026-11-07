@@ -257,6 +257,28 @@ def audit_rules_config(config: Mapping[str, Any]) -> list[dict[str, str]]:
                     )
                 )
 
+        default_awarded = rule.get("default_awarded")
+        if default_awarded is not None and not isinstance(default_awarded, bool):
+            issues.append(
+                AuditIssue(
+                    "error",
+                    "DEFAULT_AWARDED_NOT_BOOL",
+                    f"{path}.default_awarded",
+                    "default_awarded must be true or false",
+                )
+            )
+        elif default_awarded is True and not _condition_matches(
+            condition, rule.get("default_value", 0)
+        ):
+            issues.append(
+                AuditIssue(
+                    "error",
+                    "DEFAULT_VALUE_DOES_NOT_MATCH",
+                    f"{path}.default_value",
+                    "default_value must satisfy the rule condition",
+                )
+            )
+
         signature = _condition_signature(rule)
         previous = condition_signatures.get(signature)
         if previous and isinstance(rule_id, str):
@@ -326,8 +348,16 @@ def evaluate_rule_conditions(
     student_record: Mapping[str, Any],
     *,
     required_fields: Iterable[str] = (),
+    apply_default_awards: bool = False,
 ) -> dict[str, Any]:
-    """Match the flat rules against a confirmed student record."""
+    """Match the flat rules against a confirmed student record.
+
+    When ``apply_default_awards`` is true, rules marked ``default_awarded``
+    (e.g. "no violation" items granted at the start of a semester) are scored
+    with their ``default_value`` if the record does not provide the field.
+    An explicit value in the record always wins, so a reported violation
+    still removes the points.
+    """
 
     configuration_issues = audit_rules_config(config)
     fatal_codes = {
@@ -356,6 +386,7 @@ def evaluate_rule_conditions(
     scoring = config["scoring_model"]
     matched: list[dict[str, Any]] = []
     skipped_rules: list[dict[str, str]] = []
+    default_applied_rules: list[str] = []
     by_criterion_raw: dict[tuple[str, str], float] = {}
     criterion_caps: dict[tuple[str, str], Real | None] = {}
     seen_conditions: dict[tuple[Any, ...], str] = {}
@@ -385,9 +416,14 @@ def evaluate_rule_conditions(
             continue
         condition = rule["condition"]
         field = condition["field"]
+        default_applied = False
         if field not in student_record or student_record[field] is None:
-            continue
-        actual = student_record[field]
+            if not (apply_default_awards and rule.get("default_awarded") is True):
+                continue
+            actual = rule.get("default_value", 0)
+            default_applied = True
+        else:
+            actual = student_record[field]
         if not _condition_matches(condition, actual):
             continue
         signature = _condition_signature(rule)
@@ -412,8 +448,11 @@ def evaluate_rule_conditions(
                 "multiplier": multiplier,
                 "unit": rule.get("unit"),
                 "source": rule.get("source"),
+                **({"default_applied": True} if default_applied else {}),
             }
         )
+        if default_applied:
+            default_applied_rules.append(str(rule["rule_id"]))
         category = str(rule.get("category_id"))
         criterion = str(rule.get("criterion_id"))
         criterion_key = (category, criterion)
@@ -498,6 +537,7 @@ def evaluate_rule_conditions(
         "needs_review": bool(missing or relevant_configuration_issues or skipped_rules),
         "missing_fields": missing,
         "skipped_rules": skipped_rules,
+        "default_applied_rules": default_applied_rules,
         "configuration_issues": configuration_issues,
         "relevant_configuration_issues": relevant_configuration_issues,
     }
@@ -976,6 +1016,7 @@ def evaluate_rules_progress(
     scope: Mapping[str, Any] | None = None,
     personal_targets: Mapping[str, Real] | None = None,
     required_fields: Iterable[str] = (),
+    apply_default_awards: bool = False,
 ) -> dict[str, Any]:
     """Run the flat rules, then build the normal SP2 progress report."""
 
@@ -1018,7 +1059,10 @@ def evaluate_rules_progress(
         return report
 
     rule_result = evaluate_rule_conditions(
-        config, values, required_fields=required_fields
+        config,
+        values,
+        required_fields=required_fields,
+        apply_default_awards=apply_default_awards,
     )
     records: list[dict[str, Any]] = []
     for category in rule_result["category_scores"]:

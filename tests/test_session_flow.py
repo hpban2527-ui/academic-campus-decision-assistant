@@ -76,22 +76,22 @@ def test_preview_twice_is_not_a_duplicate_and_records_nothing():
     assert second["dedup"]["is_duplicate"] is False
     assert second["commit"]["kind"] == "score"
     assert get_activities()["total_activities"] == before_catalog
-    assert scores()["total_confirmed"] == 69
+    assert scores()["total_confirmed"] == 50
 
 
 def test_save_accumulates_and_blocks_double_save():
     a = commit_evaluation(CommitRequest(**body(POST_A, post_id="p1")))
     assert a["status"] == "saved"
-    assert scores()["total_confirmed"] == 74
+    assert scores()["total_confirmed"] == 55
 
     preview_b = evaluate_announcement(EvaluationRequest(**body(POST_B, post_id="p2")))
-    assert preview_b["sp2"]["category_before"] == 25
-    assert preview_b["sp2"]["category_after"] == 30
+    assert preview_b["sp2"]["category_before"] == 20
+    assert preview_b["sp2"]["category_after"] == 25
 
     b = commit_evaluation(CommitRequest(**body(POST_B, post_id="p3")))
     assert b["status"] == "saved"
-    assert scores()["total_confirmed"] == 79
-    assert scores()["category_scores"]["C1"]["current"] == 30
+    assert scores()["total_confirmed"] == 60
+    assert scores()["category_scores"]["C1"]["current"] == 25
 
     again = evaluate_announcement(EvaluationRequest(**body(POST_A, post_id="p4")))
     assert again["sp2"]["decision"] == "REJECTED_DUPLICATE"
@@ -99,14 +99,14 @@ def test_save_accumulates_and_blocks_double_save():
     with pytest.raises(HTTPException) as exc:
         commit_evaluation(CommitRequest(**body(POST_A, post_id="p5")))
     assert exc.value.status_code == 409
-    assert scores()["total_confirmed"] == 79
+    assert scores()["total_confirmed"] == 60
 
 
 def test_projected_then_upgrade_with_evidence_does_not_double_count():
     res1 = commit_evaluation(CommitRequest(**body(POST_A, evidence=False)))
     assert res1["status"] == "saved"
     s = scores()
-    assert s["total_confirmed"] == 69 and s["category_scores"]["C1"]["projected"] == 5
+    assert s["total_confirmed"] == 50 and s["category_scores"]["C1"]["projected"] == 5
 
     # Same post without evidence again -> duplicate.
     dup = evaluate_announcement(EvaluationRequest(**body(POST_A, evidence=False, post_id="x")))
@@ -116,7 +116,7 @@ def test_projected_then_upgrade_with_evidence_does_not_double_count():
     up = commit_evaluation(CommitRequest(**body(POST_A, evidence=True, post_id="y")))
     assert up["status"] == "upgraded"
     s = scores()
-    assert s["category_scores"]["C1"]["current"] == 25
+    assert s["category_scores"]["C1"]["current"] == 20
     assert s["category_scores"]["C1"]["projected"] == 0
     assert len(s["saved_activities"]) == 1
 

@@ -447,8 +447,8 @@
                 <h2 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Điểm rèn luyện của bạn</h2>
               </div>
               <div class="flex items-center gap-2">
-                <button id="btnResetScoreBaseline" onclick="resetScoreBaselineToDefault()" class="hidden px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 border border-[#223046] transition" title="Khôi phục về điểm gốc (69đ)">
-                  Khôi phục gốc (69đ)
+                <button id="btnResetScoreBaseline" onclick="resetScoreBaselineToDefault()" class="hidden px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 border border-[#223046] transition" title="Khôi phục về điểm mặc định do SP2 tính">
+                  Khôi phục điểm mặc định
                 </button>
                 <span id="overallGradeBadge" class="px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40 shadow-xs">
                   Xếp loại: Khá
@@ -467,7 +467,7 @@
                 <div class="absolute inset-5 rounded-full flex flex-col items-center justify-center text-center pointer-events-none">
                   <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tổng điểm</span>
                   <div class="flex items-baseline justify-center mt-0.5">
-                    <span id="totalConfirmedScoreText" class="text-4xl font-black text-white leading-none tracking-tight">69</span>
+                    <span id="totalConfirmedScoreText" class="text-4xl font-black text-white leading-none tracking-tight">0</span>
                     <span class="text-sm font-bold text-slate-400 ml-1">/100</span>
                   </div>
                 </div>
@@ -476,8 +476,8 @@
               <!-- Side Summary Card -->
               <div class="space-y-3 text-sm w-full sm:w-auto flex-1">
                 <div class="p-3.5 sm:p-4 rounded-xl bg-[#080d18] border border-[#223046] space-y-1.5">
-                  <span id="totalProjectedSubtext" class="text-sm sm:text-base font-extrabold text-indigo-300 block leading-tight">Hiện có: 69 / 100 điểm</span>
-                  <span id="devTotalMissingText" class="dev-only text-xs font-mono text-rose-400 block mt-1">[Dev] Còn thiếu: 31đ</span>
+                  <span id="totalProjectedSubtext" class="text-sm sm:text-base font-extrabold text-indigo-300 block leading-tight">Đang tải điểm mặc định từ SP2...</span>
+                  <span id="devTotalMissingText" class="dev-only text-xs font-mono text-rose-400 block mt-1">[Dev] Đang tải...</span>
                   <button type="button" onclick="switchTab('plan')" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1.5 pt-1.5 transition">
                     <span>🎯 Đặt mục tiêu &amp; Lập kế hoạch <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP3)</span></span>
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -1035,14 +1035,17 @@
     let eventFieldsEditedByUser = false;
     let savedActivitiesForStudent = [];
 
+    // Category metadata only. Current scores are loaded from /api/scores, whose
+    // baseline is calculated by SP2 from rules marked default_awarded.
     const DEFAULT_SCORES_TEMPLATE = {
-      C1: { current: 20, projected: 0, max: 30, name: "Mục 1. Học tập & NCKH", color: "#2563eb" },
-      C2: { current: 15, projected: 0, max: 20, name: "Mục 2. Chấp hành nội quy", color: "#0d9488" },
-      C3: { current: 22, projected: 0, max: 25, name: "Mục 3. Chính trị, Văn hóa, Thể thao", color: "#7c3aed" },
-      C4: { current: 10, projected: 0, max: 25, name: "Mục 4. Hoạt động cộng đồng", color: "#ea580c" },
-      C5: { current: 2,  projected: 0, max: 30, name: "Mục 5. Cán bộ lớp & CLB", color: "#db2777" }
+      C1: { current: 0, projected: 0, max: 30, name: "Mục 1. Học tập & NCKH", color: "#2563eb" },
+      C2: { current: 0, projected: 0, max: 20, name: "Mục 2. Chấp hành nội quy", color: "#0d9488" },
+      C3: { current: 0, projected: 0, max: 25, name: "Mục 3. Chính trị, Văn hóa, Thể thao", color: "#7c3aed" },
+      C4: { current: 0, projected: 0, max: 25, name: "Mục 4. Hoạt động cộng đồng", color: "#ea580c" },
+      C5: { current: 0, projected: 0, max: 30, name: "Mục 5. Cán bộ lớp & CLB", color: "#db2777" }
     };
     let studentCategoryScores = JSON.parse(JSON.stringify(DEFAULT_SCORES_TEMPLATE));
+    let defaultBaselineTotal = 0;
 
     const FIELD_COLORS = {
       C1: "#2563eb",
@@ -1259,6 +1262,11 @@
         if (sp2.projected_added === 0) {
           return `Nhóm ${catName} đã đầy trần điểm (kể cả điểm dự kiến đã lưu) nên không còn khoảng trống để cộng thêm.`;
         }
+        if (sp2.estimate_requires_review) {
+          const confidence = Math.round(Number(sp2.estimate_confidence || 0) * 100);
+          return `Hệ thống ước lượng hoạt động này có thể được +${sp2.projected_added} điểm vào nhóm ${catName}` +
+            `${confidence ? ` (độ tin cậy ${confidence}%)` : ''}. Bài đăng chưa đủ thông tin để xác nhận; bạn có thể gửi kết quả vào hàng đợi duyệt.`;
+        }
         return `Khi tham gia và hoàn thành hoạt động này, bạn sẽ được cộng +${sp2.projected_added} điểm vào nhóm ${catName}. Bạn có thể bấm "Lưu điểm dự kiến" hoặc tích vào ô "Đã tham gia & có minh chứng" ở trên để cộng thẳng vào tổng điểm.`;
       }
       if (sp2.decision === "REJECTED_DUPLICATE") {
@@ -1285,6 +1293,9 @@
         return sp2.confirmed_added > 0 ? `Đủ điều kiện +${sp2.confirmed_added} điểm` : `Chạm trần nhóm (+0đ)`;
       }
       if (sp2.decision === "PROJECTED") {
+        if (sp2.estimate_requires_review && sp2.projected_added > 0) {
+          return `Ước lượng +${sp2.projected_added} điểm`;
+        }
         return sp2.projected_added > 0 ? `Dự kiến +${sp2.projected_added} điểm` : `Chạm trần nhóm (+0đ)`;
       }
       if (sp2.decision === "REJECTED_DUPLICATE") return `Hoạt động trùng lặp`;
@@ -1425,6 +1436,7 @@
         }
       });
       studentCategoryScores = fresh;
+      defaultBaselineTotal = Number(scoreData.default_baseline_total ?? defaultBaselineTotal);
       savedActivitiesForStudent = scoreData.saved_activities || [];
       renderSavedActivitiesBox();
       updateResetBaselineButton();
@@ -1666,7 +1678,9 @@
               has_evidence: c.evidence,
               rule_override: c.rule_override,
               student_id: currentStudent?.student_id || "25127242",
-              current_category_scores: DEFAULT_SCORES_TEMPLATE,
+              ...(c.current_category_scores
+                ? { current_category_scores: c.current_category_scores }
+                : {}),
               simulate_demo: true
             })
           });
@@ -2795,7 +2809,9 @@
       const dedupPill = document.getElementById("resDedupPill");
       dedupPill.innerText = dedup.is_duplicate
         ? `Trùng lặp (${Math.round((dedup.similarity || 1) * 100)}% — ${dedup.match_id})`
-        : "Unique (MinHash-LSH OK)";
+        : dedup.catalog_match
+          ? `Có trong kho nguồn (${Math.round((dedup.similarity || 1) * 100)}%) — vẫn được ước lượng`
+          : "Unique (MinHash-LSH OK)";
 
       // Preview on the right-hand scoreboard WITHOUT mutating studentCategoryScores:
       // The big center number stays at the saved confirmed score while the sky-blue preview arc
@@ -3038,7 +3054,7 @@
         total += Number(info.current || 0);
         totalProj += Number(info.projected || 0);
       });
-      if (total !== 69 || totalProj > 0 || savedActivitiesForStudent.length > 0) {
+      if (total !== defaultBaselineTotal || totalProj > 0 || savedActivitiesForStudent.length > 0) {
         btn.classList.remove("hidden");
       } else {
         btn.classList.add("hidden");

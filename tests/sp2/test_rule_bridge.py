@@ -50,9 +50,9 @@ def test_actual_rules_match_gpa_and_violation_rules(actual_rules):
         {"semester_gpa": 8.5, "academic_exam_violations": 0},
     )
     assert [item["rule_id"] for item in result["matched_rules"]] == ["R11", "R1203"]
-    assert [item["points"] for item in result["matched_rules"]] == [10, 10]
+    assert [item["points"] for item in result["matched_rules"]] == [15, 10]
     assert result["category_scores"] == [
-        {"category_id": "C1", "raw_score": 20, "cap": 30, "score": 20}
+        {"category_id": "C1", "raw_score": 25, "cap": 30, "score": 25}
     ]
     assert result["needs_review"] is False
 
@@ -371,3 +371,84 @@ def test_unit_semantics_distinguish_repeatable_entities_from_period_awards():
         "SEMESTER": (1, 4),
         "CERTIFICATE": (3, 15),
     }
+
+
+DEFAULT_AWARDED_RULES = {"R11": 15, "R21": 15, "R37": 10, "R41": 10}
+
+
+def test_default_awarded_rules_are_marked_in_rules_file(actual_rules):
+    marked = {
+        rule["rule_id"]: rule["points"]
+        for rule in actual_rules["rules"]
+        if rule.get("default_awarded") is True
+    }
+    assert marked == DEFAULT_AWARDED_RULES
+
+
+def test_default_awards_are_off_unless_requested(actual_rules):
+    result = evaluate_rule_conditions(actual_rules, {})
+    assert result["matched_rules"] == []
+    assert result["default_applied_rules"] == []
+    assert result["final_score"] == 0
+
+
+def test_default_awards_fill_missing_no_violation_fields(actual_rules):
+    result = evaluate_rule_conditions(
+        actual_rules, {}, apply_default_awards=True
+    )
+    matched = {item["rule_id"]: item["points"] for item in result["matched_rules"]}
+    assert matched == DEFAULT_AWARDED_RULES
+    assert all(item["default_applied"] for item in result["matched_rules"])
+    assert sorted(result["default_applied_rules"]) == sorted(DEFAULT_AWARDED_RULES)
+    assert {c["category_id"]: c["score"] for c in result["category_scores"]} == {
+        "C1": 15,
+        "C2": 15,
+        "C3": 10,
+        "C4": 10,
+    }
+    assert result["final_score"] == 50
+
+
+def test_reported_violation_removes_default_award(actual_rules):
+    result = evaluate_rule_conditions(
+        actual_rules,
+        {"academic_exam_violations": 1, "semester_gpa": 8.5},
+        apply_default_awards=True,
+    )
+    matched = {item["rule_id"] for item in result["matched_rules"]}
+    assert "R11" not in matched
+    assert {"R21", "R37", "R41", "R1203"} <= matched
+    assert "R11" not in result["default_applied_rules"]
+
+
+def test_explicit_zero_is_not_marked_as_default(actual_rules):
+    result = evaluate_rule_conditions(
+        actual_rules, {"school_rule_violations_excluding_academic_exam": 0},
+        apply_default_awards=True,
+    )
+    r21 = next(item for item in result["matched_rules"] if item["rule_id"] == "R21")
+    assert "default_applied" not in r21
+    assert "R21" not in result["default_applied_rules"]
+
+
+def test_default_value_must_satisfy_condition():
+    config = {
+        "scoring_model": {
+            "semester_score_min": 0,
+            "max_total_score": 100,
+            "category_caps": [{"category_id": "C1", "max_score": 30}],
+        },
+        "rules": [
+            {
+                "rule_id": "BAD_DEFAULT",
+                "criterion_id": "1",
+                "category_id": "C1",
+                "condition": {"field": "violations", "operator": "equals", "value": 0},
+                "points": 10,
+                "default_awarded": True,
+                "default_value": 2,
+            }
+        ],
+    }
+    codes = [issue["code"] for issue in audit_rules_config(config)]
+    assert "DEFAULT_VALUE_DOES_NOT_MATCH" in codes
