@@ -1707,6 +1707,7 @@ class SP3DemoPlanRequest(BaseModel):
     scenario: str = "first_plan"
     total_target: Optional[int] = Field(default=None, ge=0, le=100)
     busy_intervals: list[dict[str, str]] = Field(default_factory=list)
+    skip_activity_id: Optional[str] = None
 
 
 @app.get("/api/sp3/catalog")
@@ -1719,7 +1720,12 @@ def get_sp3_catalog():
 def run_sp3_demo_plan(req: SP3DemoPlanRequest):
     """Read-only complete SP1-format -> feasibility -> planner -> SP2 demo."""
     try:
-        return _sp3_demo_plan(req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals)
+        return _sp3_demo_plan(
+            req.scenario,
+            target_total=req.total_target,
+            busy_intervals=req.busy_intervals,
+            skip_activity_id=req.skip_activity_id,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 

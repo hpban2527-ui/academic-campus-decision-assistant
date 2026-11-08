@@ -793,8 +793,8 @@
               <span>Mode <b>DEMO_ONLY</b> (<code class="font-mono">official_award_verified: false</code>) uses the November 2026 synthetic dataset to verify the SP3 optimization algorithm — must not be presented as official university DRL records.</span>
             </div>
 
-            <!-- 3-Step Journey Stepper (Initial Plan -> Schedule Changes -> Drop Activity) -->
-            <div id="planStepper" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5"></div>
+            <!-- 3-Step Journey Stepper (Hidden in Manual Mode) -->
+            <div id="planStepper" class="hidden"></div>
 
             <!-- Horizontal Goal & Schedule Setting Bar -->
             <div class="bg-[#080d18] rounded-xl border border-[#1b2537] p-4 lg:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
@@ -933,8 +933,23 @@
                 </div>
               </div>
 
+              <!-- What-If Notification Banner (shown only when simulating drop) -->
+              <div id="planWhatIfBanner" class="hidden p-4 rounded-xl bg-amber-950/50 border border-amber-500/50 text-amber-200 text-xs sm:text-sm flex flex-wrap items-center justify-between gap-3 shadow-lg">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <span class="text-xl shrink-0">⚠️</span>
+                  <div class="min-w-0">
+                    <span class="font-extrabold text-amber-100 block">What-If Simulation Active</span>
+                    <span id="planWhatIfBannerText" class="text-xs text-amber-300">You are simulating dropping an activity.</span>
+                  </div>
+                </div>
+                <button type="button" onclick="restoreDroppedActivity()" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-1.5 shadow-sm shrink-0">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                  Undo / Restore Activity
+                </button>
+              </div>
+
               <!-- What Changed / Next Step Card -->
-              <div id="planChangeCard"></div>
+              <div id="planChangeCard" class="hidden"></div>
 
               <!-- Full-Width Tabbed Details Container -->
               <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl overflow-hidden">
@@ -943,7 +958,7 @@
                   <div id="planPanelSelected" class="space-y-3"></div>
                   <div id="planPanelAvail" class="hidden"></div>
                   <div id="planPanelCand" class="hidden"></div>
-                  <div id="planPanelNotes" class="hidden space-y-5"></div>
+                  <div id="planPanelNotes" class="hidden space-y-5 dev-only"></div>
                 </div>
               </div>
 
@@ -2644,11 +2659,15 @@
       return intervals;
     }
 
-    async function fetchSp3Plan(scenario, targetTotal, busyIntervals) {
+    let currentDroppedActivityId = null;
+
+    async function fetchSp3Plan(scenario, targetTotal, busyIntervals, skipActivityId) {
+      const payload = { scenario, total_target: targetTotal, busy_intervals: busyIntervals };
+      if (skipActivityId) payload.skip_activity_id = skipActivityId;
       const res = await fetch(`${API_BASE}/api/sp3/demo/plan`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenario, total_target: targetTotal, busy_intervals: busyIntervals })
+        body: JSON.stringify(payload)
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -2694,6 +2713,7 @@
       setPlanButtonLabel('Optimizing roadmap...');
 
       try {
+        currentDroppedActivityId = null;
         const data = await fetchSp3Plan('first_plan', targetTotal, busyIntervals);
         planStages.first = data;
         planStages.replan = null;
@@ -2711,6 +2731,41 @@
         if (btn) btn.disabled = false;
         setPlanButtonLabel(planStages.first ? (planInputsDirty ? 'Update Plan' : 'Recompute Plan') : 'Generate Proposed Plan');
       }
+    }
+
+    async function simulateDropActivity(activityId) {
+      if (!planStages.first) return;
+      currentDroppedActivityId = activityId;
+      const targetInput = document.getElementById('inputPlanTarget');
+      const rawTarget = parseInt(targetInput ? targetInput.value : '80', 10);
+      const targetTotal = isNaN(rawTarget) ? 80 : Math.max(0, Math.min(100, rawTarget));
+      const busyIntervals = collectBusyIntervals();
+
+      const loadingText = document.getElementById('plannerLoadingText');
+      if (loadingText) loadingText.innerText = `Simulating what-if outcome without "${activityId}"...`;
+      showPlanPanels('loading');
+      try {
+        const data = await fetchSp3Plan('what_if_skip', targetTotal, busyIntervals, activityId);
+        planStages.whatif = data;
+        currentPlannerData = data;
+        currentPlanStage = 'whatif';
+        currentPlanTab = 'selected';
+        renderSp3PlanResult();
+      } catch (err) {
+        console.error('SP3 what-if error:', err);
+        showPlanError(err.message);
+      } finally {
+        showPlanPanels('active');
+      }
+    }
+
+    async function restoreDroppedActivity() {
+      currentDroppedActivityId = null;
+      planStages.whatif = null;
+      currentPlannerData = planStages.first;
+      currentPlanStage = 'first';
+      currentPlanTab = 'selected';
+      renderSp3PlanResult();
     }
 
     // Steps 2 & 3: explicit user actions that move through the journey.
@@ -2853,129 +2908,7 @@
 
     function renderPlanChangeCard(data, prevData, titles) {
       const el = document.getElementById('planChangeCard');
-      if (!el) return;
-      const plan = data.plan || {};
-      const cardCls = 'bg-[#0e1524] rounded-2xl border shadow-xl p-5 space-y-3';
-      const btnPrimary = 'px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition';
-      const btnGhost = 'px-4 py-2.5 rounded-xl bg-[#080d18] hover:bg-[#162032] border border-[#223046] text-slate-200 text-sm font-bold transition';
-      const errorHtml = planStageError
-        ? `<div class="p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-sm text-rose-300">Unable to execute: ${escapeHTML(planStageError)}</div>`
-        : '';
-
-      if (currentPlanStage === 'first') {
-        el.innerHTML = `
-          <div class="${cardCls} border-indigo-500/30">
-            ${errorHtml}
-            <div class="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h4 class="text-base font-extrabold text-white">Could your schedule change?</h4>
-                <p class="text-sm text-slate-300 mt-1">See how the schedule automatically reorganizes when your availability shifts.</p>
-              </div>
-              <button type="button" onclick="gotoPlanStage('replan')" class="${btnPrimary}">Simulate Schedule Change →</button>
-            </div>
-          </div>`;
-        return;
-      }
-
-      const diff = diffPlans((prevData.plan || {}), plan);
-      const tag = (cls, label) => `<span class="px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 ${cls}">${label}</span>`;
-      const row = (tagHtml, ids) => ids.length === 0 ? '' : `
-        <div class="flex items-start gap-3 text-sm text-slate-300">
-          ${tagHtml}
-          <span class="min-w-0">${ids.map(id => planActivityTitleHtml(titles, id)).join(', ')}</span>
-        </div>`;
-      const removedReason = id => {
-        const ex = (plan.excluded_candidates || []).find(e => e.activity_id === id);
-        return ex ? planExcludeReason(ex) : '';
-      };
-
-      if (currentPlanStage === 'replan') {
-        const comparison = plan.score_comparison || {};
-        const prevFree = (prevData.availability || {}).available_intervals || [];
-        const newFree = (data.availability || {}).available_intervals || [];
-        const fmtRange = r => `${formatPlanDate(new Date(r[0]).toISOString())} → ${formatPlanDate(new Date(r[1]).toISOString())}`;
-        const becameBusy = subtractIntervals(prevFree, newFree).map(fmtRange);
-        const becameFree = subtractIntervals(newFree, prevFree).map(fmtRange);
-        const scheduleLines = [
-          becameBusy.length ? `<div class="flex items-start gap-3 text-sm text-slate-300">${tag('bg-rose-950/60 text-rose-300 border-rose-500/40', 'New Busy Slot')}<span class="min-w-0 text-white font-semibold">${becameBusy.map(escapeHTML).join('; ')}</span></div>` : '',
-          becameFree.length ? `<div class="flex items-start gap-3 text-sm text-slate-300">${tag('bg-emerald-950/60 text-emerald-300 border-emerald-500/40', 'New Free Slot')}<span class="min-w-0 text-white font-semibold">${becameFree.map(escapeHTML).join('; ')}</span></div>` : ''
-        ].join('');
-        const removedLines = diff.removed.map(id => {
-          const reason = removedReason(id);
-          return `<div class="flex items-start gap-3 text-sm text-slate-300">
-              ${tag('bg-rose-950/60 text-rose-300 border-rose-500/40', 'Removed')}
-              <span class="min-w-0">${planActivityTitleHtml(titles, id)}${reason ? ` <span class="text-slate-400">— ${escapeHTML(reason)}</span>` : ''}</span>
-            </div>`;
-        }).join('');
-        const keepOldScore = comparison.previous_projected_total;
-        const newScore = comparison.new_projected_total ?? (plan.score_summary || {}).projected_total;
-        const scoreLine = (keepOldScore != null && keepOldScore !== newScore)
-          ? `Keeping the old plan with your new schedule yields only <b class="text-white">${keepOldScore} pts</b>. The new plan achieves <b class="text-emerald-300">${newScore} pts</b>.`
-          : `Projected points after rescheduling: <b class="text-white">${newScore} pts</b>.`;
-        const skipSelected = (plan.selected_activities || []).some(a => a.activity_id === WHAT_IF_SKIP_ACTIVITY_ID);
-
-        el.innerHTML = `
-          <div class="${cardCls} border-amber-500/30">
-            ${errorHtml}
-            <div>
-              <h4 class="text-base font-extrabold text-white">Your availability just changed</h4>
-              <p class="text-sm text-slate-300 mt-1">Simulation scenario: your schedule changes as follows:</p>
-            </div>
-            <div class="space-y-2">${scheduleLines || '<div class="text-sm text-slate-300">No changes in available time slots.</div>'}</div>
-            <p class="text-sm text-slate-300">The system has re-optimized your plan:</p>
-            <div class="space-y-2">
-              ${removedLines}
-              ${row(tag('bg-emerald-950/60 text-emerald-300 border-emerald-500/40', 'Added'), diff.added)}
-              ${row(tag('bg-sky-950/60 text-sky-300 border-sky-500/40', 'Rescheduled'), diff.moved)}
-              ${diff.removed.length + diff.added.length + diff.moved.length === 0 ? '<div class="text-sm text-slate-300">Your plan is unaffected.</div>' : ''}
-            </div>
-            <div class="text-sm text-slate-300">${scoreLine}</div>
-            <div class="flex flex-wrap items-center gap-2 pt-1">
-              ${skipSelected ? `<button type="button" onclick="gotoPlanStage('whatif')" class="${btnPrimary}">Try dropping “${escapeHTML(titles[WHAT_IF_SKIP_ACTIVITY_ID] || WHAT_IF_SKIP_ACTIVITY_ID)}” →</button>` : ''}
-              <button type="button" onclick="gotoPlanStage('first')" class="${btnGhost}">← Return to Initial Plan</button>
-            </div>
-          </div>`;
-        return;
-      }
-
-      // what-if stage
-      const summary = plan.score_summary || {};
-      const prevSummary = (prevData.plan || {}).score_summary || {};
-      const catChanges = ['C1', 'C2', 'C3', 'C4', 'C5'].map(cid => {
-        const before = (prevSummary.projected_by_category || {})[cid] ?? 0;
-        const after = (summary.projected_by_category || {})[cid] ?? 0;
-        return { cid, before, after, delta: after - before };
-      }).filter(c => c.delta !== 0);
-      const missing = Object.entries(summary.remaining_by_category || {}).filter(([, v]) => v > 0);
-      const skippedTitle = titles[WHAT_IF_SKIP_ACTIVITY_ID] || WHAT_IF_SKIP_ACTIVITY_ID;
-      const verdict = missing.length > 0
-        ? `<div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-sm text-amber-200">
-             If you drop this activity, <b>${missing.map(([cid, v]) => `${PLAN_CAT_LABELS[cid] || cid} (${PLAN_CAT_FULL[cid] || ''}) has a deficit of ${v} pts`).join('; ')}</b> from your goal ${plan.feasibility_conclusion === 'PROVEN_UNREACHABLE' ? ' — and no remaining activities fit your schedule to compensate' : ''}.
-           </div>`
-        : `<div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-sm text-emerald-200">Even after dropping this activity, you still achieve your goal via the replacement activities below.</div>`;
-
-      el.innerHTML = `
-        <div class="${cardCls} border-rose-500/30">
-          ${errorHtml}
-          <div>
-            <h4 class="text-base font-extrabold text-white">What-If Simulation: You drop “${escapeHTML(skippedTitle)}”</h4>
-            <p class="text-sm text-slate-300 mt-1">Projected outcome if you cannot attend this activity:</p>
-          </div>
-          <div class="space-y-2">
-            ${row(tag('bg-rose-950/60 text-rose-300 border-rose-500/40', 'Dropped'), diff.removed)}
-            ${row(tag('bg-emerald-950/60 text-emerald-300 border-emerald-500/40', 'Replaced with'), diff.added)}
-            ${row(tag('bg-sky-950/60 text-sky-300 border-sky-500/40', 'Rescheduled'), diff.moved)}
-          </div>
-          ${catChanges.length ? `<div class="flex flex-wrap gap-2">${catChanges.map(c => `
-            <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${c.delta > 0 ? 'bg-emerald-950/40 text-emerald-300 border-emerald-600/50' : 'bg-rose-950/40 text-rose-300 border-rose-600/50'}">
-              ${PLAN_CAT_LABELS[c.cid]}: ${c.before} → ${c.after} pts (${c.delta > 0 ? '+' : ''}${c.delta} pts)
-            </span>`).join('')}</div>` : ''}
-          ${verdict}
-          <div class="flex flex-wrap items-center gap-2 pt-1">
-            <button type="button" onclick="gotoPlanStage('replan')" class="${btnGhost}">← Return to Step 2</button>
-            <button type="button" onclick="gotoPlanStage('first')" class="${btnGhost}">Return to Initial Plan</button>
-          </div>
-        </div>`;
+      if (el) el.innerHTML = '';
     }
 
     // ---- main renderer: draws whichever journey step is currently selected ----
@@ -2997,6 +2930,25 @@
       if (stale) stale.classList.toggle('hidden', !planInputsDirty);
 
       renderPlanStepper();
+
+      // What-If Notification Banner
+      const whatIfBanner = document.getElementById('planWhatIfBanner');
+      const whatIfText = document.getElementById('planWhatIfBannerText');
+      if (whatIfBanner) {
+        if (currentPlanStage === 'whatif' && currentDroppedActivityId) {
+          whatIfBanner.classList.remove('hidden');
+          const droppedName = titles[currentDroppedActivityId] || currentDroppedActivityId;
+          const missing = Object.entries(summary.remaining_by_category || {}).filter(([, v]) => v > 0);
+          const deficitStr = missing.length > 0
+            ? missing.map(([cid, v]) => `${PLAN_CAT_LABELS[cid] || cid} deficit: ${v} pts`).join(', ')
+            : 'Alternative activities rescheduled to maintain score target';
+          if (whatIfText) {
+            whatIfText.innerHTML = `Simulating dropping <b>“${escapeHTML(droppedName)}”</b>. Outcome: <span class="text-amber-200 font-semibold">${escapeHTML(deficitStr)}</span>.`;
+          }
+        } else {
+          whatIfBanner.classList.add('hidden');
+        }
+      }
 
       // Summary header
       const met = plan.status === 'TARGET_MET';
@@ -3068,13 +3020,17 @@
         ['selected', 'Proposed Roadmap', acts.length],
         ['avail', 'Available Slots', availIntervals.length],
         ['cand', 'Feasibility Assessment', `${feasOk}/${feasCandidates.length}`],
-        ['notes', 'Unscheduled & Notes', visibleWarnings.length + excluded.length]
+        ['notes', 'Unscheduled & Notes', visibleWarnings.length + excluded.length, true /* isDev */]
       ];
+      if (!isDev && currentPlanTab === 'notes') {
+        currentPlanTab = 'selected';
+      }
       const tabBar = document.getElementById('planTabBar');
       if (tabBar) {
-        tabBar.innerHTML = tabs.map(([key, label, count]) => {
+        tabBar.innerHTML = tabs.map(([key, label, count, isDevTab]) => {
           const on = key === currentPlanTab;
-          return `<button type="button" onclick="setPlanTab('${key}')" class="px-3.5 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 ${on ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-[#162032]'}">
+          const devCls = isDevTab ? 'dev-only ' : '';
+          return `<button type="button" onclick="setPlanTab('${key}')" class="${devCls}px-3.5 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 ${on ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-[#162032]'}">
             ${label}
             <span class="px-1.5 py-0.5 rounded-full text-[11px] font-bold ${on ? 'bg-indigo-500/60 text-white' : 'bg-[#162032] text-slate-300'}">${count}</span>
           </button>`;
@@ -3130,6 +3086,10 @@
                       <div class="flex flex-wrap items-center justify-end gap-1.5 shrink-0">
                         ${changeTag}
                         ${gains.map(r => `<span class="px-2 py-0.5 rounded-md text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">+${r.projected_added} pts to ${PLAN_CAT_LABELS[r.category_id] || escapeHTML(r.category_id)}</span>`).join('')}
+                        ${currentPlanStage !== 'whatif' ? `<button type="button" onclick="event.stopPropagation(); simulateDropActivity('${escapeHTML(item.activity_id)}')" class="px-2.5 py-1 rounded-lg text-xs font-bold text-rose-300 hover:text-white bg-rose-950/50 hover:bg-rose-900 border border-rose-500/40 transition flex items-center gap-1.5 shadow-xs ml-1" title="Simulate dropping this activity">
+                          <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                          <span>Simulate Drop</span>
+                        </button>` : ''}
                         <span class="chevron-icon text-xs text-slate-400 ml-1 transition-transform duration-200">▼</span>
                       </div>
                     </div>
