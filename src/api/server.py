@@ -82,11 +82,11 @@ ACTIVITY_SCHEMA = load_json(SCHEMAS_DIR / "activity.schema.json", {})
 def _build_category_caps_map() -> dict[str, dict[str, Any]]:
     """Build category metadata and max_score caps directly from drl_rules.json."""
     short_names = {
-        "C1": "Học tập & NCKH",
-        "C2": "Chấp hành quy chế & nội quy",
-        "C3": "Chính trị - Xã hội, VH-VN, TDTT",
-        "C4": "Hoạt động vì cộng đồng",
-        "C5": "Khuyến khích & Cán bộ lớp/Đoàn Hội",
+        "C1": "Academic & Research",
+        "C2": "Regulation Compliance",
+        "C3": "Political, Cultural & Sports",
+        "C4": "Community & Volunteerism",
+        "C5": "Student Union & Leadership",
     }
     caps_list = DRL_RULES_CONFIG.get("scoring_model", {}).get("category_caps", [])
     result: dict[str, dict[str, Any]] = {}
@@ -100,11 +100,11 @@ def _build_category_caps_map() -> dict[str, dict[str, Any]]:
             }
     if not result:
         result = {
-            "C1": {"max": 30, "name": "Học tập & NCKH"},
-            "C2": {"max": 25, "name": "Chấp hành quy chế & nội quy"},
-            "C3": {"max": 25, "name": "Chính trị - Xã hội, VH-VN, TDTT"},
-            "C4": {"max": 25, "name": "Hoạt động vì cộng đồng"},
-            "C5": {"max": 10, "name": "Khuyến khích & Cán bộ lớp/Đoàn Hội"},
+            "C1": {"max": 30, "name": "Academic & Research"},
+            "C2": {"max": 25, "name": "Regulation Compliance"},
+            "C3": {"max": 25, "name": "Political, Cultural & Sports"},
+            "C4": {"max": 25, "name": "Community & Volunteerism"},
+            "C5": {"max": 10, "name": "Student Union & Leadership"},
         }
     return result
 
@@ -220,7 +220,7 @@ def _scores_payload(student_id: str) -> dict[str, Any]:
         "total_projected": _clean_num(total_projected),
         "total_hypothetical": _clean_num(min(100, total_current + total_projected)),
         "saved_activities": [
-            {k: c.get(k) for k in ("commit_id", "title", "category_id", "confirmed_added", "projected_added", "committed_at")}
+            {k: c.get(k) for k in ("commit_id", "activity_id", "title", "category_id", "confirmed_added", "projected_added", "raw_content", "committed_at")}
             for c in session_committed
             if c.get("kind") == "score" and c.get("student_id") == student_id
         ],
@@ -851,7 +851,7 @@ def evaluate_announcement(req: EvaluationRequest):
         flat_baseline = _extract_flat_baseline_scores(req.current_category_scores)
 
     category_id = matched_rule.get("category_id", "C1") if matched_rule else "C1"
-    cat_meta = CATEGORY_META.get(category_id, {"max": 30, "name": "Học tập & NCKH"})
+    cat_meta = CATEGORY_META.get(category_id, {"max": 30, "name": "Academic & Research"})
     cat_cap = cat_meta["max"]
     cat_name = cat_meta["name"]
     current_cat_score = _clean_num(flat_baseline.get(category_id, 0))
