@@ -3,12 +3,12 @@
   "description": "Synthetic student, activities and bindings to real verified rules in data/drl_rules.json. Not real student data and not university-verified scores.",
   "ruleset_source": "data/drl_rules.json",
   "derivation": [
-    "Baseline facts: R11 academic_exam_violations=0 -> C1 +10; R19 eligible_academic_seminars=2 -> C1 5x2=10; C1=20.",
+    "Baseline facts: R11 academic_exam_violations=0 -> C1 +15; R19 eligible_academic_seminars=1 -> C1 +5; C1=20.",
     "R21 school_rule_violations_excluding_academic_exam=0 -> C2 +15; C2=15.",
     "R37 social_evil_violations_or_coverups=0 -> C3 +10; R33 school_faculty_mobilization_activities=1 -> C3 5x1=5; C3=15.",
     "R41 legal_violations=0 -> C4 +10; R46 legal_health_communication_activities=0 does not match (0 > 0 is false); C4=10.",
     "No C5 fact is present; C5=0. Total = min(20+15+15+10+0, 100) = 60.",
-    "Each seminar adds 1 to eligible_academic_seminars (R19, 5 points per activity, C1 cap 30): 2->3 gives C1 25, 3->4 gives C1 30, 4->5 stays capped at 30.",
+    "Each seminar adds 1 to eligible_academic_seminars (R19, 5 points per activity, C1 cap 30): 1->2 gives C1 25, 2->3 gives C1 30, 3->4 stays capped at 30.",
     "MOB-1 adds 1 to school_faculty_mobilization_activities (R33): C3 15->20. LAW-1 adds 1 to legal_health_communication_activities (R46, 10 per activity): C4 10->20.",
     "Targets C1 30, C4 20, total 80 need LAW-1 plus two seminars, so no plan of size 1 or 2 meets them.",
     "Size-3 plans meeting all targets: {LAW-1,SEM-1,SEM-2} (1 online match, 240 min), {LAW-1,SEM-1,SEM-3} (1 match, 180 min), {LAW-1,SEM-2,SEM-3} (2 matches, 240 min). Preference ranks before duration, so {LAW-1,SEM-2,SEM-3} wins.",
@@ -31,7 +31,7 @@
         "baseline_ref": "synthetic-baseline-b1",
         "facts": {
           "academic_exam_violations": 0,
-          "eligible_academic_seminars": 2,
+          "eligible_academic_seminars": 1,
           "school_rule_violations_excluding_academic_exam": 0,
           "social_evil_violations_or_coverups": 0,
           "school_faculty_mobilization_activities": 1,

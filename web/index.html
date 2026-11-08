@@ -150,10 +150,6 @@
             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             Switch Student Account
           </button>
-          <button onclick="resetScoreBaselineToDefault(); toggleUserDropdown();" class="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-[#11192b] font-medium transition flex items-center gap-2">
-            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            Reset Score Baseline (69 pts)
-          </button>
           <button onclick="resetSessionData()" class="w-full px-4 py-2 text-left text-sm text-rose-400 hover:bg-rose-950/30 font-medium transition flex items-center gap-2">
             <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             Reset All Session Data
@@ -369,8 +365,14 @@
                   </div>
                 </div>
 
-                <!-- Hidden elements for JS compatibility -->
-                <span id="resExplanation" class="hidden"></span>
+                <!-- Developer Mode Technical Audit / Explanation -->
+                <div id="resExplanationContainer" class="dev-only p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-indigo-200 text-xs leading-relaxed space-y-1">
+                  <div class="font-bold text-indigo-300 flex items-center justify-between">
+                    <span>Technical Evaluation Audit</span>
+                    <span id="resRuleSourceBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-900/60 text-indigo-300 uppercase">SP2 Engine</span>
+                  </div>
+                  <p id="resExplanation" class="text-slate-300 font-mono text-[11px] leading-relaxed"></p>
+                </div>
                 <span id="resCitation" class="hidden"></span>
                 <span id="resDedupPill" class="hidden"></span>
 
@@ -537,7 +539,7 @@
                   </button>
                   <button id="subtabBtnRecordedConfirmed" onclick="switchRecordedSubtab('confirmed')" class="flex-1 py-2 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2.5 text-slate-400 hover:text-white hover:bg-[#162032]">
                     <span class="truncate">Confirmed</span>
-                    <span id="recordedConfirmedTabBadge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">0</span>
+                    <span id="recordedConfirmedTabBadge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">1</span>
                   </button>
                 </div>
               </div>
@@ -1033,13 +1035,52 @@
     let savedActivitiesForStudent = [];
 
     const DEFAULT_SCORES_TEMPLATE = {
-      C1: { current: 20, projected: 0, max: 30, name: "Criterion 1. Academic & Research", color: "#2563eb" },
-      C2: { current: 15, projected: 0, max: 20, name: "Criterion 2. Regulation Compliance", color: "#0d9488" },
-      C3: { current: 22, projected: 0, max: 25, name: "Criterion 3. Political, Cultural & Sports", color: "#7c3aed" },
+      C1: { current: 15, projected: 0, max: 30, name: "Criterion 1. Academic & Research", color: "#2563eb" },
+      C2: { current: 15, projected: 0, max: 25, name: "Criterion 2. Regulation Compliance", color: "#0d9488" },
+      C3: { current: 10, projected: 0, max: 25, name: "Criterion 3. Political, Cultural & Sports", color: "#7c3aed" },
       C4: { current: 10, projected: 0, max: 25, name: "Criterion 4. Community & Volunteerism", color: "#ea580c" },
-      C5: { current: 2,  projected: 0, max: 30, name: "Criterion 5. Student Union & Leadership", color: "#db2777" }
+      C5: { current: 0,  projected: 0, max: 10, name: "Criterion 5. Student Union & Leadership", color: "#db2777" }
     };
     let studentCategoryScores = JSON.parse(JSON.stringify(DEFAULT_SCORES_TEMPLATE));
+    let defaultBaselineTotal = 50;
+
+    function cloneDefaultScores() {
+      return JSON.parse(JSON.stringify(DEFAULT_SCORES_TEMPLATE));
+    }
+
+    function applyServerScorePayload(scoreData) {
+      if (!scoreData || !scoreData.category_scores) return;
+      const fresh = cloneDefaultScores();
+      Object.entries(scoreData.category_scores).forEach(([cid, sc]) => {
+        if (fresh[cid]) {
+          fresh[cid].current = Number(sc.current ?? fresh[cid].current);
+          fresh[cid].projected = Number(sc.projected ?? 0);
+          fresh[cid].max = Number(sc.max ?? fresh[cid].max);
+        }
+      });
+      studentCategoryScores = fresh;
+      defaultBaselineTotal = Number(scoreData.total_confirmed_score ?? 50);
+      if (Array.isArray(scoreData.saved_activities) && scoreData.saved_activities.length > 0) {
+        savedActivitiesForStudent = scoreData.saved_activities;
+      }
+      renderSavedActivitiesBox();
+      updateResetBaselineButton();
+    }
+
+    async function syncScoresFromServer(mssv) {
+      const targetId = mssv || (currentStudent ? currentStudent.student_id : "25127242");
+      try {
+        const res = await fetch(`${API_BASE}/api/scores?student_id=${encodeURIComponent(targetId)}`);
+        if (res.ok) {
+          const data = await res.json();
+          applyServerScorePayload(data);
+          renderCategoryBars(studentCategoryScores);
+          return;
+        }
+      } catch (e) {}
+      renderCategoryBars(studentCategoryScores);
+      updateResetBaselineButton();
+    }
 
     const FIELD_COLORS = {
       C1: "#2563eb",
@@ -1490,6 +1531,62 @@
       const footerEl = document.getElementById("peekModalFooter");
       if (!modal || !titleEl || !bodyEl || !footerEl) return;
 
+      if (type === 'baseline') {
+        badgeEl.className = "px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 shrink-0";
+        badgeEl.innerText = "+50 pts (Default Baseline)";
+        if (subbadgeEl) {
+          subbadgeEl.innerText = "default_awarded";
+          subbadgeEl.className = "dev-only px-2 py-0.5 rounded text-[11px] font-mono text-emerald-400 bg-emerald-950/50 shrink-0";
+        }
+        titleEl.innerText = "Official Semester Baseline Profile";
+
+        bodyEl.innerHTML = `
+          <div class="p-3.5 rounded-xl bg-[#080d18] border border-[#223046] space-y-3">
+            <div class="text-xs text-slate-300 leading-relaxed">
+              This record represents your official verified semester opening baseline points granted automatically at semester start per HCMUS QĐ 1028 via <code>apply_default_awards</code> for students with zero conduct or academic violations.
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div class="p-2.5 rounded-lg bg-[#0e1524] border border-[#1b2537]">
+                <div class="font-bold text-blue-400">Criterion 1: Academic & Research (R11)</div>
+                <div class="text-white font-mono text-sm mt-0.5">15 / 30 pts</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">On-time course registration and zero examination violations.</div>
+              </div>
+              <div class="p-2.5 rounded-lg bg-[#0e1524] border border-[#1b2537]">
+                <div class="font-bold text-teal-400">Criterion 2: Regulation Compliance (R21)</div>
+                <div class="text-white font-mono text-sm mt-0.5">15 / 25 pts</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">Full compliance with school rules, mandatory health insurance.</div>
+              </div>
+              <div class="p-2.5 rounded-lg bg-[#0e1524] border border-[#1b2537]">
+                <div class="font-bold text-purple-400">Criterion 3: Political & Cultural (R37)</div>
+                <div class="text-white font-mono text-sm mt-0.5">10 / 25 pts</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">State law & civic orientation compliance.</div>
+              </div>
+              <div class="p-2.5 rounded-lg bg-[#0e1524] border border-[#1b2537]">
+                <div class="font-bold text-amber-400">Criterion 4: Community & Volunteering (R41)</div>
+                <div class="text-white font-mono text-sm mt-0.5">10 / 25 pts</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">Public order and campus safety maintenance.</div>
+              </div>
+              <div class="sm:col-span-2 p-2.5 rounded-lg bg-[#0e1524] border border-[#1b2537]">
+                <div class="font-bold text-pink-400">Criterion 5: Student Union & Leadership</div>
+                <div class="text-white font-mono text-sm mt-0.5">0 / 10 pts</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">No leadership or union officer bonus by default.</div>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-400 italic">
+              Verified by Office of Student Affairs (CTSV) - HCMUS QĐ 1028/QĐ-KHTN-CTSV.
+            </div>
+          </div>
+        `;
+
+        footerEl.innerHTML = `
+          <button onclick="closeActivityPeekModal()" class="px-4 py-2 rounded-xl bg-[#162032] hover:bg-[#1f2d46] text-slate-300 hover:text-white font-bold text-xs border border-[#223046] transition">
+            Close
+          </button>
+        `;
+        modal.classList.remove("hidden");
+        return;
+      }
+
       if (type === 'catalog') {
         const row = (cachedCatalogActivities || [])[idx];
         if (!row) return;
@@ -1647,29 +1744,86 @@
       } else if (type === 'review') {
         const item = (cachedReviewQueue || [])[idx];
         if (!item) return;
-        const rec = item.record || item;
-        const flags = (item.meta?.flags || item.flags || []).join(", ") || 'REVIEW_REQUIRED';
+        const commitId = item.commit_id || '';
+        const initialCat = item.category_id || (item.meta && item.meta.category_id) || 'C4';
+        const rulePts = Number(item.rule_points || (item.meta && item.meta.estimated_points) || 3);
+        const rawContent = item.raw_content || item.content || '';
+        const title = item.title || 'Bài đăng chờ rà soát';
 
         badgeEl.className = "px-2.5 py-0.5 rounded-md text-xs font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40 shrink-0";
-        badgeEl.innerText = "Pending Review";
+        badgeEl.innerText = "Chờ rà soát";
         if (subbadgeEl) {
-          subbadgeEl.innerText = "session_queue";
-          subbadgeEl.className = "dev-only px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-[#162032] shrink-0";
+          subbadgeEl.innerText = "review_queue";
+          subbadgeEl.className = "dev-only px-2 py-0.5 rounded text-[11px] font-mono text-amber-400 bg-amber-950/50 shrink-0";
         }
-        titleEl.innerText = rec.title || 'Post Pending Review';
+        titleEl.innerText = title;
 
         bodyEl.innerHTML = `
-          <div class="p-3.5 rounded-xl bg-[#080d18] border border-[#223046] space-y-2">
-            <div><b class="text-slate-400 block mb-0.5">Flagged Reason</b><span class="text-amber-300 font-mono text-xs">${escapeHTML(flags)}</span></div>
-            ${item.content ? `<div class="pt-2 border-t border-[#1b2537]"><b class="text-slate-400 block mb-1">Post Content</b><p class="text-slate-300 leading-relaxed text-xs max-h-48 overflow-y-auto">${escapeHTML(item.content)}</p></div>` : ''}
+          <div class="p-3.5 rounded-xl bg-[#080d18] border border-[#223046] space-y-1.5">
+            <b class="text-slate-400 text-xs block">Nội dung bài đăng:</b>
+            <div class="text-slate-200 text-xs font-mono whitespace-pre-wrap max-h-48 overflow-y-auto bg-[#0a101d] p-3 rounded-lg border border-[#1b2537] leading-relaxed">
+              ${escapeHTML(rawContent || 'Không có nội dung chi tiết')}
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-[#0d1627] border border-sky-500/30 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-sky-300 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Ghi nhận điểm cộng
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1">Mục tiêu chí</label>
+                <select id="reviewAwardCategory" class="w-full px-3 py-2 rounded-lg bg-[#080d18] border border-[#223046] text-white text-xs font-medium focus:border-indigo-500 focus:outline-none">
+                  <option value="C1">C1: Học tập & NCKH</option>
+                  <option value="C2">C2: Pháp quy & Kỷ luật</option>
+                  <option value="C3">C3: Văn thể mỹ & Chính trị</option>
+                  <option value="C4">C4: Tình nguyện & Cộng đồng</option>
+                  <option value="C5">C5: Phụ trách đoàn thể</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1">Số điểm cộng</label>
+                <div class="relative">
+                  <input id="reviewAwardPoints" type="number" min="0.5" step="0.5" value="${rulePts}" class="w-full px-3 py-2 rounded-lg bg-[#080d18] border border-[#223046] text-white text-xs font-mono font-bold focus:border-emerald-500 focus:outline-none pr-8">
+                  <span class="absolute right-3 top-2 text-xs text-slate-400 font-bold">đ</span>
+                </div>
+              </div>
+            </div>
+
+            <div id="reviewAwardValidationMsg" class="hidden text-[11px] text-rose-400 font-medium"></div>
           </div>
         `;
 
         footerEl.innerHTML = `
-          <button onclick="closeActivityPeekModal()" class="px-4 py-2 rounded-xl bg-[#162032] hover:bg-[#1f2d46] text-slate-300 hover:text-white font-bold text-xs border border-[#223046] transition">
-            Close
-          </button>
+          <div class="flex items-center justify-between w-full gap-2">
+            <button id="btnDismissReview" onclick="dismissReviewItem('${escapeHTML(commitId)}', ${idx})" class="px-3.5 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 hover:text-white border border-rose-500/40 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              <span>Không cộng điểm (Dismiss)</span>
+            </button>
+
+            <div class="flex items-center gap-2">
+              <button onclick="closeActivityPeekModal()" class="px-3.5 py-2 rounded-xl bg-[#162032] hover:bg-[#1f2d46] text-slate-300 hover:text-white text-xs font-bold border border-[#223046] transition cursor-pointer">
+                Đóng
+              </button>
+              <button id="btnExecuteReviewAward" onclick="executeReviewAward('${escapeHTML(commitId)}', ${idx})" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>Xác nhận cộng điểm</span>
+              </button>
+            </div>
+          </div>
         `;
+
+        setTimeout(() => {
+          const catSelect = document.getElementById("reviewAwardCategory");
+          if (catSelect && initialCat) {
+            catSelect.value = initialCat;
+          }
+        }, 10);
       }
 
       modal.classList.remove("hidden");
@@ -1678,6 +1832,98 @@
     function closeActivityPeekModal() {
       const modal = document.getElementById("activityPeekModal");
       if (modal) modal.classList.add("hidden");
+    }
+
+    async function dismissReviewItem(commitId, idx) {
+      if (!confirm("Bạn có chắc chắn muốn loại bỏ hoạt động này khỏi hàng đợi rà soát (không cộng điểm)?")) {
+        return;
+      }
+      const btn = document.getElementById("btnDismissReview");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="inline-block animate-spin mr-1">↻</span> Đang xử lý...`;
+      }
+      try {
+        const studentId = currentStudent?.student_id || "25127242";
+        const res = await fetch(`${API_BASE}/api/review/dismiss`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ commit_id: commitId, student_id: studentId })
+        });
+        if (!res.ok) throw new Error("Dismiss request failed");
+        closeActivityPeekModal();
+        await loadActivitiesFromApi();
+        await syncScoresFromServer(studentId);
+      } catch (e) {
+        alert("Lỗi khi loại bỏ hoạt động: " + e.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function executeReviewAward(commitId, idx) {
+      const catEl = document.getElementById("reviewAwardCategory");
+      const ptsEl = document.getElementById("reviewAwardPoints");
+      const errEl = document.getElementById("reviewAwardValidationMsg");
+      const btn = document.getElementById("btnExecuteReviewAward");
+      if (!catEl || !ptsEl) return;
+
+      const category = catEl.value;
+      const points = parseFloat(ptsEl.value);
+
+      if (isNaN(points) || points <= 0) {
+        if (errEl) {
+          errEl.innerText = "Vui lòng nhập số điểm hợp lệ (> 0).";
+          errEl.classList.remove("hidden");
+        }
+        return;
+      }
+      if (errEl) errEl.classList.add("hidden");
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="inline-block animate-spin mr-1">↻</span> Đang ghi nhận...`;
+      }
+
+      try {
+        const studentId = currentStudent?.student_id || "25127242";
+        const res = await fetch(`${API_BASE}/api/review/award`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            commit_id: commitId,
+            student_id: studentId,
+            category_id: category,
+            points: points,
+            reason: "Cộng điểm hoạt động sau khi rà soát"
+          })
+        });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || "Không thể cộng điểm");
+        }
+        const data = await res.json();
+        if (data.scores) {
+          applyServerScorePayload(data.scores);
+          renderCategoryBars(studentCategoryScores);
+        }
+        closeActivityPeekModal();
+        await loadActivitiesFromApi();
+        await syncScoresFromServer(studentId);
+
+        // Switch sang Confirmed tab để người dùng nhìn thấy ngay
+        switchCatalogSubtab('recorded');
+        switchRecordedSubtab('confirmed');
+      } catch (e) {
+        if (errEl) {
+          errEl.innerText = e.message;
+          errEl.classList.remove("hidden");
+        } else {
+          alert("Lỗi khi cộng điểm: " + e.message);
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+      }
     }
 
     document.addEventListener("keydown", (e) => {
@@ -1741,38 +1987,22 @@
       const btn = document.getElementById("btnConfirmAttendancePeek");
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = `<span>Verifying...</span>`;
+        btn.innerHTML = `<span class="inline-block animate-spin mr-1">↻</span> Đang xác nhận...`;
       }
 
       const studentId = currentStudent?.student_id || DEFAULT_STUDENT_ID;
-      const rawContent = item.raw_content || [
-        `TIÊU ĐỀ: ${item.title || item.activity_id}`,
-        `Thời gian: 14:00 30/10/2026`,
-        `Hình thức: Trực tiếp`,
-        `Địa điểm: Giảng đường 1, Trường Đại học Khoa học tự nhiên`,
-        `Quyền lợi: Cộng ${item.projected_added || 5} điểm rèn luyện khi tham gia đầy đủ.`
-      ].join('\n');
 
       try {
         let commitData = null;
-        if (window.serverSupportsCommit !== false) {
-          const resp = await fetch(`${API_BASE}/api/commit`, {
+        if (item.commit_id) {
+          const resp = await fetch(`${API_BASE}/api/recorded/confirm`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              raw_content: rawContent,
-              post_id: `verify_${item.commit_id || Date.now()}`,
-              url: `https://www.facebook.com/ctsv.hcmus/posts/${item.commit_id || 'verify'}`,
-              publisher: "HCMUS",
-              platform: "facebook",
-              date_posted: "2026-10-25",
-              has_evidence: true,
-              simulate_demo: true,
-              rule_override: "auto",
+              commit_id: item.commit_id,
               student_id: studentId
             })
           });
-
           if (resp.ok) {
             commitData = await resp.json();
           }
@@ -1780,6 +2010,8 @@
 
         if (commitData && commitData.scores) {
           applyServerScorePayload(commitData.scores);
+          renderCategoryBars(studentCategoryScores);
+          renderSavedActivitiesBox();
         } else {
           // Fallback if local or server returned status without scores payload
           const catId = item.category_id || "C1";
@@ -1793,7 +2025,6 @@
           item.projected_added = 0;
           renderSavedActivitiesBox();
           renderCategoryBars(studentCategoryScores);
-          updateResetBaselineButton();
         }
 
         closeActivityPeekModal();
@@ -1829,7 +2060,7 @@
       const totalCount = (savedActivitiesForStudent || []).length;
       if (badgeEl) badgeEl.innerText = `${totalCount} activities`;
       if (projBadge) projBadge.innerText = `${projectedItems.length}`;
-      if (confBadge) confBadge.innerText = `${confirmedItems.length}`;
+      if (confBadge) confBadge.innerText = `${1 + confirmedItems.length}`;
 
       if (listProjEl) {
         if (projectedItems.length === 0) {
@@ -1864,35 +2095,43 @@
       }
 
       if (listConfEl) {
-        if (confirmedItems.length === 0) {
-          listConfEl.innerHTML = `
-            <div class="p-8 text-center bg-[#080d18] rounded-xl border border-dashed border-[#223046] space-y-2">
-              <div class="text-2xl">🏆</div>
-              <div class="text-sm font-bold text-slate-300">No confirmed points yet</div>
-              <p class="text-xs text-slate-500 max-w-sm mx-auto">
-                Activities with confirmed attendance and official points recorded will appear here.
-              </p>
+        const baselineHtml = `
+          <div onclick="openActivityPeekModal('baseline', 0)" class="p-3 rounded-xl bg-[#080d18] hover:bg-[#0f172a] border border-emerald-500/40 hover:border-emerald-400 transition cursor-pointer flex items-center justify-between gap-2.5 select-none group">
+            <div class="font-bold text-xs text-white leading-snug flex items-center gap-2 min-w-0">
+              <span class="text-xs font-mono font-bold text-emerald-400 shrink-0">📌</span>
+              <div class="truncate">
+                <div class="truncate group-hover:text-emerald-300 transition-colors font-bold text-white text-xs">Official Semester Baseline Profile</div>
+                <div class="text-[10px] text-slate-400 font-normal truncate">Default Awards (QĐ 1028): C1: 15, C2: 15, C3: 10, C4: 10, C5: 0</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 whitespace-nowrap">
+                +50 pts (Baseline)
+              </span>
+              <svg class="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+        `;
+
+        const userConfirmedHtml = confirmedItems.map(({ item, originalIdx }, idx) => {
+          const pts = `+${item.confirmed_added} pts`;
+          return `
+            <div onclick="openActivityPeekModal('recorded', ${originalIdx})" class="p-3 rounded-xl bg-[#080d18] hover:bg-[#0f172a] border border-emerald-500/40 hover:border-emerald-400 transition cursor-pointer flex items-center justify-between gap-2.5 select-none group">
+              <div class="font-bold text-xs text-white leading-snug flex items-center gap-2 min-w-0">
+                <span class="text-xs font-mono font-bold text-emerald-400 shrink-0">#${idx + 1}</span>
+                <span class="truncate group-hover:text-emerald-300 transition-colors">${escapeHTML(item.title || item.commit_id)}</span>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 whitespace-nowrap">
+                  ${pts}
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </div>
             </div>
           `;
-        } else {
-          listConfEl.innerHTML = confirmedItems.map(({ item, originalIdx }, idx) => {
-            const pts = `+${item.confirmed_added} pts`;
-            return `
-              <div onclick="openActivityPeekModal('recorded', ${originalIdx})" class="p-3 rounded-xl bg-[#080d18] hover:bg-[#0f172a] border border-emerald-500/40 hover:border-emerald-400 transition cursor-pointer flex items-center justify-between gap-2.5 select-none group">
-                <div class="font-bold text-xs text-white leading-snug flex items-center gap-2 min-w-0">
-                  <span class="text-xs font-mono font-bold text-emerald-400 shrink-0">#${idx + 1}</span>
-                  <span class="truncate group-hover:text-emerald-300 transition-colors">${escapeHTML(item.title || item.commit_id)}</span>
-                </div>
-                <div class="flex items-center gap-1.5 shrink-0">
-                  <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 whitespace-nowrap">
-                    ${pts}
-                  </span>
-                  <svg class="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </div>
-              </div>
-            `;
-          }).join("");
-        }
+        }).join("");
+
+        listConfEl.innerHTML = baselineHtml + userConfirmedHtml;
       }
     }
 
@@ -3561,7 +3800,8 @@
         total += Number(info.current || 0);
         totalProj += Number(info.projected || 0);
       });
-      if (total !== 69 || totalProj > 0 || savedActivitiesForStudent.length > 0) {
+      const defaultTotal = typeof defaultBaselineTotal === "number" && defaultBaselineTotal > 0 ? defaultBaselineTotal : 50;
+      if (total !== defaultTotal || totalProj > 0 || savedActivitiesForStudent.length > 0) {
         btn.classList.remove("hidden");
       } else {
         btn.classList.add("hidden");
@@ -3614,23 +3854,27 @@
       const dt = a["4_datetimes"] || {};
       const timeDisplay = a.start ? formatIsoToVietnamese(a.start) : (dt.start_datetime || '14:00 15/11/2026');
       const locDisplay = a.location || (a.mode === 'online' ? 'Online' : 'HCMUS Campus');
-      const pts = (a.points != null) ? a.points : (a.points_awarded || 5);
+      const pts = (a.points != null) ? a.points : (a.points_awarded != null ? a.points_awarded : null);
 
       switchTab('dashboard');
 
-      document.getElementById('inputRawContent').value = [
+      const contentLines = [
         `TIÊU ĐỀ: ${a.title || a.activity_id}`,
         `Thời gian: ${timeDisplay}`,
         `Hình thức: ${a.mode === 'online' ? 'Trực tuyến' : 'Trực tiếp'}`,
         `Địa điểm: ${locDisplay}`,
-        `Đối tượng tham gia: ${Array.isArray(a.audience) ? a.audience.join(', ') : 'Sinh viên toàn trường'}`,
-        `Quyền lợi: Cộng ${pts} điểm rèn luyện khi tham gia đầy đủ.`
-      ].join('\n');
+        `Đối tượng tham gia: ${Array.isArray(a.audience) ? a.audience.join(', ') : 'Sinh viên toàn trường'}`
+      ];
+      if (pts != null) {
+        contentLines.push(`Quyền lợi: Cộng ${pts} điểm rèn luyện khi tham gia đầy đủ.`);
+      }
+
+      document.getElementById('inputRawContent').value = contentLines.join('\n');
 
       document.getElementById('sp1TitleInput').value = a.title || a.activity_id;
       document.getElementById('sp1TimeInput').value = timeDisplay;
       document.getElementById('sp1LocationInput').value = locDisplay;
-      document.getElementById('sp1PointsInput').value = pts;
+      document.getElementById('sp1PointsInput').value = pts != null ? pts : '';
       document.getElementById('sp1ReqInput').value = a.completion_requirements || 'Điểm danh cuối buổi';
       document.getElementById('inputPublisher').value = a.source?.publisher || a.organizer || 'HCMUS';
 
@@ -3828,6 +4072,7 @@
       renderSavedActivitiesBox();
       updateResetBaselineButton();
       await checkBackendHealth();
+      await syncScoresFromServer();
       await loadE2ECasesFromApi();
       await loadActivitiesFromApi();
 
