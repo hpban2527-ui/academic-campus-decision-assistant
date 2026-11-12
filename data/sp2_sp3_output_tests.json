@@ -1,0 +1,704 @@
+{
+  "schema_version": "sp2_sp3_v1",
+  "purpose": "Kiểm tra nội dung SP2 bàn giao cho SP3 theo cùng schema với sp2_sp3_output_sample.json.",
+  "shared_context": {
+    "student_profile": {
+      "university": "HCMUS",
+      "student_type": "full_time"
+    },
+    "rule_caps": {
+      "C1": 30,
+      "C2": 20,
+      "C3": 25,
+      "C4": 25,
+      "C5": 30,
+      "DEDUCTION": null
+    },
+    "max_total_score": 100,
+    "evidence_status_required_for_confirmed": "VERIFIED"
+  },
+  "test_cases": [
+    {
+      "test_id": "OT01",
+      "name": "Một tiêu chí được xác nhận hợp lệ",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [
+          {
+            "record_id": "R1",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.1",
+            "category_id": "C1",
+            "points": 15
+          }
+        ]
+      },
+      "expected_output": {
+        "summary": {
+          "confirmed_total": 15,
+          "remaining_to_max": 85
+        },
+        "category_scores": [
+          {
+            "category_id": "C1",
+            "confirmed_points": 15
+          }
+        ],
+        "criteria": [
+          {
+            "criterion_id": "1.1",
+            "confirmed_points": 15
+          }
+        ],
+        "pending_records_count": 0,
+        "review": {
+          "needs_review": false
+        }
+      }
+    },
+    {
+      "test_id": "OT02",
+      "name": "Hồ sơ PENDING không được cộng điểm",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [
+          {
+            "record_id": "R2",
+            "status": "PENDING",
+            "criterion_id": "1.1",
+            "category_id": "C1",
+            "points": 15
+          }
+        ]
+      },
+      "expected_output": {
+        "summary": {
+          "confirmed_total": 0,
+          "remaining_to_max": 100
+        },
+        "category_scores": [
+          {
+            "category_id": "C1",
+            "confirmed_points": 0
+          }
+        ],
+        "pending_records_count": 1
+      }
+    },
+    {
+      "test_id": "OT03",
+      "name": "CONFIRMED nhưng minh chứng chưa xác minh",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [
+          {
+            "record_id": "R3",
+            "status": "CONFIRMED",
+            "evidence_status": "UNVERIFIED",
+            "criterion_id": "1.1",
+            "category_id": "C1",
+            "points": 15
+          }
+        ]
+      },
+      "expected_output": {
+        "summary": {
+          "confirmed_total": 0
+        },
+        "pending_records_count": 1,
+        "review": {
+          "needs_review": true
+        }
+      }
+    },
+    {
+      "test_id": "OT04",
+      "name": "Hoạt động có tính DRL đã xác minh và sinh viên đã được xác nhận tham gia",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [
+          {
+            "record_id": "R4",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "activity_id": "A4"
+          }
+        ],
+        "activities": [
+          {
+            "activity_id": "A4",
+            "benefit_claims": [
+              {
+                "claim_id": "CL4",
+                "type": "DRL_POINTS",
+                "criterion_id": "1.9",
+                "points": 5,
+                "verification_status": "VERIFIED_BY_REVIEWER"
+              }
+            ]
+          }
+        ]
+      },
+      "expected_output": {
+        "summary": {
+          "confirmed_total": 5
+        },
+        "criteria": [
+          {
+            "criterion_id": "1.9",
+            "confirmed_points": 5
+          }
+        ],
+        "activity_assessments": [
+          {
+            "activity_id": "A4",
+            "expected_points": 5,
+            "confirmed_points": 5,
+            "counted_in_total": true
+          }
+        ]
+      }
+    },
+    {
+      "test_id": "OT05",
+      "name": " Khai báo DRL chưa xác minh không được dùng để suy ra điểm",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [
+          {
+            "record_id": "R5",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "activity_id": "A5"
+          }
+        ],
+        "activities": [
+          {
+            "activity_id": "A5",
+            "benefit_claims": [
+              {
+                "claim_id": "CL5",
+                "type": "DRL_POINTS",
+                "criterion_id": "1.9",
+                "points": 5,
+                "verification_status": "UNVERIFIED"
+              }
+            ]
+          }
+        ]
+      },
+      "expected_output": {
+        "summary": {
+          "confirmed_total": 0
+        },
+        "criteria": [],
+        "review": {
+          "needs_review": true
+        }
+      }
+    },
+    {
+      "test_id": "OT06",
+      "name": "Hai hồ sơ trùng cùng hoạt động và tiêu chí chỉ được tính một lần",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [
+          {
+            "record_id": "R6A",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "activity_id": "A6",
+            "criterion_id": "1.9",
+            "category_id": "C1",
+            "points": 5
+          },
+          {
+            "record_id": "R6B",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "activity_id": "A6",
+            "criterion_id": "1.9",
+            "category_id": "C1",
+            "points": 5
+          }
+        ]
+      },
+      "expected_output": {
+        "summary": {
+          "confirmed_total": 5
+        },
+        "criteria": [
+          {
+            "criterion_id": "1.9",
+            "confirmed_points": 5
+          }
+        ],
+        "review": {
+          "needs_review": true,
+          "flag_contains": "duplicate"
+        }
+      }
+    },
+    {
+      "test_id": "OT07",
+      "name": "Điểm nhóm C1 vượt trần thì chỉ ghi nhận tối đa 30",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [
+          {
+            "record_id": "R7A",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.1",
+            "category_id": "C1",
+            "points": 15
+          },
+          {
+            "record_id": "R7B",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.2",
+            "category_id": "C1",
+            "points": 10
+          },
+          {
+            "record_id": "R7C",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.9",
+            "category_id": "C1",
+            "points": 10
+          }
+        ]
+      },
+      "expected_output": {
+        "category_scores": [
+          {
+            "category_id": "C1",
+            "raw_confirmed_points": 35,
+            "confirmed_points": 30,
+            "cap": 30,
+            "remaining_to_cap": 0
+          }
+        ],
+        "summary": {
+          "confirmed_total": 30
+        }
+      }
+    },
+    {
+      "test_id": "OT08",
+      "name": "Tổng điểm sau khi áp trần không vượt quá 100",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [
+          {
+            "record_id": "R8_01",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.1",
+            "category_id": "C1",
+            "points": 15
+          },
+          {
+            "record_id": "R8_02",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.2",
+            "category_id": "C1",
+            "points": 15
+          },
+          {
+            "record_id": "R8_03",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.5",
+            "category_id": "C1",
+            "points": 15
+          },
+          {
+            "record_id": "R8_04",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "2.1",
+            "category_id": "C2",
+            "points": 15
+          },
+          {
+            "record_id": "R8_05",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "2.2",
+            "category_id": "C2",
+            "points": 5
+          },
+          {
+            "record_id": "R8_06",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "3.1",
+            "category_id": "C3",
+            "points": 10
+          },
+          {
+            "record_id": "R8_07",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "3.2",
+            "category_id": "C3",
+            "points": 5
+          },
+          {
+            "record_id": "R8_08",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "3.3",
+            "category_id": "C3",
+            "points": 5
+          },
+          {
+            "record_id": "R8_09",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "3.4",
+            "category_id": "C3",
+            "points": 5
+          },
+          {
+            "record_id": "R8_10",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "4.1",
+            "category_id": "C4",
+            "points": 10
+          },
+          {
+            "record_id": "R8_11",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "4.2",
+            "category_id": "C4",
+            "points": 10
+          },
+          {
+            "record_id": "R8_12",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "4.3",
+            "category_id": "C4",
+            "points": 5
+          },
+          {
+            "record_id": "R8_13",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "5.1",
+            "category_id": "C5",
+            "points": 20
+          },
+          {
+            "record_id": "R8_14",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "5.2",
+            "category_id": "C5",
+            "points": 5
+          },
+          {
+            "record_id": "R8_15",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "5.3",
+            "category_id": "C5",
+            "points": 5
+          }
+        ]
+      },
+      "expected_output": {
+        "category_scores": [
+          {
+            "category_id": "C1",
+            "raw_confirmed_points": 45,
+            "confirmed_points": 30,
+            "cap": 30,
+            "remaining_to_cap": 0
+          },
+          {
+            "category_id": "C2",
+            "raw_confirmed_points": 20,
+            "confirmed_points": 20,
+            "cap": 20,
+            "remaining_to_cap": 0
+          },
+          {
+            "category_id": "C3",
+            "raw_confirmed_points": 25,
+            "confirmed_points": 25,
+            "cap": 25,
+            "remaining_to_cap": 0
+          },
+          {
+            "category_id": "C4",
+            "raw_confirmed_points": 25,
+            "confirmed_points": 25,
+            "cap": 25,
+            "remaining_to_cap": 0
+          },
+          {
+            "category_id": "C5",
+            "raw_confirmed_points": 30,
+            "confirmed_points": 30,
+            "cap": 30,
+            "remaining_to_cap": 0
+          }
+        ],
+        "summary": {
+          "confirmed_total": 100,
+          "max_total_score": 100,
+          "remaining_to_max": 0
+        }
+      }
+    },
+    {
+      "test_id": "OT09",
+      "name": "Thiếu dữ liệu bắt buộc để xác định phạm vi áp dụng",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS"
+        },
+        "student_records": []
+      },
+      "expected_output": {
+        "regulation": {
+          "scope_status": "NEEDS_INFO"
+        },
+        "summary": {
+          "confirmed_total": 0
+        },
+        "review": {
+          "needs_review": true
+        }
+      }
+    },
+    {
+      "test_id": "OT10",
+      "name": "Sinh viên ngoài phạm vi quy chế",
+      "input": {
+        "student_profile": {
+          "university": "OTHER_UNIVERSITY",
+          "student_type": "full_time"
+        },
+        "student_records": [
+          {
+            "record_id": "R10",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.1",
+            "category_id": "C1",
+            "points": 15
+          }
+        ]
+      },
+      "expected_output": {
+        "regulation": {
+          "scope_status": "NEEDS_VERIFICATION"
+        },
+        "summary": {
+          "confirmed_total": 0
+        },
+        "criteria": []
+      }
+    },
+    {
+      "test_id": "OT11",
+      "name": "Thông báo có ghi điểm nhưng chưa có xác nhận tham gia",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [],
+        "activities": [
+          {
+            "activity_id": "A11",
+            "title": "Seminar",
+            "points": 5,
+            "benefit_claims": [
+              {
+                "claim_id": "CL11",
+                "type": "DRL_POINTS",
+                "criterion_id": "1.9",
+                "points": 5,
+                "verification_status": "VERIFIED"
+              }
+            ]
+          }
+        ]
+      },
+      "expected_output": {
+        "activity_assessments": [
+          {
+            "activity_id": "A11",
+            "announced_points": 5,
+            "expected_points": 5,
+            "confirmed_points": 0,
+            "counted_in_total": false
+          }
+        ],
+        "summary": {
+          "confirmed_total": 0
+        }
+      }
+    },
+    {
+      "test_id": "OT12",
+      "name": "Hoạt động chưa đủ căn cứ để gán tiêu chí",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [],
+        "activities": [
+          {
+            "activity_id": "A12",
+            "title": "Hoạt động tình nguyện",
+            "points": null,
+            "benefit_claims": []
+          }
+        ]
+      },
+      "expected_output": {
+        "activity_assessments": [
+          {
+            "activity_id": "A12",
+            "criterion_id": null,
+            "expected_points": null,
+            "confirmed_points": 0,
+            "counted_in_total": false
+          }
+        ],
+        "review": {
+          "needs_review": true
+        }
+      }
+    },
+    {
+      "test_id": "OT13",
+      "name": "Điểm trừ được áp dụng vào tổng nhưng không chịu trần nhóm dương",
+      "input": {
+        "student_profile": {
+          "university": "HCMUS",
+          "student_type": "full_time"
+        },
+        "student_records": [
+          {
+            "record_id": "R13_1",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.1",
+            "category_id": "C1",
+            "points": 15
+          },
+          {
+            "record_id": "R13_2",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.2",
+            "category_id": "C1",
+            "points": 10
+          },
+          {
+            "record_id": "R13_3",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "1.9",
+            "category_id": "C1",
+            "points": 5
+          },
+          {
+            "record_id": "R13_4",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_id": "6.5",
+            "category_id": "DEDUCTION",
+            "points": -10
+          }
+        ]
+      },
+      "expected_output": {
+        "summary": {
+          "confirmed_total": 20,
+          "max_total_score": 100,
+          "remaining_to_max": 80
+        },
+        "category_scores": [
+          {
+            "category_id": "C1",
+            "raw_confirmed_points": 30,
+            "confirmed_points": 30,
+            "cap": 30,
+            "remaining_to_cap": 0
+          },
+          {
+            "category_id": "DEDUCTION",
+            "raw_confirmed_points": -10,
+            "confirmed_points": -10,
+            "cap": null,
+            "remaining_to_cap": null
+          }
+        ],
+        "criteria": [
+          {
+            "criterion_id": "1.1",
+            "confirmed_points": 15
+          },
+          {
+            "criterion_id": "1.2",
+            "confirmed_points": 10
+          },
+          {
+            "criterion_id": "1.9",
+            "confirmed_points": 5
+          },
+          {
+            "criterion_id": "6.5",
+            "confirmed_points": -10
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "Expected output chỉ liệt kê các trường cần đối chiếu trong từng ca; các trường còn lại vẫn tuân theo schema sample.",
+    "Các test OT01–OT12 là test hợp đồng output (output contract tests), không phải mã unit test pytest chạy trực tiếp.",
+    "Engine cần chuẩn hóa record đầu vào để có criterion_id/category_id/points hoặc suy ra từ rule/claim đã xác minh.",
+    "OT08 dùng mã tiêu chí thật và các đóng góp điểm đã được xác nhận sau bước đối chiếu rule; mục tiêu là kiểm tra trần từng nhóm và trần tổng, không kiểm tra lại điều kiện GPA/hoạt động.",
+    "OT13 kiểm tra logic điểm trừ theo calculation_rules: điểm trừ không chịu trần nhóm C1–C5 nhưng vẫn được tính vào tổng điểm cuối."
+  ]
+}
