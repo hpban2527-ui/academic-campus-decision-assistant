@@ -1,0 +1,1564 @@
+{
+  "split_version": "2.0.0",
+  "created": "2026-11-13",
+  "seed": 20261113,
+  "source_file": "data/raw/source.json",
+  "source_sha256": "c6bca5873981bd1c70a7b2f82e2a258fdfaec5471313df35cf2250c4b754dd0e",
+  "similarity_rule": "exact Jaccard on NFC-lowercased char 5-shingles >= 0.60, plus CS-1..CS-3",
+  "counts": {
+    "dev_gold": 16,
+    "dev_extra": 24,
+    "test": 60,
+    "pool": 89,
+    "overlap": 20
+  },
+  "test_ids_sha256": "4974c1af6ee0105a32d08b8b96617c31f6325246db64439d1b76ab838ebd1ded",
+  "strata_by_split": {
+    "dev_gold": {
+      "mandatory": 0,
+      "quiz_threshold": 2,
+      "info_candidate": 2,
+      "multi_date": 7,
+      "online": 0,
+      "other": 5
+    },
+    "dev_extra": {
+      "mandatory": 2,
+      "quiz_threshold": 1,
+      "info_candidate": 3,
+      "multi_date": 2,
+      "online": 1,
+      "other": 15
+    },
+    "test": {
+      "mandatory": 1,
+      "quiz_threshold": 2,
+      "info_candidate": 7,
+      "multi_date": 7,
+      "online": 3,
+      "other": 40
+    },
+    "pool": {
+      "mandatory": 1,
+      "quiz_threshold": 1,
+      "info_candidate": 11,
+      "multi_date": 11,
+      "online": 1,
+      "other": 64
+    }
+  },
+  "posts": [
+    {
+      "position": 1,
+      "post_id": "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl",
+      "split": "dev_gold",
+      "stratum": "multi_date",
+      "group": "G001",
+      "in_overlap": false
+    },
+    {
+      "position": 2,
+      "post_id": "pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l",
+      "split": "dev_gold",
+      "stratum": "multi_date",
+      "group": "G002",
+      "in_overlap": false
+    },
+    {
+      "position": 3,
+      "post_id": "pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl",
+      "split": "dev_gold",
+      "stratum": "other",
+      "group": "G003",
+      "in_overlap": false
+    },
+    {
+      "position": 4,
+      "post_id": "pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l",
+      "split": "dev_gold",
+      "stratum": "multi_date",
+      "group": "G004",
+      "in_overlap": false
+    },
+    {
+      "position": 5,
+      "post_id": "pfbid02fsjfr4MEtTjN9TpVw3DvfWumQm7Wx2GGE56n7J51Y8sh4brg3p4k1uwhX41h26FFl",
+      "split": "dev_gold",
+      "stratum": "multi_date",
+      "group": "G005",
+      "in_overlap": false
+    },
+    {
+      "position": 6,
+      "post_id": "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl",
+      "split": "dev_gold",
+      "stratum": "quiz_threshold",
+      "group": "G006",
+      "in_overlap": false
+    },
+    {
+      "position": 7,
+      "post_id": "pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl",
+      "split": "dev_gold",
+      "stratum": "other",
+      "group": "G007",
+      "in_overlap": false
+    },
+    {
+      "position": 8,
+      "post_id": "pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl",
+      "split": "dev_gold",
+      "stratum": "other",
+      "group": "G008",
+      "in_overlap": false
+    },
+    {
+      "position": 9,
+      "post_id": "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
+      "split": "dev_gold",
+      "stratum": "multi_date",
+      "group": "G009",
+      "in_overlap": false
+    },
+    {
+      "position": 10,
+      "post_id": "pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl",
+      "split": "dev_gold",
+      "stratum": "multi_date",
+      "group": "G010",
+      "in_overlap": false
+    },
+    {
+      "position": 11,
+      "post_id": "pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l",
+      "split": "dev_gold",
+      "stratum": "multi_date",
+      "group": "G011",
+      "in_overlap": false
+    },
+    {
+      "position": 12,
+      "post_id": "pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl",
+      "split": "dev_gold",
+      "stratum": "info_candidate",
+      "group": "G012",
+      "in_overlap": false
+    },
+    {
+      "position": 13,
+      "post_id": "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl",
+      "split": "dev_gold",
+      "stratum": "info_candidate",
+      "group": "G013",
+      "in_overlap": false
+    },
+    {
+      "position": 14,
+      "post_id": "pfbid02buju6UWyad8k9Z4xH1tR5eNwpWsuaZtnwfesY2o8UQzdFh3p7cHemVx24dkaHSdFl",
+      "split": "dev_gold",
+      "stratum": "other",
+      "group": "G014",
+      "in_overlap": false
+    },
+    {
+      "position": 15,
+      "post_id": "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
+      "split": "dev_gold",
+      "stratum": "quiz_threshold",
+      "group": "G015",
+      "in_overlap": false
+    },
+    {
+      "position": 16,
+      "post_id": "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al",
+      "split": "dev_gold",
+      "stratum": "other",
+      "group": "G016",
+      "in_overlap": false
+    },
+    {
+      "position": 17,
+      "post_id": "pfbid05YjQKZS5mfiAGdG3uwRVghCnAHQaj3L7CAs7BFWBgcehwZUcWged7VogZbrzcgP8l",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G017",
+      "in_overlap": false
+    },
+    {
+      "position": 18,
+      "post_id": "pfbid02gk5voNQ9aqW4p4jaYsdK2hiiWkcAPrHoghJpUogA6HangBq7apjqKASPb6oYAXjEl",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G018",
+      "in_overlap": false
+    },
+    {
+      "position": 19,
+      "post_id": "pfbid0gTGXKP523cAQRMj54AFxPTJdfmx82i9Dnu2e4e3BERaJnKuwdwS3LxGHMQruE9Lwl",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G019",
+      "in_overlap": false
+    },
+    {
+      "position": 20,
+      "post_id": "pfbid07U8FM3d6sDU19AFyzF8QXSKToyt21UwDAGcrWV34EzRHHD3k9YXszg128RGCX3Pfl",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G020",
+      "in_overlap": false
+    },
+    {
+      "position": 21,
+      "post_id": "pfbid0JzvoeBcvCnuaPzgSM5VmLLaEhiD8KXUviThgoTksoo12w9TV8kRfM6c96rAZXMEGl",
+      "split": "test",
+      "stratum": "info_candidate",
+      "group": "G021",
+      "in_overlap": false
+    },
+    {
+      "position": 22,
+      "post_id": "pfbid036iL9LZpFZyFpzdho2MMSzP4zzcby8vdZRnyh2Wa7zkuC9aXX8wnPW7pDijHJX4Uxl",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G022",
+      "in_overlap": false
+    },
+    {
+      "position": 23,
+      "post_id": "pfbid0348peH7andUqAfothwtJxbr5BQnQKPbTUZWjoGcuba4gMHMeBazFxpUseEBGd78xwl",
+      "split": "test",
+      "stratum": "multi_date",
+      "group": "G023",
+      "in_overlap": true
+    },
+    {
+      "position": 24,
+      "post_id": "pfbid0JiSLqaex23GZMuiZA32GYeFC5nQdjqZNs353EmEd9ZVnMFDGfLDUEbCDeL82A8UCl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G024",
+      "in_overlap": false
+    },
+    {
+      "position": 25,
+      "post_id": "pfbid02pq9FwpzAvtwrUyMU7rxRSWykB1Nbb6jN8UGZ7A2ckSViqLVUaAmqJaDGAgWebgBHl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G025",
+      "in_overlap": false
+    },
+    {
+      "position": 26,
+      "post_id": "pfbid0uZb9qbB5CMgWojhQ2uh8wRUt7F5sqQnRC316fffAvAkXDsbMHybjfncvzNJRraAfl",
+      "split": "dev_extra",
+      "stratum": "multi_date",
+      "group": "G026",
+      "in_overlap": false
+    },
+    {
+      "position": 27,
+      "post_id": "pfbid02nBhkYKDvQr3jTEnDwyyykJ6eEWWiJmjqTDt6KBbeTm7ucnwnLftxyFRSaYfXjBbDl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G027",
+      "in_overlap": false
+    },
+    {
+      "position": 28,
+      "post_id": "pfbid02siTEQKEuCF2qpDVh744eEdtSD3qdzfgyo86pwB9S8VxBv8YyaStV2Y2he6nqMYLil",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G028",
+      "in_overlap": false
+    },
+    {
+      "position": 29,
+      "post_id": "pfbid02sg3uR6Gxc97MRGCYwTL3TgbV1gT9RV7wvMQjuhg1pEfmGy8vba6XKR5GjW25aJAXl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G029",
+      "in_overlap": false
+    },
+    {
+      "position": 30,
+      "post_id": "pfbid08gtoQNh4T5peEggPdPJ5TxUTfcVqEKwXhyxVYFGaceSV3vJHaENVEXC6o3iezgfil",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G030",
+      "in_overlap": false
+    },
+    {
+      "position": 31,
+      "post_id": "pfbid0yTDaiJTTCvE9PS5TsxfrWCVXLT6xyCsP5YMAJh5m1bzERrbn6xduhge2kr4pSZEWl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G031",
+      "in_overlap": false
+    },
+    {
+      "position": 32,
+      "post_id": "pfbid0axvNSc1yr7jRCiyy2vu9Uj1Df769i6QKu5jnA9eJBdYYCDDE65Yy2pHazDhGBPU8l",
+      "split": "test",
+      "stratum": "other",
+      "group": "G032",
+      "in_overlap": false
+    },
+    {
+      "position": 33,
+      "post_id": "pfbid02ib6XiRibHb5pBX27ym3QMs1QJMgqiSjJUtPRp4w7ipghZ5MpZRQ4brHn7VVkrw8l",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G033",
+      "in_overlap": false
+    },
+    {
+      "position": 34,
+      "post_id": "pfbid02eBT6oYCt55hLyxTL2seDNVSvkurP61h2M7CRNs524Ydt9ASonyXPzGzTnYmr8zJGl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G034",
+      "in_overlap": false
+    },
+    {
+      "position": 35,
+      "post_id": "pfbid026qSFM265Ft8XG2VwUNw6YoooAKBLtBzDAAMDdv9HdL78aqBx91MALHnWrENVh6QMl",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G035",
+      "in_overlap": false
+    },
+    {
+      "position": 36,
+      "post_id": "pfbid02fGUGmmeFVfurrKSD5o4vZHViiLRkCqJEEQbyMCiS41JAm5uStkEB1gaGRA7pBAZGl",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G036",
+      "in_overlap": false
+    },
+    {
+      "position": 37,
+      "post_id": "pfbid02bVcZdd9u3YkPwKABb5ofe5SjtcdV7kB2DjyoGEzhbmuLwobMuKwF1QPxrP2xaoaKl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G037",
+      "in_overlap": false
+    },
+    {
+      "position": 38,
+      "post_id": "pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G038",
+      "in_overlap": true
+    },
+    {
+      "position": 39,
+      "post_id": "pfbid0DXgKFVRwCk3ET9QdYjio3E2o1M2G7UaYuxHF89GhYEpdwpSyTsDf65iNNFXx4jEAl",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G039",
+      "in_overlap": false
+    },
+    {
+      "position": 40,
+      "post_id": "pfbid038DGUhwuATw2zV7BXaEZz4yaAZsxCeaqBmtHitPMphYTmkeVcso2V31FFNNCQv5grl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G040",
+      "in_overlap": true
+    },
+    {
+      "position": 41,
+      "post_id": "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G041",
+      "in_overlap": false
+    },
+    {
+      "position": 42,
+      "post_id": "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G042",
+      "in_overlap": false
+    },
+    {
+      "position": 43,
+      "post_id": "pfbid037Fu3dCFRn8bvGgLJ57t3fg38yhtWukNKTQeFgFvzL4vJ6AhysqnPbxhZVvxZ8WEyl",
+      "split": "test",
+      "stratum": "info_candidate",
+      "group": "G043",
+      "in_overlap": true
+    },
+    {
+      "position": 44,
+      "post_id": "pfbid0ceLozgCMi4CTrTBFSrJGiD9ZypE6ZGvDW6YuYGwuCeqbrAazNyFR6whGtvYSWt3pl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G044",
+      "in_overlap": false
+    },
+    {
+      "position": 45,
+      "post_id": "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G045",
+      "in_overlap": false
+    },
+    {
+      "position": 46,
+      "post_id": "pfbid0jFLoVS3yVwDRFdr5yTdX92hNG76pP2gz8SjN5ZuYNYvL3gJzUPRN814PGYMNZcQyl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G045",
+      "in_overlap": false
+    },
+    {
+      "position": 47,
+      "post_id": "pfbid02eQzrvj7F749ehTidCzne4rUP9NnrBi8stCoaSRwYFjg5ErhuqmzQ4w2ckN3ATT1Fl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G046",
+      "in_overlap": false
+    },
+    {
+      "position": 48,
+      "post_id": "pfbid02k1a64HpY4MFwMBRqhHbsczAVbKwmV3xUa3pPAX6V8zeUXKiFADFuyKnAoCXmv1TCl",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G047",
+      "in_overlap": false
+    },
+    {
+      "position": 49,
+      "post_id": "pfbid02hUMc36SLcoeJQj2eqhy8eYzmS7MWjaatrm1otqAYAzbLxL4spU4r3B8rVUyUi7Rgl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G048",
+      "in_overlap": false
+    },
+    {
+      "position": 50,
+      "post_id": "pfbid0B4HZ4d6x6R9DGgSC91Go4hzFEZM2XHAWitnpAatkvt1s9JVwpLBAx7Z8xgNxtt3tl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G049",
+      "in_overlap": false
+    },
+    {
+      "position": 51,
+      "post_id": "pfbid0AEzrJsJY7PUJjjBi4qxUx3L5XFRuTt9GuRKTvvaidxagcFN6xd3Ru6DsccNpuPNEl",
+      "split": "test",
+      "stratum": "online",
+      "group": "G050",
+      "in_overlap": true
+    },
+    {
+      "position": 52,
+      "post_id": "pfbid0DYE32yV1XMkeXbfucffpmGGDL6W77rjwaPd4NZXpnv4bZZegtDM7TFU6Yg3jFfpnl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G051",
+      "in_overlap": false
+    },
+    {
+      "position": 53,
+      "post_id": "pfbid025erNwk7cF1tMs1kos2bfv64bXQ5ucFuZXFjWTJrkq61bCFrmx2sN56pFmuCodtyyl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G052",
+      "in_overlap": false
+    },
+    {
+      "position": 54,
+      "post_id": "pfbid0rWnRjXaG5b2ZYJfRm3KTFERyVrApzzSbY9kbxSn7cNvoXJLgR4sZpJyeHd29fRJcl",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G053",
+      "in_overlap": false
+    },
+    {
+      "position": 55,
+      "post_id": "pfbid09Y9s952puDP3QcZQP7cT2Qu37195SBSwKXE7X4ARiy5b48nZ9VqpKAo7mF2b8ZbLl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G054",
+      "in_overlap": false
+    },
+    {
+      "position": 56,
+      "post_id": "pfbid0285J7o94gHZcTDZ3T7g9t2rUyZaopXD2xCpCQevjusKo49EXM7mmycf3beX6tkqWxl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G054",
+      "in_overlap": false
+    },
+    {
+      "position": 57,
+      "post_id": "pfbid0pEXhirx5yvVsxQViVJwbTSm2rTF7ZxMXiHHg9qYhzVELkayfMKdkMH3f7LrHVS7ol",
+      "split": "test",
+      "stratum": "other",
+      "group": "G055",
+      "in_overlap": false
+    },
+    {
+      "position": 58,
+      "post_id": "pfbid0289LXq7GYKD9KR5A73sWwd6w3HsY1eknyMjZJwkRTbVbDhK8CzRJtaTiYPgFj7vF2l",
+      "split": "test",
+      "stratum": "multi_date",
+      "group": "G056",
+      "in_overlap": false
+    },
+    {
+      "position": 59,
+      "post_id": "pfbid0BpJELJG8E2fN28dp63xuopmJpK1Q8nLkNXAgSk9QzKAfM1XDt1yZDDtLhmFTSqxhl",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G057",
+      "in_overlap": false
+    },
+    {
+      "position": 60,
+      "post_id": "pfbid0mccsgBkgThN6At1thzoRVDwHAvpG5mcw7u1nf77agcNYU4AGTfafFqY82VTouN1ql",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G058",
+      "in_overlap": false
+    },
+    {
+      "position": 61,
+      "post_id": "pfbid02yCG328qNfLc5QHP3fZtx3HtdPKijcrpjiGGdLHSSY8BbAAJyAPkfrWYzQrUtr4kBl",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G059",
+      "in_overlap": false
+    },
+    {
+      "position": 62,
+      "post_id": "pfbid0dREAKyPjGZpJ4B7vYsjwWF2QweiZPuUroCATCPohAkeSLr2fYUzQNudBaDwgZ8thl",
+      "split": "dev_extra",
+      "stratum": "online",
+      "group": "G060",
+      "in_overlap": false
+    },
+    {
+      "position": 63,
+      "post_id": "pfbid0bLDucenYUZ6TKbA5d9iB4FvM77cgyYNv3DocuF94pZDT1Co85AE6oCEERhNqHF28l",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G061",
+      "in_overlap": false
+    },
+    {
+      "position": 64,
+      "post_id": "pfbid0yeafBSGKfrMPWtkdxjC43DqnzTBBGtx8x7bH9oAU8PAoqDCT9rJxuSiayvDauQdZl",
+      "split": "test",
+      "stratum": "multi_date",
+      "group": "G062",
+      "in_overlap": false
+    },
+    {
+      "position": 65,
+      "post_id": "pfbid0dpALiXtQDy2n5ZEpxGCaVwHBzazbqioR8HAjRAnBqEudZuPagknnpnMNSQo3u9o2l",
+      "split": "test",
+      "stratum": "multi_date",
+      "group": "G063",
+      "in_overlap": true
+    },
+    {
+      "position": 66,
+      "post_id": "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G064",
+      "in_overlap": false
+    },
+    {
+      "position": 67,
+      "post_id": "pfbid02kR3wMs65f7GQ89ojixmKDysEPt77nEd6hv4UgBar99NoQghQZoDbK5PiyqKUsJP3l",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G065",
+      "in_overlap": false
+    },
+    {
+      "position": 68,
+      "post_id": "pfbid02KYphUfhTSv343V1AHeqLJtuRvoWKF6ue7ChUFkPAoMs9zvfgosyY4xuGj9o4JDeDl",
+      "split": "test",
+      "stratum": "quiz_threshold",
+      "group": "G066",
+      "in_overlap": false
+    },
+    {
+      "position": 69,
+      "post_id": "pfbid02eMqDhKVyrocNhXZ8AR5ugCNRj1MHZCdGjXJ6GYFo8ZVGNqAQcixVqeCMPDP2PtUPl",
+      "split": "dev_extra",
+      "stratum": "info_candidate",
+      "group": "G067",
+      "in_overlap": false
+    },
+    {
+      "position": 70,
+      "post_id": "pfbid02sJS5iFnzYXizYKqEMWkYCyB8ZBnQixEnohVWxPPQRZSn6QC5d2aMYdo8YXZcu5Wdl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G068",
+      "in_overlap": false
+    },
+    {
+      "position": 71,
+      "post_id": "pfbid0v6B57dTNtndVzWhM8mJfJ4jaCYzsBf9J5YkQvvNTb5CpDGHtTnuNSXmpSdYivD2zl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G069",
+      "in_overlap": false
+    },
+    {
+      "position": 72,
+      "post_id": "pfbid02yMDVHE16UDK4zTjaearF8omPMY7LzTvCP8Fd9JCUUV43hnzrd7DdiXFr35gFvPFSl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G070",
+      "in_overlap": false
+    },
+    {
+      "position": 73,
+      "post_id": "pfbid02qCE8MUFBhdARZM7M5q1PLaAhRF9orw39kZeWvaEgfwKEpYQesa9itqgp2cAdcYS1l",
+      "split": "test",
+      "stratum": "other",
+      "group": "G071",
+      "in_overlap": false
+    },
+    {
+      "position": 74,
+      "post_id": "pfbid0HSj8yJoaxt3xytoxrhDDsnBXbzqoKXCNJooAbB9zusiNDkSWg1Cj1Mz2cJf676mml",
+      "split": "test",
+      "stratum": "other",
+      "group": "G072",
+      "in_overlap": true
+    },
+    {
+      "position": 75,
+      "post_id": "pfbid02TrYpTsUSKzgxih7JW8WBQb6FThavaGZH3H2SU1kHNkY78e6nRVQKXqFFU77oBR4Bl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G073",
+      "in_overlap": false
+    },
+    {
+      "position": 76,
+      "post_id": "pfbid0333yBjDEvD9S7dYuwtp5G7xwGsSutgKcuVFDGNuuQN13TtD3pehF1B8CE8PfDE2Kl",
+      "split": "pool",
+      "stratum": "mandatory",
+      "group": "G074",
+      "in_overlap": false
+    },
+    {
+      "position": 77,
+      "post_id": "pfbid0YbKfdmeThGmwCrgSQ4QNPQXNRkK6AXsfbGdPcMDb5GwGYHJvRNPVYzLDfqeQ6SZ3l",
+      "split": "test",
+      "stratum": "other",
+      "group": "G075",
+      "in_overlap": false
+    },
+    {
+      "position": 78,
+      "post_id": "pfbid04cZzYL3H43W2be1KJdqcphQuDGBvesXXvWYR41L9zgSB5cpaVd4RoAXUqenh8CXjl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G076",
+      "in_overlap": false
+    },
+    {
+      "position": 79,
+      "post_id": "pfbid0XsH1Fk5EGo78si8yhjCyy78BP6NiAJC7rJE7ttJ7F1xiWNqY5jj5bZQ4sPokUEXAl",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G077",
+      "in_overlap": false
+    },
+    {
+      "position": 80,
+      "post_id": "pfbid0HoFxwQhDVohGedE1sY1Q4dez3D4KFuCQtwd3kzoGXrAVwaVQXUH3h5RomZg8QzRml",
+      "split": "test",
+      "stratum": "other",
+      "group": "G078",
+      "in_overlap": false
+    },
+    {
+      "position": 81,
+      "post_id": "pfbid02kutBrbygb4ncZwC53vzgyBAv4hztCjB5FmxBAMeDqfPu8w1M57nvEseypp6skHeLl",
+      "split": "test",
+      "stratum": "info_candidate",
+      "group": "G079",
+      "in_overlap": true
+    },
+    {
+      "position": 82,
+      "post_id": "pfbid0zsnbe3daebUmSH2MjuiTBqbPbN8Y4gT8FqCPHz4KwmUCWjKuzgyHL5mBabnD8SVil",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G080",
+      "in_overlap": false
+    },
+    {
+      "position": 83,
+      "post_id": "pfbid0QD1ZSXT9WK1jcvGaRLBLpJbHauPL1ynXXM8M6uNwGBsKbfmR9YjrPwGP7kNHVywYl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G081",
+      "in_overlap": false
+    },
+    {
+      "position": 84,
+      "post_id": "pfbid0jePLhRwXE5Vs7K1EjpqXDCv9GNRCxtC1k2w8ssb3aWbp8jEzmrAEkR44sES4VNnLl",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G082",
+      "in_overlap": false
+    },
+    {
+      "position": 85,
+      "post_id": "pfbid02hJkDnVfGkv83TzXoq8XKNPRkKmdxcKaM3QyUwa2X1tgtdxonqyoWkjYCsfHCQNAVl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G083",
+      "in_overlap": false
+    },
+    {
+      "position": 86,
+      "post_id": "pfbid028nU9z1suxgWj7baVZuSjfF1YbGT3VY39wNQRcWytEKNxVaCLuenpxGpdUpuNQYHYl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G084",
+      "in_overlap": false
+    },
+    {
+      "position": 87,
+      "post_id": "pfbid02DSEr8WQJzpdWxaA3x9fsG2mqZ7H8tTPjvkWyc2nKTumE2NRhrFDWNX7U8MQvxZ1l",
+      "split": "dev_extra",
+      "stratum": "info_candidate",
+      "group": "G085",
+      "in_overlap": false
+    },
+    {
+      "position": 88,
+      "post_id": "pfbid0FyyqMGmaPaHsEV5fTrNZgCcgx38FpETvUCg1MuobJNHcgRhfRgRAiTyEupBH6Uiel",
+      "split": "test",
+      "stratum": "other",
+      "group": "G079",
+      "in_overlap": false
+    },
+    {
+      "position": 89,
+      "post_id": "pfbid025fBQXb22sDH9ZNzBhXEYXozzFwAswPCg8dzZfvxSx831ERBzcxmXXC7VtwvtdJoTl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G086",
+      "in_overlap": false
+    },
+    {
+      "position": 90,
+      "post_id": "pfbid024uVjQX8BX7AJsE4VP7y6jNZcPmRvLCSvk7fVuBCoUG77FAx2Uj3JC5kKS3F3fRKgl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G087",
+      "in_overlap": false
+    },
+    {
+      "position": 91,
+      "post_id": "pfbid05g494RxPj45X3dAdedowc2ZtR7VmqyuXXtXvmEHYR65ptYHV8zUsPCMnArf5VDsol",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G088",
+      "in_overlap": false
+    },
+    {
+      "position": 92,
+      "post_id": "pfbid02DtyVjVd8KapWdeZfjuKWzkAkLYh7zKYNGvVYVhgaWJJykCdafquexAYMvrWWf7k2l",
+      "split": "test",
+      "stratum": "online",
+      "group": "G089",
+      "in_overlap": false
+    },
+    {
+      "position": 93,
+      "post_id": "pfbid0aa6txmsbR2PKoZ8uVc4rCL7kbppAVgNrDgUWJnvWebPwEBTVoF97YTwC6Aj7V6cel",
+      "split": "test",
+      "stratum": "mandatory",
+      "group": "G079",
+      "in_overlap": true
+    },
+    {
+      "position": 94,
+      "post_id": "pfbid0X6wKqTejMciuYWvtPqdH28rcSBxvJnx8aqPyzCdZJ3s4vyS2aWuBCmqQA8JkvwaTl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G090",
+      "in_overlap": true
+    },
+    {
+      "position": 95,
+      "post_id": "pfbid0HhFatGBcSMxdSUYDifMitRMxjmZYQFUa3B2nVn6n4GeDswPcjAALPrQdLVz5vTCPl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G091",
+      "in_overlap": false
+    },
+    {
+      "position": 96,
+      "post_id": "pfbid0uvTL3bHSGPbLZMW34W7ahtnUE1ZvMhDAAwRM29Av9B3gCXki1KVY3pTxSnSe8KUol",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G092",
+      "in_overlap": false
+    },
+    {
+      "position": 97,
+      "post_id": "pfbid02FMWA2Mngt1A7nFcKZwJnMoiBft7U5PfbR9oSVc3XEAPPFB7qPskSHjnKicQBdo5ql",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G093",
+      "in_overlap": false
+    },
+    {
+      "position": 98,
+      "post_id": "pfbid038GmCPfh41jVGAaDGzmWJQSRVFtQ7hNVj1Qph1FSL1qtxzUw8azUnd3Ggpc4G6i97l",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G094",
+      "in_overlap": false
+    },
+    {
+      "position": 99,
+      "post_id": "pfbid0f39ayW71WE5pLD1Ar1bmJANnEiAVju9aLr9tcVG3pJsqXGz5WbB48FoEPyefSji9l",
+      "split": "test",
+      "stratum": "other",
+      "group": "G095",
+      "in_overlap": false
+    },
+    {
+      "position": 100,
+      "post_id": "pfbid0v64mAfLhoWNgjX3PEqARcWj4S3bZW7zcDur89qqSxSrQ47SRgbgVkEGuN6vbPHnCl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G096",
+      "in_overlap": false
+    },
+    {
+      "position": 101,
+      "post_id": "pfbid031smy1CreLd2gU4UXkaWv1dvRTFvxriAL54EkUGBp2NDToBTMpx9YMKw9EBeLvjsfl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G079",
+      "in_overlap": false
+    },
+    {
+      "position": 102,
+      "post_id": "pfbid0DMdcuKGsUUdshzF34zwD7RWtE8BUQKHuduXDBRSRoBJgdCqkstgFj5q2gT1re2R1l",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G097",
+      "in_overlap": false
+    },
+    {
+      "position": 103,
+      "post_id": "pfbid02qwN8ZXNAQQzZqjPdeCwiAz1jNGhYARbXVq7yVxCEfZdbDaiVqSCRtHKN51Cp1y7Fl",
+      "split": "test",
+      "stratum": "info_candidate",
+      "group": "G079",
+      "in_overlap": false
+    },
+    {
+      "position": 104,
+      "post_id": "pfbid0ZrAbQBhEkyDX78nX31LitqTS2KKG7vLMaToGvpJUNa2JFE69bvybMDj2mrcxhqfWl",
+      "split": "dev_extra",
+      "stratum": "info_candidate",
+      "group": "G098",
+      "in_overlap": false
+    },
+    {
+      "position": 105,
+      "post_id": "pfbid02LE91HdQKfQTU4APo1zkPAbp2ehNvSWkje3GhUEMw4HauC4CSki4h7yxVTPkXBfZ2l",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G099",
+      "in_overlap": false
+    },
+    {
+      "position": 106,
+      "post_id": "pfbid02zyFDsiq3o68YGWrRuhvSitLHd5SK4segqABuRCRhSq8Y9orEo7sEjs6Tx6LbgVxLl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G100",
+      "in_overlap": false
+    },
+    {
+      "position": 107,
+      "post_id": "pfbid0arbMmNqZbdPeQvrpnmHyghSkbCNFoPcBhsjqUkACEZJq1FDzDYNbcjAiCBVBaHsjl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G101",
+      "in_overlap": false
+    },
+    {
+      "position": 108,
+      "post_id": "pfbid034B81QfPTsxeT9aqWhTRsKeghDQ1NZZRqZonp9HYUwjpjiEbQRegGZfdfddFRgz98l",
+      "split": "test",
+      "stratum": "info_candidate",
+      "group": "G102",
+      "in_overlap": false
+    },
+    {
+      "position": 109,
+      "post_id": "pfbid0CwVmJXUgJUuV6TChmgGsFj9Lwm9A7ycitChowYdW92KaYdzVR5T4pAfFHbZUgCWtl",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G103",
+      "in_overlap": false
+    },
+    {
+      "position": 110,
+      "post_id": "pfbid03JtQFt1ThCdY31bYF4xAct8ZAgQ4P6F7fzXiGAXNrG4vyrARwVXzvgSEApmDP1k4l",
+      "split": "test",
+      "stratum": "online",
+      "group": "G104",
+      "in_overlap": true
+    },
+    {
+      "position": 111,
+      "post_id": "pfbid029Jij29wV7kgrAX9S3gAYGwJqsF3anMhxQJTTMCgPgT9YPzf8U2Gu6LKrgQwTzPPEl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G105",
+      "in_overlap": false
+    },
+    {
+      "position": 112,
+      "post_id": "pfbid034P8mWxQfzzGLbMrSwyw9XdXKhsPoZm8GoYEYCzZZKvHmsVJKtVMj4xjbraKGrcCql",
+      "split": "test",
+      "stratum": "other",
+      "group": "G106",
+      "in_overlap": true
+    },
+    {
+      "position": 113,
+      "post_id": "pfbid07Tux7Ai4bxJcL5j8rckoGTQMbJHFRbTjBqdVmbCTqydgmM5gdvakjh8A7EK5eGejl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G107",
+      "in_overlap": false
+    },
+    {
+      "position": 114,
+      "post_id": "pfbid03X1XBcRYamue2CtNT1nBHGsuPwqeHEfArVYBTKkEaZkPgVoRwf5XkTBDR4ba65uTl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G108",
+      "in_overlap": false
+    },
+    {
+      "position": 115,
+      "post_id": "pfbid026tGxjXMKEfjUcKGxJrJPcAxuaqEv2B4VGJQDaX4Gk7U3tjHs2B5KL4QhdiERvZigl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G109",
+      "in_overlap": false
+    },
+    {
+      "position": 116,
+      "post_id": "pfbid0224hSkhEGcN3QxsHdmmUNP115JkFUAzZ2SbBdWmmFsGwt375fAnrq1PoCoXj3c1KMl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G110",
+      "in_overlap": false
+    },
+    {
+      "position": 117,
+      "post_id": "pfbid02Hbu9f7JVWqGnUURwKSQFtzAt2LR83s4KA52ybyfBQyhNCFGJCKtJ1jrfxxFdtJzAl",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G111",
+      "in_overlap": false
+    },
+    {
+      "position": 118,
+      "post_id": "pfbid02r8qFC3FbixnX1Ca711EpxPjUgH9dFHLUm2ubzGJMm5Q5sbsqpTFCSa5RVGcinrAQl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G112",
+      "in_overlap": false
+    },
+    {
+      "position": 119,
+      "post_id": "pfbid0vbzL4C8xBDcahqarrDFJcc4hqVYDAbSAyBoSqQ8VuqznFMW52AcdPz2uH6nH66Kal",
+      "split": "dev_extra",
+      "stratum": "mandatory",
+      "group": "G113",
+      "in_overlap": false
+    },
+    {
+      "position": 120,
+      "post_id": "pfbid08bsoKaZwLc6X473mUcYVujvuqqHTxTQYeofmvA2WGttwNVChgHFCcrGo2ker5fN2l",
+      "split": "test",
+      "stratum": "other",
+      "group": "G114",
+      "in_overlap": false
+    },
+    {
+      "position": 121,
+      "post_id": "pfbid0ZL8h8T9DTa1H5hT2yNKJhPGJrsqz5sB8hn81E47nuYTsZpvkQhJcKNgpJGBB9pn3l",
+      "split": "test",
+      "stratum": "other",
+      "group": "G115",
+      "in_overlap": true
+    },
+    {
+      "position": 122,
+      "post_id": "1939136540726614",
+      "split": "test",
+      "stratum": "multi_date",
+      "group": "G116",
+      "in_overlap": false
+    },
+    {
+      "position": 123,
+      "post_id": "pfbid0uAt1jxnTgrtEAtvDhYotJgYFVNAMeSi2rnQrovSANvMj8vnmEGX2KQShGgckwTc9l",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G117",
+      "in_overlap": false
+    },
+    {
+      "position": 124,
+      "post_id": "pfbid02nHiUgkgwE7APBtveTm5vuZQrqmyirBLQh3jreNrTMkoRCxXn1D7hrci4yuvy3zkLl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G118",
+      "in_overlap": false
+    },
+    {
+      "position": 125,
+      "post_id": "pfbid0381oQwuHvpmEh3ZK1TnzirV1vQyMe747ToR1nQ918JF6cYBVmJMS9Bwyphwekzi5Al",
+      "split": "dev_extra",
+      "stratum": "quiz_threshold",
+      "group": "G119",
+      "in_overlap": false
+    },
+    {
+      "position": 126,
+      "post_id": "pfbid02285ocydHPVMww7euZXHZq6sqfKstCRijWuA1byprpGga4YynxFJsd9TwMvvVBiD2l",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G120",
+      "in_overlap": false
+    },
+    {
+      "position": 127,
+      "post_id": "pfbid027nUhiQ7aznU2x99pKZq59VRcUmfAdvheW9QZFLUg6UWDGckVTsgBN919cdp5WQCql",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G121",
+      "in_overlap": false
+    },
+    {
+      "position": 128,
+      "post_id": "pfbid02DfS2q8PyN6jgKAtMV8961vKUSUS6daTwGd7XAtStMn3RE4mbTzTKXusqpG3CkoTUl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G122",
+      "in_overlap": false
+    },
+    {
+      "position": 129,
+      "post_id": "pfbid02nCN8N4M5aEeETae34vgQgVPNgsHgCRwBxXDzkx7zGHw3rzQi8UueJqFZX6eMU9UUl",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G123",
+      "in_overlap": false
+    },
+    {
+      "position": 130,
+      "post_id": "pfbid02XZ9UEstUjWk1HmPL9wxrGm3eLmXznbqkA4WaFofggdWyYTV6vwCdmd3iwWi8MKEUl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G124",
+      "in_overlap": false
+    },
+    {
+      "position": 131,
+      "post_id": "pfbid02SXEDSP813Nakurd3SoxwZcyrGeDd6zEmckJB3HMJmNUWYBqmNPQCW4NvxwCEk8oTl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G125",
+      "in_overlap": false
+    },
+    {
+      "position": 132,
+      "post_id": "pfbid0pyfkoPMGNKdfxBDFpYPJRr7nLfosHM31NPqsdbxqqMMLVQYzWD336cetGxZCuS21l",
+      "split": "test",
+      "stratum": "multi_date",
+      "group": "G126",
+      "in_overlap": true
+    },
+    {
+      "position": 133,
+      "post_id": "pfbid02t92pVgHoWRYaV8FjZbebVvmJv9Yq4XaK6WNecBVT43Q56AKux7zZQMDj4VvuMvNsl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G127",
+      "in_overlap": false
+    },
+    {
+      "position": 134,
+      "post_id": "pfbid037nFyUmhshymd7mrmP2MEYjE9jEy2Dxt5h3nmuxccbnsW98pDuR738ASevRgTdx4el",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G128",
+      "in_overlap": false
+    },
+    {
+      "position": 135,
+      "post_id": "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl",
+      "split": "test",
+      "stratum": "info_candidate",
+      "group": "G129",
+      "in_overlap": false
+    },
+    {
+      "position": 136,
+      "post_id": "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel",
+      "split": "test",
+      "stratum": "other",
+      "group": "G130",
+      "in_overlap": true
+    },
+    {
+      "position": 137,
+      "post_id": "pfbid0219WhKzg2VY5EfQp6HMhoMuEF6Lgh7zsvdovR38vwdVLxtCA2gE2EDfVPteg8SyAwl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G131",
+      "in_overlap": true
+    },
+    {
+      "position": 138,
+      "post_id": "pfbid0hHscC6XEmEUXDRjVPmVDaEjtFhkfgwZ5nDGuZjgrcdYicipTWrmazdv5jEoTv9ZDl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G132",
+      "in_overlap": false
+    },
+    {
+      "position": 139,
+      "post_id": "pfbid02MvySj3SMqNNyvECYsRgnAnhyG6QWBTf8qMMb9c2UETuXdwNmEEGPrbRcCjchtjM2l",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G133",
+      "in_overlap": false
+    },
+    {
+      "position": 140,
+      "post_id": "pfbid0XzA4NWd2m3eB1qz6Q7jmmoDrTDjipgRBeRq7rUBrN4DFGLAWRkJrbf1GiyUDaVdNl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G134",
+      "in_overlap": false
+    },
+    {
+      "position": 141,
+      "post_id": "pfbid0boR7w7iRdsuvBfCXvESjpRi81S7Js93u4QHY9jXCS7yUF1A2NYoYYewBPaMXdHRYl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G135",
+      "in_overlap": false
+    },
+    {
+      "position": 142,
+      "post_id": "pfbid01AAm6S6qVctGQsv4wNGYrx7zWTMJ653yWSnzhqoxnzR9DjeXPcjBMLFrzKycB6Gpl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G136",
+      "in_overlap": false
+    },
+    {
+      "position": 143,
+      "post_id": "pfbid037dQuUMa8WZycfPidHfFu2ZioZyQiQCNzffpts1NjzD7Nasx9orUaJM1iGuh4a415l",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G137",
+      "in_overlap": false
+    },
+    {
+      "position": 144,
+      "post_id": "pfbid0pwGRpAPKnSaoim8tfrJCmZXAs14Ne5wPzvqmoLLmXAgiebGwfPUvaohbWsZHbT6Ql",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G138",
+      "in_overlap": false
+    },
+    {
+      "position": 145,
+      "post_id": "pfbid02oMXdMTsNgYeGkCHTL5eNmjGVpyNwsWmJp4asbnPeMhhgLcbLdLxryaETCvwZLPDYl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G139",
+      "in_overlap": false
+    },
+    {
+      "position": 146,
+      "post_id": "pfbid02Tjn5J53Jvp7ar4gF8F1PLBMQayHYvXg2fMWgRcZK2CBad8uhte3pryhQ7BLz7cWYl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G140",
+      "in_overlap": false
+    },
+    {
+      "position": 147,
+      "post_id": "pfbid0uLbjNmKJUSVtPsvVjmVxkUZ7XBz2gZyffobwGXUz14dNZpVBA9TYP6f7VzJdnuo1l",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G141",
+      "in_overlap": false
+    },
+    {
+      "position": 148,
+      "post_id": "pfbid02ufAUyzips3EBXmQt4Nm2pLtbahyZZenaWtpUQJ4NS6fVYHbTUipk1hUe5kUxnKEel",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G142",
+      "in_overlap": false
+    },
+    {
+      "position": 149,
+      "post_id": "pfbid02QMkDAHHrWA2uPJjG4s9PHzoRfhmJHDk19RxQ7bfQ76RTPdgZjhXcffG8zX3t3i2jl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G143",
+      "in_overlap": false
+    },
+    {
+      "position": 150,
+      "post_id": "pfbid0JwSUvE4e65FU1A1k2s9tGU7jjC2YosgNvawJb41X1uDxbxCE7yf6Rbj1uWG1f8k7l",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G144",
+      "in_overlap": false
+    },
+    {
+      "position": 151,
+      "post_id": "pfbid026Sq6YJVpvZ94HBx364fXmJs2i5jTLFKHE6Yt2XziXy6jcsuuuzM38EPfGBsYUn2gl",
+      "split": "test",
+      "stratum": "quiz_threshold",
+      "group": "G145",
+      "in_overlap": true
+    },
+    {
+      "position": 152,
+      "post_id": "pfbid0y6US561ga4uvo4oHgFg6NQhXhApDKWsAjxYsNJFWBFT2YLHdMbunahgCG81NnGaZl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G146",
+      "in_overlap": false
+    },
+    {
+      "position": 153,
+      "post_id": "pfbid02R2QY7G7Az76zRtJtgpUZEh9US3tLSKRKCZ8K7oUbKvNojfbjYxioJQC5fCdxkJCDl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G147",
+      "in_overlap": false
+    },
+    {
+      "position": 154,
+      "post_id": "pfbid0wqQryW6TVVatK9fMU2Yxg5HDjV6biQZbJ7sFBVcCWJTwKaRvNnYvfZLQXY8RBBGUl",
+      "split": "pool",
+      "stratum": "quiz_threshold",
+      "group": "G148",
+      "in_overlap": false
+    },
+    {
+      "position": 155,
+      "post_id": "pfbid0gA27o84EoBnEWsir7FptnjJswVcKANTEW2smJSkgw9V3HmWpfJGiNEGAXaFxhgGUl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G149",
+      "in_overlap": false
+    },
+    {
+      "position": 156,
+      "post_id": "pfbid06exFW2AyQW5HDpHfyMWnECX7HdaZMm7szug6R5JXkU3QE2EuDiCRzqspwxjqTnkpl",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G150",
+      "in_overlap": false
+    },
+    {
+      "position": 157,
+      "post_id": "pfbid02WVszVBUuvGDcdyBKjmig4KhhZ8j7vpvw8gZV8pUgM8zrhbo7niNNztyL4KsTA39Jl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G151",
+      "in_overlap": true
+    },
+    {
+      "position": 158,
+      "post_id": "pfbid0aUCrHq7mHLANjHkGTRUDVKZ6QXfzfDve9v3Y6hiqrUnSXTepxkh6sEKRB27x3aSHl",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G152",
+      "in_overlap": false
+    },
+    {
+      "position": 159,
+      "post_id": "pfbid032ty6V3vVWp3XP1qU2frLhFWnvZPbv2ZsBm6Rbach9QvdcdYGKT3ha2pznQxQvtGWl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G153",
+      "in_overlap": false
+    },
+    {
+      "position": 160,
+      "post_id": "pfbid02WDiXqBnGX2CMAnUs2FuKrZ7kXitvuDDeoB6yG9ZigmWt3VMxGAVvZ5jazmSQKeGWl",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G154",
+      "in_overlap": false
+    },
+    {
+      "position": 161,
+      "post_id": "pfbid02gQSArenKumt6jbHtfrhHs3gcuCj7WtPX9K19MqtngN6kxLyoRAeNDcPLvDsEsT9Sl",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G155",
+      "in_overlap": false
+    },
+    {
+      "position": 162,
+      "post_id": "pfbid032ty6V3vVWv86ySbmwwVuVoJdzRtp8ho9jWNGfn93PCVUiFw5yq4sA87MUuzc1pjel",
+      "split": "dev_extra",
+      "stratum": "mandatory",
+      "group": "G156",
+      "in_overlap": false
+    },
+    {
+      "position": 163,
+      "post_id": "pfbid02uqyZt4SWmoJme1y2HHWtaigR3vsESsgeeq4v97BJTJGvWhvPDcfuy9d79Z1qF81gl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G157",
+      "in_overlap": false
+    },
+    {
+      "position": 164,
+      "post_id": "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G158",
+      "in_overlap": false
+    },
+    {
+      "position": 165,
+      "post_id": "pfbid02FRDX3FT2Sgwx1Bc76q6kskVkegZczF4CLqz8nrwHhrqMVUzsMVEWKuYDqQ1ZN2Yhl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G159",
+      "in_overlap": false
+    },
+    {
+      "position": 166,
+      "post_id": "pfbid032KfAjEjEMxdFFsj7Cy9vSEGuUQKRa4f3gECk4dTN1gSTb8SMXtgjk2BnqDNQUw6Zl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G160",
+      "in_overlap": false
+    },
+    {
+      "position": 167,
+      "post_id": "pfbid034HtkaTpbHATZQf2FNfLkY1u78X7ocS3Ym3et2BmXVhtAaFZq1W9ANr9Kbkf31zetl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G161",
+      "in_overlap": true
+    },
+    {
+      "position": 168,
+      "post_id": "pfbid02d8dMYR42QFsvyt8NtRf9PnnZykLp5asyvJibUUu9xjhEHsn824m9wKparUSouwsml",
+      "split": "test",
+      "stratum": "other",
+      "group": "G162",
+      "in_overlap": false
+    },
+    {
+      "position": 169,
+      "post_id": "pfbid04sy8x96bnq2Kns58R6Jgjdr1LfLrsgSexXbfG6so7kLJWCeUCZDLMrDqZ4czaUZbl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G163",
+      "in_overlap": false
+    },
+    {
+      "position": 170,
+      "post_id": "pfbid06qL2JWWfSVKvDaiZMJggoz2BK5GFA3KvchYDTBAFzNJck59vNqgM7TckBtcm8gZDl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G164",
+      "in_overlap": false
+    },
+    {
+      "position": 171,
+      "post_id": "pfbid0cppwcbvvWWjzU4XaYEWELKBSGsukoi7ZzoKQNWZrFoRtSK7aUGaMQk7p4gHp8V2Zl",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G165",
+      "in_overlap": false
+    },
+    {
+      "position": 172,
+      "post_id": "pfbid02yyN6zJpVkzoUEtVwR1yXjsYwmno8Zn6ErCUYFKNn5iMxq1MoyeaiQWiM1k7bGLgQl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G166",
+      "in_overlap": false
+    },
+    {
+      "position": 173,
+      "post_id": "pfbid02WqKUdFpoAdWQNe4ZLgf9gQBZtKqmkFUWiaid3jcXV9sazNq2MkTxz5DzHvtq8cwsl",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G167",
+      "in_overlap": false
+    },
+    {
+      "position": 174,
+      "post_id": "pfbid02DCZpfGjQzAAYMT1iGMTLMT1ZhupsrtjzP976EHHMxXjyftf9o1hCdXFGxLKKg89wl",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G168",
+      "in_overlap": false
+    },
+    {
+      "position": 175,
+      "post_id": "pfbid04TWHCk35qTYcTge6Y9MegsAB75pzxkkNt8eBcVvwNaAkAvAYkDHP1FK1B7kLeUjdl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G169",
+      "in_overlap": false
+    },
+    {
+      "position": 176,
+      "post_id": "pfbid02STJBf5x7cuU8UpDzjJHCtyD2DwtPD7o6fGWR3i2BdpExnETcXSUuHryeeJ5uvnA9l",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G170",
+      "in_overlap": false
+    },
+    {
+      "position": 177,
+      "post_id": "pfbid073tRtafeN7CM4HEhct79p942MFANdoLk3ebnXRZEpHUfa1sa3ux6z1BpdpBFntWgl",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G171",
+      "in_overlap": false
+    },
+    {
+      "position": 178,
+      "post_id": "pfbid023BTcksnd8iA2DSSa8drrgiFWmZ8jDQRUDzcBAEoy7ooHQDmMMPVgHXNoA42cip1hl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G172",
+      "in_overlap": false
+    },
+    {
+      "position": 179,
+      "post_id": "pfbid0YHQrrXsRSecHxmPMzbBkgYTncQh2CYEAWuDAnkqHL1RSySZkeaZFwoa76U9jHxqol",
+      "split": "pool",
+      "stratum": "other",
+      "group": "G173",
+      "in_overlap": false
+    },
+    {
+      "position": 180,
+      "post_id": "pfbid0iMo6F1TT9i8amU8tcpMynWZnzJWpdFmxFMGZxKonKXuEL3u6WTX5TeoNKiApooM6l",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G174",
+      "in_overlap": false
+    },
+    {
+      "position": 181,
+      "post_id": "pfbid0dYmFBC7HAaW1nMfZuinVHpoyK5vVprV9AK74wpmQWBBwyFcBNUe9sBiAZvSf5CMwl",
+      "split": "pool",
+      "stratum": "online",
+      "group": "G175",
+      "in_overlap": false
+    },
+    {
+      "position": 182,
+      "post_id": "pfbid03UiW9MaH5rbtETZ5Yj6c1MqdRgDj1ZDzmpgitawKmbZNc5hqAeHRgAidcAqkK48Kl",
+      "split": "test",
+      "stratum": "info_candidate",
+      "group": "G176",
+      "in_overlap": false
+    },
+    {
+      "position": 183,
+      "post_id": "pfbid0fbNCLXPdDNXXDZ6jigFqByEZeXJVCCnavhpVcTZTrxPLM1GFgpSCjHBbqMqZ75arl",
+      "split": "pool",
+      "stratum": "info_candidate",
+      "group": "G177",
+      "in_overlap": false
+    },
+    {
+      "position": 184,
+      "post_id": "pfbid02hfH3kbYuHruq3L6aWNwNg2tF1DU6qMDTBYZeCA9Yp89bMLyodk13nExeuooHtDi3l",
+      "split": "dev_extra",
+      "stratum": "multi_date",
+      "group": "G178",
+      "in_overlap": false
+    },
+    {
+      "position": 185,
+      "post_id": "pfbid0y3JjyD8DeZyf6wq46u2jvimz7puoyGc9ETfsduVRHC7buVNq19xSShGVqFu2tLZQl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G179",
+      "in_overlap": false
+    },
+    {
+      "position": 186,
+      "post_id": "pfbid0LR4V37mwvsshK8KUbKQGqk5C9rnmSZy9McGSyRvMHmKd6RuJGMmTimYv8iavL6KBl",
+      "split": "dev_extra",
+      "stratum": "other",
+      "group": "G180",
+      "in_overlap": false
+    },
+    {
+      "position": 187,
+      "post_id": "pfbid02YAXkGYRTXTUcJRZjFSBgaLkew2aghR2ymjvwUsLyShg98GSJ6yDzcZU4hT3L2hwNl",
+      "split": "test",
+      "stratum": "multi_date",
+      "group": "G181",
+      "in_overlap": false
+    },
+    {
+      "position": 188,
+      "post_id": "pfbid02SaqDdqPTqXpdpZ3kkMRYD9cWSknTBbbkj2v8D17piLdDoMMwo8xN2sz1CwaUhBtXl",
+      "split": "test",
+      "stratum": "other",
+      "group": "G182",
+      "in_overlap": true
+    },
+    {
+      "position": 189,
+      "post_id": "pfbid02bdhLq6HRRQ994GUuGbkfqjGpW3dhu9UrYi1Nq2Kiv1Y6U6F4sdXau9JwdDGPJeEyl",
+      "split": "pool",
+      "stratum": "multi_date",
+      "group": "G183",
+      "in_overlap": false
+    }
+  ]
+}
