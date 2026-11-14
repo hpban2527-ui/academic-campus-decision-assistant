@@ -116,7 +116,6 @@ Start the existing API with `python run_server.py`. The SP3 endpoints are:
 - The demo recomputes availability and feasibility from Ngọc's code, plans with Duyên's code and invokes the real SP2 engine. The student, dates and activity bindings are synthetic fixture data; output is **DEMO_ONLY**, not a university-confirmed DRL award.
 
 Run `PYTHONPATH=src python -m pytest -q tests/sp3 tests/integration/test_sp3_flow.py` for the complete SP3 checks. The live HK3 planner remains review-gated until source activity records and point bindings are verified; do not turn unknown points into zero or claim official credit.
-<<<<<<< HEAD
 
 ## Phase 2 — MVP acceptance
 
@@ -127,5 +126,3 @@ SP1's source catalog and SP3's November 2026 synthetic fixture are separate data
 Acceptance: `PYTHONPATH=src python -m pytest -q tests/sp1 tests/sp2 tests/sp3 tests/integration tests/test_e2e_pipeline.py tests/test_session_flow.py`, `python scripts/check_team_source_integrity.py`, `python scripts/check_sp2_cases.py`, and `python scripts/verify_browser_e2e.py` (requires Playwright Chromium). Browser evidence covers SP1/SP2, SP3 first-plan/replan/what-if, target/busy input changes, catalog labels, and mobile view.
 
 Existing teammate rules, source, and SP3 modules remain unchanged. Do not merge until exact-head CI passes and a valid reviewer approves.
-=======
->>>>>>> eeffe5b13de641b0ea8e4c92e5897f41c5fc9fa9

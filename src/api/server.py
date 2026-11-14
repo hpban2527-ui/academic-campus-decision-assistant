@@ -1002,12 +1002,7 @@ def evaluate_announcement(req: EvaluationRequest):
         and "needs_review:completion_requirements" in extraction_flags
     )
     estimate_requires_review = bool(
-<<<<<<< HEAD
-        rec.get("points") is None
-        and (extraction_has_warnings or rule_match.ambiguous)
-=======
         (extraction_has_warnings or rule_match.ambiguous)
->>>>>>> a327853bae30f7a3a820ac4b851a38b578fccf67
         and matched_rule is not None
         and rule_match.confidence >= 0.65
         and not online_missing_completion
