@@ -557,9 +557,10 @@
             <div class="lg:col-span-7 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
               <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
                 <div>
-                  <h3 class="text-base font-extrabold text-white">Hoạt động nguồn · cần xác minh điểm <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP1 14 trường + Data QA)</span></h3>
+                  <h3 class="text-base font-extrabold text-white">Hoạt động đã thu thập <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP1 14 trường + Data QA)</span></h3>
+                  <p class="text-xs text-slate-400 mt-1">Điểm và điều kiện tham gia được cập nhật sau khi xác minh.</p>
                 </div>
-                <span class="dev-only text-xs font-mono font-semibold text-indigo-400">activities.json + QA20.json</span>
+                <span class="dev-only text-xs font-mono font-semibold text-indigo-400">20 reviewed + real raw-source feed</span>
               </div>
               <div id="validActivitiesList" class="space-y-3.5 max-h-[680px] overflow-y-auto pr-1"></div>
             </div>
@@ -567,7 +568,7 @@
             <!-- CỘT 2 (5/12): BẢN NHÁP NGUỒN MỚI, HÀNG ĐỢI CHỜ DUYỆT & THÔNG TIN LƯU TRỮ -->
             <div class="lg:col-span-5 space-y-6">
               
-              <!-- 18 Bài đăng nguồn mới (new_post_drafts — REVIEW_REQUIRED) -->
+              <!-- Real source posts not in the reviewed 20-record catalog. -->
               <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
                   <div>
@@ -787,14 +788,75 @@
               </div>
             </div>
 
-            <!-- Simulation status stays visible in both modes. -->
-            <div id="planDisclosure" class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-xs text-amber-200 flex flex-wrap items-center gap-2">
-              <span class="font-bold shrink-0">Dữ liệu mô phỏng</span>
-              <span>Kế hoạch dùng dữ liệu minh họa, chưa phải điểm rèn luyện được nhà trường xác nhận.</span><span class="dev-only font-mono text-amber-300">DEMO_ONLY · official_award_verified: false · SYNTHETIC-DEMO</span>
+            <!-- One concise disclosure for students; technical status is developer-only. -->
+            <div id="planDisclosure" class="px-3 py-2 rounded-xl bg-[#080d18] border border-slate-700/70 text-xs text-slate-400 flex flex-wrap items-center gap-2">
+              <span aria-hidden="true">ℹ</span>
+              <span><b class="text-slate-300">Bản đề xuất tham khảo.</b> Điểm chỉ được ghi nhận sau khi nhà trường xác nhận.</span><span class="dev-only font-mono text-amber-300">DEMO_ONLY · official_award_verified: false · SYNTHETIC-DEMO</span>
             </div>
 
             <!-- Stepper 3 Bước Hành Trình (Kế hoạch ban đầu -> Khi lịch thay đổi -> Khi bỏ hoạt động) -->
             <div id="planStepper" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5"></div>
+
+            <!-- Day 4: AI-assisted preference review. AI output is never sent
+                 to the planner until the student explicitly confirms it. -->
+            <section class="rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-4 lg:p-5 space-y-4" aria-labelledby="preferenceAssistantTitle">
+              <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
+                <div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h3 id="preferenceAssistantTitle" class="text-base font-extrabold text-white">Cá nhân hóa kế hoạch theo nguyện vọng</h3>
+                    <span id="preferenceAiHealth" class="px-2 py-0.5 rounded-full text-[10px] font-bold border border-slate-600 text-slate-400">Đang kiểm tra AI…</span>
+                  </div>
+                  <p class="text-xs text-slate-300 mt-1 max-w-3xl">Mô tả điều bạn ưu tiên bằng tiếng Việt. Yêu cầu rõ ràng được nhận diện tức thì; AI chỉ xử lý câu khó hoặc mơ hồ. Bạn luôn được kiểm tra và xác nhận trước khi xếp lịch.</p>
+                </div>
+                <span id="preferenceConfirmedBadge" class="hidden px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 shrink-0 transition-all duration-300">✓ Đã xác nhận</span>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-3 items-end">
+                <label class="block">
+                  <span class="text-xs font-bold text-slate-200 block mb-1.5">Nguyện vọng của bạn</span>
+                  <textarea id="preferenceText" rows="3" maxlength="2000" oninput="onPreferenceTextChanged()" class="w-full rounded-xl bg-[#080d18] border border-[#223046] px-3.5 py-3 text-sm text-white placeholder:text-slate-500 focus:border-indigo-500 outline-none resize-y" placeholder="Ví dụ: Em thích Toán và AI, ưu tiên hoạt động mục 4, thích học online; nếu trực tiếp thì ưu tiên cơ sở Nguyễn Văn Cừ. Tối đa 4 hoạt động."></textarea>
+                </label>
+                <button id="btnInterpretPreference" type="button" onclick="interpretPreference()" class="h-11 px-5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-bold transition">Phân tích nguyện vọng</button>
+              </div>
+
+              <div id="preferenceMessage" class="hidden rounded-xl border px-3.5 py-3 text-sm" role="status"></div>
+
+              <div id="preferenceReview" class="hidden rounded-xl bg-[#080d18] border border-[#223046] p-4 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h4 class="text-sm font-extrabold text-white">Kiểm tra kết quả AI</h4>
+                    <p class="text-xs text-amber-300 mt-0.5">Trọng số 1 = ít ưu tiên, 5 = rất ưu tiên. Hãy sửa hoặc xóa mục AI hiểu chưa đúng.</p>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <button id="btnDeleteSavedPreference" type="button" onclick="deleteSavedPreference()" class="hidden text-xs font-bold text-rose-400 hover:text-rose-300">Xóa nguyện vọng đã lưu</button>
+                    <button type="button" onclick="clearPreferenceDraft()" class="text-xs font-bold text-slate-400 hover:text-white">Làm lại</button>
+                  </div>
+                </div>
+                <div id="preferenceEditor" class="space-y-3"></div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <label class="text-xs text-slate-300">Tối đa hoạt động
+                    <input id="prefMaxActivities" type="number" min="1" max="20" onchange="updatePreferenceLimit('max_activities', this.value)" class="mt-1 w-full rounded-lg bg-[#0e1524] border border-[#223046] px-3 py-2 text-white" />
+                  </label>
+                  <label class="text-xs text-slate-300">Tổng thời lượng tối đa (phút)
+                    <input id="prefMaxDuration" type="number" min="30" max="10080" step="30" onchange="updatePreferenceLimit('max_duration_minutes', this.value)" class="mt-1 w-full rounded-lg bg-[#0e1524] border border-[#223046] px-3 py-2 text-white" />
+                  </label>
+                  <label class="text-xs text-slate-300">Chiến lược
+                    <select id="prefStrategy" onchange="updatePreferenceStrategy(this.value)" class="mt-1 w-full rounded-lg bg-[#0e1524] border border-[#223046] px-3 py-2 text-white">
+                      <option value="MINIMUM_EFFORT">Ít hoạt động / thời gian nhất</option>
+                      <option value="BALANCED">Cân bằng mục tiêu và sở thích</option>
+                      <option value="PREFERENCE_FIRST">Ưu tiên sở thích cao nhất</option>
+                    </select>
+                  </label>
+                </div>
+                <div id="confirmPreferenceRow" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl border border-[#223046] bg-[#0e1524] transition-all duration-200">
+                  <label id="confirmPreferenceLabel" class="flex items-start gap-2 text-xs text-slate-200 cursor-pointer">
+                    <input id="confirmPreferenceCheck" type="checkbox" onchange="updatePreferenceConfirmButton()" class="mt-0.5 rounded border-[#223046] text-indigo-600 focus:ring-indigo-500" />
+                    <span>Tôi đã kiểm tra và xác nhận các tiêu chí trên đúng với nguyện vọng của mình.<span id="confirmPreferenceHint" class="block mt-1 text-[11px] text-slate-500">Đánh dấu ô này để bật nút xác nhận.</span></span>
+                  </label>
+                  <button id="btnConfirmPreference" type="button" disabled onclick="confirmPreference()" class="px-4 py-2.5 rounded-xl bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-300 text-sm font-bold shrink-0 transition-all duration-200">Xác nhận để dùng khi xếp lịch</button>
+                </div>
+              </div>
+            </section>
 
             <!-- Horizontal Goal & Schedule Setting Bar -->
             <div class="bg-[#080d18] rounded-xl border border-[#1b2537] p-4 lg:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
@@ -935,6 +997,7 @@
               </div>
 
               <!-- What Changed / Next Step Card -->
+              <div id="planPersonalizationCard" class="hidden"></div>
               <div id="planChangeCard"></div>
 
               <!-- Full-Width Tabbed Details Container -->
@@ -1518,6 +1581,7 @@
       document.getElementById("headerAvatar").innerText = initials || "SV";
       resetForm();
       await syncScoresFromServer(st.student_id);
+      await loadConfirmedPreferenceForStudent(st.student_id);
     }
 
     async function syncProfileFromApi(mssv) {
@@ -1969,6 +2033,351 @@
       return intervals;
     }
 
+    // ---- Day 4: AI preference review and explicit confirmation ----
+    let preferenceDraft = null;
+    let confirmedPreference = null;
+    let activePlanPreference = null;
+    let persistedPreferenceVersion = null;
+
+    const PREF_GROUPS = [
+      { field: 'topic_preferences', key: 'topic_id', label: 'Chủ đề' },
+      { field: 'category_priorities', key: 'category_id', label: 'Mục ĐRL' },
+      { field: 'campus_preferences', key: 'campus_id', label: 'Cơ sở' },
+      { field: 'mode_preferences', key: 'mode', label: 'Hình thức' },
+      { field: 'time_preferences', key: 'time_slot', label: 'Thời gian' }
+    ];
+    const PREF_LABELS = {
+      mathematics: 'Toán học', artificial_intelligence: 'Trí tuệ nhân tạo', technology: 'Công nghệ',
+      research: 'Nghiên cứu', soft_skills: 'Kỹ năng mềm', career: 'Nghề nghiệp', volunteer: 'Tình nguyện',
+      environment: 'Môi trường', culture: 'Văn hóa', sports: 'Thể thao', health: 'Sức khỏe',
+      safety: 'An toàn', civic_education: 'Giáo dục công dân', NVC: 'Nguyễn Văn Cừ',
+      DONG_HOA: 'Đông Hòa', ONLINE: 'Trực tuyến', OTHER: 'Cơ sở khác', online: 'Online',
+      offline: 'Trực tiếp', hybrid: 'Kết hợp', weekday_morning: 'Sáng ngày thường',
+      weekday_afternoon: 'Chiều ngày thường', weekday_evening: 'Tối ngày thường',
+      weekend_morning: 'Sáng cuối tuần', weekend_afternoon: 'Chiều cuối tuần', weekend_evening: 'Tối cuối tuần',
+      C1: 'Mục 1', C2: 'Mục 2', C3: 'Mục 3', C4: 'Mục 4', C5: 'Mục 5'
+    };
+
+    function showPreferenceMessage(message, kind = 'info') {
+      const el = document.getElementById('preferenceMessage');
+      if (!el) return;
+      el.classList.remove('hidden');
+      el.className = kind === 'error'
+        ? 'rounded-xl border border-rose-500/40 bg-rose-950/40 px-3.5 py-3 text-sm text-rose-300'
+        : kind === 'success'
+          ? 'rounded-xl border border-emerald-500/40 bg-emerald-950/40 px-3.5 py-3 text-sm text-emerald-300'
+          : 'rounded-xl border border-indigo-500/40 bg-indigo-950/40 px-3.5 py-3 text-sm text-indigo-200';
+      el.textContent = message;
+    }
+
+    async function checkPreferenceAIHealth() {
+      const badge = document.getElementById('preferenceAiHealth');
+      if (!badge) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/preferences/ai-health`);
+        const data = await res.json();
+        if (data.available) {
+          badge.textContent = `AI sẵn sàng · ${data.model || 'Ollama'}`;
+          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-500/40 bg-emerald-950/50 text-emerald-300';
+          return;
+        }
+        badge.textContent = 'AI chưa sẵn sàng';
+      } catch (_) {
+        badge.textContent = 'Không kết nối được AI';
+      }
+      badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold border border-amber-500/40 bg-amber-950/50 text-amber-300';
+    }
+
+    function onPreferenceTextChanged() {
+      if (!preferenceDraft && !confirmedPreference) return;
+      markPreferenceUnconfirmed();
+      showPreferenceMessage('Nội dung đã thay đổi. Hãy bấm “Phân tích nguyện vọng” để cập nhật lại tiêu chí.');
+    }
+
+    async function interpretPreference() {
+      const textBox = document.getElementById('preferenceText');
+      const btn = document.getElementById('btnInterpretPreference');
+      const text = (textBox?.value || '').trim();
+      if (!text) {
+        showPreferenceMessage('Hãy nhập nguyện vọng trước khi yêu cầu AI phân tích.', 'error');
+        textBox?.focus();
+        return;
+      }
+      if (btn) { btn.disabled = true; btn.textContent = 'Đang phân tích…'; }
+      const startedAt = performance.now();
+      showPreferenceMessage('Đang nhận diện tiêu chí…');
+      const progressTimer = window.setInterval(() => {
+        const elapsed = Math.max(1, Math.floor((performance.now() - startedAt) / 1000));
+        showPreferenceMessage(`AI đang xử lý câu phức tạp… ${elapsed} giây. Bạn vẫn có thể xem các phần khác trong lúc chờ.`);
+      }, 1000);
+      try {
+        const res = await fetch(`${API_BASE}/api/preferences/interpret`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const detail = data.detail || {};
+          throw new Error(detail.message || (typeof detail === 'string' ? detail : `Máy chủ phản hồi mã ${res.status}`));
+        }
+        preferenceDraft = JSON.parse(JSON.stringify(data.preference));
+        confirmedPreference = null;
+        renderPreferenceEditor();
+        document.getElementById('preferenceReview')?.classList.remove('hidden');
+        const seconds = Math.max(0, Number(data.processing_ms || 0) / 1000);
+        const timing = data.method === 'FAST_RULES'
+          ? 'Đã nhận diện yêu cầu rõ ràng gần như tức thì, không cần chờ AI.'
+          : data.cached
+            ? 'Kết quả AI giống lần phân tích trước nên được mở gần như tức thì.'
+            : `AI hoàn tất sau ${seconds.toFixed(1)} giây.`;
+        showPreferenceMessage(`${timing} Hãy kiểm tra từng tiêu chí rồi xác nhận.`, 'success');
+      } catch (err) {
+        showPreferenceMessage(err.message || 'Không thể phân tích nguyện vọng.', 'error');
+        await checkPreferenceAIHealth();
+      } finally {
+        window.clearInterval(progressTimer);
+        if (btn) { btn.disabled = false; btn.textContent = 'Phân tích nguyện vọng'; }
+      }
+    }
+
+    function renderPreferenceEditor() {
+      if (!preferenceDraft) return;
+      const editor = document.getElementById('preferenceEditor');
+      if (!editor) return;
+      const weightOptions = selected => [1, 2, 3, 4, 5].map(n => `<option value="${n}" ${n === selected ? 'selected' : ''}>${n}</option>`).join('');
+      const groups = PREF_GROUPS.map(group => {
+        const rows = preferenceDraft[group.field] || [];
+        const body = rows.length ? rows.map((item, index) => `
+          <div class="flex items-center gap-2 rounded-lg bg-[#0e1524] border border-[#223046] px-3 py-2">
+            <span class="text-xs text-slate-200 flex-1">${escapeHTML(PREF_LABELS[item[group.key]] || item[group.key])}</span>
+            <label class="text-[10px] text-slate-500">Ưu tiên
+              <select onchange="updatePreferenceWeight('${group.field}', ${index}, this.value)" class="ml-1 rounded bg-[#080d18] border border-[#223046] px-1.5 py-1 text-xs text-white">${weightOptions(item.weight)}</select>
+            </label>
+            <button type="button" onclick="removePreferenceItem('${group.field}', ${index})" aria-label="Xóa tiêu chí" class="text-slate-500 hover:text-rose-400 text-lg leading-none">×</button>
+          </div>`).join('') : '<div class="text-xs text-slate-500 italic">Không nêu ưu tiên</div>';
+        return `<div><div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">${group.label}</div><div class="grid grid-cols-1 md:grid-cols-2 gap-2">${body}</div></div>`;
+      }).join('');
+      const exclusions = preferenceDraft.hard_exclusions || { campus_ids: [], modes: [], time_slots: [] };
+      const exclusionItems = [
+        ...exclusions.campus_ids.map((value, index) => ({ field: 'campus_ids', value, index })),
+        ...exclusions.modes.map((value, index) => ({ field: 'modes', value, index })),
+        ...exclusions.time_slots.map((value, index) => ({ field: 'time_slots', value, index }))
+      ];
+      const hardHtml = exclusionItems.length
+        ? exclusionItems.map(item => `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-rose-950/40 border border-rose-500/30 text-xs text-rose-300">Không thể: ${escapeHTML(PREF_LABELS[item.value] || item.value)}<button type="button" onclick="removeHardExclusion('${item.field}', ${item.index})" class="hover:text-white">×</button></span>`).join(' ')
+        : '<span class="text-xs text-slate-500 italic">Không có điều kiện loại trừ bắt buộc</span>';
+      editor.innerHTML = groups + `<div><div class="text-[11px] font-bold uppercase tracking-wider text-rose-300 mb-1.5">Điều kiện không thể tham gia</div><div class="flex flex-wrap gap-2">${hardHtml}</div></div>`;
+      const limits = preferenceDraft.limits || {};
+      document.getElementById('prefMaxActivities').value = limits.max_activities ?? '';
+      document.getElementById('prefMaxDuration').value = limits.max_duration_minutes ?? '';
+      document.getElementById('prefStrategy').value = preferenceDraft.strategy || 'BALANCED';
+      markPreferenceUnconfirmed();
+    }
+
+    function markPreferenceUnconfirmed() {
+      confirmedPreference = null;
+      const check = document.getElementById('confirmPreferenceCheck');
+      if (check) { check.checked = false; check.disabled = false; }
+      updatePreferenceConfirmButton();
+      markPlanStale();
+    }
+
+    function updatePreferenceWeight(field, index, value) {
+      if (!preferenceDraft?.[field]?.[index]) return;
+      preferenceDraft[field][index].weight = Math.max(1, Math.min(5, Number(value)));
+      markPreferenceUnconfirmed();
+    }
+
+    function removePreferenceItem(field, index) {
+      preferenceDraft?.[field]?.splice(index, 1);
+      renderPreferenceEditor();
+    }
+
+    function removeHardExclusion(field, index) {
+      preferenceDraft?.hard_exclusions?.[field]?.splice(index, 1);
+      renderPreferenceEditor();
+    }
+
+    function updatePreferenceLimit(field, value) {
+      if (!preferenceDraft) return;
+      preferenceDraft.limits[field] = value === '' ? null : Number(value);
+      markPreferenceUnconfirmed();
+    }
+
+    function updatePreferenceStrategy(value) {
+      if (!preferenceDraft) return;
+      preferenceDraft.strategy = value;
+      markPreferenceUnconfirmed();
+    }
+
+    function updatePreferenceConfirmButton() {
+      const btn = document.getElementById('btnConfirmPreference');
+      const check = document.getElementById('confirmPreferenceCheck');
+      const row = document.getElementById('confirmPreferenceRow');
+      const label = document.getElementById('confirmPreferenceLabel');
+      const hint = document.getElementById('confirmPreferenceHint');
+      const badge = document.getElementById('preferenceConfirmedBadge');
+      const checked = document.getElementById('confirmPreferenceCheck')?.checked;
+      const confirmed = Boolean(confirmedPreference);
+      const ready = Boolean(preferenceDraft && checked && !confirmed);
+
+      if (check) check.disabled = confirmed;
+      row?.classList.toggle('border-emerald-500/60', ready || confirmed);
+      row?.classList.toggle('bg-emerald-950/30', ready || confirmed);
+      row?.classList.toggle('ring-2', confirmed);
+      row?.classList.toggle('ring-emerald-500/20', confirmed);
+      label?.classList.toggle('text-emerald-200', ready || confirmed);
+      label?.classList.toggle('text-slate-200', !ready && !confirmed);
+
+      if (hint) {
+        hint.textContent = confirmed
+          ? 'Tiêu chí này sẽ được dùng cho lần xếp lịch tiếp theo.'
+          : (ready ? 'Sẵn sàng — bấm nút xanh để hoàn tất xác nhận.' : 'Đánh dấu ô này để bật nút xác nhận.');
+        hint.className = confirmed || ready
+          ? 'block mt-1 text-[11px] font-semibold text-emerald-300'
+          : 'block mt-1 text-[11px] text-slate-500';
+      }
+
+      if (badge) {
+        badge.classList.toggle('hidden', !confirmed);
+      }
+      if (btn) {
+        btn.disabled = !ready;
+        btn.textContent = confirmed ? '✓ Đã xác nhận' : 'Xác nhận để dùng khi xếp lịch';
+        btn.className = confirmed
+          ? 'px-4 py-2.5 rounded-xl bg-emerald-950/70 border border-emerald-500/60 text-emerald-300 text-sm font-extrabold shrink-0 cursor-default transition-all duration-200'
+          : ready
+            ? 'px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-extrabold shrink-0 shadow-lg shadow-emerald-600/30 hover:scale-[1.02] active:scale-95 transition-all duration-200'
+            : 'px-4 py-2.5 rounded-xl bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-300 text-sm font-bold shrink-0 transition-all duration-200';
+      }
+    }
+
+    async function confirmPreference() {
+      if (!preferenceDraft || !document.getElementById('confirmPreferenceCheck')?.checked) return;
+      confirmedPreference = JSON.parse(JSON.stringify(preferenceDraft));
+      updatePreferenceConfirmButton();
+      const badge = document.getElementById('preferenceConfirmedBadge');
+      badge?.classList.add('scale-110', 'ring-2', 'ring-emerald-400/40');
+      window.setTimeout(() => badge?.classList.remove('scale-110', 'ring-2', 'ring-emerald-400/40'), 350);
+      const confirmBtn = document.getElementById('btnConfirmPreference');
+      const studentId = currentStudent?.student_id;
+      let persisted = false;
+      if (studentId) {
+        try {
+          if (confirmBtn) { confirmBtn.textContent = '✓ Đã xác nhận · đang lưu…'; confirmBtn.classList.add('animate-pulse'); }
+          const res = await fetch(`${API_BASE}/api/preferences/confirmed`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              student_id: studentId,
+              confirmed: true,
+              preference: confirmedPreference,
+              source_text: (document.getElementById('preferenceText')?.value || '').trim() || null
+            })
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          persistedPreferenceVersion = data.confirmed_preference?.preference_version || null;
+          document.getElementById('btnDeleteSavedPreference')?.classList.remove('hidden');
+          persisted = true;
+        } catch (err) {
+          console.warn('Could not persist confirmed preference:', err);
+        }
+      }
+      confirmBtn?.classList.remove('animate-pulse');
+      updatePreferenceConfirmButton();
+      showPreferenceMessage(
+        persisted
+          ? 'Đã xác nhận và lưu cho sinh viên hiện tại. Kế hoạch tiếp theo sẽ dùng các tiêu chí này.'
+          : '✓ Đã xác nhận cho phiên hiện tại. Máy chủ chưa lưu được, nhưng bạn vẫn có thể xếp lịch ngay.',
+        'success'
+      );
+      setPlanButtonLabel('Lập kế hoạch cá nhân hóa');
+      markPlanStale();
+    }
+
+    function clearPreferenceDraft() {
+      preferenceDraft = null;
+      confirmedPreference = null;
+      document.getElementById('preferenceReview')?.classList.add('hidden');
+      document.getElementById('preferenceConfirmedBadge')?.classList.add('hidden');
+      document.getElementById('preferenceMessage')?.classList.add('hidden');
+      const box = document.getElementById('preferenceText');
+      if (box) box.value = '';
+      markPlanStale();
+    }
+
+    async function deleteSavedPreference() {
+      const studentId = currentStudent?.student_id;
+      if (!studentId) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/preferences/confirmed?student_id=${encodeURIComponent(studentId)}`, {
+          method: 'DELETE'
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        persistedPreferenceVersion = null;
+        document.getElementById('btnDeleteSavedPreference')?.classList.add('hidden');
+        clearPreferenceDraft();
+        showPreferenceMessage('Đã xóa nguyện vọng đã lưu của sinh viên này.', 'success');
+      } catch (err) {
+        showPreferenceMessage('Không thể xóa nguyện vọng đã lưu. Vui lòng thử lại.', 'error');
+      }
+    }
+
+    async function loadConfirmedPreferenceForStudent(studentId) {
+      preferenceDraft = null;
+      confirmedPreference = null;
+      activePlanPreference = null;
+      persistedPreferenceVersion = null;
+      planStages.first = null;
+      planStages.replan = null;
+      planStages.whatif = null;
+      currentPlannerData = null;
+      currentPlanStage = 'first';
+      showPlanPanels('empty');
+      setPlanButtonLabel('Lập kế hoạch đề xuất');
+      document.getElementById('preferenceReview')?.classList.add('hidden');
+      document.getElementById('preferenceConfirmedBadge')?.classList.add('hidden');
+      document.getElementById('btnDeleteSavedPreference')?.classList.add('hidden');
+      document.getElementById('preferenceMessage')?.classList.add('hidden');
+      const textBox = document.getElementById('preferenceText');
+      if (textBox) textBox.value = '';
+      try {
+        const res = await fetch(`${API_BASE}/api/preferences/confirmed?student_id=${encodeURIComponent(studentId)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const stored = data.confirmed_preference;
+        if (!stored?.preference) return;
+        preferenceDraft = JSON.parse(JSON.stringify(stored.preference));
+        if (textBox) textBox.value = stored.source_text || '';
+        renderPreferenceEditor();
+        confirmedPreference = JSON.parse(JSON.stringify(stored.preference));
+        persistedPreferenceVersion = stored.preference_version || null;
+        const check = document.getElementById('confirmPreferenceCheck');
+        if (check) check.checked = true;
+        document.getElementById('preferenceReview')?.classList.remove('hidden');
+        document.getElementById('preferenceConfirmedBadge')?.classList.remove('hidden');
+        document.getElementById('btnDeleteSavedPreference')?.classList.remove('hidden');
+        updatePreferenceConfirmButton();
+        showPreferenceMessage('Đã tải nguyện vọng bạn xác nhận trước đó cho sinh viên này.', 'success');
+      } catch (err) {
+        console.warn('Could not load confirmed preference:', err);
+      }
+    }
+
+    async function fetchPersonalizedSp3Plan(scenario, targetTotal, busyIntervals, preference) {
+      const res = await fetch(`${API_BASE}/api/sp3/personalized/plan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmed: true, preference, scenario, total_target: targetTotal, busy_intervals: busyIntervals })
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        const detail = errData.detail;
+        throw new Error(typeof detail === 'string' ? detail : `Không thể lập kế hoạch cá nhân hóa (mã ${res.status})`);
+      }
+      return res.json();
+    }
+
     async function fetchSp3Plan(scenario, targetTotal, busyIntervals) {
       const res = await fetch(`${API_BASE}/api/sp3/demo/plan`, {
         method: 'POST',
@@ -2012,6 +2421,13 @@
       const targetTotal = isNaN(rawTarget) ? 80 : Math.max(0, Math.min(100, rawTarget));
       const busyIntervals = collectBusyIntervals();
 
+      const hasPreferenceText = Boolean((document.getElementById('preferenceText')?.value || '').trim());
+      if (hasPreferenceText && !confirmedPreference) {
+        showPreferenceMessage('Bạn đã nhập nguyện vọng nhưng chưa xác nhận. Hãy phân tích, kiểm tra và xác nhận trước khi xếp lịch.', 'error');
+        document.getElementById('preferenceAssistantTitle')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
       const loadingText = document.getElementById('plannerLoadingText');
       if (loadingText) loadingText.innerText = 'Đang tối ưu lộ trình đề xuất...';
       showPlanPanels('loading');
@@ -2019,13 +2435,16 @@
       setPlanButtonLabel('Đang tối ưu lộ trình...');
 
       try {
-        const data = await fetchSp3Plan('first_plan', targetTotal, busyIntervals);
+        const data = confirmedPreference
+          ? await fetchPersonalizedSp3Plan('first_plan', targetTotal, busyIntervals, confirmedPreference)
+          : await fetchSp3Plan('first_plan', targetTotal, busyIntervals);
         planStages.first = data;
         planStages.replan = null;
         planStages.whatif = null;
         currentPlannerData = data;
         currentPlanStage = 'first';
         currentPlanTab = 'selected';
+        activePlanPreference = confirmedPreference ? JSON.parse(JSON.stringify(confirmedPreference)) : null;
         planInputsDirty = false;
         planStageError = '';
         renderSp3PlanResult();
@@ -2034,7 +2453,9 @@
         showPlanError(err.message);
       } finally {
         if (btn) btn.disabled = false;
-        setPlanButtonLabel(planStages.first ? (planInputsDirty ? 'Cập nhật kế hoạch' : 'Lập lại kế hoạch') : 'Lập kế hoạch đề xuất');
+        setPlanButtonLabel(planStages.first
+          ? (planInputsDirty ? 'Cập nhật kế hoạch' : (confirmedPreference ? 'Lập lại kế hoạch cá nhân hóa' : 'Lập lại kế hoạch'))
+          : (confirmedPreference ? 'Lập kế hoạch cá nhân hóa' : 'Lập kế hoạch đề xuất'));
       }
     }
 
@@ -2053,7 +2474,10 @@
         showPlanPanels('loading');
         try {
           const target = planStages.first.requested_total_target ?? 80;
-          planStages[stage] = await fetchSp3Plan(stage === 'replan' ? 'replan' : 'what_if_skip', target, []);
+          const scenario = stage === 'replan' ? 'replan' : 'what_if_skip';
+          planStages[stage] = activePlanPreference
+            ? await fetchPersonalizedSp3Plan(scenario, target, [], activePlanPreference)
+            : await fetchSp3Plan(scenario, target, []);
         } catch (err) {
           console.error('SP3 stage error:', err);
           planStageError = err.message;
@@ -2174,6 +2598,39 @@
             </span>
           </button>`;
       }).join('');
+    }
+
+    function renderPlanPersonalizationCard(data, titles) {
+      const el = document.getElementById('planPersonalizationCard');
+      if (!el) return;
+      const personalization = data.personalization;
+      if (!personalization) {
+        el.classList.add('hidden');
+        el.innerHTML = '';
+        return;
+      }
+      const dimensionLabels = { topic: 'Chủ đề', category: 'Mục ĐRL', campus: 'Cơ sở', mode: 'Hình thức', time: 'Thời gian' };
+      const rows = (personalization.selected_breakdown || []).map(item => {
+        const matches = (item.matches || []).length
+          ? item.matches.map(match => `<span class="inline-flex px-2 py-0.5 rounded-md bg-indigo-950/60 border border-indigo-500/30 text-[11px] text-indigo-200">${escapeHTML(dimensionLabels[match.dimension] || match.dimension)}: ${escapeHTML(PREF_LABELS[match.value] || match.value)} · +${match.weight}</span>`).join(' ')
+          : '<span class="text-xs text-slate-500">Hoạt động này được chọn để bảo đảm mục tiêu điểm và lịch khả thi.</span>';
+        return `<div class="p-3 rounded-xl bg-[#080d18] border border-[#223046] flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+          <div class="min-w-0 md:w-1/3"><div class="text-sm font-bold text-white">${escapeHTML(titles[item.activity_id] || item.activity_id)}</div><div class="text-xs text-emerald-300 font-bold mt-0.5">Độ phù hợp: ${item.utility} điểm</div></div>
+          <div class="flex flex-wrap gap-1.5 flex-1">${matches}</div>
+        </div>`;
+      }).join('');
+      const hardCount = (personalization.hard_excluded || []).length;
+      const unknownFees = personalization.unknown_fee_activity_ids || [];
+      el.classList.remove('hidden');
+      el.innerHTML = `<div class="bg-[#0e1524] rounded-2xl border border-emerald-500/30 shadow-xl p-5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div><h4 class="text-base font-extrabold text-white">Vì sao kế hoạch này phù hợp với bạn?</h4><p class="text-xs text-slate-300 mt-1">Thuật toán tất định đã dùng nguyện vọng bạn xác nhận; AI không trực tiếp chọn hoạt động.</p></div>
+          <span class="px-2.5 py-1 rounded-lg bg-emerald-950/50 border border-emerald-500/40 text-xs font-bold text-emerald-300">Tổng phù hợp: ${personalization.total_utility} · ${escapeHTML(personalization.strategy)}</span>
+        </div>
+        <div class="space-y-2">${rows || '<div class="text-sm text-slate-400">Không có hoạt động được chọn.</div>'}</div>
+        ${hardCount ? `<div class="text-xs text-rose-300">Đã loại ${hardCount} hoạt động do vi phạm điều kiện “không thể tham gia”.</div>` : ''}
+        ${unknownFees.length ? `<div class="text-xs text-amber-300">${unknownFees.length} hoạt động chưa có dữ liệu lệ phí nên hệ thống chưa thể xác minh giới hạn chi phí cho các hoạt động đó.</div>` : ''}
+      </div>`;
     }
 
     function renderPlanChangeCard(data, prevData, titles) {
@@ -2322,6 +2779,7 @@
       if (stale) stale.classList.toggle('hidden', !planInputsDirty);
 
       renderPlanStepper();
+      renderPlanPersonalizationCard(data, titles);
 
       // Summary header
       const met = plan.status === 'TARGET_MET';
@@ -2389,12 +2847,14 @@
         .filter(x => x.text || isDev);
 
       // Tab bar
+      const showNotesTab = isDev || visibleWarnings.length > 0 || excluded.length > 0;
+      if (!showNotesTab && currentPlanTab === 'notes') currentPlanTab = 'selected';
       const tabs = [
         ['selected', 'Lộ trình đề xuất', acts.length],
         ['avail', 'Khung giờ rảnh', availIntervals.length],
-        ['cand', 'Kiểm tra khả thi', `${feasOk}/${feasCandidates.length}`],
-        ['notes', 'Lưu ý & chưa xếp lịch', visibleWarnings.length + excluded.length]
+        ['cand', 'Kiểm tra khả thi', `${feasOk}/${feasCandidates.length}`]
       ];
+      if (showNotesTab) tabs.push(['notes', 'Chưa được chọn', visibleWarnings.length + excluded.length]);
       const tabBar = document.getElementById('planTabBar');
       if (tabBar) {
         tabBar.innerHTML = tabs.map(([key, label, count]) => {
@@ -2551,7 +3011,7 @@
       const panelNotes = document.getElementById('planPanelNotes');
       if (panelNotes) {
         const warnHtml = visibleWarnings.length === 0
-          ? `<div class="text-sm text-slate-400">Không có lưu ý nào.</div>`
+          ? `<div class="text-sm text-slate-400">Không có thông tin bổ sung.</div>`
           : visibleWarnings.map(({ w, text }) => `
               <div class="flex items-start gap-2 text-sm text-amber-200 bg-amber-950/40 p-3 rounded-xl border border-amber-500/30">
                 <span class="mt-0.5">⚠️</span>
@@ -2566,11 +3026,11 @@
               </div>`).join('');
         panelNotes.innerHTML = `
           <div class="space-y-2">
-            <h5 class="text-sm font-extrabold text-white">Lưu ý <span class="dev-only font-mono text-xs text-slate-500 font-normal">(plan.warnings)</span></h5>
+            <h5 class="text-sm font-extrabold text-white">Điều cần biết <span class="dev-only font-mono text-xs text-slate-500 font-normal">(plan.warnings)</span></h5>
             ${warnHtml}
           </div>
           <div class="space-y-2">
-            <h5 class="text-sm font-extrabold text-white">Hoạt động chưa được xếp lịch <span class="dev-only font-mono text-xs text-slate-500 font-normal">(plan.excluded_candidates)</span></h5>
+            <h5 class="text-sm font-extrabold text-white">Hoạt động chưa được chọn <span class="dev-only font-mono text-xs text-slate-500 font-normal">(plan.excluded_candidates)</span></h5>
             ${exclHtml}
           </div>`;
       }
@@ -3238,6 +3698,7 @@
       renderCategoryBars(studentCategoryScores);
       updateResetBaselineButton();
       await checkBackendHealth();
+      await checkPreferenceAIHealth();
       await loadE2ECasesFromApi();
       await loadActivitiesFromApi();
 
