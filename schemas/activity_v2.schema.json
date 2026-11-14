@@ -1,0 +1,467 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "activity_v2.schema.json",
+  "title": "SP1 normalised activity",
+  "x-schema-version": "2.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "activity_id",
+    "source",
+    "post_type",
+    "drl_recognized",
+    "title",
+    "domain",
+    "multi_session",
+    "mode",
+    "window",
+    "duration_minutes",
+    "duration_source",
+    "registration_deadline",
+    "location",
+    "campus",
+    "audience",
+    "mandatory",
+    "recognition_stated",
+    "points_announced",
+    "fee",
+    "registration_url",
+    "join_url",
+    "completion_requirements",
+    "semester_by_program",
+    "meta"
+  ],
+  "properties": {
+    "activity_id": {
+      "type": "string",
+      "pattern": "^TMP-[0-9a-f]{8}-01$"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "post_id",
+        "URL_post",
+        "publisher",
+        "platform",
+        "date_posted"
+      ],
+      "properties": {
+        "post_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "URL_post": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1
+        },
+        "date_posted": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "post_type": {
+      "enum": [
+        "activity",
+        "info_only",
+        "insufficient",
+        null
+      ]
+    },
+    "drl_recognized": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "domain": {
+      "enum": [
+        "academic",
+        "volunteer",
+        "culture_sports",
+        "skills",
+        "career",
+        "other",
+        null
+      ]
+    },
+    "multi_session": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "online",
+        "offline",
+        "hybrid",
+        null
+      ]
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "open",
+        "close"
+      ],
+      "properties": {
+        "open": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\+07:00$"
+        },
+        "close": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\+07:00$"
+        }
+      }
+    },
+    "duration_minutes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "duration_source": {
+      "enum": [
+        "stated",
+        "window_span",
+        "default_offline_2h",
+        "default_quiz_30m",
+        "default_online_30m",
+        "unsupported",
+        "unknown"
+      ]
+    },
+    "registration_deadline": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\+07:00$"
+    },
+    "location": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "campus": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "CS1",
+          "CS2",
+          "Other"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "audience": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "cohorts",
+        "programs",
+        "all_students"
+      ],
+      "properties": {
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "cohorts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^K[0-9]{2}$"
+          },
+          "uniqueItems": true
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "standard",
+              "high_quality"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "all_students": {
+          "type": "boolean"
+        }
+      }
+    },
+    "mandatory": {
+      "type": "boolean"
+    },
+    "recognition_stated": {
+      "enum": [
+        true,
+        null
+      ]
+    },
+    "points_announced": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "fee": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "const": 0
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "amount_vnd",
+            "per",
+            "deposit"
+          ],
+          "properties": {
+            "amount_vnd": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "per": {
+              "enum": [
+                "person",
+                "team",
+                "unknown"
+              ]
+            },
+            "deposit": {
+              "type": "boolean"
+            }
+          }
+        }
+      ]
+    },
+    "registration_url": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "join_url": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "completion_requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "threshold",
+          "unit",
+          "deadline"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "check_in",
+              "check_out",
+              "quiz",
+              "form",
+              "proof_upload",
+              "min_duration",
+              "other"
+            ]
+          },
+          "threshold": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1
+          },
+          "deadline": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\+07:00$"
+          }
+        }
+      }
+    },
+    "semester_by_program": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "standard",
+        "high_quality"
+      ],
+      "properties": {
+        "standard": {
+          "type": "string",
+          "minLength": 1
+        },
+        "high_quality": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "flags",
+        "derived",
+        "unsupported",
+        "time_defaults",
+        "year_inferred",
+        "normalizer_version",
+        "config_versions"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "valid",
+            "partial",
+            "failed"
+          ]
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "derived": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^.+$": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "unsupported": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "time_defaults": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^.+$": {
+              "enum": [
+                "date_only_0000",
+                "date_only_2359"
+              ]
+            }
+          }
+        },
+        "year_inferred": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "normalizer_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "config_versions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "semesters",
+            "campus"
+          ],
+          "properties": {
+            "semesters": {
+              "type": "string",
+              "minLength": 1
+            },
+            "campus": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  },
+  "if": {
+    "properties": {
+      "mode": {
+        "const": "online"
+      }
+    }
+  },
+  "then": {
+    "properties": {
+      "location": {
+        "type": "null"
+      },
+      "campus": {
+        "maxItems": 0
+      }
+    }
+  }
+}

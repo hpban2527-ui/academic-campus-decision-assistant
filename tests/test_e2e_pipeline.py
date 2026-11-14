@@ -59,7 +59,7 @@ def test_backend_loads_real_team_data_and_exposes_rule_audit():
     info = response.json()
     assert info["status"] == "healthy"
     assert info["regulation"] == "1028/QD-KHTN-CTSV"
-    assert info["total_rules"] == 75
+    assert info["total_rules"] == 76  # 75 + R2301 (criterion 2.3, STSV2025)
     assert info["total_activities"] >= 20
 
 

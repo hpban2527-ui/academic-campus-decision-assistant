@@ -55,3 +55,33 @@ def test_year_from_posted_date():
 def test_range_across_new_year():
     r = parse_range("từ 30/12 đến 02/01/2027")
     assert (r.start, r.end) == ("2026-12-30T00:00:00+07:00", "2027-01-02T23:59:00+07:00")
+
+
+# Synthetic regression cases for same-month day ranges (bug found in the 2026-11-14 manual check).
+@pytest.mark.parametrize(("span", "start", "end"), [
+    ("Hội nghị diễn ra 3 ngày (06-08/11/2026) tại trường", "2026-11-06T00:00:00+07:00", "2026-11-08T23:59:00+07:00"),
+    ("Nộp hồ sơ: 05–08/10/2026.", "2026-10-05T00:00:00+07:00", "2026-10-08T23:59:00+07:00"),
+    ("Tập huấn dự kiến 15 - 20/10/2026", "2026-10-15T00:00:00+07:00", "2026-10-20T23:59:00+07:00"),
+])
+def test_same_month_day_range(span, start, end):
+    result = parse_range(span)
+    assert (result.start, result.end) == (start, end)
+
+
+def test_day_range_point_first_and_last():
+    assert parse_point("06-08/11/2026", pick="first").value == "2026-11-06T00:00:00+07:00"
+    assert parse_point("06-08/11/2026").value == "2026-11-08T23:59:00+07:00"
+
+
+def test_non_ranges_unchanged():
+    # A time range before a date and a dd-mm-yyyy date are not day ranges.
+    result = parse_range("14h00-16h00, 06/11/2026")
+    assert (result.start, result.end) == ("2026-11-06T14:00:00+07:00", "2026-11-06T16:00:00+07:00")
+    assert parse_range("ngày 06-08-2026").start == "2026-08-06T00:00:00+07:00"
+    assert parse_range("from 08/11 to 06/12/2026").start.startswith("2026-11-08")
+
+
+def test_g_time_range_is_not_a_date():
+    # "7g30 - 11g00" was read as 30/11 (bug found in the 2026-11-14 after-fix check, pool post).
+    result = parse_range("7g30 - 11g00 (Sáng), Thứ Tư, Ngày 28/10/2026")
+    assert (result.start, result.end) == ("2026-10-28T07:30:00+07:00", "2026-10-28T11:00:00+07:00")

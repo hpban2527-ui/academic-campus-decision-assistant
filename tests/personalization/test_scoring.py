@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 from personalization.models import StudentPreference
 from personalization.scoring import ActivityFeatures, PreferenceUtilityEngine
 
@@ -70,3 +72,27 @@ def test_set_utility_uses_sp2_contribution_category(valid_preference_payload):
     )
 
     assert utility == 5.0
+
+
+def test_undetermined_campus_is_excluded_only_when_a_campus_is_impossible(valid_preference_payload):
+    payload = deepcopy(valid_preference_payload)
+    payload["campus_preferences"] = []
+    payload["hard_exclusions"]["campus_ids"] = ["DONG_HOA"]
+    with_exclusion = PreferenceUtilityEngine(
+        StudentPreference.model_validate(payload),
+        {"A": ActivityFeatures(frozenset(), None, frozenset()),
+         "B": ActivityFeatures(frozenset(), None, frozenset()),
+         "C": ActivityFeatures(frozenset(), "NVC", frozenset())},
+        {"A": {"mode": "offline", "fee": 0}, "B": {"mode": "online", "fee": 0}, "C": {"mode": "offline", "fee": 0}},
+    )
+    assert with_exclusion.hard_exclusion_reasons("A") == ["campus:unknown"]   # venue unknown, could be DONG_HOA
+    assert with_exclusion.hard_exclusion_reasons("B") == []                   # online: no campus to avoid
+    assert with_exclusion.hard_exclusion_reasons("C") == []                   # known other campus
+
+    payload["hard_exclusions"]["campus_ids"] = []
+    without = PreferenceUtilityEngine(
+        StudentPreference.model_validate(payload),
+        {"A": ActivityFeatures(frozenset(), None, frozenset())},
+        {"A": {"mode": "offline", "fee": 0}},
+    )
+    assert without.hard_exclusion_reasons("A") == []        # a mere preference never bans an activity

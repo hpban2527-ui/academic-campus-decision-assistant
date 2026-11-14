@@ -1,0 +1,112 @@
+[
+  {
+    "position": 3,
+    "post_id": "pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl",
+    "reasons": [
+      "not_an_activity",
+      "missing_mode"
+    ]
+  },
+  {
+    "position": 5,
+    "post_id": "pfbid02fsjfr4MEtTjN9TpVw3DvfWumQm7Wx2GGE56n7J51Y8sh4brg3p4k1uwhX41h26FFl",
+    "reasons": [
+      "not_an_activity",
+      "failed_status"
+    ]
+  },
+  {
+    "position": 14,
+    "post_id": "pfbid02buju6UWyad8k9Z4xH1tR5eNwpWsuaZtnwfesY2o8UQzdFh3p7cHemVx24dkaHSdFl",
+    "reasons": [
+      "missing_mode"
+    ]
+  },
+  {
+    "position": 39,
+    "post_id": "pfbid0DXgKFVRwCk3ET9QdYjio3E2o1M2G7UaYuxHF89GhYEpdwpSyTsDf65iNNFXx4jEAl",
+    "reasons": [
+      "missing_mode"
+    ]
+  },
+  {
+    "position": 61,
+    "post_id": "pfbid02yCG328qNfLc5QHP3fZtx3HtdPKijcrpjiGGdLHSSY8BbAAJyAPkfrWYzQrUtr4kBl",
+    "reasons": [
+      "missing_mode"
+    ]
+  },
+  {
+    "position": 62,
+    "post_id": "pfbid0dREAKyPjGZpJ4B7vYsjwWF2QweiZPuUroCATCPohAkeSLr2fYUzQNudBaDwgZ8thl",
+    "reasons": [
+      "not_an_activity"
+    ]
+  },
+  {
+    "position": 76,
+    "post_id": "pfbid0333yBjDEvD9S7dYuwtp5G7xwGsSutgKcuVFDGNuuQN13TtD3pehF1B8CE8PfDE2Kl",
+    "reasons": [
+      "not_an_activity"
+    ]
+  },
+  {
+    "position": 77,
+    "post_id": "pfbid0YbKfdmeThGmwCrgSQ4QNPQXNRkK6AXsfbGdPcMDb5GwGYHJvRNPVYzLDfqeQ6SZ3l",
+    "reasons": [
+      "not_an_activity",
+      "failed_status",
+      "missing_mode"
+    ]
+  },
+  {
+    "position": 90,
+    "post_id": "pfbid024uVjQX8BX7AJsE4VP7y6jNZcPmRvLCSvk7fVuBCoUG77FAx2Uj3JC5kKS3F3fRKgl",
+    "reasons": [
+      "missing_mode"
+    ]
+  },
+  {
+    "position": 95,
+    "post_id": "pfbid0HhFatGBcSMxdSUYDifMitRMxjmZYQFUa3B2nVn6n4GeDswPcjAALPrQdLVz5vTCPl",
+    "reasons": [
+      "missing_mode"
+    ]
+  },
+  {
+    "position": 101,
+    "post_id": "pfbid031smy1CreLd2gU4UXkaWv1dvRTFvxriAL54EkUGBp2NDToBTMpx9YMKw9EBeLvjsfl",
+    "reasons": [
+      "missing_mode"
+    ]
+  },
+  {
+    "position": 103,
+    "post_id": "pfbid02qwN8ZXNAQQzZqjPdeCwiAz1jNGhYARbXVq7yVxCEfZdbDaiVqSCRtHKN51Cp1y7Fl",
+    "reasons": [
+      "failed_status",
+      "missing_mode"
+    ]
+  },
+  {
+    "position": 122,
+    "post_id": "1939136540726614",
+    "reasons": [
+      "fee_not_per_person"
+    ]
+  },
+  {
+    "position": 132,
+    "post_id": "pfbid0pyfkoPMGNKdfxBDFpYPJRr7nLfosHM31NPqsdbxqqMMLVQYzWD336cetGxZCuS21l",
+    "reasons": [
+      "missing_mode"
+    ]
+  },
+  {
+    "position": 155,
+    "post_id": "pfbid0gA27o84EoBnEWsir7FptnjJswVcKANTEW2smJSkgw9V3HmWpfJGiNEGAXaFxhgGUl",
+    "reasons": [
+      "missing_mode"
+    ]
+  }
+]
