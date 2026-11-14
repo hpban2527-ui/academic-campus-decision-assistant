@@ -50,9 +50,9 @@ def test_actual_rules_match_gpa_and_violation_rules(actual_rules):
         {"semester_gpa": 8.5, "academic_exam_violations": 0},
     )
     assert [item["rule_id"] for item in result["matched_rules"]] == ["R11", "R1203"]
-    assert [item["points"] for item in result["matched_rules"]] == [10, 10]
+    assert [item["points"] for item in result["matched_rules"]] == [15, 10]
     assert result["category_scores"] == [
-        {"category_id": "C1", "raw_score": 20, "cap": 30, "score": 20}
+        {"category_id": "C1", "raw_score": 25, "cap": 30, "score": 25}
     ]
     assert result["needs_review"] is False
 
@@ -153,3 +153,302 @@ def test_bridge_rejects_unallocated_existing_score(actual_rules):
             },
             scope={"universities": ["HCMUS"]},
         )
+
+
+def _scope_aware_config():
+    return {
+        "regulation": {
+            "regulation_id": "SYNTHETIC",
+            "effective_from": "SYNTHETIC-TERM",
+            "status": "verified",
+            "scope": {
+                "university": "HCMUS",
+                "student_type": "full_time",
+                "faculty": None,
+                "cohort": None,
+                "program": None,
+            },
+        },
+        "scoring_model": {
+            "status": "verified",
+            "semester_score_min": 0,
+            "semester_score_max": 100,
+            "category_caps": [{"category_id": "C1", "max_score": 30}],
+        },
+        "rules": [
+            {
+                "rule_id": "R-SCOPE",
+                "criterion_id": "1.1",
+                "category_id": "C1",
+                "condition": {"field": "eligible", "operator": "equals", "value": True},
+                "points": 10,
+                "unit": "per_semester",
+                "status": "verified",
+            }
+        ],
+    }
+
+
+def test_bridge_reads_singular_regulation_scope_without_duplicate_scope_argument():
+    result = evaluate_rules_progress(
+        _scope_aware_config(),
+        {"university": "HCMUS", "student_type": "full_time"},
+        {
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "values": {"eligible": True},
+        },
+    )
+
+    assert result["rule_resolution"] == "APPLICABLE"
+    assert result["confirmed_total"] == 10
+    assert result["category_scores"] == [
+        {"category_id": "C1", "raw_score": 10, "cap": 30, "score": 10}
+    ]
+    assert result["criterion_scores"] == [
+        {
+            "criterion_id": "1.1",
+            "category_id": "C1",
+            "raw_score": 10,
+            "cap": None,
+            "score": 10,
+        }
+    ]
+
+
+def test_bridge_rejects_api_scope_that_conflicts_with_regulation_scope():
+    with pytest.raises(DRLEngineError, match="conflicts with regulation.scope"):
+        evaluate_rules_progress(
+            _scope_aware_config(),
+            {"university": "HCMUS", "student_type": "full_time"},
+            {
+                "status": "CONFIRMED",
+                "evidence_status": "VERIFIED",
+                "values": {"eligible": True},
+            },
+            scope={"universities": ["OTHER"]},
+        )
+
+
+def test_category_cap_is_not_reused_as_a_criterion_cap():
+    config = {
+        "scoring_model": {
+            "semester_score_min": 0,
+            "semester_score_max": 100,
+            "category_caps": [{"category_id": "C1", "max_score": 30}],
+        },
+        "rules": [
+            {
+                "rule_id": "R-A",
+                "criterion_id": "1.9",
+                "category_id": "C1",
+                "condition": {"field": "a", "operator": "equals", "value": True},
+                "points": 20,
+                "unit": "per_semester",
+            },
+            {
+                "rule_id": "R-B",
+                "criterion_id": "1.9",
+                "category_id": "C1",
+                "condition": {"field": "b", "operator": "equals", "value": True},
+                "points": 20,
+                "unit": "per_semester",
+            },
+        ],
+    }
+
+    result = evaluate_rule_conditions(config, {"a": True, "b": True})
+
+    assert result["criterion_scores"] == [
+        {
+            "criterion_id": "1.9",
+            "category_id": "C1",
+            "raw_score": 40,
+            "cap": None,
+            "score": 40,
+        }
+    ]
+    assert result["category_scores"] == [
+        {"category_id": "C1", "raw_score": 40, "cap": 30, "score": 30}
+    ]
+
+
+def test_explicit_criterion_cap_is_applied_before_the_category_cap():
+    config = {
+        "scoring_model": {
+            "semester_score_min": 0,
+            "semester_score_max": 100,
+            "category_caps": [{"category_id": "C1", "max_score": 30}],
+        },
+        "rules": [
+            {
+                "rule_id": rule_id,
+                "criterion_id": "1.9",
+                "category_id": "C1",
+                "condition": {"field": field, "operator": "equals", "value": True},
+                "points": 20,
+                "unit": "per_semester",
+                "criterion_max_score": 25,
+            }
+            for rule_id, field in (("R-A", "a"), ("R-B", "b"))
+        ],
+    }
+
+    result = evaluate_rule_conditions(config, {"a": True, "b": True})
+
+    assert result["criterion_scores"][0] == {
+        "criterion_id": "1.9",
+        "category_id": "C1",
+        "raw_score": 40,
+        "cap": 25,
+        "score": 25,
+    }
+    assert result["category_scores"] == [
+        {"category_id": "C1", "raw_score": 25, "cap": 30, "score": 25}
+    ]
+    assert result["final_score"] == 25
+
+
+def test_unit_semantics_distinguish_repeatable_entities_from_period_awards():
+    config = {
+        "scoring_model": {
+            "semester_score_min": 0,
+            "semester_score_max": 100,
+            "category_caps": [{"category_id": "C3", "max_score": 100}],
+        },
+        "rules": [
+            {
+                "rule_id": "ACTIVITY",
+                "criterion_id": "3.1",
+                "category_id": "C3",
+                "condition": {"field": "activities", "operator": "count_greater_than", "value": 0},
+                "points": 2,
+                "unit": "per_activity",
+            },
+            {
+                "rule_id": "ACTIVITY_PERIOD",
+                "criterion_id": "3.2",
+                "category_id": "C3",
+                "condition": {"field": "period_activities", "operator": "count_greater_than", "value": 0},
+                "points": 3,
+                "unit": "per_activity_period",
+            },
+            {
+                "rule_id": "SEMESTER",
+                "criterion_id": "3.3",
+                "category_id": "C3",
+                "condition": {"field": "semester_events", "operator": "count_greater_than", "value": 0},
+                "points": 4,
+                "unit": "per_semester",
+            },
+            {
+                "rule_id": "CERTIFICATE",
+                "criterion_id": "3.4",
+                "category_id": "C3",
+                "condition": {"field": "certificates", "operator": "count_greater_than", "value": 0},
+                "points": 5,
+                "unit": "per_certificate_or_activity",
+            },
+        ],
+    }
+
+    result = evaluate_rule_conditions(
+        config,
+        {
+            "activities": 3,
+            "period_activities": 3,
+            "semester_events": 3,
+            "certificates": 3,
+        },
+    )
+
+    assert {
+        item["rule_id"]: (item["multiplier"], item["points"])
+        for item in result["matched_rules"]
+    } == {
+        "ACTIVITY": (3, 6),
+        "ACTIVITY_PERIOD": (1, 3),
+        "SEMESTER": (1, 4),
+        "CERTIFICATE": (3, 15),
+    }
+
+
+DEFAULT_AWARDED_RULES = {"R11": 15, "R21": 15, "R37": 10, "R41": 10}
+
+
+def test_default_awarded_rules_are_marked_in_rules_file(actual_rules):
+    marked = {
+        rule["rule_id"]: rule["points"]
+        for rule in actual_rules["rules"]
+        if rule.get("default_awarded") is True
+    }
+    assert marked == DEFAULT_AWARDED_RULES
+
+
+def test_default_awards_are_off_unless_requested(actual_rules):
+    result = evaluate_rule_conditions(actual_rules, {})
+    assert result["matched_rules"] == []
+    assert result["default_applied_rules"] == []
+    assert result["final_score"] == 0
+
+
+def test_default_awards_fill_missing_no_violation_fields(actual_rules):
+    result = evaluate_rule_conditions(
+        actual_rules, {}, apply_default_awards=True
+    )
+    matched = {item["rule_id"]: item["points"] for item in result["matched_rules"]}
+    assert matched == DEFAULT_AWARDED_RULES
+    assert all(item["default_applied"] for item in result["matched_rules"])
+    assert sorted(result["default_applied_rules"]) == sorted(DEFAULT_AWARDED_RULES)
+    assert {c["category_id"]: c["score"] for c in result["category_scores"]} == {
+        "C1": 15,
+        "C2": 15,
+        "C3": 10,
+        "C4": 10,
+    }
+    assert result["final_score"] == 50
+
+
+def test_reported_violation_removes_default_award(actual_rules):
+    result = evaluate_rule_conditions(
+        actual_rules,
+        {"academic_exam_violations": 1, "semester_gpa": 8.5},
+        apply_default_awards=True,
+    )
+    matched = {item["rule_id"] for item in result["matched_rules"]}
+    assert "R11" not in matched
+    assert {"R21", "R37", "R41", "R1203"} <= matched
+    assert "R11" not in result["default_applied_rules"]
+
+
+def test_explicit_zero_is_not_marked_as_default(actual_rules):
+    result = evaluate_rule_conditions(
+        actual_rules, {"school_rule_violations_excluding_academic_exam": 0},
+        apply_default_awards=True,
+    )
+    r21 = next(item for item in result["matched_rules"] if item["rule_id"] == "R21")
+    assert "default_applied" not in r21
+    assert "R21" not in result["default_applied_rules"]
+
+
+def test_default_value_must_satisfy_condition():
+    config = {
+        "scoring_model": {
+            "semester_score_min": 0,
+            "max_total_score": 100,
+            "category_caps": [{"category_id": "C1", "max_score": 30}],
+        },
+        "rules": [
+            {
+                "rule_id": "BAD_DEFAULT",
+                "criterion_id": "1",
+                "category_id": "C1",
+                "condition": {"field": "violations", "operator": "equals", "value": 0},
+                "points": 10,
+                "default_awarded": True,
+                "default_value": 2,
+            }
+        ],
+    }
+    codes = [issue["code"] for issue in audit_rules_config(config)]
+    assert "DEFAULT_VALUE_DOES_NOT_MATCH" in codes

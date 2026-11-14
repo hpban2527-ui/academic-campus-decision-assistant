@@ -3,12 +3,12 @@
 Covers:
 1. Strict Intake Mode (PR #3 Contract: 14-field publication lock, REVIEW_REQUIRED, 0 auto-awarded points).
 2. Demo Simulation Mode (5 mandatory E2E scenarios through real SP1 -> prepare_publication -> evaluate_reviewed_activity -> SP2 evaluate_progress):
-   - Case 1: PCCC Training Workshop (Mục 1.9, R19, C1 +5đ projected, confirmed stays 20/30, hypothetical 25/30).
+   - Case 1: PCCC Training Workshop (Mục 1.9, R19, C1 +5đ projected, confirmed stays 15/30, hypothetical 20/30).
    - Case 2: Blood Donation (Mục 4.2, R42, C4 +10đ demo-confirmed, 10 -> 20/25).
    - Case 3: Online Webinar missing completion_requirements (D16 flag -> NEEDS_REVIEW, +0đ).
    - Case 4: Category C3 Cap enforcement (CALC_02, R3101 +10đ capped at +3đ -> 22 -> 25/25).
    - Case 5: Duplicate Post Detection (MinHash-LSH & canonical URL -> REJECTED_DUPLICATE, +0đ).
-3. Academic Snapshot SP2 Engine Bridge (/api/sp2/evaluate: R11=+10, R1203=+10, R23 quarantined).
+3. Academic Snapshot SP2 Engine Bridge (/api/sp2/evaluate: R11=+15, R1203=+10, R23 quarantined).
 4. Lead Dataset & Regulation Audit (/api/lead/audit) & Frontend No-Fake-Fallback Guard.
 """
 
@@ -37,7 +37,7 @@ def fresh_api_state():
 
 def payload(case_id: int, *, simulate_demo: bool = False) -> dict:
     c = E2E_SCENARIOS[case_id]
-    return {
+    result = {
         "post_id": c["post_id"],
         "publisher": c["publisher"],
         "platform": c["platform"],
@@ -48,6 +48,9 @@ def payload(case_id: int, *, simulate_demo: bool = False) -> dict:
         "rule_override": c["rule_override"],
         "simulate_demo": simulate_demo,
     }
+    if c.get("current_category_scores") is not None:
+        result["current_category_scores"] = c["current_category_scores"]
+    return result
 
 
 def test_backend_loads_real_team_data_and_exposes_rule_audit():
@@ -66,6 +69,9 @@ def test_demo_profile_has_authentic_category_caps_and_demo_label():
     assert info["official_score_verified"] is False
     caps = {k: v["max"] for k, v in info["category_scores"].items()}
     assert caps == {"C1": 30, "C2": 20, "C3": 25, "C4": 25, "C5": 30}
+    assert info["total_confirmed_score"] == 50
+    assert info["score_source"] == "DRL_DEFAULT_AWARDS"
+    assert info["default_applied_rules"] == ["R11", "R21", "R37", "R41"]
 
 
 @pytest.mark.parametrize("case_id", [1, 2, 3, 4, 5])
@@ -86,7 +92,7 @@ def test_five_real_api_e2e_paths_do_not_fabricate_credit_in_strict_mode(case_id)
 
 
 def test_demo_e2e_case_1_pccc_projected_points():
-    """Case 1 (Demo Mode): PCCC workshop without evidence -> PROJECTED (+5đ on C1, confirmed stays 20, hypothetical 25)."""
+    """Case 1: PCCC without evidence -> PROJECTED (+5đ on C1 baseline 15, hypothetical 20)."""
     res = client.post("/api/evaluate", json=payload(1, simulate_demo=True)).json()
     assert res["mode"] == "DEMO_ONLY"
     assert res["official_award_verified"] is False
@@ -96,11 +102,11 @@ def test_demo_e2e_case_1_pccc_projected_points():
     assert sp2["category_id"] == "C1"
     assert sp2["projected_added"] == 5
     assert sp2["confirmed_added"] == 0
-    assert sp2["category_before"] == 20
-    assert sp2["category_after"] == 20
-    assert sp2["hypothetical_category_after"] == 25
+    assert sp2["category_before"] == 15
+    assert sp2["category_after"] == 15
+    assert sp2["hypothetical_category_after"] == 20
     assert sp2["category_cap"] == 30
-    assert sp2["category_missing"] == 5
+    assert sp2["category_missing"] == 10
 
 
 def test_demo_e2e_case_2_blood_donation_confirmed_points():
@@ -191,9 +197,9 @@ def test_real_sp2_engine_with_team_rules_and_numeric_progress():
     result = response.json()
     assert result["mode"] == "DEMO_ONLY"
     assert result["official_award_verified"] is False
-    assert result["sp2"]["confirmed_total"] == 20
+    assert result["sp2"]["confirmed_total"] == 25
     category = next(x for x in result["sp2"]["confirmed_by_criterion"] if x["code"] == "C1")
-    assert category["score"] == 20 and category["remaining"] == 10
+    assert category["score"] == 25 and category["remaining"] == 5
     rules = result["sp2"]["rule_evaluation"]["matched_rules"]
     assert [r["rule_id"] for r in rules] == ["R11", "R1203"]
 
@@ -262,6 +268,6 @@ def test_conflicting_rule_cannot_be_saved_as_demo_credit():
     assert response.status_code == 200, response.text
     assert response.json()["kind"] == "review"
     scores = client.get("/api/scores", params={"student_id": "25127242"}).json()
-    assert scores["total_confirmed"] == 69
+    assert scores["total_confirmed"] == 50
     assert scores["total_projected"] == 0
 

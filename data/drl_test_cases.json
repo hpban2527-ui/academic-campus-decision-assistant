@@ -232,7 +232,7 @@
         {
           "rule_id": "R11",
           "criterion_id": "1.1",
-          "points": 10
+          "points": 15
         },
         {
           "rule_id": "R1203",
@@ -240,7 +240,7 @@
           "points": 10
         }
       ],
-      "rule_points_total": 20,
+      "rule_points_total": 25,
       "needs_review": false
     }
   },
@@ -424,10 +424,10 @@
         {
           "rule_id": "R11",
           "criterion_id": "1.1",
-          "points": 10
+          "points": 15
         }
       ],
-      "raw_total_before_cap": 121,
+      "raw_total_before_cap": 126,
       "final_score": 100,
       "needs_review": false,
       "note": "Test giới hạn tổng điểm; engine cần định nghĩa rõ current_confirmed_score và eligible_extra_points là đầu vào đã xác minh, tránh cộng trùng."

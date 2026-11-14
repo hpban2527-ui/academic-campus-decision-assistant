@@ -89,7 +89,7 @@ def test_sp2_verified_fixture_stays_demo_only():
     assert out["mode"] == "DEMO_ONLY"
     assert out["official_award_verified"] is False
     assert out["sp2"]["rule_evaluation"]["matched_rules"][0]["rule_id"] == "R11"
-    assert out["sp2"]["confirmed_total"] == 20
+    assert out["sp2"]["confirmed_total"] == 25
 
 
 def test_missing_evidence_cannot_raise_confirmed_total():
@@ -104,3 +104,81 @@ def test_missing_evidence_cannot_raise_confirmed_total():
     response = client.post("/api/sp2/evaluate", json=payload)
     assert response.status_code == 200, response.text
     assert response.json()["sp2"]["confirmed_total"] == 0
+
+
+def _availability_payload(apply_scope="WEEK_ONLY"):
+    semester = apply_scope == "SEMESTER_WEEKLY"
+    return {
+        "availability": {
+            "availability_version": "sp3-availability/0.2",
+            "timezone": "Asia/Ho_Chi_Minh",
+            "week_start": "2026-11-02",
+            "apply_scope": apply_scope,
+            "weekly_blocks": [
+                {
+                    "day_of_week": "MONDAY",
+                    "start_time": "08:00",
+                    "end_time": "11:30",
+                }
+            ],
+            "effective_from": "2026-11-01" if semester else None,
+            "effective_until": "2026-11-30" if semester else None,
+            "exceptions": [],
+            "busy_intervals": [],
+        },
+        "window_start": "2026-11-01T00:00:00+07:00",
+        "window_end": "2026-11-17T00:00:00+07:00",
+    }
+
+
+def test_sp3_availability_endpoint_resolves_ui_week_without_persisting_it():
+    response = client.post(
+        "/api/sp3/availability/resolve",
+        json=_availability_payload(),
+    )
+
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert result["mode"] == "DEMO_ONLY"
+    assert result["persistent"] is False
+    assert result["apply_scope"] == "WEEK_ONLY"
+    assert result["available_intervals"] == [
+        {
+            "start": "2026-11-02T08:00:00+07:00",
+            "end": "2026-11-02T11:30:00+07:00",
+        }
+    ]
+
+
+def test_sp3_availability_endpoint_subtracts_ad_hoc_busy_intervals():
+    payload = _availability_payload()
+    payload["availability"]["busy_intervals"] = [
+        {
+            "start": "2026-11-02T09:00:00+07:00",
+            "end": "2026-11-02T10:00:00+07:00",
+        }
+    ]
+
+    response = client.post("/api/sp3/availability/resolve", json=payload)
+
+    assert response.status_code == 200, response.text
+    assert response.json()["available_intervals"] == [
+        {
+            "start": "2026-11-02T08:00:00+07:00",
+            "end": "2026-11-02T09:00:00+07:00",
+        },
+        {
+            "start": "2026-11-02T10:00:00+07:00",
+            "end": "2026-11-02T11:30:00+07:00",
+        },
+    ]
+
+
+def test_sp3_availability_endpoint_rejects_an_ambiguous_semester_repeat():
+    payload = _availability_payload("SEMESTER_WEEKLY")
+    payload["availability"]["effective_until"] = None
+
+    response = client.post("/api/sp3/availability/resolve", json=payload)
+
+    assert response.status_code == 422
+    assert "are required" in response.json()["detail"]

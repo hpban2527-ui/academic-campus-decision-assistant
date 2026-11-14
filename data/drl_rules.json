@@ -8,7 +8,7 @@
     "status": "verified",
     "source_review": {
       "appendix_checked": "https://hcmus.edu.vn/wp-content/uploads/2024/03/QD-1028-QC-DRL-2020_20231.pdf",
-      "base_rule_check": "Appendix p.8: R11=10; p.9: 2.2 course evaluation; p.10: 4.3 24h to below 1 week.",
+      "base_rule_check": "Appendix p.8 originally lists R11=10. The operational CTDA portal for the 2026 semester displays criterion 1.1 as 15 points; this ruleset follows the current portal value.",
       "later_framework_notice": "https://stsv.hcmus.edu.vn/quy-che-diem-ren-luyen",
       "note": "2026 national student-regulation framework published. School-level applicability of 2020 scoring matrix for current semester requires human confirmation. Internal outputs are demo-only."
     }
@@ -97,9 +97,12 @@
       "points": 15,
       "unit": "per_semester",
       "evidence_required": true,
+      "default_awarded": true,
+      "default_value": 0,
+      "default_note": "Mặc định được cộng từ đầu học kỳ (CTĐA trên cổng DRL); chỉ mất điểm khi có ghi nhận vi phạm. Engine chỉ áp dụng khi gọi với apply_default_awards=True.",
       "source": {
-        "document_id": "1028/QD-KHTN-CTSV",
-        "location": "Phụ lục, mục 1.1"
+        "document_id": "CTDA-HK1-2026-2027",
+        "location": "Cổng DRL, mục 1.1 (12/01/2026 - 17/05/2026)"
       },
       "status": "verified"
     },
@@ -428,6 +431,9 @@
       "points": 15,
       "unit": "per_semester",
       "evidence_required": true,
+      "default_awarded": true,
+      "default_value": 0,
+      "default_note": "Mặc định được cộng từ đầu học kỳ (CTĐA trên cổng DRL); chỉ mất điểm khi có ghi nhận vi phạm. Engine chỉ áp dụng khi gọi với apply_default_awards=True.",
       "source": {
         "document_id": "1028/QD-KHTN-CTSV",
         "location": "Phụ lục, mục 2.1"
@@ -621,6 +627,9 @@
       "points": 10,
       "unit": "per_semester",
       "evidence_required": true,
+      "default_awarded": true,
+      "default_value": 0,
+      "default_note": "Mặc định được cộng từ đầu học kỳ (CTĐA trên cổng DRL); chỉ mất điểm khi có ghi nhận vi phạm. Engine chỉ áp dụng khi gọi với apply_default_awards=True.",
       "source": {
         "document_id": "1028/QD-KHTN-CTSV",
         "location": "Phụ lục, mục 3.7"
@@ -830,6 +839,9 @@
       "points": 10,
       "unit": "per_semester",
       "evidence_required": true,
+      "default_awarded": true,
+      "default_value": 0,
+      "default_note": "Mặc định được cộng từ đầu học kỳ (CTĐA trên cổng DRL); chỉ mất điểm khi có ghi nhận vi phạm. Engine chỉ áp dụng khi gọi với apply_default_awards=True.",
       "source": {
         "document_id": "1028/QD-KHTN-CTSV",
         "location": "Phụ lục, mục 4.1"

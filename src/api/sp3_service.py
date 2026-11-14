@@ -146,6 +146,10 @@ def demo_plan(
     *,
     target_total: int | None = None,
     busy_intervals: list[dict[str, str]] | None = None,
+<<<<<<< HEAD
+=======
+    skip_activity_id: str | None = None,
+>>>>>>> eeffe5b13de641b0ea8e4c92e5897f41c5fc9fa9
 ) -> dict:
     """Exercise the full pipeline on synthetic data with optional UI constraints."""
     if scenario not in {"first_plan", "replan", "what_if_skip"}:
@@ -154,12 +158,18 @@ def demo_plan(
         type(target_total) is not int or not 0 <= target_total <= 100
     ):
         raise ValueError("target_total must be an integer from 0 to 100")
+<<<<<<< HEAD
     if busy_intervals and scenario != "first_plan":
         raise ValueError("busy_intervals can only be customized in first_plan")
+=======
+    if busy_intervals and scenario not in {"first_plan", "what_if_skip"}:
+        raise ValueError("busy_intervals can only be customized in first_plan or what_if_skip")
+>>>>>>> eeffe5b13de641b0ea8e4c92e5897f41c5fc9fa9
     fixture = _json(DEMO)
     first = _step(fixture, "step1", target_total=target_total, busy_intervals=busy_intervals)
     if scenario == "first_plan":
         output = first
+<<<<<<< HEAD
     else:
         second = _step(fixture, "step2", previous=first["plan"], target_total=target_total)
         if scenario == "replan":
@@ -181,6 +191,31 @@ def demo_plan(
             ):
                 raise RuntimeError("SP3 what-if plan check failed.")
             output = {**second, "plan": preview}
+=======
+    elif scenario == "replan":
+        second = _step(fixture, "step2", previous=first["plan"], target_total=target_total)
+        output = second
+    else:
+        skip_id = skip_activity_id or "QUIZ-L"
+        base_step = first if not busy_intervals else _step(fixture, "step2", previous=first["plan"], target_total=target_total)
+        base_input = base_step["planner_input"]
+        preview = what_if_skip(base_input, skip_id, _score_callback(fixture))
+        if check_plan(
+            {**deepcopy(base_input),
+             "candidates": [
+                 {**deepcopy(item),
+                  "participation": {
+                      **item["participation"],
+                      "progress": "CANCELLED" if item["activity"]["activity_id"] == skip_id
+                      else item["participation"]["progress"],
+                  }}
+                 for item in base_input["candidates"]
+             ]},
+            preview, _score_callback(fixture),
+        ):
+            raise RuntimeError("SP3 what-if plan check failed.")
+        output = {**base_step, "plan": preview}
+>>>>>>> eeffe5b13de641b0ea8e4c92e5897f41c5fc9fa9
     return {
         "mode": "DEMO_ONLY",
         "official_award_verified": False,
@@ -191,4 +226,8 @@ def demo_plan(
         "availability": output["availability"],
         "feasibility": output["feasibility"],
         "plan": output["plan"],
+<<<<<<< HEAD
+=======
+        "dropped_activity_id": skip_id if scenario == "what_if_skip" else None,
+>>>>>>> eeffe5b13de641b0ea8e4c92e5897f41c5fc9fa9
     }
