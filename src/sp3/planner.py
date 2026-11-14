@@ -91,11 +91,19 @@ from sp3.contract import (
 )
 from sp3.scheduler import MAX_FLEXIBLE_PER_SET, ScheduleResult, ScheduleStatus, schedule_set
 
-__all__ = ["DEFAULT_MAX_EVALUATIONS", "MAX_FLEXIBLE_PER_SET", "ScorePlan", "build_plan", "what_if_skip"]
+__all__ = [
+    "DEFAULT_MAX_EVALUATIONS",
+    "MAX_FLEXIBLE_PER_SET",
+    "PreferenceUtility",
+    "ScorePlan",
+    "build_plan",
+    "what_if_skip",
+]
 
 DEFAULT_MAX_EVALUATIONS = 4096
 
 ScorePlan = Callable[[dict[str, Any]], dict[str, Any]]
+PreferenceUtility = Callable[[tuple[str, ...], Mapping[str, Any]], float]
 
 _SCORER_STATUSES = tuple(status.value for status in EvaluationStatus)
 
@@ -300,6 +308,8 @@ def build_plan(
     *,
     max_evaluations: int = DEFAULT_MAX_EVALUATIONS,
     max_flexible_per_set: int = MAX_FLEXIBLE_PER_SET,
+    preference_utility: PreferenceUtility | None = None,
+    personalization_strategy: str = "BALANCED",
 ) -> dict[str, Any]:
     """Return the section-10 planner_output for ``planner_input``.
 
@@ -317,6 +327,10 @@ def build_plan(
         raise ValueError("max_evaluations must be a positive integer")
     if type(max_flexible_per_set) is not int or max_flexible_per_set < 1:
         raise ValueError("max_flexible_per_set must be a positive integer")
+    if preference_utility is not None and not callable(preference_utility):
+        raise TypeError("preference_utility must be callable")
+    if personalization_strategy not in {"MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"}:
+        raise ValueError("personalization_strategy is not supported")
     _validate_envelope(planner_input)
     try:
         plan = _parse_input(planner_input)
@@ -333,11 +347,28 @@ def build_plan(
         base_schedule = scheduling(plan.kept)
         # Keep requests passed _keep_conflicts, so the kept blocks are a valid schedule.
         assert base_schedule.status is ScheduleStatus.SCHEDULED
-        base = _evaluate(plan, scorer, plan.kept, base_schedule)
+        base = _evaluate(
+            plan,
+            scorer,
+            plan.kept,
+            base_schedule,
+            preference_utility,
+            personalization_strategy,
+        )
         if plan.previous is None and base.meets_targets:
             return _already_met_output(plan, base, scheduling)
         extra = tuple(c for c in plan.candidates if plan.eligible(c) and c.activity_id not in plan.kept)
-        outcome = _search(plan, extra, base, scorer, scheduling, flags, max_evaluations) if extra else _SearchOutcome(base, _SearchStop.EXHAUSTED)
+        outcome = _search(
+            plan,
+            extra,
+            base,
+            scorer,
+            scheduling,
+            flags,
+            max_evaluations,
+            preference_utility,
+            personalization_strategy,
+        ) if extra else _SearchOutcome(base, _SearchStop.EXHAUSTED)
         comparison = _score_comparison(plan, scorer, outcome.best)
     except _ScorerFailure as failure:
         return _scorer_failure_output(plan, failure, scorer.evaluated)
@@ -638,14 +669,35 @@ def _ineligible_message(plan: _PlannerInput, candidate: _Candidate) -> str:
 
 # --- Scoring and ranking --------------------------------------------------
 
-def _evaluate(plan: _PlannerInput, scorer: _Scorer, activity_ids: tuple[str, ...], schedule: ScheduleResult) -> _Evaluation:
+def _evaluate(
+    plan: _PlannerInput,
+    scorer: _Scorer,
+    activity_ids: tuple[str, ...],
+    schedule: ScheduleResult,
+    preference_utility: PreferenceUtility | None = None,
+    personalization_strategy: str = "BALANCED",
+) -> _Evaluation:
     order = attribution_order({activity_id: schedule.blocks[activity_id][0][0] for activity_id in activity_ids})
     result = scorer.evaluate(activity_ids, order)
-    rank = _rank(plan, activity_ids, result, schedule.time_changes)
+    rank = _rank(
+        plan,
+        activity_ids,
+        result,
+        schedule.time_changes,
+        preference_utility,
+        personalization_strategy,
+    )
     return _Evaluation(activity_ids, schedule, result, rank, meets_targets=rank[0] == 0 and rank[1] == 0)
 
 
-def _rank(plan: _PlannerInput, activity_ids: tuple[str, ...], result: Mapping[str, Any], time_changes: int) -> tuple[Any, ...]:
+def _rank(
+    plan: _PlannerInput,
+    activity_ids: tuple[str, ...],
+    result: Mapping[str, Any],
+    time_changes: int,
+    preference_utility: PreferenceUtility | None = None,
+    personalization_strategy: str = "BALANCED",
+) -> tuple[Any, ...]:
     """Section 9 ranking tuple; lower is better."""
     after = result["category_after"]
     category_gap = math.fsum(remaining_gap(target, after[category]) for category, target in plan.goals.category_targets)
@@ -659,7 +711,17 @@ def _rank(plan: _PlannerInput, activity_ids: tuple[str, ...], result: Mapping[st
     selected = [plan.by_id[activity_id] for activity_id in activity_ids]
     preference = sum(len(_preference_matches(plan.preferences, c)) for c in selected)
     duration = math.fsum(c.minutes for c in selected)
-    return (category_gap, total_gap, set_changes, time_changes, len(activity_ids), -preference, duration, activity_ids)
+    if preference_utility is None:
+        return (category_gap, total_gap, set_changes, time_changes, len(activity_ids), -preference, duration, activity_ids)
+
+    utility = preference_utility(activity_ids, result)
+    if isinstance(utility, bool) or not isinstance(utility, (int, float)) or not math.isfinite(utility):
+        raise ValueError("preference_utility must return a finite number")
+    if personalization_strategy == "MINIMUM_EFFORT":
+        return (category_gap, total_gap, set_changes, time_changes, len(activity_ids), duration, -utility, activity_ids)
+    if personalization_strategy == "PREFERENCE_FIRST":
+        return (category_gap, total_gap, set_changes, time_changes, -utility, len(activity_ids), duration, activity_ids)
+    return (category_gap, total_gap, set_changes, time_changes, len(activity_ids), -utility, duration, activity_ids)
 
 
 def _preference_matches(preferences: _Preferences, candidate: _Candidate) -> list[tuple[str, str]]:
@@ -700,6 +762,8 @@ def _search(
     scheduling: _Scheduling,
     flags: _SearchFlags,
     max_evaluations: int,
+    preference_utility: PreferenceUtility | None = None,
+    personalization_strategy: str = "BALANCED",
 ) -> _SearchOutcome:
     """Score valid supersets of the base set by increasing size, then lexicographic ID order.
 
@@ -715,13 +779,22 @@ def _search(
     """
     best = base
     met_size: int | None = None
-    prune_dominated = plan.previous is None
+    # PREFERENCE_FIRST may intentionally choose a larger set with greater
+    # utility, so the v0.2 activity-count dominance proof no longer applies.
+    prune_dominated = plan.previous is None and personalization_strategy != "PREFERENCE_FIRST"
     for activity_ids, schedule in _valid_subsets(plan, extra, scheduling, flags):
         if prune_dominated and met_size is not None and len(activity_ids) > met_size:
             return _SearchOutcome(best, _SearchStop.DOMINATED, met_size)
         if scorer.evaluated >= max_evaluations:
             return _SearchOutcome(best, _SearchStop.BUDGET, met_size)
-        evaluation = _evaluate(plan, scorer, activity_ids, schedule)
+        evaluation = _evaluate(
+            plan,
+            scorer,
+            activity_ids,
+            schedule,
+            preference_utility,
+            personalization_strategy,
+        )
         flags.not_minimal |= not schedule.time_changes_minimal
         if evaluation.rank < best.rank:
             best = evaluation

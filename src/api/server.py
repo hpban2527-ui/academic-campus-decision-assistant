@@ -14,10 +14,13 @@ Integrates:
 from __future__ import annotations
 
 import json
+import hashlib
 import sys
 import uuid
+from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
+from time import perf_counter
 from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException
@@ -35,6 +38,16 @@ if str(ROOT_DIR / "src") not in sys.path:
 from api.dedup_review import possible_duplicates
 from api.lead_contract import ACTIVITY_FIELDS, audit_dataset, canonical_url, prepare_publication
 from api.reviewed_pipeline import evaluate_reviewed_activity, fingerprint
+from personalization import (
+    ConfirmedPreferenceSaveRequest,
+    InterpretPreferenceRequest,
+    PersonalizedPlanRequest,
+    PreferenceProviderInvalidResponse,
+    PreferenceProviderUnavailable,
+    StudentPreference,
+    preference_provider_from_env,
+)
+from personalization.fast_interpreter import interpret_explicit_preference
 from sp1.deduplication import PostDeduplicator
 from sp1.extractor import extract
 from sp2.drl_engine import (
@@ -195,6 +208,14 @@ SESSION_SCHEMA_VERSION = 3
 session_committed: list[dict[str, Any]] = []
 # Per-student saved scores: {student_id: {"current": {Cx: n}, "projected": {Cx: n}}}
 session_scores: dict[str, dict[str, dict[str, float]]] = {}
+# Per-student preference snapshots confirmed in the UI.  The AI's unconfirmed
+# draft is intentionally never persisted.
+session_preferences: dict[str, dict[str, Any]] = {}
+# Successful interpretations are safe to reuse because temperature is zero and
+# deterministic normalization runs before this boundary. Keep the cache small
+# and process-local; confirmed preferences remain stored separately per student.
+preference_interpret_cache: OrderedDict[tuple[str, str, str], dict[str, Any]] = OrderedDict()
+PREFERENCE_INTERPRET_CACHE_SIZE = 128
 # Posts explicitly submitted for human review.
 review_queue: list[dict[str, Any]] = []
 # Per-student MinHash index of *committed* posts (prevents counting the same post twice).
@@ -271,6 +292,7 @@ def _save_session_to_disk() -> None:
             "storage_mode": "local_filesystem_folder",
             "folder": str(SESSION_DIR),
             "session_scores": session_scores,
+            "confirmed_preferences": session_preferences,
             "committed": session_committed,
             "review_queue": review_queue,
             # Read-only convenience view for humans opening the file.
@@ -285,6 +307,7 @@ def _save_session_to_disk() -> None:
 def _clear_session_state() -> None:
     session_committed.clear()
     session_scores.clear()
+    session_preferences.clear()
     review_queue.clear()
     student_dedupers.clear()
 
@@ -296,6 +319,7 @@ def _load_session_from_disk() -> None:
         return
     try:
         session_scores.update(data.get("session_scores") or {})
+        session_preferences.update(data.get("confirmed_preferences") or {})
         session_committed.extend(data.get("committed") or [])
         review_queue.extend(data.get("review_queue") or [])
         for c in session_committed:
@@ -978,8 +1002,12 @@ def evaluate_announcement(req: EvaluationRequest):
         and "needs_review:completion_requirements" in extraction_flags
     )
     estimate_requires_review = bool(
+<<<<<<< HEAD
         rec.get("points") is None
         and (extraction_has_warnings or rule_match.ambiguous)
+=======
+        (extraction_has_warnings or rule_match.ambiguous)
+>>>>>>> a327853bae30f7a3a820ac4b851a38b578fccf67
         and matched_rule is not None
         and rule_match.confidence >= 0.65
         and not online_missing_completion
@@ -1684,8 +1712,8 @@ def evaluate_end_to_end_demo(req: DemoPipelineRequest):
 
 @app.get("/api/lead/audit")
 def lead_data_audit():
-    """Quick read-only audit of regulation rules, 20-activity catalog, and cross-post duplicates."""
-    raw_source = load_json(ROOT_DIR / "Collecting_Data/source.json", None) or SOURCE_POSTS
+    """Audit rules, the reviewed catalog, and Minh Tri's current raw-source feed."""
+    raw_source = load_json(DATA_DIR / "raw" / "source.json", None) or SOURCE_POSTS
     return {
         "mode": "DEMO_ONLY",
         "regulation_id": DRL_RULES_CONFIG.get("regulation", {}).get("regulation_id"),
@@ -1700,7 +1728,11 @@ def lead_data_audit():
 
 
 # Serve Frontend static files if web directory exists
-from api.sp3_service import demo_plan as _sp3_demo_plan, sp1_catalog as _sp3_catalog
+from api.sp3_service import (
+    demo_plan as _sp3_demo_plan,
+    personalized_demo_plan as _sp3_personalized_plan,
+    sp1_catalog as _sp3_catalog,
+)
 
 
 class SP3DemoPlanRequest(BaseModel):
@@ -1735,6 +1767,188 @@ def run_sp3_demo_plan(req: SP3DemoPlanRequest):
 >>>>>>> eeffe5b13de641b0ea8e4c92e5897f41c5fc9fa9
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/sp3/personalized/plan")
+def run_sp3_personalized_plan(req: PersonalizedPlanRequest):
+    """Rank the demo SP3 schedule using a student-confirmed preference only."""
+
+    try:
+        return _sp3_personalized_plan(
+            req.preference,
+            scenario=req.scenario,
+            target_total=req.total_target,
+            busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+def _get_preference_provider():
+    """Late provider construction keeps env configuration testable and reloadable."""
+
+    return preference_provider_from_env()
+
+
+def _preference_error_detail(exc) -> dict[str, str]:
+    return {"code": exc.code, "message": exc.public_message}
+
+
+def _validated_student_id(value: str) -> str:
+    normalized = value.strip()
+    if not normalized or len(normalized) > 64:
+        raise HTTPException(status_code=422, detail="student_id must contain 1 to 64 characters")
+    return normalized
+
+
+def _preference_version(preference: dict[str, Any]) -> str:
+    canonical = json.dumps(preference, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return "pref-" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
+@app.get("/api/preferences/confirmed")
+def get_confirmed_preference(student_id: str):
+    """Return only the last preference explicitly confirmed by this student."""
+
+    normalized_id = _validated_student_id(student_id)
+    stored = session_preferences.get(normalized_id)
+    if not isinstance(stored, dict):
+        return {"status": "EMPTY", "student_id": normalized_id, "confirmed_preference": None}
+    try:
+        preference = StudentPreference.model_validate(stored.get("preference"))
+    except (ValueError, TypeError):
+        return {"status": "EMPTY", "student_id": normalized_id, "confirmed_preference": None}
+    return {
+        "status": "OK",
+        "student_id": normalized_id,
+        "confirmed_preference": {
+            "preference": preference.model_dump(mode="json"),
+            "source_text": stored.get("source_text"),
+            "preference_version": stored.get("preference_version"),
+            "confirmed_at": stored.get("confirmed_at"),
+        },
+    }
+
+
+@app.put("/api/preferences/confirmed")
+def save_confirmed_preference(req: ConfirmedPreferenceSaveRequest):
+    """Persist a validated preference after the student's explicit confirmation."""
+
+    preference = req.preference.model_dump(mode="json")
+    record = {
+        "preference": preference,
+        "source_text": req.source_text,
+        "preference_version": _preference_version(preference),
+        "confirmed_at": _now_iso(),
+    }
+    session_preferences[req.student_id] = record
+    _save_session_to_disk()
+    return {
+        "status": "SAVED",
+        "student_id": req.student_id,
+        "confirmed_preference": record,
+    }
+
+
+@app.delete("/api/preferences/confirmed")
+def delete_confirmed_preference(student_id: str):
+    """Delete one student's confirmed preference without touching scores."""
+
+    normalized_id = _validated_student_id(student_id)
+    existed = session_preferences.pop(normalized_id, None) is not None
+    _save_session_to_disk()
+    return {"status": "DELETED" if existed else "EMPTY", "student_id": normalized_id}
+
+
+@app.get("/api/preferences/ai-health")
+def get_preference_ai_health():
+    """Report Ollama/model readiness without making a generation request."""
+
+    try:
+        provider = _get_preference_provider()
+        health = provider.health()
+    except PreferenceProviderUnavailable as exc:
+        return {
+            "available": False,
+            "provider": None,
+            "model": None,
+            **_preference_error_detail(exc),
+        }
+    return {
+        "available": health.available,
+        "provider": health.provider,
+        "model": health.model,
+        "code": health.code,
+        "message": health.message,
+    }
+
+
+@app.post("/api/preferences/interpret")
+def interpret_student_preference(req: InterpretPreferenceRequest):
+    """Translate Vietnamese preference text into a validated, non-scheduling contract."""
+
+    started = perf_counter()
+    if not req.force_ai:
+        fast_preference = interpret_explicit_preference(req.text)
+        if fast_preference is not None:
+            return {
+                "status": "OK",
+                "provider": "deterministic",
+                "model": None,
+                "method": "FAST_RULES",
+                "cached": False,
+                "processing_ms": round((perf_counter() - started) * 1_000),
+                "preference": fast_preference.model_dump(mode="json"),
+            }
+    try:
+        provider = _get_preference_provider()
+    except PreferenceProviderUnavailable as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=_preference_error_detail(exc),
+        ) from exc
+
+    normalized_text = " ".join(req.text.casefold().split())
+    cache_key = (provider.provider_name, provider.model, normalized_text)
+    cached_payload = preference_interpret_cache.get(cache_key)
+    if cached_payload is not None:
+        preference_interpret_cache.move_to_end(cache_key)
+        return {
+            "status": "OK",
+            "provider": provider.provider_name,
+            "model": provider.model,
+            "method": "AI_CACHE",
+            "cached": True,
+            "processing_ms": round((perf_counter() - started) * 1_000),
+            "preference": cached_payload,
+        }
+
+    try:
+        preference = provider.interpret(req.text)
+    except PreferenceProviderUnavailable as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=_preference_error_detail(exc),
+        ) from exc
+    except PreferenceProviderInvalidResponse as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=_preference_error_detail(exc),
+        ) from exc
+    preference_payload = preference.model_dump(mode="json")
+    preference_interpret_cache[cache_key] = preference_payload
+    preference_interpret_cache.move_to_end(cache_key)
+    while len(preference_interpret_cache) > PREFERENCE_INTERPRET_CACHE_SIZE:
+        preference_interpret_cache.popitem(last=False)
+    return {
+        "status": "OK",
+        "provider": provider.provider_name,
+        "model": provider.model,
+        "method": "AI",
+        "cached": False,
+        "processing_ms": round((perf_counter() - started) * 1_000),
+        "preference": preference_payload,
+    }
 
 
 @app.get("/favicon.ico", include_in_schema=False)
