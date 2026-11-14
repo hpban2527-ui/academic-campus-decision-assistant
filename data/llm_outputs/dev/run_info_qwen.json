@@ -1,0 +1,27 @@
+{
+  "runs": [
+    {
+      "versions": {
+        "python": "3.13.16",
+        "transformers": "5.23.0",
+        "accelerate": "1.15.0",
+        "bitsandbytes": "0.50.2",
+        "torch": "2.11.0+cu130"
+      },
+      "gpu": [
+        "Tesla T4",
+        "Tesla T4"
+      ],
+      "date": "2026-11-14T07:10:03.891901+00:00",
+      "models": [
+        "Qwen/Qwen3.5-4B"
+      ],
+      "dry_run": false,
+      "input_file": "/kaggle/input/datasets/thaoduyensld/unilife-sp1-dev/dev.jsonl",
+      "max_new_tokens": {
+        "classify": 256,
+        "roles": 768
+      }
+    }
+  ]
+}

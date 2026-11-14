@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "patterns": {
+    "CS1": [
+      "nguyễn văn cừ",
+      "nguyen van cu",
+      "chợ quán",
+      "cho quan",
+      "cơ sở 1",
+      "cs1",
+      "cơ sở nguyễn văn cừ"
+    ],
+    "CS2": [
+      "linh trung",
+      "đông hòa",
+      "đông hoà",
+      "dong hoa",
+      "cơ sở 2",
+      "cs2",
+      "cơ sở linh trung"
+    ],
+    "both": [
+      "một trong hai cơ sở",
+      "1 trong 2 cơ sở",
+      "hai cơ sở"
+    ]
+  },
+  "source": "rule set 2026-11-13 + new ward names Cho Quan / Dong Hoa, confirmed by Thao Duyen 2026-11-14"
+}

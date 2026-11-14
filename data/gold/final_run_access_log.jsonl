@@ -1,0 +1,13 @@
+{"at": "2026-11-14T08:51:00+00:00", "reason": "Final Qwen3.5-4B batch run on all 189 posts to build the SP1 activity store (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T08:52:15+00:00", "reason": "Re-export after adding bank-account masking to preprocess (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:13:30+00:00", "reason": "Build SP1 activity store from final Qwen run (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:15:57+00:00", "reason": "Rebuild SP1 activity store after text-to-ID parser fix (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:21:39+00:00", "reason": "Manual check of 20 sampled activities (evaluation only, no tuning)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:32:27+00:00", "reason": "Rebuild SP1 activity store after day-range, campus and consistency fixes (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:32:56+00:00", "reason": "Rebuild store and draw the after-fix manual-check sample (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:33:13+00:00", "reason": "Manual check of the after-fix sample (evaluation only)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:34:49+00:00", "reason": "Rebuild store after g-time fix; redraw the same after sample (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:45:49+00:00", "reason": "Rebuild store with duplicate grouping (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:52:46+00:00", "reason": "Rebuild store after injection-detection and place-over-online changes (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T11:35:53+00:00", "reason": "Rebuild store with activity_type for SP2 binding (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T11:36:01+00:00", "reason": "Propose SP2 bindings for handed-over activities (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}

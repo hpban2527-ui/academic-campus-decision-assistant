@@ -1,0 +1,1537 @@
+{
+  "schema": "sp2-bindings/1.0",
+  "label": "auto_proposed_not_human_reviewed",
+  "policy": "agree_else_review",
+  "type_rules": {
+    "seminar_workshop": [
+      "R19"
+    ],
+    "academic_competition": [
+      "R16"
+    ],
+    "culture_sports_competition": [
+      "R3102",
+      "R3101"
+    ],
+    "legal_health_campaign": [
+      "R46"
+    ],
+    "volunteer": [
+      "R4301",
+      "R4302",
+      "R4303"
+    ],
+    "fundraising": [
+      "R45"
+    ],
+    "blood_donation": [
+      "R42"
+    ]
+  },
+  "ruleset_file": "drl_rules.json",
+  "n_activities": 140,
+  "bindings": [
+    {
+      "activity_id": "TMP-1b9b9e20-01",
+      "binding_ref": "auto-R4302-TMP-1b9b9e20-01",
+      "rule_id": "R4302",
+      "field": "volunteer_duration_bucket",
+      "operation": "SET",
+      "value": "24_hours_to_under_one_week"
+    },
+    {
+      "activity_id": "TMP-1f7d4d46-01",
+      "binding_ref": "auto-R16-TMP-1f7d4d46-01",
+      "rule_id": "R16",
+      "field": "academic_competitions_completed_first_round",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-3cb2e678-01",
+      "binding_ref": "auto-R19-TMP-3cb2e678-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-87a35c01-01",
+      "binding_ref": "auto-R19-TMP-87a35c01-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-99d11c9c-01",
+      "binding_ref": "auto-R19-TMP-99d11c9c-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-4cad3e72-01",
+      "binding_ref": "auto-R19-TMP-4cad3e72-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-d4b49d00-01",
+      "binding_ref": "auto-R19-TMP-d4b49d00-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-8b57014c-01",
+      "binding_ref": "auto-R19-TMP-8b57014c-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-a3d341b9-01",
+      "binding_ref": "auto-R45-TMP-a3d341b9-01",
+      "rule_id": "R45",
+      "field": "school_fundraising_activities",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-32c74a49-01",
+      "binding_ref": "auto-R46-TMP-32c74a49-01",
+      "rule_id": "R46",
+      "field": "legal_health_communication_activities",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-4031ba32-01",
+      "binding_ref": "auto-R42-TMP-4031ba32-01",
+      "rule_id": "R42",
+      "field": "blood_donation_certificates",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-ead5f953-01",
+      "binding_ref": "auto-R19-TMP-ead5f953-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-d2a4361d-01",
+      "binding_ref": "auto-R19-TMP-d2a4361d-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-651f7978-01",
+      "binding_ref": "auto-R3102-TMP-651f7978-01",
+      "rule_id": "R3102",
+      "field": "eligible_civic_cultural_sports_competition_level",
+      "operation": "SET",
+      "value": "faculty"
+    },
+    {
+      "activity_id": "TMP-5ecd52f9-01",
+      "binding_ref": "auto-R3102-TMP-5ecd52f9-01",
+      "rule_id": "R3102",
+      "field": "eligible_civic_cultural_sports_competition_level",
+      "operation": "SET",
+      "value": "faculty"
+    },
+    {
+      "activity_id": "TMP-a63d82e5-01",
+      "binding_ref": "auto-R19-TMP-a63d82e5-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-5fcee8e7-01",
+      "binding_ref": "auto-R19-TMP-5fcee8e7-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-b17de2eb-01",
+      "binding_ref": "auto-R19-TMP-b17de2eb-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-d9de3603-01",
+      "binding_ref": "auto-R19-TMP-d9de3603-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-cc961a9c-01",
+      "binding_ref": "auto-R19-TMP-cc961a9c-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-8720b674-01",
+      "binding_ref": "auto-R19-TMP-8720b674-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-f803264a-01",
+      "binding_ref": "auto-R19-TMP-f803264a-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-3784ed4f-01",
+      "binding_ref": "auto-R46-TMP-3784ed4f-01",
+      "rule_id": "R46",
+      "field": "legal_health_communication_activities",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-59fce405-01",
+      "binding_ref": "auto-R19-TMP-59fce405-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-1949dab7-01",
+      "binding_ref": "auto-R19-TMP-1949dab7-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-b7232be1-01",
+      "binding_ref": "auto-R19-TMP-b7232be1-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-8e99e454-01",
+      "binding_ref": "auto-R19-TMP-8e99e454-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-38e3659f-01",
+      "binding_ref": "auto-R19-TMP-38e3659f-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-25a46b36-01",
+      "binding_ref": "auto-R19-TMP-25a46b36-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-4ccd8446-01",
+      "binding_ref": "auto-R19-TMP-4ccd8446-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-112c5412-01",
+      "binding_ref": "auto-R19-TMP-112c5412-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-fa3016c6-01",
+      "binding_ref": "auto-R19-TMP-fa3016c6-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-81be723c-01",
+      "binding_ref": "auto-R16-TMP-81be723c-01",
+      "rule_id": "R16",
+      "field": "academic_competitions_completed_first_round",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-de20e215-01",
+      "binding_ref": "auto-R19-TMP-de20e215-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-a4ffc4a4-01",
+      "binding_ref": "auto-R3102-TMP-a4ffc4a4-01",
+      "rule_id": "R3102",
+      "field": "eligible_civic_cultural_sports_competition_level",
+      "operation": "SET",
+      "value": "faculty"
+    },
+    {
+      "activity_id": "TMP-0da22741-01",
+      "binding_ref": "auto-R19-TMP-0da22741-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-7ade63d1-01",
+      "binding_ref": "auto-R19-TMP-7ade63d1-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-446a2af3-01",
+      "binding_ref": "auto-R19-TMP-446a2af3-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-41e00a86-01",
+      "binding_ref": "auto-R19-TMP-41e00a86-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-d2d51dad-01",
+      "binding_ref": "auto-R19-TMP-d2d51dad-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-9037899f-01",
+      "binding_ref": "auto-R19-TMP-9037899f-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-53c299fb-01",
+      "binding_ref": "auto-R19-TMP-53c299fb-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-dc6956da-01",
+      "binding_ref": "auto-R19-TMP-dc6956da-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-f0f5faed-01",
+      "binding_ref": "auto-R19-TMP-f0f5faed-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-ddde98d6-01",
+      "binding_ref": "auto-R19-TMP-ddde98d6-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-6d935ef5-01",
+      "binding_ref": "auto-R19-TMP-6d935ef5-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-60429e74-01",
+      "binding_ref": "auto-R19-TMP-60429e74-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-2b315523-01",
+      "binding_ref": "auto-R19-TMP-2b315523-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-f78afb5d-01",
+      "binding_ref": "auto-R19-TMP-f78afb5d-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-e4208fb8-01",
+      "binding_ref": "auto-R19-TMP-e4208fb8-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-bfdcb6cc-01",
+      "binding_ref": "auto-R19-TMP-bfdcb6cc-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-654d871a-01",
+      "binding_ref": "auto-R19-TMP-654d871a-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-f9cb0c4b-01",
+      "binding_ref": "auto-R19-TMP-f9cb0c4b-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-fc65ac80-01",
+      "binding_ref": "auto-R19-TMP-fc65ac80-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-253a957c-01",
+      "binding_ref": "auto-R19-TMP-253a957c-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-7718dbb8-01",
+      "binding_ref": "auto-R19-TMP-7718dbb8-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-f95da043-01",
+      "binding_ref": "auto-R19-TMP-f95da043-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-5da3da99-01",
+      "binding_ref": "auto-R19-TMP-5da3da99-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-52e0aea1-01",
+      "binding_ref": "auto-R19-TMP-52e0aea1-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-6eb7e1c0-01",
+      "binding_ref": "auto-R19-TMP-6eb7e1c0-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-707cae9d-01",
+      "binding_ref": "auto-R19-TMP-707cae9d-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-596b4482-01",
+      "binding_ref": "auto-R19-TMP-596b4482-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-d594bec4-01",
+      "binding_ref": "auto-R19-TMP-d594bec4-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-bf77b708-01",
+      "binding_ref": "auto-R19-TMP-bf77b708-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-c7151c48-01",
+      "binding_ref": "auto-R19-TMP-c7151c48-01",
+      "rule_id": "R19",
+      "field": "eligible_academic_seminars",
+      "operation": "INCREMENT",
+      "value": 1
+    },
+    {
+      "activity_id": "TMP-6c829773-01",
+      "binding_ref": "auto-R46-TMP-6c829773-01",
+      "rule_id": "R46",
+      "field": "legal_health_communication_activities",
+      "operation": "INCREMENT",
+      "value": 1
+    }
+  ],
+  "explanations": {
+    "TMP-2e8129ab-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-5656c4cd-01": {
+      "activity_type": "culture_sports_competition",
+      "matcher_rule": "R16",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-86a74af8-01": {
+      "activity_type": "academic_competition",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-5479351c-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-ce99c117-01": {
+      "activity_type": "other",
+      "matcher_rule": "R4301",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-1b9b9e20-01": {
+      "activity_type": "volunteer",
+      "matcher_rule": "R4302",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C4",
+      "points_from_rules": 10
+    },
+    "TMP-1f7d4d46-01": {
+      "activity_type": "academic_competition",
+      "matcher_rule": "R16",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-aaa97967-01": {
+      "activity_type": "culture_sports_competition",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-3cb2e678-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-95d7ac3c-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-c84de7dc-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R4301",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-87a35c01-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-f9525994-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-99d11c9c-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-d9dcbf6a-01": {
+      "activity_type": "other",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-ce89622f-01": {
+      "activity_type": "other",
+      "matcher_rule": "R1701",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-67c66b9d-01": {
+      "activity_type": "volunteer",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-3612ad60-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R16",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-c0e42640-01": {
+      "activity_type": "other",
+      "matcher_rule": "R4401",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-4cad3e72-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-d4b49d00-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-c22ca1e9-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-2eb8b706-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-792b56ac-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-ae949c9d-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R16",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-8b57014c-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-a3d341b9-01": {
+      "activity_type": "fundraising",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C4",
+      "points_from_rules": 3
+    },
+    "TMP-02bc7bb1-01": {
+      "activity_type": "other",
+      "matcher_rule": "R35",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-32c74a49-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R46",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C4",
+      "points_from_rules": 10
+    },
+    "TMP-4031ba32-01": {
+      "activity_type": "blood_donation",
+      "matcher_rule": "R42",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C4",
+      "points_from_rules": 10
+    },
+    "TMP-ead5f953-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-d2a4361d-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-cf61da1d-01": {
+      "activity_type": "other",
+      "matcher_rule": "R38",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-e6a729ba-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-1710d683-01": {
+      "activity_type": "career_admissions_event",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-ca159467-01": {
+      "activity_type": "other",
+      "matcher_rule": "R1701",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-651f7978-01": {
+      "activity_type": "culture_sports_competition",
+      "matcher_rule": "R3102",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C3",
+      "points_from_rules": 5
+    },
+    "TMP-5ecd52f9-01": {
+      "activity_type": "culture_sports_competition",
+      "matcher_rule": "R3102",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C3",
+      "points_from_rules": 5
+    },
+    "TMP-a63d82e5-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-19caa7d9-01": {
+      "activity_type": "other",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-f7c6b345-01": {
+      "activity_type": "club_membership",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-6a35fa3f-01": {
+      "activity_type": "volunteer",
+      "matcher_rule": "R4301",
+      "matcher_method": "catalog_signal_match",
+      "reason": "operator_unsupported_by_sp3:less_than"
+    },
+    "TMP-31b77194-01": {
+      "activity_type": "other",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-6ca87326-01": {
+      "activity_type": "other",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-fd8d37cc-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R35",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-579eedf1-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R16",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-c49c033a-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-79eb276f-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-728f7479-01": {
+      "activity_type": "other",
+      "matcher_rule": "R1701",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-5fcee8e7-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-9b64d001-01": {
+      "activity_type": "volunteer",
+      "matcher_rule": "R4301",
+      "matcher_method": "catalog_signal_match",
+      "reason": "operator_unsupported_by_sp3:less_than"
+    },
+    "TMP-b17de2eb-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-d9de3603-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-d9a0bcec-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-cc961a9c-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-199f4cf9-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4401",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-debdc6c1-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-57cbbf23-01": {
+      "activity_type": "other",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-d296ea4d-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-8720b674-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-f803264a-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-3784ed4f-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R46",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C4",
+      "points_from_rules": 10
+    },
+    "TMP-31415a0c-01": {
+      "activity_type": "club_membership",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-6b5e022e-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-ad876767-01": {
+      "activity_type": "university_history",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-820d0b54-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-b02d6238-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R313",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-59fce405-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-62f53139-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-1949dab7-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-b7232be1-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-8e99e454-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-38e3659f-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-25a46b36-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-d9dea1f6-01": {
+      "activity_type": "other",
+      "matcher_rule": "R39",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-089f2d0a-01": {
+      "activity_type": "career_admissions_event",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-4ccd8446-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-356d238f-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R16",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-8142fff0-01": {
+      "activity_type": "other",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-112c5412-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-fa3016c6-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-750ed3c1-01": {
+      "activity_type": "other",
+      "matcher_rule": "R45",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-81be723c-01": {
+      "activity_type": "academic_competition",
+      "matcher_rule": "R16",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-de20e215-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-a4ffc4a4-01": {
+      "activity_type": "culture_sports_competition",
+      "matcher_rule": "R3102",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C3",
+      "points_from_rules": 5
+    },
+    "TMP-2f6e390d-01": {
+      "activity_type": "volunteer",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-133dd51e-01": {
+      "activity_type": "other",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-b19b010d-01": {
+      "activity_type": "volunteer",
+      "matcher_rule": "R4301",
+      "matcher_method": "catalog_signal_match",
+      "reason": "operator_unsupported_by_sp3:less_than"
+    },
+    "TMP-cb81ee00-01": {
+      "activity_type": "other",
+      "matcher_rule": "R4301",
+      "matcher_method": "catalog_signal_match",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-0da22741-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-795334b7-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-7ade63d1-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-446a2af3-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-41e00a86-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-d2d51dad-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-9037899f-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-53c299fb-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-35987f85-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-f2eed724-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R16",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-dc6956da-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-f0f5faed-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-ddde98d6-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-6d935ef5-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-60429e74-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-2b315523-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-17cb0089-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R16",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-f3dd1219-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-f78afb5d-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-c0dad9f8-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R16",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-26b300e6-01": {
+      "activity_type": "academic_competition",
+      "matcher_rule": "R3102",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-2367670f-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4401",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-e4208fb8-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-bfdcb6cc-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-a274531e-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R45",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_disagree"
+    },
+    "TMP-71e28016-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R313",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-654d871a-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-f9cb0c4b-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-fc65ac80-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-78a959a0-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R39",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-253a957c-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-08c68c35-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-98e84a20-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-e09e5fe6-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-7718dbb8-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-0fe1ad90-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R4401",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-9616f85b-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R3101",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-10432603-01": {
+      "activity_type": "other",
+      "matcher_rule": "R4303",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-7ff8daca-01": {
+      "activity_type": "other",
+      "matcher_rule": "R4401",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "activity_type_not_auto_bound"
+    },
+    "TMP-568327c1-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R1701",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-f95da043-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-5da3da99-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-52e0aea1-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-6eb7e1c0-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-707cae9d-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-596b4482-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-d594bec4-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-bf77b708-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-ef3a7c48-01": {
+      "activity_type": "academic_competition",
+      "matcher_rule": "R4403",
+      "matcher_method": "rule_name_token_overlap",
+      "reason": "sources_disagree"
+    },
+    "TMP-c7151c48-01": {
+      "activity_type": "seminar_workshop",
+      "matcher_rule": "R19",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C1",
+      "points_from_rules": 5
+    },
+    "TMP-6c829773-01": {
+      "activity_type": "legal_health_campaign",
+      "matcher_rule": "R46",
+      "matcher_method": "catalog_signal_match",
+      "reason": "sources_agree",
+      "category_id": "C4",
+      "points_from_rules": 10
+    }
+  }
+}
