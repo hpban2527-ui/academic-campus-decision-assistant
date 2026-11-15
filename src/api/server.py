@@ -1701,6 +1701,7 @@ def lead_data_audit():
 
 # Serve Frontend static files if web directory exists
 from api.sp3_service import demo_plan as _sp3_demo_plan, sp1_catalog as _sp3_catalog
+from sp3.planner import AVAILABLE_PRESETS, SpeedMode
 
 
 class SP3DemoPlanRequest(BaseModel):
@@ -1708,6 +1709,19 @@ class SP3DemoPlanRequest(BaseModel):
     total_target: Optional[int] = Field(default=None, ge=0, le=100)
     busy_intervals: list[dict[str, str]] = Field(default_factory=list)
     skip_activity_id: Optional[str] = None
+    preset: Optional[str] = None
+    speed_mode: str = "auto"
+    max_plans: int = Field(default=5, ge=1, le=20)
+    filters: Optional[dict[str, Any]] = None
+
+
+@app.get("/api/sp3/presets")
+def get_sp3_presets():
+    """Return available SP3 schedule recommendation presets and speed modes."""
+    return {
+        "presets": AVAILABLE_PRESETS,
+        "speed_modes": [mode.value for mode in SpeedMode],
+    }
 
 
 @app.get("/api/sp3/catalog")
@@ -1725,6 +1739,10 @@ def run_sp3_demo_plan(req: SP3DemoPlanRequest):
             target_total=req.total_target,
             busy_intervals=req.busy_intervals,
             skip_activity_id=req.skip_activity_id,
+            preset=req.preset,
+            speed_mode=req.speed_mode,
+            max_plans=req.max_plans,
+            filters=req.filters,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

@@ -70,6 +70,7 @@ def schedule_set(
     previous_blocks: Mapping[str, Sequence[Interval]] | None = None,
     keep: Iterable[str] = (),
     max_flexible_per_set: int = MAX_FLEXIBLE_PER_SET,
+    fast_flexible: bool = False,
 ) -> ScheduleResult:
     """Schedule every activity of ``activities`` together, or prove it impossible.
 
@@ -77,6 +78,8 @@ def schedule_set(
     entries for activities outside the set are ignored. ``keep`` names the
     KEEP_TIME activities, which must be in the set and have previous blocks.
     Computed flexible blocks are expressed in the offset of ``window_start``.
+    When ``fast_flexible=True``, large flexible sets use O(k^2) EDF/slack
+    heuristics to avoid exponential blowup while guaranteeing valid blocks.
     """
     if type(max_flexible_per_set) is not int or max_flexible_per_set < 0:
         raise ValueError("max_flexible_per_set must be a non-negative integer")
@@ -123,21 +126,55 @@ def schedule_set(
         if _earliest_fit(item, item.start, free) is None:
             return _unschedulable("A flexible activity fits in no free interval on its own.")
         items.append(item)
-    if len(items) > max_flexible_per_set:
+
+    if not fast_flexible and len(items) > max_flexible_per_set:
         return ScheduleResult(ScheduleStatus.UNDETERMINED, reason="More flexible activities than the scheduling limit.")
 
-    placement = _place(items, free)
-    if placement is None:
-        return _unschedulable("No non-overlapping placement exists for the flexible activities.")
-    held: tuple[_Flexible, ...] = ()
-    minimal = True
-    keepable = [item for item in items if item.activity_id in previous and _fits_previous(item, previous[item.activity_id], free)]
-    if keepable:
-        outcome = _keep_most(items, keepable, previous, free, max_flexible_per_set * (1 << max_flexible_per_set))
-        if outcome is None:
-            minimal = False
-        elif outcome[0]:
-            held, placement = outcome
+    total_free_us = sum(e - s for s, e in zip(free[0], free[1]))
+    if sum(item.duration for item in items) > total_free_us:
+        return _unschedulable("Total flexible duration exceeds remaining free time.")
+
+    if not fast_flexible:
+        placement = _place(items, free)
+        if placement is None:
+            return _unschedulable("No non-overlapping placement exists for the flexible activities.")
+        held: tuple[_Flexible, ...] = ()
+        minimal = True
+        keepable = [item for item in items if item.activity_id in previous and _fits_previous(item, previous[item.activity_id], free)]
+        if keepable:
+            outcome = _keep_most(items, keepable, previous, free, max_flexible_per_set * (1 << max_flexible_per_set))
+            if outcome is None:
+                minimal = False
+            elif outcome[0]:
+                held, placement = outcome
+    else:
+        if len(items) <= min(8, max_flexible_per_set):
+            placement = _place(items, free)
+            if placement is None:
+                return _unschedulable("No non-overlapping placement exists for the flexible activities.")
+        else:
+            placement = _place_greedy_edf(items, free)
+            if placement is None and len(items) <= min(11, max_flexible_per_set):
+                placement = _place(items, free)
+            if placement is None:
+                if len(items) > max_flexible_per_set:
+                    return ScheduleResult(ScheduleStatus.UNDETERMINED, reason="More flexible activities than the scheduling limit.")
+                return _unschedulable("No non-overlapping placement exists for the flexible activities.")
+        held = ()
+        minimal = len(items) <= min(8, max_flexible_per_set)
+        keepable = [item for item in items if item.activity_id in previous and _fits_previous(item, previous[item.activity_id], free)]
+        if keepable:
+            if len(items) <= min(8, max_flexible_per_set):
+                outcome = _keep_most(items, keepable, previous, free, 8 * (1 << 8))
+                if outcome is None:
+                    minimal = False
+                elif outcome[0]:
+                    held, placement = outcome
+            else:
+                greedy_held = _keep_greedy(items, keepable, previous, free)
+                if greedy_held is not None:
+                    held, placement = greedy_held
+                minimal = False
 
     zone = window_start.tzinfo
     held_ids = {item.activity_id for item in held}
@@ -289,3 +326,92 @@ def _keep_most(
             if placement is not None:
                 return group, placement
     return (), {}
+
+
+def _place_greedy_edf(
+    items: Sequence[_Flexible],
+    free: tuple[list[int], list[int]],
+) -> dict[str, tuple[int, int]] | None:
+    """Fast O(k^2) placement using multi-rule dispatch (Earliest Finish, EDF, Least Slack)."""
+    if not items:
+        return {}
+    # Rule 1: Left-shifted dynamic Earliest-Completion-Time + Earliest-Deadline tie-break
+    remaining = list(enumerate(items))
+    cursor = min(item.start for item in items)
+    placement: dict[str, tuple[int, int]] = {}
+    ok = True
+    while remaining:
+        best_choice: tuple[int, int, int, int, _Flexible] | None = None
+        for idx, item in remaining:
+            begin = _earliest_fit(item, cursor, free)
+            if begin is None:
+                ok = False
+                break
+            finish = begin + item.duration
+            candidate_key = (finish, item.end, -idx, begin, item)
+            if best_choice is None or candidate_key[:3] < best_choice[:3]:
+                best_choice = candidate_key
+        if not ok or best_choice is None:
+            break
+        finish, _, neg_idx, begin, chosen_item = best_choice
+        chosen_idx = -neg_idx
+        placement[chosen_item.activity_id] = (begin, finish)
+        cursor = finish
+        remaining = [(i, it) for i, it in remaining if i != chosen_idx]
+    if ok and len(placement) == len(items):
+        return placement
+
+    # Rule 2 & 3: Interval-carving with Earliest Deadline First (EDF) and Least Slack First
+    indexed = list(enumerate(items))
+    orders = (
+        sorted(indexed, key=lambda pair: (pair[1].end, pair[1].start, pair[1].duration, -pair[0])),
+        sorted(indexed, key=lambda pair: (pair[1].end - pair[1].start - pair[1].duration, pair[1].end, -pair[0])),
+        sorted(indexed, key=lambda pair: (pair[1].start, pair[1].end, pair[1].duration, -pair[0])),
+    )
+    for order in orders:
+        cur_free = (list(free[0]), list(free[1]))
+        carved: dict[str, tuple[int, int]] = {}
+        for _, item in order:
+            begin = _earliest_fit(item, item.start, cur_free)
+            if begin is None:
+                break
+            end = begin + item.duration
+            carved[item.activity_id] = (begin, end)
+            cur_free = _subtract(list(zip(cur_free[0], cur_free[1])), [(begin, end)])
+        else:
+            return carved
+    return None
+
+
+def _keep_greedy(
+    items: Sequence[_Flexible],
+    keepable: Sequence[_Flexible],
+    previous: Mapping[str, tuple[Interval, ...]],
+    free: tuple[list[int], list[int]],
+) -> tuple[tuple[_Flexible, ...], dict[str, tuple[int, int]]] | None:
+    """Greedily retain non-overlapping previous blocks when the set is large."""
+    held_blocks = {
+        item.activity_id: (_us(previous[item.activity_id][0][0]), _us(previous[item.activity_id][0][1]))
+        for item in keepable
+    }
+    held: list[_Flexible] = []
+    spans: list[tuple[int, int]] = []
+    for item in keepable:
+        block = held_blocks[item.activity_id]
+        if any(block[0] < s[1] and s[0] < block[1] for s in spans):
+            continue
+        candidate_spans = sorted([*spans, block])
+        rest = [other for other in items if other not in held and other != item]
+        rem_free = _subtract(list(zip(free[0], free[1])), candidate_spans)
+        placement = _place_greedy_edf(rest, rem_free)
+        if placement is not None:
+            held.append(item)
+            spans = candidate_spans
+    if not held:
+        return None
+    rest = [other for other in items if other not in held]
+    rem_free = _subtract(list(zip(free[0], free[1])), spans)
+    placement = _place_greedy_edf(rest, rem_free)
+    if placement is None:
+        return None
+    return tuple(held), placement

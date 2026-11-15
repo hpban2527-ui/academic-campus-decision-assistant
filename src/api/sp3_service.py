@@ -11,7 +11,7 @@ from sp1.extractor import extract_post
 from sp3.availability import resolve_availability
 from sp3.feasibility import FeasibilityEvidence, assess_feasibility
 from sp3.plan_checker import check_plan
-from sp3.planner import build_plan, what_if_skip
+from sp3.planner import AVAILABLE_PRESETS, SpeedMode, build_plan, recommend_plans, what_if_skip
 from sp3.projected_scorer import InMemoryScoringData, ProjectedScorer
 from sp3.scorer_adapter import ScorerAdapter
 
@@ -82,6 +82,10 @@ def _step(
     *,
     target_total: int | None = None,
     busy_intervals: list[dict[str, str]] | None = None,
+    preset: str | None = None,
+    speed_mode: str = "auto",
+    max_plans: int = 5,
+    filters: dict | None = None,
 ) -> dict:
     stored = fixture["steps"][name]
     feasibility_request = deepcopy(stored["feasibility_request"])
@@ -129,15 +133,30 @@ def _step(
         "previous_plan": previous_plan,
         "keep_requests": [],
     }
-    plan = build_plan(planner_input, _score_callback(fixture))
+    plan = build_plan(
+        planner_input,
+        _score_callback(fixture),
+        preset=preset,
+        speed_mode=speed_mode,
+        filters=filters,
+    )
     violations = check_plan(planner_input, plan, _score_callback(fixture), input_snapshot=deepcopy(planner_input))
     if violations:
         raise RuntimeError("SP3 independent plan check failed.")
+    recommendation = recommend_plans(
+        planner_input,
+        _score_callback(fixture),
+        preset=preset or "balanced",
+        speed_mode=speed_mode,
+        max_plans=max_plans,
+        filters=filters,
+    )
     return {
         "availability": availability,
         "feasibility": feasibility,
         "plan": plan,
         "planner_input": planner_input,
+        "recommendation": recommendation,
     }
 
 
@@ -147,6 +166,10 @@ def demo_plan(
     target_total: int | None = None,
     busy_intervals: list[dict[str, str]] | None = None,
     skip_activity_id: str | None = None,
+    preset: str | None = None,
+    speed_mode: str = "auto",
+    max_plans: int = 5,
+    filters: dict | None = None,
 ) -> dict:
     """Exercise the full pipeline on synthetic data with optional UI constraints."""
     if scenario not in {"first_plan", "replan", "what_if_skip"}:
@@ -158,32 +181,78 @@ def demo_plan(
     if busy_intervals and scenario not in {"first_plan", "what_if_skip"}:
         raise ValueError("busy_intervals can only be customized in first_plan or what_if_skip")
     fixture = _json(DEMO)
-    first = _step(fixture, "step1", target_total=target_total, busy_intervals=busy_intervals)
+    first = _step(
+        fixture,
+        "step1",
+        target_total=target_total,
+        busy_intervals=busy_intervals,
+        preset=preset,
+        speed_mode=speed_mode,
+        max_plans=max_plans,
+        filters=filters,
+    )
     if scenario == "first_plan":
         output = first
     elif scenario == "replan":
-        second = _step(fixture, "step2", previous=first["plan"], target_total=target_total)
+        second = _step(
+            fixture,
+            "step2",
+            previous=first["plan"],
+            target_total=target_total,
+            preset=preset,
+            speed_mode=speed_mode,
+            max_plans=max_plans,
+            filters=filters,
+        )
         output = second
     else:
         skip_id = skip_activity_id or "QUIZ-L"
-        base_step = first if not busy_intervals else _step(fixture, "step2", previous=first["plan"], target_total=target_total)
+        base_step = first if not busy_intervals else _step(
+            fixture,
+            "step2",
+            previous=first["plan"],
+            target_total=target_total,
+            preset=preset,
+            speed_mode=speed_mode,
+            max_plans=max_plans,
+            filters=filters,
+        )
         base_input = base_step["planner_input"]
-        preview = what_if_skip(base_input, skip_id, _score_callback(fixture))
-        if check_plan(
-            {**deepcopy(base_input),
-             "candidates": [
-                 {**deepcopy(item),
-                  "participation": {
-                      **item["participation"],
-                      "progress": "CANCELLED" if item["activity"]["activity_id"] == skip_id
-                      else item["participation"]["progress"],
-                  }}
-                 for item in base_input["candidates"]
-             ]},
-            preview, _score_callback(fixture),
-        ):
+        preview = what_if_skip(
+            base_input,
+            skip_id,
+            _score_callback(fixture),
+            preset=preset,
+            speed_mode=speed_mode,
+            filters=filters,
+        )
+        skipped_input = {
+            **deepcopy(base_input),
+            "candidates": [
+                {
+                    **deepcopy(item),
+                    "participation": {
+                        **item["participation"],
+                        "progress": "CANCELLED"
+                        if item["activity"]["activity_id"] == skip_id
+                        else item["participation"]["progress"],
+                    },
+                }
+                for item in base_input["candidates"]
+            ],
+        }
+        if check_plan(skipped_input, preview, _score_callback(fixture)):
             raise RuntimeError("SP3 what-if plan check failed.")
-        output = {**base_step, "plan": preview}
+        rec = recommend_plans(
+            skipped_input,
+            _score_callback(fixture),
+            preset=preset or "balanced",
+            speed_mode=speed_mode,
+            max_plans=max_plans,
+            filters=filters,
+        )
+        output = {**base_step, "plan": preview, "recommendation": rec}
+    rec_data = output["recommendation"]
     return {
         "mode": "DEMO_ONLY",
         "official_award_verified": False,
@@ -194,5 +263,12 @@ def demo_plan(
         "availability": output["availability"],
         "feasibility": output["feasibility"],
         "plan": output["plan"],
+        "recommended_plans": rec_data["plans"],
+        "plan_summaries": rec_data["plan_summaries"],
+        "preset": rec_data["preset"],
+        "speed_mode": rec_data["speed_mode"],
+        "available_presets": AVAILABLE_PRESETS,
+        "candidate_stats": rec_data["candidate_stats"],
+        "elapsed_ms": rec_data["elapsed_ms"],
         "dropped_activity_id": skip_id if scenario == "what_if_skip" else None,
     }

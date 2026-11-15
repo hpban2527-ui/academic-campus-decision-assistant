@@ -19,8 +19,18 @@ from .feasibility import (
     TermScopeStatus,
     assess_feasibility,
 )
+from .planner import (
+    AVAILABLE_PRESETS,
+    PlanFilters,
+    PresetMode,
+    SpeedMode,
+    build_plan,
+    recommend_plans,
+    what_if_skip,
+)
 
 __all__ = [
+    "AVAILABLE_PRESETS",
     "AVAILABILITY_VERSION",
     "ApplyScope",
     "AvailabilityContractError",
@@ -29,10 +39,16 @@ __all__ = [
     "FeasibilityContractError",
     "FeasibilityEvidence",
     "FeasibilityStatus",
+    "PlanFilters",
+    "PresetMode",
     "ProgressStatus",
     "RegistrationStatus",
     "ScheduleType",
+    "SpeedMode",
     "TermScopeStatus",
     "assess_feasibility",
+    "build_plan",
+    "recommend_plans",
     "resolve_availability",
+    "what_if_skip",
 ]
