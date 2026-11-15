@@ -2,7 +2,7 @@
   "schema": "sp1-features-provenance/1.0",
   "label": "auto_derived_not_human_reviewed",
   "note": "Every value in the output file is derived by the documented rules (D19), including for the activities that also appear in data/activity_features.json. The differences list shows where that file says something else, for its owner to reconcile. That file is never written here, and no value here is human reviewed.",
-  "output_file": "data/handover/activity_features_sp1.json",
+  "output_file": "data\\handover\\activity_features_sp1.json",
   "policy": "rules_decide",
   "also_in_activity_features_json": [
     "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al",
@@ -413,7 +413,8 @@
       "rule_value_used": {
         "topics": [
           "research",
-          "technology"
+          "chemistry",
+          "computer_science"
         ],
         "campus_id": null,
         "time_tags": [

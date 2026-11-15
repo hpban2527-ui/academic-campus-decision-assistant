@@ -68,6 +68,54 @@
     ::-webkit-scrollbar-track { background: #080c14; }
     ::-webkit-scrollbar-thumb { background: #1b2537; border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: #2b3a54; }
+    .planner-heading { text-wrap: balance; }
+    .planner-copy { text-wrap: pretty; }
+    .planner-number { font-variant-numeric: tabular-nums; }
+    .availability-cell {
+      min-height: 44px;
+      transition-property: transform, background-color, border-color, color, box-shadow;
+      transition-duration: 150ms;
+      transition-timing-function: ease-out;
+    }
+    .availability-cell:active { transform: scale(0.97); }
+    .availability-cell[data-free="true"] {
+      background: rgba(5, 150, 105, 0.13);
+      border-color: rgba(52, 211, 153, 0.38);
+      color: #a7f3d0;
+    }
+    .availability-cell[data-free="false"] {
+      background: rgba(71, 85, 105, 0.2);
+      border-color: rgba(100, 116, 139, 0.36);
+      color: #94a3b8;
+    }
+    .plan-calendar-board { min-width: 760px; }
+    .plan-calendar-day {
+      height: 672px;
+      background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 47px, rgba(51, 65, 85, 0.52) 48px);
+    }
+    .plan-calendar-event {
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      box-shadow: 0 8px 22px rgba(2, 6, 23, 0.32);
+      transition-property: transform, box-shadow, filter;
+      transition-duration: 150ms;
+      transition-timing-function: ease-out;
+    }
+    .plan-calendar-event:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(2, 6, 23, 0.48);
+      filter: brightness(1.08);
+      z-index: 4;
+    }
+    .plan-view-toggle {
+      min-height: 40px;
+      transition-property: background-color, color, border-color, box-shadow;
+      transition-duration: 150ms;
+      transition-timing-function: ease-out;
+    }
   </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden antialiased bg-[#080c14] text-slate-100 selection:bg-indigo-900 selection:text-white">
@@ -775,7 +823,7 @@
               <div class="flex flex-wrap items-center gap-2.5">
                 <h2 class="text-xl font-extrabold text-white tracking-tight">Kế hoạch Rèn luyện Cá nhân <span class="dev-only font-mono text-sm text-indigo-300 font-normal">(SP3)</span></h2>
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
-                  Lộ trình tối ưu
+                  Planner
                 </span>
                 <span id="planHeaderModeBadge" class="dev-only px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
                   DEMO_ONLY
@@ -827,6 +875,24 @@
                   <textarea id="preferenceText" rows="3" maxlength="2000" oninput="onPreferenceTextChanged()" class="w-full rounded-xl bg-[#080d18] border border-[#223046] px-3.5 py-3 text-sm text-white placeholder:text-slate-500 focus:border-indigo-500 outline-none resize-y" placeholder="Ví dụ: Em thích Toán và AI, ưu tiên hoạt động mục 4, thích học online; nếu trực tiếp thì ưu tiên cơ sở Nguyễn Văn Cừ. Tối đa 4 hoạt động."></textarea>
                 </label>
                 <button id="btnInterpretPreference" type="button" onclick="interpretPreference()" class="h-11 px-5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-bold transition">Phân tích nguyện vọng</button>
+              </div>
+              <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Chọn nhanh chủ đề quan tâm</span>
+                <div id="preferenceQuickTopics" class="flex flex-wrap gap-2">
+                  <button type="button" onclick="addPreferencePhrase('Toán học')" class="min-h-10 px-3 rounded-lg border border-violet-500/30 bg-violet-950/30 text-xs font-bold text-violet-200 hover:bg-violet-900/50">Toán học</button>
+                  <button type="button" onclick="addPreferencePhrase('Vật lý')" class="min-h-10 px-3 rounded-lg border border-emerald-500/30 bg-emerald-950/30 text-xs font-bold text-emerald-200 hover:bg-emerald-900/50">Vật lý</button>
+                  <button type="button" onclick="addPreferencePhrase('Hóa học')" class="min-h-10 px-3 rounded-lg border border-sky-500/30 bg-sky-950/30 text-xs font-bold text-sky-200 hover:bg-sky-900/50">Hóa học</button>
+                  <button type="button" onclick="addPreferencePhrase('Sinh học')" class="min-h-10 px-3 rounded-lg border border-lime-500/30 bg-lime-950/30 text-xs font-bold text-lime-200 hover:bg-lime-900/50">Sinh học</button>
+                  <button type="button" onclick="addPreferencePhrase('Tin học và lập trình')" class="min-h-10 px-3 rounded-lg border border-blue-500/30 bg-blue-950/30 text-xs font-bold text-blue-200 hover:bg-blue-900/50">Tin học &amp; Lập trình</button>
+                  <button type="button" onclick="addPreferencePhrase('Trí tuệ nhân tạo')" class="min-h-10 px-3 rounded-lg border border-fuchsia-500/30 bg-fuchsia-950/30 text-xs font-bold text-fuchsia-200 hover:bg-fuchsia-900/50">AI</button>
+                  <button type="button" onclick="addPreferencePhrase('Ngoại ngữ')" class="min-h-10 px-3 rounded-lg border border-cyan-500/30 bg-cyan-950/30 text-xs font-bold text-cyan-200 hover:bg-cyan-900/50">Ngoại ngữ</button>
+                  <button type="button" onclick="addPreferencePhrase('Kinh tế và tài chính')" class="min-h-10 px-3 rounded-lg border border-amber-500/30 bg-amber-950/30 text-xs font-bold text-amber-200 hover:bg-amber-900/50">Kinh tế &amp; Tài chính</button>
+                  <button type="button" onclick="addPreferencePhrase('Nghiên cứu')" class="min-h-10 px-3 rounded-lg border border-[#334155] bg-[#111827] text-xs font-bold text-slate-300 hover:bg-[#1e293b]">Nghiên cứu</button>
+                  <button type="button" onclick="addPreferencePhrase('Kỹ năng mềm')" class="min-h-10 px-3 rounded-lg border border-[#334155] bg-[#111827] text-xs font-bold text-slate-300 hover:bg-[#1e293b]">Kỹ năng mềm</button>
+                  <button type="button" onclick="addPreferencePhrase('Tình nguyện')" class="min-h-10 px-3 rounded-lg border border-[#334155] bg-[#111827] text-xs font-bold text-slate-300 hover:bg-[#1e293b]">Tình nguyện</button>
+                  <button type="button" onclick="addPreferencePhrase('Môi trường')" class="min-h-10 px-3 rounded-lg border border-[#334155] bg-[#111827] text-xs font-bold text-slate-300 hover:bg-[#1e293b]">Môi trường</button>
+                  <button type="button" onclick="addPreferencePhrase('Văn hóa và thể thao')" class="min-h-10 px-3 rounded-lg border border-[#334155] bg-[#111827] text-xs font-bold text-slate-300 hover:bg-[#1e293b]">Văn hóa &amp; Thể thao</button>
+                </div>
               </div>
 
               <div id="preferenceMessage" class="hidden rounded-xl border px-3.5 py-3 text-sm" role="status"></div>
@@ -898,34 +964,37 @@
                 
                 <!-- Popover Toggle for Personal Busy Time -->
                 <div class="relative">
-                  <button type="button" onclick="toggleBusySlotsPopover()" id="btnToggleBusySlots" class="px-3.5 py-2 rounded-xl bg-[#0e1524] hover:bg-[#11192b] border border-[#223046] text-xs font-semibold text-slate-300 flex items-center gap-2 transition">
+                  <button type="button" onclick="toggleBusySlotsPopover()" id="btnToggleBusySlots" class="min-h-11 px-3.5 py-2 rounded-xl bg-[#0e1524] hover:bg-[#11192b] border border-[#223046] text-xs font-semibold text-slate-300 flex items-center gap-2 transition">
                     <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <span>Tránh trùng lịch học</span>
-                    <span id="busySlotsBadge" class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#162032] text-slate-400">0 buổi</span>
+                    <span>Thiết lập thời gian rảnh</span>
+                    <span id="busySlotsBadge" class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/60 text-emerald-300">Tất cả rảnh</span>
                     <svg id="busySlotsChevron" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                   </button>
 
                   <!-- Popover Panel -->
-                  <div id="busySlotsPopover" class="hidden absolute right-0 mt-2 w-72 sm:w-84 bg-[#0e1524] rounded-2xl shadow-2xl border border-[#223046] p-4 z-40 space-y-3">
-                    <div class="flex items-center justify-between pb-2 border-b border-[#1b2537]">
+                  <div id="busySlotsPopover" class="hidden absolute right-0 mt-2 w-[min(92vw,760px)] bg-[#0e1524] rounded-2xl shadow-2xl border border-[#2b3a54] p-4 sm:p-5 z-40 space-y-4">
+                    <div class="flex items-start justify-between gap-4 pb-3 border-b border-[#1b2537]">
                       <div>
-                        <span class="text-xs font-bold text-white block">Buổi bạn bận học / việc riêng</span>
-                        <span class="text-[11px] text-slate-400">Hệ thống sẽ tự động tránh xếp hoạt động vào các buổi này:</span>
+                        <span class="text-sm font-extrabold text-white block">Lịch rảnh trong tuần</span>
+                        <span class="text-xs text-slate-400 planner-copy">Ô xanh là thời gian có thể tham gia. Bấm vào ô để đánh dấu bận; hệ thống sẽ không xếp hoạt động vào đó.</span>
                       </div>
+                      <button type="button" onclick="resetAvailabilityPicker()" class="min-h-10 px-3 rounded-lg border border-[#2b3a54] text-xs font-bold text-slate-300 hover:text-white hover:bg-[#162032]">Đặt lại</button>
                     </div>
-                    <div id="busySlotsInputs" class="space-y-2 text-xs text-slate-300">
-                      <label class="flex items-center gap-2.5 p-2 rounded-lg bg-[#080d18] border border-[#1b2537] hover:border-indigo-500/50 cursor-pointer transition">
-                        <input type="checkbox" id="busySlot1" onchange="onBusySlotChanged()" data-start="2026-11-09T09:00:00+07:00" data-end="2026-11-09T10:30:00+07:00" class="rounded border-[#223046] text-indigo-600 focus:ring-indigo-500" />
-                        <span class="leading-tight">Thứ 2 (09/11): 09:00–10:30 <span class="text-slate-500 block text-[10px]">Trùng ca seminar sáng</span></span>
-                      </label>
-                      <label class="flex items-center gap-2.5 p-2 rounded-lg bg-[#080d18] border border-[#1b2537] hover:border-indigo-500/50 cursor-pointer transition">
-                        <input type="checkbox" id="busySlot2" onchange="onBusySlotChanged()" data-start="2026-11-11T07:00:00+07:00" data-end="2026-11-11T08:00:00+07:00" class="rounded border-[#223046] text-indigo-600 focus:ring-indigo-500" />
-                        <span class="leading-tight">Thứ 4 (11/11): 07:00–08:00 <span class="text-slate-500 block text-[10px]">Đầu ca sáng</span></span>
-                      </label>
-                      <label class="flex items-center gap-2.5 p-2 rounded-lg bg-[#080d18] border border-[#1b2537] hover:border-indigo-500/50 cursor-pointer transition">
-                        <input type="checkbox" id="busySlot3" onchange="onBusySlotChanged()" data-start="2026-11-12T14:00:00+07:00" data-end="2026-11-12T15:30:00+07:00" class="rounded border-[#223046] text-indigo-600 focus:ring-indigo-500" />
-                        <span class="leading-tight">Thứ 5 (12/11): 14:00–15:30 <span class="text-slate-500 block text-[10px]">Trùng ca chiều</span></span>
-                      </label>
+                    <div class="overflow-x-auto pb-1">
+                      <p class="sm:hidden text-[11px] text-indigo-300 mb-2">Kéo ngang để xem đủ 7 ngày.</p>
+                      <div id="availabilityPickerGrid" class="min-w-[650px]"></div>
+                    </div>
+                    <div class="rounded-xl border border-[#223046] bg-[#080d18] p-3 space-y-3">
+                      <div>
+                        <span class="text-xs font-extrabold text-white">Thêm giờ bận chính xác</span>
+                        <span class="text-[11px] text-slate-500 block">Dùng khi lịch học hoặc việc riêng không trùng trọn một buổi.</span>
+                      </div>
+                      <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 items-end">
+                        <label class="text-[11px] text-slate-400">Bắt đầu<input id="customBusyStart" type="datetime-local" class="mt-1 w-full min-h-10 rounded-lg bg-[#0e1524] border border-[#2b3a54] px-2.5 text-xs text-white" /></label>
+                        <label class="text-[11px] text-slate-400">Kết thúc<input id="customBusyEnd" type="datetime-local" class="mt-1 w-full min-h-10 rounded-lg bg-[#0e1524] border border-[#2b3a54] px-2.5 text-xs text-white" /></label>
+                        <button type="button" onclick="addCustomBusyInterval()" class="min-h-10 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white">Thêm</button>
+                      </div>
+                      <div id="customBusySlotsList" class="flex flex-wrap gap-2"></div>
                     </div>
                   </div>
                 </div>
@@ -1010,8 +1079,44 @@
               <div id="planPersonalizationCard" class="hidden"></div>
               <div id="planChangeCard"></div>
 
+              <!-- Calendar-first planner result, matching the way students read a weekly schedule. -->
+              <section class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl overflow-hidden" aria-labelledby="planScheduleTitle">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border-b border-[#1b2537] bg-[#0b101b]">
+                  <div>
+                    <h3 id="planScheduleTitle" class="text-base font-extrabold text-white planner-heading">Lịch trình gợi ý</h3>
+                    <p class="text-xs text-slate-400 planner-copy">Hoạt động được đặt vào lịch theo giờ rảnh, mục tiêu ĐRL và nguyện vọng bạn đã xác nhận.</p>
+                  </div>
+                  <div class="inline-flex self-start sm:self-auto rounded-xl border border-[#2b3a54] bg-[#080d18] p-1">
+                    <button id="planCalendarModeBtn" type="button" onclick="setPlannerResultMode('calendar')" class="plan-view-toggle px-3.5 rounded-lg bg-indigo-600 text-white text-xs font-bold">Lịch</button>
+                    <button id="planListModeBtn" type="button" onclick="setPlannerResultMode('list')" class="plan-view-toggle px-3.5 rounded-lg text-slate-300 text-xs font-bold">Danh sách</button>
+                  </div>
+                </div>
+
+                <div id="planCalendarView" class="grid grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_320px]">
+                  <div class="min-w-0 border-b 2xl:border-b-0 2xl:border-r border-[#1b2537]">
+                    <div class="flex items-center justify-between gap-3 p-3 border-b border-[#1b2537]">
+                      <div class="flex items-center gap-2">
+                        <button type="button" onclick="changePlanCalendarWeek(-1)" aria-label="Tuần trước" class="w-10 h-10 rounded-xl border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">‹</button>
+                        <button type="button" onclick="changePlanCalendarWeek(1)" aria-label="Tuần sau" class="w-10 h-10 rounded-xl border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">›</button>
+                      </div>
+                      <strong id="planCalendarWeekLabel" class="text-sm text-white planner-number text-center"></strong>
+                      <span class="hidden sm:inline text-[11px] text-slate-500">07:00–21:00</span>
+                    </div>
+                    <div id="planCalendarGrid" class="overflow-x-auto"></div>
+                    <p class="sm:hidden px-4 pb-3 text-[11px] text-indigo-300">Kéo ngang để xem đủ 7 ngày trong tuần.</p>
+                    <div id="planCalendarLegend" class="flex flex-wrap gap-3 px-4 py-3 border-t border-[#1b2537] text-[11px] text-slate-400"></div>
+                  </div>
+                  <aside class="p-4 bg-[#0b101b]/60">
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                      <h4 class="text-sm font-extrabold text-white">Hoạt động trong kế hoạch</h4>
+                      <span id="planCalendarCount" class="px-2 py-0.5 rounded-full bg-indigo-950/60 text-indigo-300 text-xs font-bold planner-number">0</span>
+                    </div>
+                    <div id="planCalendarActivities" class="space-y-2.5 max-h-[670px] overflow-y-auto pr-1"></div>
+                  </aside>
+                </div>
+
               <!-- Full-Width Tabbed Details Container -->
-              <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl overflow-hidden">
+              <div id="planListView" class="hidden bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl overflow-hidden">
                 <div id="planTabBar" class="flex flex-wrap gap-2 p-3 border-b border-[#1b2537] bg-[#0b101b]"></div>
                 <div class="p-5">
                   <div id="planPanelSelected" class="space-y-3"></div>
@@ -1973,6 +2078,10 @@
     const planStages = { first: null, replan: null, whatif: null };
     let currentPlanStage = 'first';
     let currentPlanTab = 'selected';
+    let plannerResultMode = 'calendar';
+    let planCalendarWeekStart = null;
+    let lastCalendarPlanData = null;
+    let lastCalendarTitles = {};
     let planInputsDirty = false;
     let planStageError = '';
     // The backend demo always simulates cancelling this activity on top of the replanned schedule.
@@ -2023,6 +2132,109 @@
       C4: 'Hoạt động cộng đồng', C5: 'Cán bộ lớp & CLB'
     };
 
+    const AVAILABILITY_DEFAULT_WEEK_START = '2026-11-09';
+    const AVAILABILITY_DAYS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+    const AVAILABILITY_PERIODS = [
+      { key: 'morning', label: 'Sáng', time: '07:00–12:00', start: '07:00', end: '12:00' },
+      { key: 'afternoon', label: 'Chiều', time: '12:00–17:00', start: '12:00', end: '17:00' },
+      { key: 'evening', label: 'Tối', time: '17:00–21:00', start: '17:00', end: '21:00' }
+    ];
+    const unavailableAvailabilitySlots = new Set();
+    let availabilityWeekStart = AVAILABILITY_DEFAULT_WEEK_START;
+    let customBusyIntervals = [];
+
+    function addDaysToIsoDate(isoDate, days) {
+      const [year, month, day] = isoDate.split('-').map(Number);
+      return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+    }
+
+    function renderAvailabilityPicker() {
+      const grid = document.getElementById('availabilityPickerGrid');
+      if (!grid) return;
+      const headers = AVAILABILITY_DAYS.map((label, dayIndex) => {
+        const date = addDaysToIsoDate(availabilityWeekStart, dayIndex);
+        return `<div class="text-center py-2"><span class="block text-xs font-extrabold text-slate-200">${label}</span><span class="text-[10px] text-slate-500 planner-number">${date.slice(8, 10)}/${date.slice(5, 7)}</span></div>`;
+      }).join('');
+      const rows = AVAILABILITY_PERIODS.map(period => {
+        const cells = AVAILABILITY_DAYS.map((label, dayIndex) => {
+          const date = addDaysToIsoDate(availabilityWeekStart, dayIndex);
+          const key = `${date}|${period.key}`;
+          const free = !unavailableAvailabilitySlots.has(key);
+          return `<button type="button" data-free="${free}" aria-pressed="${!free}" aria-label="${label} ${period.label}: ${free ? 'rảnh' : 'bận'}" onclick="toggleAvailabilitySlot('${key}')" class="availability-cell rounded-xl border px-2 py-2 text-center text-[11px] font-bold">
+            <span class="block">${free ? 'Rảnh' : 'Bận'}</span><span class="block mt-0.5 text-[9px] opacity-70">${period.time}</span>
+          </button>`;
+        }).join('');
+        return `<div class="contents"><div class="flex flex-col justify-center pr-2"><span class="text-xs font-bold text-slate-200">${period.label}</span><span class="text-[9px] text-slate-500 planner-number">${period.time}</span></div>${cells}</div>`;
+      }).join('');
+      const weekEnd = addDaysToIsoDate(availabilityWeekStart, 6);
+      grid.innerHTML = `<div class="flex items-center justify-between gap-3 mb-2">
+        <button type="button" onclick="changeAvailabilityWeek(-1)" aria-label="Tuần trước" class="w-10 h-10 rounded-lg border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">‹</button>
+        <strong class="text-xs text-white planner-number">${shortCalendarDate(availabilityWeekStart)} – ${shortCalendarDate(weekEnd)}</strong>
+        <button type="button" onclick="changeAvailabilityWeek(1)" aria-label="Tuần sau" class="w-10 h-10 rounded-lg border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">›</button>
+      </div><div class="grid grid-cols-[74px_repeat(7,minmax(74px,1fr))] gap-2"><div></div>${headers}${rows}</div>`;
+      renderCustomBusySlots();
+      updateBusySlotsBadge();
+    }
+
+    function changeAvailabilityWeek(direction) {
+      availabilityWeekStart = addDaysToIsoDate(availabilityWeekStart, direction * 7);
+      renderAvailabilityPicker();
+    }
+
+    function toggleAvailabilitySlot(key) {
+      if (unavailableAvailabilitySlots.has(key)) unavailableAvailabilitySlots.delete(key);
+      else unavailableAvailabilitySlots.add(key);
+      renderAvailabilityPicker();
+      markPlanStale();
+    }
+
+    function resetAvailabilityPicker() {
+      unavailableAvailabilitySlots.clear();
+      availabilityWeekStart = AVAILABILITY_DEFAULT_WEEK_START;
+      customBusyIntervals = [];
+      const start = document.getElementById('customBusyStart');
+      const end = document.getElementById('customBusyEnd');
+      if (start) start.value = '';
+      if (end) end.value = '';
+      renderAvailabilityPicker();
+      markPlanStale();
+    }
+
+    function localDateTimeToIso(value) {
+      return value ? `${value}:00+07:00` : '';
+    }
+
+    function addCustomBusyInterval() {
+      const startInput = document.getElementById('customBusyStart');
+      const endInput = document.getElementById('customBusyEnd');
+      const start = localDateTimeToIso(startInput?.value || '');
+      const end = localDateTimeToIso(endInput?.value || '');
+      if (!start || !end || new Date(end) <= new Date(start)) {
+        showPreferenceMessage('Giờ kết thúc của khoảng bận phải sau giờ bắt đầu.', 'error');
+        return;
+      }
+      customBusyIntervals.push({ start, end });
+      customBusyIntervals.sort((a, b) => a.start.localeCompare(b.start));
+      if (startInput) startInput.value = '';
+      if (endInput) endInput.value = '';
+      renderAvailabilityPicker();
+      markPlanStale();
+    }
+
+    function removeCustomBusyInterval(index) {
+      customBusyIntervals.splice(index, 1);
+      renderAvailabilityPicker();
+      markPlanStale();
+    }
+
+    function renderCustomBusySlots() {
+      const list = document.getElementById('customBusySlotsList');
+      if (!list) return;
+      list.innerHTML = customBusyIntervals.length
+        ? customBusyIntervals.map((slot, index) => `<span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-amber-500/30 bg-amber-950/30 text-[11px] text-amber-200 planner-number">${escapeHTML(formatPlanTimeRange(slot.start, slot.end))}<button type="button" onclick="removeCustomBusyInterval(${index})" aria-label="Xóa giờ bận" class="w-5 h-5 rounded text-amber-300 hover:bg-amber-900/60">×</button></span>`).join('')
+        : '<span class="text-[11px] text-slate-500">Chưa có giờ bận lẻ.</span>';
+    }
+
     function toggleBusySlotsPopover(forceClose) {
       const popover = document.getElementById('busySlotsPopover');
       const chevron = document.getElementById('busySlotsChevron');
@@ -2032,6 +2244,7 @@
         if (chevron) chevron.style.transform = 'rotate(0deg)';
         return;
       }
+      renderAvailabilityPicker();
       const isHidden = popover.classList.toggle('hidden');
       if (chevron) chevron.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
     }
@@ -2044,16 +2257,12 @@
     function updateBusySlotsBadge() {
       const badge = document.getElementById('busySlotsBadge');
       if (!badge) return;
-      let count = 0;
-      ['busySlot1', 'busySlot2', 'busySlot3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el && el.checked) count++;
-      });
-      badge.innerText = `${count} buổi`;
+      const count = unavailableAvailabilitySlots.size + customBusyIntervals.length;
+      badge.innerText = count ? `${count} khung bận` : 'Tất cả rảnh';
       if (count > 0) {
-        badge.className = "px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-950/80 text-indigo-300 border border-indigo-500/40";
+        badge.className = "px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950/70 text-amber-300 border border-amber-500/30";
       } else {
-        badge.className = "px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#162032] text-slate-400";
+        badge.className = "px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/30";
       }
     }
 
@@ -2071,14 +2280,14 @@
     }
 
     function collectBusyIntervals() {
-      const intervals = [];
-      ['busySlot1', 'busySlot2', 'busySlot3'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el && el.checked) {
-          intervals.push({ start: el.getAttribute('data-start'), end: el.getAttribute('data-end') });
-        }
+      const intervals = [...customBusyIntervals];
+      unavailableAvailabilitySlots.forEach(key => {
+        const [date, periodKey] = key.split('|');
+        const period = AVAILABILITY_PERIODS.find(item => item.key === periodKey);
+        if (!period || !date) return;
+        intervals.push({ start: `${date}T${period.start}:00+07:00`, end: `${date}T${period.end}:00+07:00` });
       });
-      return intervals;
+      return intervals.sort((a, b) => a.start.localeCompare(b.start));
     }
 
     // ---- Day 4: AI preference review and explicit confirmation ----
@@ -2095,7 +2304,9 @@
       { field: 'time_preferences', key: 'time_slot', label: 'Thời gian' }
     ];
     const PREF_LABELS = {
-      mathematics: 'Toán học', artificial_intelligence: 'Trí tuệ nhân tạo', technology: 'Công nghệ',
+      mathematics: 'Toán học', physics: 'Vật lý', chemistry: 'Hóa học', biology: 'Sinh học',
+      computer_science: 'Tin học & Lập trình', foreign_language: 'Ngoại ngữ',
+      economics_finance: 'Kinh tế & Tài chính', artificial_intelligence: 'Trí tuệ nhân tạo', technology: 'Công nghệ',
       research: 'Nghiên cứu', soft_skills: 'Kỹ năng mềm', career: 'Nghề nghiệp', volunteer: 'Tình nguyện',
       environment: 'Môi trường', culture: 'Văn hóa', sports: 'Thể thao', health: 'Sức khỏe',
       safety: 'An toàn', civic_education: 'Giáo dục công dân', NVC: 'Nguyễn Văn Cừ',
@@ -2140,6 +2351,17 @@
       if (!preferenceDraft && !confirmedPreference) return;
       markPreferenceUnconfirmed();
       showPreferenceMessage('Nội dung đã thay đổi. Hãy bấm “Phân tích nguyện vọng” để cập nhật lại tiêu chí.');
+    }
+
+    function addPreferencePhrase(phrase) {
+      const textBox = document.getElementById('preferenceText');
+      if (!textBox) return;
+      const current = textBox.value.trim();
+      if (!current.toLocaleLowerCase('vi').includes(phrase.toLocaleLowerCase('vi'))) {
+        textBox.value = current ? `${current.replace(/[.;,\s]+$/, '')}, ${phrase}` : `Em ưu tiên ${phrase}`;
+      }
+      onPreferenceTextChanged();
+      textBox.focus();
     }
 
     async function interpretPreference() {
@@ -2808,6 +3030,119 @@
         </div>`;
     }
 
+    const PLAN_EVENT_COLORS = [
+      { bg: 'linear-gradient(135deg, rgba(109,40,217,.96), rgba(76,29,149,.94))', border: '#8b5cf6', dot: '#a78bfa' },
+      { bg: 'linear-gradient(135deg, rgba(5,150,105,.94), rgba(6,95,70,.94))', border: '#10b981', dot: '#34d399' },
+      { bg: 'linear-gradient(135deg, rgba(37,99,235,.94), rgba(30,64,175,.94))', border: '#3b82f6', dot: '#60a5fa' },
+      { bg: 'linear-gradient(135deg, rgba(217,119,6,.94), rgba(146,64,14,.94))', border: '#f59e0b', dot: '#fbbf24' },
+      { bg: 'linear-gradient(135deg, rgba(219,39,119,.94), rgba(131,24,67,.94))', border: '#ec4899', dot: '#f472b6' }
+    ];
+
+    function planWeekStart(iso) {
+      const date = (iso || AVAILABILITY_DEFAULT_WEEK_START).slice(0, 10);
+      const [year, month, day] = date.split('-').map(Number);
+      const point = new Date(Date.UTC(year, month - 1, day));
+      const offset = (point.getUTCDay() + 6) % 7;
+      point.setUTCDate(point.getUTCDate() - offset);
+      return point.toISOString().slice(0, 10);
+    }
+
+    function shortCalendarDate(isoDate) {
+      const [year, month, day] = isoDate.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    function setPlannerResultMode(mode) {
+      plannerResultMode = mode === 'list' ? 'list' : 'calendar';
+      document.getElementById('planCalendarView')?.classList.toggle('hidden', plannerResultMode !== 'calendar');
+      document.getElementById('planListView')?.classList.toggle('hidden', plannerResultMode !== 'list');
+      const calendarBtn = document.getElementById('planCalendarModeBtn');
+      const listBtn = document.getElementById('planListModeBtn');
+      if (calendarBtn) calendarBtn.className = `plan-view-toggle px-3.5 rounded-lg text-xs font-bold ${plannerResultMode === 'calendar' ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30' : 'text-slate-300 hover:bg-[#162032]'}`;
+      if (listBtn) listBtn.className = `plan-view-toggle px-3.5 rounded-lg text-xs font-bold ${plannerResultMode === 'list' ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30' : 'text-slate-300 hover:bg-[#162032]'}`;
+    }
+
+    function changePlanCalendarWeek(direction) {
+      if (!lastCalendarPlanData) return;
+      const blocks = (lastCalendarPlanData.plan?.selected_activities || []).flatMap(item => item.scheduled_blocks || []);
+      const weeks = [...new Set(blocks.map(block => planWeekStart(block.start)))].sort();
+      if (!weeks.length) weeks.push(planWeekStart(AVAILABILITY_DEFAULT_WEEK_START));
+      const current = Math.max(0, weeks.indexOf(planCalendarWeekStart));
+      planCalendarWeekStart = weeks[Math.max(0, Math.min(weeks.length - 1, current + direction))];
+      renderPlanCalendar(lastCalendarPlanData, lastCalendarTitles, true);
+    }
+
+    function renderPlanCalendar(data, titles, preserveWeek = false) {
+      lastCalendarPlanData = data;
+      lastCalendarTitles = titles || {};
+      const plan = data.plan || {};
+      const acts = plan.selected_activities || [];
+      const blocks = acts.flatMap((item, activityIndex) => (item.scheduled_blocks || []).map(block => ({
+        ...block, activityIndex, activity: item
+      })));
+      const weeks = [...new Set(blocks.map(block => planWeekStart(block.start)))].sort();
+      if (!weeks.length) weeks.push(planWeekStart(AVAILABILITY_DEFAULT_WEEK_START));
+      if (!preserveWeek || !weeks.includes(planCalendarWeekStart)) planCalendarWeekStart = weeks[0];
+
+      const weekEnd = addDaysToIsoDate(planCalendarWeekStart, 6);
+      const label = document.getElementById('planCalendarWeekLabel');
+      if (label) label.textContent = `Tuần ${shortCalendarDate(planCalendarWeekStart)} – ${shortCalendarDate(weekEnd)}`;
+      const count = document.getElementById('planCalendarCount');
+      if (count) count.textContent = String(acts.length);
+
+      const grid = document.getElementById('planCalendarGrid');
+      if (grid) {
+        const dayHeaders = AVAILABILITY_DAYS.map((dayName, index) => {
+          const date = addDaysToIsoDate(planCalendarWeekStart, index);
+          return `<div class="py-2.5 text-center border-l border-[#1b2537]"><span class="block text-xs font-extrabold text-slate-200">${dayName}</span><span class="text-[10px] text-slate-500 planner-number">${date.slice(8, 10)}/${date.slice(5, 7)}</span></div>`;
+        }).join('');
+        const hourLabels = Array.from({ length: 15 }, (_, index) => {
+          const hour = 7 + index;
+          return `<span class="absolute right-2 -translate-y-1/2 text-[10px] text-slate-500 planner-number" style="top:${index * 48}px">${String(hour).padStart(2, '0')}:00</span>`;
+        }).join('');
+        const dayColumns = AVAILABILITY_DAYS.map((_, dayIndex) => {
+          const date = addDaysToIsoDate(planCalendarWeekStart, dayIndex);
+          const events = blocks.filter(block => block.start.slice(0, 10) === date).map(block => {
+            const start = new Date(block.start);
+            const end = new Date(block.end);
+            const startMinutes = start.getHours() * 60 + start.getMinutes();
+            const endMinutes = end.getHours() * 60 + end.getMinutes();
+            const top = Math.max(0, ((startMinutes - 420) / 60) * 48);
+            const height = Math.max(30, ((Math.min(endMinutes, 1260) - Math.max(startMinutes, 420)) / 60) * 48);
+            const color = PLAN_EVENT_COLORS[block.activityIndex % PLAN_EVENT_COLORS.length];
+            const title = block.activity.title || titles[block.activity.activity_id] || block.activity.activity_id;
+            const time = `${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}–${String(end.getHours()).padStart(2, '0')}:${String(end.getMinutes()).padStart(2, '0')}`;
+            return `<button type="button" title="${escapeHTML(title)} · ${time}" onclick="setPlannerResultMode('list')" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white" style="top:${top}px;height:${height}px;background:${color.bg};border-left:3px solid ${color.border}">
+              <span class="block text-[10px] font-extrabold leading-tight line-clamp-2">${escapeHTML(title)}</span>
+              <span class="block mt-1 text-[9px] text-white/75 planner-number">${time}</span>
+            </button>`;
+          }).join('');
+          return `<div class="plan-calendar-day relative border-l border-[#1b2537]">${events}</div>`;
+        }).join('');
+        grid.innerHTML = `<div class="plan-calendar-board"><div class="grid bg-[#0b101b] border-b border-[#1b2537]" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div></div>${dayHeaders}</div><div class="grid" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div class="relative h-[672px] bg-[#080d18]">${hourLabels}</div>${dayColumns}</div></div>`;
+      }
+
+      const activities = document.getElementById('planCalendarActivities');
+      if (activities) {
+        activities.innerHTML = acts.length ? acts.map((item, index) => {
+          const color = PLAN_EVENT_COLORS[index % PLAN_EVENT_COLORS.length];
+          const title = item.title || titles[item.activity_id] || item.activity_id;
+          const firstBlock = (item.scheduled_blocks || [])[0];
+          const gains = (item.reasons || []).filter(reason => (reason.projected_added || 0) > 0);
+          const gain = gains.reduce((total, reason) => total + Number(reason.projected_added || 0), 0);
+          const categories = [...new Set(gains.map(reason => PLAN_CAT_LABELS[reason.category_id] || reason.category_id))].join(', ');
+          return `<article class="rounded-xl border border-[#223046] bg-[#080d18] p-3" style="border-left:3px solid ${color.border}">
+            <div class="flex items-start justify-between gap-2"><h5 class="text-xs font-extrabold text-white leading-snug planner-copy">${escapeHTML(title)}</h5>${gain ? `<span class="px-2 py-0.5 rounded-md bg-indigo-950/70 text-indigo-300 text-[10px] font-extrabold shrink-0 planner-number">+${gain}đ</span>` : ''}</div>
+            <div class="mt-2 space-y-1 text-[11px] text-slate-400">${firstBlock ? `<div class="planner-number">◷ ${escapeHTML(formatPlanTimeRange(firstBlock.start, firstBlock.end))}</div>` : '<div>Thời gian linh hoạt</div>'}${categories ? `<div class="text-slate-500">${escapeHTML(categories)}</div>` : ''}</div>
+          </article>`;
+        }).join('') : '<div class="rounded-xl border border-dashed border-[#2b3a54] p-5 text-center text-xs text-slate-500">Không cần thêm hoạt động để đạt mục tiêu hiện tại.</div>';
+      }
+
+      const legend = document.getElementById('planCalendarLegend');
+      if (legend) legend.innerHTML = `<span class="inline-flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-indigo-500"></i>Hoạt động đã xếp</span><span class="inline-flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-slate-600"></i>Khung nền trống chưa có hoạt động</span>${weeks.length > 1 ? `<span class="ml-auto text-indigo-300 planner-number">${weeks.indexOf(planCalendarWeekStart) + 1}/${weeks.length} tuần có hoạt động</span>` : ''}`;
+      setPlannerResultMode(plannerResultMode);
+    }
+
     // ---- main renderer: draws whichever journey step is currently selected ----
     function renderSp3PlanResult() {
       const data = planStages[currentPlanStage];
@@ -2888,6 +3223,7 @@
       const acts = plan.selected_activities || [];
       const availIntervals = availability.available_intervals || [];
       const feasCandidates = feasibility.candidates || [];
+      renderPlanCalendar(data, titles);
       const feasOk = feasCandidates.filter(c => c.feasibility?.status === 'FEASIBLE').length;
       const excluded = plan.excluded_candidates || [];
       const warnings = plan.warnings || [];

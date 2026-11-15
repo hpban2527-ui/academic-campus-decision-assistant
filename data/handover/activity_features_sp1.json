@@ -3,6 +3,12 @@
   "catalog": {
     "topics": [
       "mathematics",
+      "physics",
+      "chemistry",
+      "biology",
+      "computer_science",
+      "foreign_language",
+      "economics_finance",
       "artificial_intelligence",
       "technology",
       "research",
@@ -36,6 +42,7 @@
   "activities": {
     "pfbid01AAm6S6qVctGQsv4wNGYrx7zWTMJ653yWSnzhqoxnzR9DjeXPcjBMLFrzKycB6Gpl": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",
@@ -63,9 +70,9 @@
     },
     "pfbid02285ocydHPVMww7euZXHZq6sqfKstCRijWuA1byprpGga4YynxFJsd9TwMvvVBiD2l": {
       "topics": [
+        "chemistry",
         "technology",
-        "research",
-        "soft_skills"
+        "research"
       ],
       "campus_id": "DONG_HOA",
       "time_tags": [
@@ -170,6 +177,7 @@
     "pfbid029Jij29wV7kgrAX9S3gAYGwJqsF3anMhxQJTTMCgPgT9YPzf8U2Gu6LKrgQwTzPPEl": {
       "topics": [
         "mathematics",
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",
@@ -245,6 +253,7 @@
     },
     "pfbid02Hbu9f7JVWqGnUURwKSQFtzAt2LR83s4KA52ybyfBQyhNCFGJCKtJ1jrfxxFdtJzAl": {
       "topics": [
+        "chemistry",
         "artificial_intelligence",
         "research"
       ],
@@ -274,6 +283,7 @@
     },
     "pfbid02MvySj3SMqNNyvECYsRgnAnhyG6QWBTf8qMMb9c2UETuXdwNmEEGPrbRcCjchtjM2l": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",
@@ -302,6 +312,7 @@
     },
     "pfbid02STJBf5x7cuU8UpDzjJHCtyD2DwtPD7o6fGWR3i2BdpExnETcXSUuHryeeJ5uvnA9l": {
       "topics": [
+        "economics_finance",
         "research"
       ],
       "campus_id": "NVC",
@@ -357,6 +368,7 @@
     "pfbid02WVszVBUuvGDcdyBKjmig4KhhZ8j7vpvw8gZV8pUgM8zrhbo7niNNztyL4KsTA39Jl": {
       "topics": [
         "mathematics",
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",
@@ -366,6 +378,7 @@
     },
     "pfbid02WqKUdFpoAdWQNe4ZLgf9gQBZtKqmkFUWiaid3jcXV9sazNq2MkTxz5DzHvtq8cwsl": {
       "topics": [
+        "economics_finance",
         "research"
       ],
       "campus_id": "NVC",
@@ -481,6 +494,7 @@
     },
     "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl": {
       "topics": [
+        "chemistry",
         "artificial_intelligence",
         "research"
       ],
@@ -580,6 +594,7 @@
     },
     "pfbid02kutBrbygb4ncZwC53vzgyBAv4hztCjB5FmxBAMeDqfPu8w1M57nvEseypp6skHeLl": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "DONG_HOA",
@@ -610,6 +625,7 @@
     },
     "pfbid02oMXdMTsNgYeGkCHTL5eNmjGVpyNwsWmJp4asbnPeMhhgLcbLdLxryaETCvwZLPDYl": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",
@@ -638,6 +654,7 @@
     },
     "pfbid02r8qFC3FbixnX1Ca711EpxPjUgH9dFHLUm2ubzGJMm5Q5sbsqpTFCSa5RVGcinrAQl": {
       "topics": [
+        "chemistry",
         "research",
         "career"
       ],
@@ -787,9 +804,9 @@
     },
     "pfbid034HtkaTpbHATZQf2FNfLkY1u78X7ocS3Ym3et2BmXVhtAaFZq1W9ANr9Kbkf31zetl": {
       "topics": [
+        "physics",
         "artificial_intelligence",
-        "technology",
-        "research"
+        "technology"
       ],
       "campus_id": "NVC",
       "time_tags": [
@@ -798,6 +815,7 @@
     },
     "pfbid034P8mWxQfzzGLbMrSwyw9XdXKhsPoZm8GoYEYCzZZKvHmsVJKtVMj4xjbraKGrcCql": {
       "topics": [
+        "biology",
         "environment",
         "culture"
       ],
@@ -833,6 +851,7 @@
     },
     "pfbid037dQuUMa8WZycfPidHfFu2ZioZyQiQCNzffpts1NjzD7Nasx9orUaJM1iGuh4a415l": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",
@@ -923,6 +942,7 @@
     },
     "pfbid04cZzYL3H43W2be1KJdqcphQuDGBvesXXvWYR41L9zgSB5cpaVd4RoAXUqenh8CXjl": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",
@@ -933,8 +953,8 @@
     "pfbid04sy8x96bnq2Kns58R6Jgjdr1LfLrsgSexXbfG6so7kLJWCeUCZDLMrDqZ4czaUZbl": {
       "topics": [
         "mathematics",
-        "technology",
-        "research"
+        "computer_science",
+        "technology"
       ],
       "campus_id": "NVC",
       "time_tags": [
@@ -969,6 +989,7 @@
     },
     "pfbid06qL2JWWfSVKvDaiZMJggoz2BK5GFA3KvchYDTBAFzNJck59vNqgM7TckBtcm8gZDl": {
       "topics": [
+        "biology",
         "research"
       ],
       "campus_id": "NVC",
@@ -1046,6 +1067,7 @@
     },
     "pfbid0B4HZ4d6x6R9DGgSC91Go4hzFEZM2XHAWitnpAatkvt1s9JVwpLBAx7Z8xgNxtt3tl": {
       "topics": [
+        "chemistry",
         "technology",
         "research"
       ],
@@ -1132,6 +1154,7 @@
     },
     "pfbid0HoFxwQhDVohGedE1sY1Q4dez3D4KFuCQtwd3kzoGXrAVwaVQXUH3h5RomZg8QzRml": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",
@@ -1150,8 +1173,8 @@
     },
     "pfbid0JwSUvE4e65FU1A1k2s9tGU7jjC2YosgNvawJb41X1uDxbxCE7yf6Rbj1uWG1f8k7l": {
       "topics": [
-        "research",
-        "career"
+        "physics",
+        "research"
       ],
       "campus_id": "DONG_HOA",
       "time_tags": [
@@ -1170,7 +1193,8 @@
     "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl": {
       "topics": [
         "research",
-        "technology"
+        "chemistry",
+        "computer_science"
       ],
       "campus_id": null,
       "time_tags": [
@@ -1180,8 +1204,8 @@
     "pfbid0LR4V37mwvsshK8KUbKQGqk5C9rnmSZy9McGSyRvMHmKd6RuJGMmTimYv8iavL6KBl": {
       "topics": [
         "mathematics",
-        "technology",
-        "research"
+        "computer_science",
+        "technology"
       ],
       "campus_id": "NVC",
       "time_tags": [
@@ -1238,8 +1262,8 @@
     "pfbid0YHQrrXsRSecHxmPMzbBkgYTncQh2CYEAWuDAnkqHL1RSySZkeaZFwoa76U9jHxqol": {
       "topics": [
         "mathematics",
-        "technology",
-        "research"
+        "computer_science",
+        "technology"
       ],
       "campus_id": "NVC",
       "time_tags": [
@@ -1257,8 +1281,8 @@
     },
     "pfbid0ZrAbQBhEkyDX78nX31LitqTS2KKG7vLMaToGvpJUNa2JFE69bvybMDj2mrcxhqfWl": {
       "topics": [
-        "research",
-        "career"
+        "chemistry",
+        "research"
       ],
       "campus_id": "OTHER",
       "time_tags": []
@@ -1274,8 +1298,8 @@
     },
     "pfbid0aa6txmsbR2PKoZ8uVc4rCL7kbppAVgNrDgUWJnvWebPwEBTVoF97YTwC6Aj7V6cel": {
       "topics": [
-        "research",
-        "soft_skills"
+        "chemistry",
+        "research"
       ],
       "campus_id": "DONG_HOA",
       "time_tags": []
@@ -1373,7 +1397,7 @@
     "pfbid0fbNCLXPdDNXXDZ6jigFqByEZeXJVCCnavhpVcTZTrxPLM1GFgpSCjHBbqMqZ75arl": {
       "topics": [
         "mathematics",
-        "research"
+        "physics"
       ],
       "campus_id": "NVC",
       "time_tags": [
@@ -1391,6 +1415,7 @@
     },
     "pfbid0hHscC6XEmEUXDRjVPmVDaEjtFhkfgwZ5nDGuZjgrcdYicipTWrmazdv5jEoTv9ZDl": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",
@@ -1462,8 +1487,9 @@
     },
     "pfbid0pwGRpAPKnSaoim8tfrJCmZXAs14Ne5wPzvqmoLLmXAgiebGwfPUvaohbWsZHbT6Ql": {
       "topics": [
-        "research",
-        "soft_skills"
+        "chemistry",
+        "foreign_language",
+        "research"
       ],
       "campus_id": "NVC",
       "time_tags": [
@@ -1480,6 +1506,7 @@
     },
     "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml": {
       "topics": [
+        "chemistry",
         "research",
         "environment"
       ],
@@ -1499,6 +1526,7 @@
     },
     "pfbid0uLbjNmKJUSVtPsvVjmVxkUZ7XBz2gZyffobwGXUz14dNZpVBA9TYP6f7VzJdnuo1l": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",
@@ -1607,6 +1635,7 @@
     },
     "pfbid0zsnbe3daebUmSH2MjuiTBqbPbN8Y4gT8FqCPHz4KwmUCWjKuzgyHL5mBabnD8SVil": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "NVC",

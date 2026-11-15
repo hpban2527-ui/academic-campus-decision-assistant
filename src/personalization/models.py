@@ -17,6 +17,12 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 class TopicId(str, Enum):
     MATHEMATICS = "mathematics"
+    PHYSICS = "physics"
+    CHEMISTRY = "chemistry"
+    BIOLOGY = "biology"
+    COMPUTER_SCIENCE = "computer_science"
+    FOREIGN_LANGUAGE = "foreign_language"
+    ECONOMICS_FINANCE = "economics_finance"
     ARTIFICIAL_INTELLIGENCE = "artificial_intelligence"
     TECHNOLOGY = "technology"
     RESEARCH = "research"

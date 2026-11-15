@@ -31,3 +31,10 @@ def test_comparative_wording_uses_ai_fallback():
 
 def test_unknown_number_uses_ai_fallback():
     assert interpret_explicit_preference("Em thích Toán và cần đạt 80 điểm") is None
+
+
+def test_multiple_academic_topics_are_kept_without_ai():
+    preference = interpret_explicit_preference("Em thích toán học và vật lý")
+
+    assert preference is not None
+    assert [item.topic_id.value for item in preference.topic_preferences] == ["mathematics", "physics"]

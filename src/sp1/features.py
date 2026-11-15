@@ -31,6 +31,13 @@ DOMAIN_TOPICS = {"academic": ("research",), "career": ("career",), "skills": ("s
 TITLE_TOPICS = (
     ("mathematics", ("toan hoc", "toan tin", "xac suat", "thong ke", "giai tich", "dai so", "olympic toan",
                      "mathematic", "statistic"), ("math",)),
+    ("physics", ("vat ly", "vat li", "luong tu", "quantum", "physics")),
+    ("chemistry", ("hoa hoc", "chemistry")),
+    ("biology", ("sinh hoc", "cong nghe sinh hoc", "biology", "biotech")),
+    ("computer_science", ("tin hoc", "khoa hoc may tinh", "cong nghe thong tin", "lap trinh",
+                          "computer science")),
+    ("foreign_language", ("ngoai ngu", "tieng anh", "english", "foreign language")),
+    ("economics_finance", ("kinh te", "tai chinh", "economics", "finance")),
     ("artificial_intelligence", ("tri tue nhan tao", "machine learning", "deep learning", "hoc may",
                                  "generative", "chatgpt"), ("ai",)),
     ("technology", ("cong nghe", "lap trinh", "tin hoc", "chuyen doi so", "nang luc so", "ky nang so", "web3",
