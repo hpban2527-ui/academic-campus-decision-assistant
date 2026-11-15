@@ -121,8 +121,14 @@ class PreferenceUtilityEngine:
         activity = self.activities.get(activity_id, {})
         exclusions = self.preference.hard_exclusions
         reasons: list[str] = []
-        if feature.campus_id in {item.value for item in exclusions.campus_ids}:
+        excluded_campuses = {item.value for item in exclusions.campus_ids}
+        if feature.campus_id in excluded_campuses:
             reasons.append(f"campus:{feature.campus_id}")
+        elif excluded_campuses and feature.campus_id is None and activity.get("mode") in {"offline", "hybrid"}:
+            # The student said a campus is impossible, and SP1 could not determine this venue, so we
+            # cannot show that the activity avoids it. A preference would only lose its bonus here; a
+            # hard exclusion must not be bypassed by missing data.
+            reasons.append("campus:unknown")
         mode = activity.get("mode")
         if mode in {item.value for item in exclusions.modes}:
             reasons.append(f"mode:{mode}")

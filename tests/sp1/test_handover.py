@@ -32,7 +32,8 @@ def test_projection_has_exact_contract_and_applies_conventions():
     assert out["derived"]["registration_deadline"] == "team_convention:deadline_at_start"
     assert a["completion_requirements"] == NOT_STATED
     assert a["source"]["URL_registration"] == "https://forms.gle/abc"
-    assert a["audience"] == ["Sinh viên"] and out["sidecar"]["post_id"] == "p1"
+    assert a["audience"] == ["Sinh viên"] and a["activity_id"] == "p1"
+    assert out["sidecar"]["post_id"] == "p1" and out["sidecar"]["sp1_activity_id"] == "TMP-1"
 
 
 def test_stated_values_are_never_replaced():
@@ -72,9 +73,10 @@ def test_eligibility_and_auto_evidence_are_rule_based_and_labelled():
     assert eligibility({"cohorts": ["K24"], "programs": [], "all_students": False}, profile) == "ELIGIBLE"
     assert eligibility({"cohorts": [], "programs": [], "all_students": False}, profile) == "NEEDS_REVIEW"
     partial = rec(activity_id="TMP-2")
+    partial["activity"]["source"]["post_id"] = "p2"
     partial["activity"]["meta"]["status"] = "partial"
     evidence = auto_evidence([project(rec()), project(partial), project(rec(mode=None))], profile, "HK1_2026_2027")
     assert evidence["label"] == "auto_checked_not_human_reviewed"
-    assert evidence["source_review_by_activity"] == {"TMP-1": True, "TMP-2": None}
-    assert evidence["term_scope_by_activity"]["TMP-1"] == "IN_SCOPE"
-    assert auto_evidence([project(rec())], profile, "HK3_2025_2026")["term_scope_by_activity"]["TMP-1"] == "OUT_OF_SCOPE"
+    assert evidence["source_review_by_activity"] == {"p1": True, "p2": None}
+    assert evidence["term_scope_by_activity"]["p1"] == "IN_SCOPE"
+    assert auto_evidence([project(rec())], profile, "HK3_2025_2026")["term_scope_by_activity"]["p1"] == "OUT_OF_SCOPE"

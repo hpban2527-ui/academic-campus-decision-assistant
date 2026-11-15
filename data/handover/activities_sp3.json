@@ -1,6 +1,6 @@
 [
   {
-    "activity_id": "TMP-2e8129ab-01",
+    "activity_id": "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -23,7 +23,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-5656c4cd-01",
+    "activity_id": "pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l",
     "source": {
       "publisher": "SAB in HCMUS",
       "platform": "Facebook",
@@ -46,7 +46,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-86a74af8-01",
+    "activity_id": "pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -67,7 +67,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-5479351c-01",
+    "activity_id": "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl",
+    "source": {
+      "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl?rdid=4T4m6qT6fR0mZdVn",
+      "URL_registration": "https://courses.hcmus.edu.vn/course/view.php?id=25541"
+    },
+    "title": "KHTN ZERO+ 2026 | SINH VIÊN KHTN ƠI, CÙNG THAM GIA THI TRỰC TUYẾN",
+    "domain": "skills",
+    "start": "2026-10-19T08:00:00+07:00",
+    "end": "2026-10-23T23:59:00+07:00",
+    "registration_deadline": "2026-10-19T08:00:00+07:00",
+    "mode": "online",
+    "location": null,
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "[{\"deadline\": null, \"threshold\": 70, \"type\": \"quiz\", \"unit\": \"percent\"}]"
+  },
+  {
+    "activity_id": "pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -90,7 +111,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-ce99c117-01",
+    "activity_id": "pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl",
     "source": {
       "publisher": "Đội Sinh Viên Tình Nguyện - Khoa Toán Tin Học",
       "platform": "Facebook",
@@ -113,7 +134,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-1b9b9e20-01",
+    "activity_id": "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
     "source": {
       "publisher": "Đội Sinh Viên Tình Nguyện - Khoa Toán Tin Học",
       "platform": "Facebook",
@@ -134,7 +155,51 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-1f7d4d46-01",
+    "activity_id": "pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl",
+    "source": {
+      "publisher": "Đội Sinh Viên Tình Nguyện - Khoa Toán Tin Học",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/doisvtnkhoatoantin/posts/pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl?rdid=JOKk1K5nGyFttIPF",
+      "URL_registration": "https://tinyurl.com/hatnangdem"
+    },
+    "title": "HẠT NẮNG ĐÊM - MỞ FORM",
+    "domain": "volunteer",
+    "start": "2026-04-12T15:00:00+07:00",
+    "end": "2026-04-12T21:00:00+07:00",
+    "registration_deadline": "2026-04-10T23:00:00+07:00",
+    "mode": "offline",
+    "location": "Các tuyến đường tại Quận 10; nấu tại 14/1 Ngô Quyền, Phường 5, Quận 10, TP.HCM",
+    "points": null,
+    "mandatory": false,
+    "audience": [
+      "30 - 35 sinh viên."
+    ],
+    "fee": 40000,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l",
+    "source": {
+      "publisher": "SAB in HCMUS",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/sab.ctda/posts/pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l?rdid=tjSkLDHo0LUDXJsH",
+      "URL_registration": "https://t.sab.edu.vn/fsl26_form"
+    },
+    "title": "FIT SUPER LEAGUE 2026",
+    "domain": "skills",
+    "start": "2026-03-14T18:00:00+07:00",
+    "end": "2026-04-04T21:00:00+07:00",
+    "registration_deadline": "2026-03-14T18:00:00+07:00",
+    "mode": "offline",
+    "location": "Sân bóng đá Phạm Hùng, Hẻm C7D/17e24, Đ. Phạm Hùng, Bình Hưng, Bình Chánh, TP Hồ Chí Minh",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl",
     "source": {
       "publisher": "FIT HCMUS Kênh Hoạt động",
       "platform": "Facebook",
@@ -157,7 +222,76 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-aaa97967-01",
+    "activity_id": "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl",
+    "source": {
+      "publisher": "FIT HCMUS Kênh Hoạt động",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/fit.hcmus.hoatdong/posts/pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl?rdid=nQKoyzGVYjAKszOS",
+      "URL_registration": "https://link.hcmus.edu.vn/OLP-HCMUS26"
+    },
+    "title": "Thông báo v/v đăng ký tham dự Kỳ thi Olympic tin học sinh viên trường Đại học Khoa học tự nhiên năm 2026",
+    "domain": "academic",
+    "start": "2026-10-25T07:30:00+07:00",
+    "end": "2026-10-25T09:30:00+07:00",
+    "registration_deadline": "2026-10-04T23:59:00+07:00",
+    "mode": "offline",
+    "location": "một trong hai cơ sở của Trường",
+    "points": null,
+    "mandatory": false,
+    "audience": [
+      "Đối tượng đăng ký: Sinh viên Trường Đại học Khoa học tự nhiên, ĐHQG-HCM."
+    ],
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
+    "source": {
+      "publisher": "Đoàn khoa - Liên chi Hội CNTT KHTN",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/DoanKhoaLienChiHoi.CNTT.KHTN/posts/pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl?rdid=UlxSTqURl0S4fHqq",
+      "URL_registration": "https://bit.ly/TheoDauChanNguoi2026"
+    },
+    "title": "CUỘC THI TRẮC NGHIỆM TRỰC TUYẾN “THEO DẤU CHÂN NGƯỜI",
+    "domain": null,
+    "start": "2026-06-05T20:00:00+07:00",
+    "end": "2026-06-12T23:59:00+07:00",
+    "registration_deadline": "2026-06-05T20:00:00+07:00",
+    "mode": "online",
+    "location": null,
+    "points": null,
+    "mandatory": false,
+    "audience": [
+      "Đối tượng dự thi: Toàn thể sinh viên Trường Đại học Khoa học tự nhiên, ĐHQG-HCM."
+    ],
+    "fee": 0,
+    "completion_requirements": "[{\"deadline\": null, \"threshold\": 23, \"type\": \"quiz\", \"unit\": \"of 30 questions\"}]"
+  },
+  {
+    "activity_id": "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al",
+    "source": {
+      "publisher": "Design ITUS",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/design.itus/posts/pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al?rdid=zoxy7jxu8FrpkjS4",
+      "URL_registration": null
+    },
+    "title": "[BẢN LĨNH IT 2026] - MỞ FORM ĐĂNG KÝ",
+    "domain": "skills",
+    "start": null,
+    "end": null,
+    "registration_deadline": "2026-09-25T23:59:00+07:00",
+    "mode": "offline",
+    "location": null,
+    "points": null,
+    "mandatory": false,
+    "audience": [
+      "Các bạn Tân sinh viên K26 khoa Công nghệ thông tin - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM."
+    ],
+    "fee": 20000,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid05YjQKZS5mfiAGdG3uwRVghCnAHQaj3L7CAs7BFWBgcehwZUcWged7VogZbrzcgP8l",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -178,7 +312,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-3cb2e678-01",
+    "activity_id": "pfbid02gk5voNQ9aqW4p4jaYsdK2hiiWkcAPrHoghJpUogA6HangBq7apjqKASPb6oYAXjEl",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -199,7 +333,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-95d7ac3c-01",
+    "activity_id": "pfbid0gTGXKP523cAQRMj54AFxPTJdfmx82i9Dnu2e4e3BERaJnKuwdwS3LxGHMQruE9Lwl",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -222,7 +356,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-c84de7dc-01",
+    "activity_id": "pfbid07U8FM3d6sDU19AFyzF8QXSKToyt21UwDAGcrWV34EzRHHD3k9YXszg128RGCX3Pfl",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -243,7 +377,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-87a35c01-01",
+    "activity_id": "pfbid0JzvoeBcvCnuaPzgSM5VmLLaEhiD8KXUviThgoTksoo12w9TV8kRfM6c96rAZXMEGl",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -266,7 +400,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-f9525994-01",
+    "activity_id": "pfbid036iL9LZpFZyFpzdho2MMSzP4zzcby8vdZRnyh2Wa7zkuC9aXX8wnPW7pDijHJX4Uxl",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -287,7 +421,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-99d11c9c-01",
+    "activity_id": "pfbid0348peH7andUqAfothwtJxbr5BQnQKPbTUZWjoGcuba4gMHMeBazFxpUseEBGd78xwl",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -308,7 +442,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-d9dcbf6a-01",
+    "activity_id": "pfbid0JiSLqaex23GZMuiZA32GYeFC5nQdjqZNs353EmEd9ZVnMFDGfLDUEbCDeL82A8UCl",
     "source": {
       "publisher": "Đội Sinh viên Tình nguyện khoa CNTT, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -331,7 +465,30 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-ce89622f-01",
+    "activity_id": "pfbid02pq9FwpzAvtwrUyMU7rxRSWykB1Nbb6jN8UGZ7A2ckSViqLVUaAmqJaDGAgWebgBHl",
+    "source": {
+      "publisher": "Đội Sinh viên Tình nguyện khoa CNTT, Trường Đại học Khoa học tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/doisvtn.itus/posts/pfbid02pq9FwpzAvtwrUyMU7rxRSWykB1Nbb6jN8UGZ7A2ckSViqLVUaAmqJaDGAgWebgBHl?rdid=QNtGJWOM6ndjzzPg",
+      "URL_registration": "https://tinyurl.com/UomMamFormDangKy"
+    },
+    "title": "[ƯƠM MẦM] - MỞ FORM ĐĂNG KÝ THAM GIA",
+    "domain": "volunteer",
+    "start": "2026-05-31T06:00:00+07:00",
+    "end": "2026-05-31T14:00:00+07:00",
+    "registration_deadline": "2026-05-31T06:00:00+07:00",
+    "mode": "offline",
+    "location": "Làng trẻ em SOS Gò Vấp, 697 Quang Trung, Phường An Hội Tây, TP. Hồ Chí Minh",
+    "points": null,
+    "mandatory": false,
+    "audience": [
+      "50 tình nguyện viên là sinh viên trên địa bàn TP.HCM."
+    ],
+    "fee": 55000,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0uZb9qbB5CMgWojhQ2uh8wRUt7F5sqQnRC316fffAvAkXDsbMHybjfncvzNJRraAfl",
     "source": {
       "publisher": "Đoàn khoa - Liên chi Hội CNTT KHTN",
       "platform": "Facebook",
@@ -354,7 +511,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-67c66b9d-01",
+    "activity_id": "pfbid02nBhkYKDvQr3jTEnDwyyykJ6eEWWiJmjqTDt6KBbeTm7ucnwnLftxyFRSaYfXjBbDl",
     "source": {
       "publisher": "SAB in HCMUS",
       "platform": "Facebook",
@@ -375,7 +532,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-3612ad60-01",
+    "activity_id": "pfbid02siTEQKEuCF2qpDVh744eEdtSD3qdzfgyo86pwB9S8VxBv8YyaStV2Y2he6nqMYLil",
     "source": {
       "publisher": "Google Developer Group on Campus - HCMUS",
       "platform": "Facebook",
@@ -398,7 +555,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-c0e42640-01",
+    "activity_id": "pfbid02sg3uR6Gxc97MRGCYwTL3TgbV1gT9RV7wvMQjuhg1pEfmGy8vba6XKR5GjW25aJAXl",
     "source": {
       "publisher": "Google Developer Group on Campus - HCMUS",
       "platform": "Facebook",
@@ -419,7 +576,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-4cad3e72-01",
+    "activity_id": "pfbid08gtoQNh4T5peEggPdPJ5TxUTfcVqEKwXhyxVYFGaceSV3vJHaENVEXC6o3iezgfil",
     "source": {
       "publisher": "FIT HCMUS Kênh Hoạt động",
       "platform": "Facebook",
@@ -440,7 +597,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-d4b49d00-01",
+    "activity_id": "pfbid0yTDaiJTTCvE9PS5TsxfrWCVXLT6xyCsP5YMAJh5m1bzERrbn6xduhge2kr4pSZEWl",
     "source": {
       "publisher": "FIT HCMUS Kênh Hoạt động",
       "platform": "Facebook",
@@ -463,7 +620,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-c22ca1e9-01",
+    "activity_id": "pfbid0axvNSc1yr7jRCiyy2vu9Uj1Df769i6QKu5jnA9eJBdYYCDDE65Yy2pHazDhGBPU8l",
     "source": {
       "publisher": "FIT HCMUS Kênh Hoạt động",
       "platform": "Facebook",
@@ -484,7 +641,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-2eb8b706-01",
+    "activity_id": "pfbid02ib6XiRibHb5pBX27ym3QMs1QJMgqiSjJUtPRp4w7ipghZ5MpZRQ4brHn7VVkrw8l",
     "source": {
       "publisher": "FIT HCMUS Kênh Hoạt động",
       "platform": "Facebook",
@@ -505,7 +662,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-792b56ac-01",
+    "activity_id": "pfbid02eBT6oYCt55hLyxTL2seDNVSvkurP61h2M7CRNs524Ydt9ASonyXPzGzTnYmr8zJGl",
     "source": {
       "publisher": "FIT HCMUS Kênh Hoạt động",
       "platform": "Facebook",
@@ -526,7 +683,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-ae949c9d-01",
+    "activity_id": "pfbid026qSFM265Ft8XG2VwUNw6YoooAKBLtBzDAAMDdv9HdL78aqBx91MALHnWrENVh6QMl",
     "source": {
       "publisher": "Đoàn khoa - Liên chi Hội Khoa Môi trường",
       "platform": "Facebook",
@@ -547,7 +704,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-8b57014c-01",
+    "activity_id": "pfbid02fGUGmmeFVfurrKSD5o4vZHViiLRkCqJEEQbyMCiS41JAm5uStkEB1gaGRA7pBAZGl",
+    "source": {
+      "publisher": "Đoàn khoa - Liên chi Hội Khoa Môi trường",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/doanhoikhoamoitruong/posts/pfbid02fGUGmmeFVfurrKSD5o4vZHViiLRkCqJEEQbyMCiS41JAm5uStkEB1gaGRA7pBAZGl?rdid=n5pdse70e0suqo3H",
+      "URL_registration": null
+    },
+    "title": "TRAO GỬI YÊU THƯƠNG – GIEO MẦM XANH, ĐÓN NỤ CƯỜI",
+    "domain": null,
+    "start": "2026-09-30T00:00:00+07:00",
+    "end": "2026-10-02T23:59:00+07:00",
+    "registration_deadline": "2026-09-30T00:00:00+07:00",
+    "mode": "offline",
+    "location": "Hành lang D-E, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM Cơ sở 2 (Khu Đô thị ĐHQG-HCM, Phường Đông Hòa, TP. Hồ Chí Minh)",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid02bVcZdd9u3YkPwKABb5ofe5SjtcdV7kB2DjyoGEzhbmuLwobMuKwF1QPxrP2xaoaKl",
     "source": {
       "publisher": "Đoàn khoa - Liên chi Hội Khoa Môi trường",
       "platform": "Facebook",
@@ -568,7 +746,7 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"check_in\", \"unit\": null}]"
   },
   {
-    "activity_id": "TMP-a3d341b9-01",
+    "activity_id": "pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl",
     "source": {
       "publisher": "Đoàn khoa - Liên chi Hội Khoa Môi trường",
       "platform": "Facebook",
@@ -591,7 +769,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-02bc7bb1-01",
+    "activity_id": "pfbid038DGUhwuATw2zV7BXaEZz4yaAZsxCeaqBmtHitPMphYTmkeVcso2V31FFNNCQv5grl",
+    "source": {
+      "publisher": "Đoàn khoa - Liên chi Hội Khoa Môi trường",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/doanhoikhoamoitruong/posts/pfbid038DGUhwuATw2zV7BXaEZz4yaAZsxCeaqBmtHitPMphYTmkeVcso2V31FFNNCQv5grl?rdid=c8KFUSsha7iJhPhk",
+      "URL_registration": null
+    },
+    "title": "THƯ TRIỆU TẬP TÂN SINH VIÊN KHOA MÔI TRƯỜNG KHÓA 2026",
+    "domain": "culture_sports",
+    "start": "2026-08-25T07:45:00+07:00",
+    "end": "2026-08-25T09:45:00+07:00",
+    "registration_deadline": "2026-08-25T07:45:00+07:00",
+    "mode": "offline",
+    "location": "Hội trường B, Cơ sở 2 – Đông Hòa, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"check_in\", \"unit\": null}]"
+  },
+  {
+    "activity_id": "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -612,7 +811,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-32c74a49-01",
+    "activity_id": "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -633,7 +832,49 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-4031ba32-01",
+    "activity_id": "pfbid037Fu3dCFRn8bvGgLJ57t3fg38yhtWukNKTQeFgFvzL4vJ6AhysqnPbxhZVvxZ8WEyl",
+    "source": {
+      "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid037Fu3dCFRn8bvGgLJ57t3fg38yhtWukNKTQeFgFvzL4vJ6AhysqnPbxhZVvxZ8WEyl?rdid=vu6mq7atV1AsPwiN",
+      "URL_registration": null
+    },
+    "title": "THÔNG BÁO CẬP NHẬT – CUỘC THI SÁNG TẠO CLIP NGẮN “HIỂU LUẬT – SỐNG CHẤT",
+    "domain": null,
+    "start": null,
+    "end": null,
+    "registration_deadline": null,
+    "mode": "online",
+    "location": null,
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0ceLozgCMi4CTrTBFSrJGiD9ZypE6ZGvDW6YuYGwuCeqbrAazNyFR6whGtvYSWt3pl",
+    "source": {
+      "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid0ceLozgCMi4CTrTBFSrJGiD9ZypE6ZGvDW6YuYGwuCeqbrAazNyFR6whGtvYSWt3pl?rdid=WdnP8mImnKOS8A25",
+      "URL_registration": null
+    },
+    "title": "CHÍNH THỨC MỞ HỆ THỐNG THI BẢNG CÁ NHÂN | HỘI THI “TẦM NHÌN XUYÊN THẾ KỶ” LẦN THỨ 13 - NĂM 2026",
+    "domain": "academic",
+    "start": "2026-10-25T15:00:00+07:00",
+    "end": "2026-10-25T15:30:00+07:00",
+    "registration_deadline": "2026-10-25T15:00:00+07:00",
+    "mode": "online",
+    "location": null,
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -654,7 +895,30 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-ead5f953-01",
+    "activity_id": "pfbid0jFLoVS3yVwDRFdr5yTdX92hNG76pP2gz8SjN5ZuYNYvL3gJzUPRN814PGYMNZcQyl",
+    "source": {
+      "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid0jFLoVS3yVwDRFdr5yTdX92hNG76pP2gz8SjN5ZuYNYvL3gJzUPRN814PGYMNZcQyl?rdid=jZ3D9y2iOvELkjOq",
+      "URL_registration": null
+    },
+    "title": "HIẾN MÁU TÌNH NGUYỆN",
+    "domain": "volunteer",
+    "start": "2026-10-27T07:30:00+07:00",
+    "end": "2026-10-27T11:00:00+07:00",
+    "registration_deadline": "2026-10-27T07:30:00+07:00",
+    "mode": "offline",
+    "location": "Khu vực Sảnh I, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (cơ sở Nguyễn Văn Cừ)",
+    "points": null,
+    "mandatory": false,
+    "audience": [
+      "Mọi người dân từ 18 tuổi trở lên đều có thể tham gia chương trình khi đủ điều kiện sức khoẻ."
+    ],
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid02eQzrvj7F749ehTidCzne4rUP9NnrBi8stCoaSRwYFjg5ErhuqmzQ4w2ckN3ATT1Fl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -675,7 +939,28 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"check_out\", \"unit\": null}]"
   },
   {
-    "activity_id": "TMP-d2a4361d-01",
+    "activity_id": "pfbid02k1a64HpY4MFwMBRqhHbsczAVbKwmV3xUa3pPAX6V8zeUXKiFADFuyKnAoCXmv1TCl",
+    "source": {
+      "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid02k1a64HpY4MFwMBRqhHbsczAVbKwmV3xUa3pPAX6V8zeUXKiFADFuyKnAoCXmv1TCl?rdid=jQYgINelARRW35Ra",
+      "URL_registration": "https://uscihub.vn/ngay-hoi-sinh-vien-va-doanh-nghiep/"
+    },
+    "title": "TẤT TẦN TẬT THÔNG TIN NGÀY HỘI SINH VIÊN & DOANH NGHIỆP 2026",
+    "domain": "career",
+    "start": "2026-10-11T08:00:00+07:00",
+    "end": "2026-10-11T13:00:00+07:00",
+    "registration_deadline": "2026-10-11T08:00:00+07:00",
+    "mode": "offline",
+    "location": null,
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid02hUMc36SLcoeJQj2eqhy8eYzmS7MWjaatrm1otqAYAzbLxL4spU4r3B8rVUyUi7Rgl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -696,7 +981,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-cf61da1d-01",
+    "activity_id": "pfbid0B4HZ4d6x6R9DGgSC91Go4hzFEZM2XHAWitnpAatkvt1s9JVwpLBAx7Z8xgNxtt3tl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -717,7 +1002,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-e6a729ba-01",
+    "activity_id": "pfbid0AEzrJsJY7PUJjjBi4qxUx3L5XFRuTt9GuRKTvvaidxagcFN6xd3Ru6DsccNpuPNEl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -740,7 +1025,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-1710d683-01",
+    "activity_id": "pfbid0DYE32yV1XMkeXbfucffpmGGDL6W77rjwaPd4NZXpnv4bZZegtDM7TFU6Yg3jFfpnl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -763,7 +1048,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-ca159467-01",
+    "activity_id": "pfbid025erNwk7cF1tMs1kos2bfv64bXQ5ucFuZXFjWTJrkq61bCFrmx2sN56pFmuCodtyyl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -784,7 +1069,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-651f7978-01",
+    "activity_id": "pfbid0rWnRjXaG5b2ZYJfRm3KTFERyVrApzzSbY9kbxSn7cNvoXJLgR4sZpJyeHd29fRJcl",
+    "source": {
+      "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid0rWnRjXaG5b2ZYJfRm3KTFERyVrApzzSbY9kbxSn7cNvoXJLgR4sZpJyeHd29fRJcl?rdid=zj9DbXOkSFugqZ4H",
+      "URL_registration": "https://bit.ly/dangkycuocthisangtaotrequocgia2026"
+    },
+    "title": "CUỘC THI SÁNG TẠO TRẺ QUỐC GIA TRONG LĨNH VỰC TRÍ TUỆ NHÂN TẠO NĂM 2026",
+    "domain": "academic",
+    "start": null,
+    "end": null,
+    "registration_deadline": "2026-09-20T23:59:00+07:00",
+    "mode": "offline",
+    "location": null,
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid09Y9s952puDP3QcZQP7cT2Qu37195SBSwKXE7X4ARiy5b48nZ9VqpKAo7mF2b8ZbLl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -805,7 +1111,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-5ecd52f9-01",
+    "activity_id": "pfbid0285J7o94gHZcTDZ3T7g9t2rUyZaopXD2xCpCQevjusKo49EXM7mmycf3beX6tkqWxl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -826,7 +1132,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-a63d82e5-01",
+    "activity_id": "pfbid0pEXhirx5yvVsxQViVJwbTSm2rTF7ZxMXiHHg9qYhzVELkayfMKdkMH3f7LrHVS7ol",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -847,7 +1153,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-19caa7d9-01",
+    "activity_id": "pfbid0289LXq7GYKD9KR5A73sWwd6w3HsY1eknyMjZJwkRTbVbDhK8CzRJtaTiYPgFj7vF2l",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -870,7 +1176,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-f7c6b345-01",
+    "activity_id": "pfbid0BpJELJG8E2fN28dp63xuopmJpK1Q8nLkNXAgSk9QzKAfM1XDt1yZDDtLhmFTSqxhl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -893,7 +1199,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-6a35fa3f-01",
+    "activity_id": "pfbid0mccsgBkgThN6At1thzoRVDwHAvpG5mcw7u1nf77agcNYU4AGTfafFqY82VTouN1ql",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -914,7 +1220,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-31b77194-01",
+    "activity_id": "pfbid0bLDucenYUZ6TKbA5d9iB4FvM77cgyYNv3DocuF94pZDT1Co85AE6oCEERhNqHF28l",
+    "source": {
+      "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid0bLDucenYUZ6TKbA5d9iB4FvM77cgyYNv3DocuF94pZDT1Co85AE6oCEERhNqHF28l?rdid=AWixBcADtTeqcY9O",
+      "URL_registration": null
+    },
+    "title": "CHUYÊN ĐỀ CHÍNH TRỊ – MÙA HÈ XANH 2026",
+    "domain": "volunteer",
+    "start": "2026-07-20T07:30:00+07:00",
+    "end": "2026-07-20T09:30:00+07:00",
+    "registration_deadline": "2026-07-20T07:30:00+07:00",
+    "mode": "offline",
+    "location": "Giảng đường 1, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM cơ sở 1 (227 Nguyễn Văn Cừ, phường Chợ Quán, Thành phố Hồ Chí Minh)",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0yeafBSGKfrMPWtkdxjC43DqnzTBBGtx8x7bH9oAU8PAoqDCT9rJxuSiayvDauQdZl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -935,7 +1262,30 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-6ca87326-01",
+    "activity_id": "pfbid0dpALiXtQDy2n5ZEpxGCaVwHBzazbqioR8HAjRAnBqEudZuPagknnpnMNSQo3u9o2l",
+    "source": {
+      "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid0dpALiXtQDy2n5ZEpxGCaVwHBzazbqioR8HAjRAnBqEudZuPagknnpnMNSQo3u9o2l?rdid=GiYfJCOBvYNSLmTv",
+      "URL_registration": null
+    },
+    "title": "CUỘC THI \"KIẾN TẠO KHÔNG GIAN ĐẠI HỌC QUỐC GIA TP.HCM\" Lần I - Năm 2026",
+    "domain": null,
+    "start": "2026-07-08T00:00:00+07:00",
+    "end": null,
+    "registration_deadline": "2026-07-08T00:00:00+07:00",
+    "mode": "online",
+    "location": null,
+    "points": null,
+    "mandatory": false,
+    "audience": [
+      "ĐỐI TƯỢNG THAM GIA"
+    ],
+    "fee": 0,
+    "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"check_in\", \"unit\": null}]"
+  },
+  {
+    "activity_id": "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -958,7 +1308,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-fd8d37cc-01",
+    "activity_id": "pfbid02kR3wMs65f7GQ89ojixmKDysEPt77nEd6hv4UgBar99NoQghQZoDbK5PiyqKUsJP3l",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -979,7 +1329,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-579eedf1-01",
+    "activity_id": "pfbid02KYphUfhTSv343V1AHeqLJtuRvoWKF6ue7ChUFkPAoMs9zvfgosyY4xuGj9o4JDeDl",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",
@@ -1002,7 +1352,7 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": 20, \"type\": \"quiz\", \"unit\": \"of 30 questions\"}]"
   },
   {
-    "activity_id": "TMP-c49c033a-01",
+    "activity_id": "pfbid02eMqDhKVyrocNhXZ8AR5ugCNRj1MHZCdGjXJ6GYFo8ZVGNqAQcixVqeCMPDP2PtUPl",
     "source": {
       "publisher": "Khoa Môi Trường - Trường ĐH Khoa học Tự nhiên - ĐHQG HCM",
       "platform": "Facebook",
@@ -1025,7 +1375,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-79eb276f-01",
+    "activity_id": "pfbid02sJS5iFnzYXizYKqEMWkYCyB8ZBnQixEnohVWxPPQRZSn6QC5d2aMYdo8YXZcu5Wdl",
+    "source": {
+      "publisher": "Khoa Môi Trường - Trường ĐH Khoa học Tự nhiên - ĐHQG HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoamoitruongKHTN/posts/pfbid02sJS5iFnzYXizYKqEMWkYCyB8ZBnQixEnohVWxPPQRZSn6QC5d2aMYdo8YXZcu5Wdl?rdid=kNpU5E8W8Hz55yOL",
+      "URL_registration": "https://forms.gle/1zZDs9q76PftwKAo9"
+    },
+    "title": "THAM QUAN, HỌC TẬP THỰC TẾ TẠI NHÀ MÁY LA VIE – 22/10/2026",
+    "domain": null,
+    "start": "2026-10-22T07:45:00+07:00",
+    "end": "2026-10-22T09:45:00+07:00",
+    "registration_deadline": "2026-10-22T07:45:00+07:00",
+    "mode": "offline",
+    "location": "Nhà máy Công ty TNHH La Vie",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0v6B57dTNtndVzWhM8mJfJ4jaCYzsBf9J5YkQvvNTb5CpDGHtTnuNSXmpSdYivD2zl",
     "source": {
       "publisher": "Khoa Môi Trường - Trường ĐH Khoa học Tự nhiên - ĐHQG HCM",
       "platform": "Facebook",
@@ -1046,7 +1417,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-728f7479-01",
+    "activity_id": "pfbid02yMDVHE16UDK4zTjaearF8omPMY7LzTvCP8Fd9JCUUV43hnzrd7DdiXFr35gFvPFSl",
     "source": {
       "publisher": "Khoa Môi Trường - Trường ĐH Khoa học Tự nhiên - ĐHQG HCM",
       "platform": "Facebook",
@@ -1069,7 +1440,30 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"check_in\", \"unit\": null}]"
   },
   {
-    "activity_id": "TMP-5fcee8e7-01",
+    "activity_id": "pfbid02qCE8MUFBhdARZM7M5q1PLaAhRF9orw39kZeWvaEgfwKEpYQesa9itqgp2cAdcYS1l",
+    "source": {
+      "publisher": "Khoa Môi Trường - Trường ĐH Khoa học Tự nhiên - ĐHQG HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoamoitruongKHTN/posts/pfbid02qCE8MUFBhdARZM7M5q1PLaAhRF9orw39kZeWvaEgfwKEpYQesa9itqgp2cAdcYS1l?rdid=evDJk23te9u1ZDLd",
+      "URL_registration": null
+    },
+    "title": "KHOA MÔI TRƯỜNG THÔNG BÁO THAM DỰ CHƯƠNG TRÌNH ĐỊNH HƯỚNG NGHỀ NGHIỆP NGÀNH TÀI NGUYÊN VÀ MÔI TRƯỜNG",
+    "domain": "career",
+    "start": "2026-06-13T13:30:00+07:00",
+    "end": "2026-06-13T16:30:00+07:00",
+    "registration_deadline": "2026-06-13T13:30:00+07:00",
+    "mode": "offline",
+    "location": "Giảng đường 1, cơ sở Nguyễn Văn Cừ, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+    "points": null,
+    "mandatory": false,
+    "audience": [
+      "Sinh viên ngành Quản lý tài nguyên và môi trường và các ngành có liên quan"
+    ],
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0HSj8yJoaxt3xytoxrhDDsnBXbzqoKXCNJooAbB9zusiNDkSWg1Cj1Mz2cJf676mml",
     "source": {
       "publisher": "Khoa Môi Trường - Trường ĐH Khoa học Tự nhiên - ĐHQG HCM",
       "platform": "Facebook",
@@ -1092,7 +1486,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-9b64d001-01",
+    "activity_id": "pfbid02TrYpTsUSKzgxih7JW8WBQb6FThavaGZH3H2SU1kHNkY78e6nRVQKXqFFU77oBR4Bl",
     "source": {
       "publisher": "Khoa Môi Trường - Trường ĐH Khoa học Tự nhiên - ĐHQG HCM",
       "platform": "Facebook",
@@ -1115,7 +1509,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-b17de2eb-01",
+    "activity_id": "pfbid04cZzYL3H43W2be1KJdqcphQuDGBvesXXvWYR41L9zgSB5cpaVd4RoAXUqenh8CXjl",
+    "source": {
+      "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoashcnsh/posts/pfbid04cZzYL3H43W2be1KJdqcphQuDGBvesXXvWYR41L9zgSB5cpaVd4RoAXUqenh8CXjl?rdid=qkw89rfm1mnTZOYa",
+      "URL_registration": null
+    },
+    "title": "SEMINAR KHOA HỌC | How Enzymes Shape Plant Natural Product Stereochemistry",
+    "domain": "academic",
+    "start": "2026-11-16T09:00:00+07:00",
+    "end": "2026-11-16T11:00:00+07:00",
+    "registration_deadline": "2026-11-16T09:00:00+07:00",
+    "mode": "offline",
+    "location": "Phòng C36, cơ sở Nguyễn Văn Cừ",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0XsH1Fk5EGo78si8yhjCyy78BP6NiAJC7rJE7ttJ7F1xiWNqY5jj5bZQ4sPokUEXAl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1138,7 +1553,7 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"form\", \"unit\": null}]"
   },
   {
-    "activity_id": "TMP-d9de3603-01",
+    "activity_id": "pfbid0HoFxwQhDVohGedE1sY1Q4dez3D4KFuCQtwd3kzoGXrAVwaVQXUH3h5RomZg8QzRml",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1159,7 +1574,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-d9a0bcec-01",
+    "activity_id": "pfbid02kutBrbygb4ncZwC53vzgyBAv4hztCjB5FmxBAMeDqfPu8w1M57nvEseypp6skHeLl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1180,7 +1595,7 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"check_in\", \"unit\": null}]"
   },
   {
-    "activity_id": "TMP-cc961a9c-01",
+    "activity_id": "pfbid0zsnbe3daebUmSH2MjuiTBqbPbN8Y4gT8FqCPHz4KwmUCWjKuzgyHL5mBabnD8SVil",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1203,7 +1618,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-199f4cf9-01",
+    "activity_id": "pfbid0QD1ZSXT9WK1jcvGaRLBLpJbHauPL1ynXXM8M6uNwGBsKbfmR9YjrPwGP7kNHVywYl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1224,7 +1639,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-debdc6c1-01",
+    "activity_id": "pfbid0jePLhRwXE5Vs7K1EjpqXDCv9GNRCxtC1k2w8ssb3aWbp8jEzmrAEkR44sES4VNnLl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1245,7 +1660,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-57cbbf23-01",
+    "activity_id": "pfbid02hJkDnVfGkv83TzXoq8XKNPRkKmdxcKaM3QyUwa2X1tgtdxonqyoWkjYCsfHCQNAVl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1266,7 +1681,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-d296ea4d-01",
+    "activity_id": "pfbid028nU9z1suxgWj7baVZuSjfF1YbGT3VY39wNQRcWytEKNxVaCLuenpxGpdUpuNQYHYl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1287,7 +1702,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-8720b674-01",
+    "activity_id": "pfbid02DSEr8WQJzpdWxaA3x9fsG2mqZ7H8tTPjvkWyc2nKTumE2NRhrFDWNX7U8MQvxZ1l",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1310,7 +1725,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-f803264a-01",
+    "activity_id": "pfbid0FyyqMGmaPaHsEV5fTrNZgCcgx38FpETvUCg1MuobJNHcgRhfRgRAiTyEupBH6Uiel",
+    "source": {
+      "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoashcnsh/posts/pfbid0FyyqMGmaPaHsEV5fTrNZgCcgx38FpETvUCg1MuobJNHcgRhfRgRAiTyEupBH6Uiel?rdid=kVP9DGxZwil20bKz",
+      "URL_registration": "https://bit.ly/SLSB2026registration"
+    },
+    "title": "Registration to attend SLSB 2026 is now open",
+    "domain": null,
+    "start": "2026-11-06T00:00:00+07:00",
+    "end": "2026-11-08T23:59:00+07:00",
+    "registration_deadline": "2026-11-06T00:00:00+07:00",
+    "mode": "offline",
+    "location": "VNUHCM-University of Science, VNUHCM Urban Area, Dong Hoa Ward, Ho Chi Minh City, Vietnam",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid025fBQXb22sDH9ZNzBhXEYXozzFwAswPCg8dzZfvxSx831ERBzcxmXXC7VtwvtdJoTl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1333,7 +1769,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-3784ed4f-01",
+    "activity_id": "pfbid05g494RxPj45X3dAdedowc2ZtR7VmqyuXXtXvmEHYR65ptYHV8zUsPCMnArf5VDsol",
+    "source": {
+      "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoashcnsh/posts/pfbid05g494RxPj45X3dAdedowc2ZtR7VmqyuXXtXvmEHYR65ptYHV8zUsPCMnArf5VDsol?rdid=kTjx2cPYsoqNNTtl",
+      "URL_registration": "https://event.on24.com/.../5941EFB399CD5D7F0586E6539DEB3492"
+    },
+    "title": "[WEBINAR TIẾNG VIỆT] Khám phá giải pháp EZ-Check™ Salmonella",
+    "domain": null,
+    "start": "2026-09-24T10:00:00+07:00",
+    "end": "2026-09-24T10:30:00+07:00",
+    "registration_deadline": "2026-09-24T10:00:00+07:00",
+    "mode": "online",
+    "location": null,
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid02DtyVjVd8KapWdeZfjuKWzkAkLYh7zKYNGvVYVhgaWJJykCdafquexAYMvrWWf7k2l",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1354,7 +1811,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-31415a0c-01",
+    "activity_id": "pfbid0aa6txmsbR2PKoZ8uVc4rCL7kbppAVgNrDgUWJnvWebPwEBTVoF97YTwC6Aj7V6cel",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1367,7 +1824,7 @@
     "end": "2026-11-08T23:59:00+07:00",
     "registration_deadline": "2026-09-25T23:59:00+07:00",
     "mode": "offline",
-    "location": null,
+    "location": "Trường Đại học Khoa học tự nhiên, ĐHQG-HCM, Khu đô thị Đại học Quốc gia Thành phố Hồ Chí Minh",
     "points": null,
     "mandatory": true,
     "audience": null,
@@ -1375,7 +1832,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-6b5e022e-01",
+    "activity_id": "pfbid0X6wKqTejMciuYWvtPqdH28rcSBxvJnx8aqPyzCdZJ3s4vyS2aWuBCmqQA8JkvwaTl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1396,7 +1853,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-ad876767-01",
+    "activity_id": "pfbid0uvTL3bHSGPbLZMW34W7ahtnUE1ZvMhDAAwRM29Av9B3gCXki1KVY3pTxSnSe8KUol",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1419,7 +1876,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-820d0b54-01",
+    "activity_id": "pfbid02FMWA2Mngt1A7nFcKZwJnMoiBft7U5PfbR9oSVc3XEAPPFB7qPskSHjnKicQBdo5ql",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1440,7 +1897,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-b02d6238-01",
+    "activity_id": "pfbid038GmCPfh41jVGAaDGzmWJQSRVFtQ7hNVj1Qph1FSL1qtxzUw8azUnd3Ggpc4G6i97l",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1461,7 +1918,49 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-59fce405-01",
+    "activity_id": "pfbid0f39ayW71WE5pLD1Ar1bmJANnEiAVju9aLr9tcVG3pJsqXGz5WbB48FoEPyefSji9l",
+    "source": {
+      "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoashcnsh/posts/pfbid0f39ayW71WE5pLD1Ar1bmJANnEiAVju9aLr9tcVG3pJsqXGz5WbB48FoEPyefSji9l?rdid=qTHOGzJ0Ozn7zAe3",
+      "URL_registration": "https://forms.gle/n3z6BA1iuusbLkdq5"
+    },
+    "title": "TARGETED MOLECULAR THERAPY FOR THE TREATMENT OF LIVER DISEASES",
+    "domain": "academic",
+    "start": "2026-08-27T07:30:00+07:00",
+    "end": "2026-08-27T12:00:00+07:00",
+    "registration_deadline": "2026-08-27T07:30:00+07:00",
+    "mode": "offline",
+    "location": "VNUHCM-University of Science, VNUHCM Urban Area Campus",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0v64mAfLhoWNgjX3PEqARcWj4S3bZW7zcDur89qqSxSrQ47SRgbgVkEGuN6vbPHnCl",
+    "source": {
+      "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoashcnsh/posts/pfbid0v64mAfLhoWNgjX3PEqARcWj4S3bZW7zcDur89qqSxSrQ47SRgbgVkEGuN6vbPHnCl?rdid=pd9pGqNfPINWgnl7",
+      "URL_registration": null
+    },
+    "title": "WORKSHOP CÙNG CHANG GUNG UNIVERSITY (TAIWAN) VỚI CHỦ ĐỀ VỀ MIỄN DỊCH, CHUYỂN HOÁ VÀ BỆNH TRUYỀN NHIỄM",
+    "domain": "academic",
+    "start": "2026-08-17T14:00:00+07:00",
+    "end": "2026-08-17T17:00:00+07:00",
+    "registration_deadline": "2026-08-17T14:00:00+07:00",
+    "mode": "offline",
+    "location": "Phòng B.11a, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"check_in\", \"unit\": null}]"
+  },
+  {
+    "activity_id": "pfbid0DMdcuKGsUUdshzF34zwD7RWtE8BUQKHuduXDBRSRoBJgdCqkstgFj5q2gT1re2R1l",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1484,7 +1983,49 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-62f53139-01",
+    "activity_id": "pfbid0ZrAbQBhEkyDX78nX31LitqTS2KKG7vLMaToGvpJUNa2JFE69bvybMDj2mrcxhqfWl",
+    "source": {
+      "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoashcnsh/posts/pfbid0ZrAbQBhEkyDX78nX31LitqTS2KKG7vLMaToGvpJUNa2JFE69bvybMDj2mrcxhqfWl?rdid=hqbjTfYJoyv6UN0l",
+      "URL_registration": null
+    },
+    "title": "VIỆN TẾ BÀO GỐC – TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN, ĐHQG-HCM",
+    "domain": "career",
+    "start": "2026-07-01T00:00:00+07:00",
+    "end": "2026-07-31T23:59:00+07:00",
+    "registration_deadline": "2026-07-01T00:00:00+07:00",
+    "mode": "offline",
+    "location": "Viện Tế bào gốc, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid02LE91HdQKfQTU4APo1zkPAbp2ehNvSWkje3GhUEMw4HauC4CSki4h7yxVTPkXBfZ2l",
+    "source": {
+      "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoashcnsh/posts/pfbid02LE91HdQKfQTU4APo1zkPAbp2ehNvSWkje3GhUEMw4HauC4CSki4h7yxVTPkXBfZ2l?rdid=yn9O4GGKEa6fS5CT",
+      "URL_registration": null
+    },
+    "title": "SEMINAR: HOLOTOMOGRAPHY – LABEL-FREE 3D LIVE CELL IMAGING",
+    "domain": "academic",
+    "start": "2026-06-09T14:00:00+07:00",
+    "end": "2026-06-09T15:00:00+07:00",
+    "registration_deadline": "2026-06-09T14:00:00+07:00",
+    "mode": "offline",
+    "location": "Phòng thí nghiệm Trung tâm, Khoa Sinh học - Công nghệ Sinh học, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid02zyFDsiq3o68YGWrRuhvSitLHd5SK4segqABuRCRhSq8Y9orEo7sEjs6Tx6LbgVxLl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1505,7 +2046,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-1949dab7-01",
+    "activity_id": "pfbid0arbMmNqZbdPeQvrpnmHyghSkbCNFoPcBhsjqUkACEZJq1FDzDYNbcjAiCBVBaHsjl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1526,7 +2067,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-b7232be1-01",
+    "activity_id": "pfbid034B81QfPTsxeT9aqWhTRsKeghDQ1NZZRqZonp9HYUwjpjiEbQRegGZfdfddFRgz98l",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1547,7 +2088,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-8e99e454-01",
+    "activity_id": "pfbid0CwVmJXUgJUuV6TChmgGsFj9Lwm9A7ycitChowYdW92KaYdzVR5T4pAfFHbZUgCWtl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1568,7 +2109,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-38e3659f-01",
+    "activity_id": "pfbid03JtQFt1ThCdY31bYF4xAct8ZAgQ4P6F7fzXiGAXNrG4vyrARwVXzvgSEApmDP1k4l",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1589,7 +2130,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-25a46b36-01",
+    "activity_id": "pfbid029Jij29wV7kgrAX9S3gAYGwJqsF3anMhxQJTTMCgPgT9YPzf8U2Gu6LKrgQwTzPPEl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1610,7 +2151,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-d9dea1f6-01",
+    "activity_id": "pfbid034P8mWxQfzzGLbMrSwyw9XdXKhsPoZm8GoYEYCzZZKvHmsVJKtVMj4xjbraKGrcCql",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1633,7 +2174,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-089f2d0a-01",
+    "activity_id": "pfbid07Tux7Ai4bxJcL5j8rckoGTQMbJHFRbTjBqdVmbCTqydgmM5gdvakjh8A7EK5eGejl",
     "source": {
       "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
       "platform": "Facebook",
@@ -1654,7 +2195,49 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-4ccd8446-01",
+    "activity_id": "pfbid03X1XBcRYamue2CtNT1nBHGsuPwqeHEfArVYBTKkEaZkPgVoRwf5XkTBDR4ba65uTl",
+    "source": {
+      "publisher": "Khoa Khoa học Liên ngành, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/FIS.HCMUS/posts/pfbid03X1XBcRYamue2CtNT1nBHGsuPwqeHEfArVYBTKkEaZkPgVoRwf5XkTBDR4ba65uTl?rdid=y8jApUBamfEZVC7a",
+      "URL_registration": "https://forms.gle/z76ALQQodXz3FMaf8"
+    },
+    "title": "KEYNOTE SPEAKER | TS. VI CHÍ THÀNH",
+    "domain": null,
+    "start": "2026-11-13T00:00:00+07:00",
+    "end": "2026-11-14T23:59:00+07:00",
+    "registration_deadline": "2026-11-13T00:00:00+07:00",
+    "mode": "offline",
+    "location": "Hội trường I, 227 Nguyễn Văn Cừ, phường Chợ Quán, TP. Hồ Chí Minh",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid026tGxjXMKEfjUcKGxJrJPcAxuaqEv2B4VGJQDaX4Gk7U3tjHs2B5KL4QhdiERvZigl",
+    "source": {
+      "publisher": "Khoa Khoa học Liên ngành, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/FIS.HCMUS/posts/pfbid026tGxjXMKEfjUcKGxJrJPcAxuaqEv2B4VGJQDaX4Gk7U3tjHs2B5KL4QhdiERvZigl?rdid=qprZVSzGWw9lrXIb",
+      "URL_registration": null
+    },
+    "title": "TẬP HUẤN KỸ NĂNG HỌC TẬP ĐẠI HỌC CHO SINH VIÊN KHÓA 2026 NGÀNH CÔNG NGHỆ GIÁO DỤC",
+    "domain": "skills",
+    "start": "2026-11-04T13:15:00+07:00",
+    "end": "2026-11-04T17:00:00+07:00",
+    "registration_deadline": "2026-11-04T13:15:00+07:00",
+    "mode": "offline",
+    "location": "Hội trường I, Cơ sở 1",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0224hSkhEGcN3QxsHdmmUNP115JkFUAzZ2SbBdWmmFsGwt375fAnrq1PoCoXj3c1KMl",
     "source": {
       "publisher": "Khoa Khoa học Liên ngành, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -1675,7 +2258,7 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"check_in\", \"unit\": null}]"
   },
   {
-    "activity_id": "TMP-356d238f-01",
+    "activity_id": "pfbid02Hbu9f7JVWqGnUURwKSQFtzAt2LR83s4KA52ybyfBQyhNCFGJCKtJ1jrfxxFdtJzAl",
     "source": {
       "publisher": "Khoa Khoa học Liên ngành, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -1696,7 +2279,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-8142fff0-01",
+    "activity_id": "pfbid02r8qFC3FbixnX1Ca711EpxPjUgH9dFHLUm2ubzGJMm5Q5sbsqpTFCSa5RVGcinrAQl",
+    "source": {
+      "publisher": "Khoa Khoa học Liên ngành, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/FIS.HCMUS/posts/pfbid02r8qFC3FbixnX1Ca711EpxPjUgH9dFHLUm2ubzGJMm5Q5sbsqpTFCSa5RVGcinrAQl?rdid=bvKbooHcz4c2rQiw",
+      "URL_registration": null
+    },
+    "title": "SEMINAR KHOA HỌC THÁNG 9 | LIÊM CHÍNH KHOA HỌC VÀ ĐẠO ĐỨC NGHỀ NGHIỆP",
+    "domain": "career",
+    "start": "2026-09-10T14:00:00+07:00",
+    "end": "2026-09-10T15:30:00+07:00",
+    "registration_deadline": "2026-09-10T14:00:00+07:00",
+    "mode": "offline",
+    "location": "Phòng I41, 227 Nguyễn Văn Cừ, P. Chợ Quán, TP.HCM",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0vbzL4C8xBDcahqarrDFJcc4hqVYDAbSAyBoSqQ8VuqznFMW52AcdPz2uH6nH66Kal",
     "source": {
       "publisher": "Khoa Khoa học Liên ngành, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -1717,7 +2321,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-112c5412-01",
+    "activity_id": "pfbid08bsoKaZwLc6X473mUcYVujvuqqHTxTQYeofmvA2WGttwNVChgHFCcrGo2ker5fN2l",
     "source": {
       "publisher": "STEM - Khoa Khoa Học Liên Ngành",
       "platform": "Facebook",
@@ -1738,7 +2342,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-fa3016c6-01",
+    "activity_id": "pfbid0ZL8h8T9DTa1H5hT2yNKJhPGJrsqz5sB8hn81E47nuYTsZpvkQhJcKNgpJGBB9pn3l",
+    "source": {
+      "publisher": "Khoa Khoa học Liên ngành, Trường Đại học Khoa học tự nhiên, ĐHQG - HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/FIS.HCMUS/posts/pfbid0ZL8h8T9DTa1H5hT2yNKJhPGJrsqz5sB8hn81E47nuYTsZpvkQhJcKNgpJGBB9pn3l?rdid=aPleVjGm7yBB3HgK",
+      "URL_registration": null
+    },
+    "title": "SEMINAR ANNOUNCEMENT",
+    "domain": "academic",
+    "start": "2026-05-15T15:30:00+07:00",
+    "end": "2026-05-15T17:00:00+07:00",
+    "registration_deadline": "2026-05-15T15:30:00+07:00",
+    "mode": "offline",
+    "location": "Phòng I41, 227 Nguyễn Văn Cừ, phường Chợ Quán, TP.HCM",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0uAt1jxnTgrtEAtvDhYotJgYFVNAMeSi2rnQrovSANvMj8vnmEGX2KQShGgckwTc9l",
     "source": {
       "publisher": "Thư viện Trường Đại học Khoa học tự nhiên, Đại học Quốc gia TP. Hồ Chí Minh",
       "platform": "Facebook",
@@ -1751,7 +2376,7 @@
     "end": "2026-11-12T15:30:00+07:00",
     "registration_deadline": "2026-11-12T13:30:00+07:00",
     "mode": "offline",
-    "location": "Thư viện (Tầng 10 – Tòa nhà I), Trường ĐH Khoa học tự nhiên, ĐHQG-HCM, cơ sở 2 – 227 Nguyễn Văn Cừ, P. Chợ Quán, TP.HCM",
+    "location": "Thư viện (Tầng 10 – Tòa nhà I), Trường ĐH Khoa học tự nhiên, ĐHQG-HCM, 227 Nguyễn Văn Cừ, P. Chợ Quán, TP.HCM",
     "points": null,
     "mandatory": false,
     "audience": null,
@@ -1759,7 +2384,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-750ed3c1-01",
+    "activity_id": "pfbid02nHiUgkgwE7APBtveTm5vuZQrqmyirBLQh3jreNrTMkoRCxXn1D7hrci4yuvy3zkLl",
     "source": {
       "publisher": "Thư viện Trường Đại học Khoa học tự nhiên, Đại học Quốc gia TP. Hồ Chí Minh",
       "platform": "Facebook",
@@ -1782,7 +2407,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-81be723c-01",
+    "activity_id": "pfbid0381oQwuHvpmEh3ZK1TnzirV1vQyMe747ToR1nQ918JF6cYBVmJMS9Bwyphwekzi5Al",
     "source": {
       "publisher": "Thư viện Trường Đại học Khoa học tự nhiên, Đại học Quốc gia TP. Hồ Chí Minh",
       "platform": "Facebook",
@@ -1805,7 +2430,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-de20e215-01",
+    "activity_id": "pfbid02285ocydHPVMww7euZXHZq6sqfKstCRijWuA1byprpGga4YynxFJsd9TwMvvVBiD2l",
     "source": {
       "publisher": "KHOA ĐỊA CHẤT - Trường ĐH Khoa học Tự nhiên, ĐHQG TP. HCM",
       "platform": "Facebook",
@@ -1828,7 +2453,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-a4ffc4a4-01",
+    "activity_id": "pfbid027nUhiQ7aznU2x99pKZq59VRcUmfAdvheW9QZFLUg6UWDGckVTsgBN919cdp5WQCql",
     "source": {
       "publisher": "Đoàn khoa - Liên chi Hội Khoa Địa chất, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -1851,7 +2476,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-2f6e390d-01",
+    "activity_id": "pfbid02DfS2q8PyN6jgKAtMV8961vKUSUS6daTwGd7XAtStMn3RE4mbTzTKXusqpG3CkoTUl",
     "source": {
       "publisher": "Đoàn khoa - Liên chi Hội Khoa Địa chất, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -1872,7 +2497,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-133dd51e-01",
+    "activity_id": "pfbid02nCN8N4M5aEeETae34vgQgVPNgsHgCRwBxXDzkx7zGHw3rzQi8UueJqFZX6eMU9UUl",
+    "source": {
+      "publisher": "Đoàn khoa - Liên chi Hội Khoa Địa chất, Trường Đại học Khoa học tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/dk.lch.diachatkhtn/posts/pfbid02nCN8N4M5aEeETae34vgQgVPNgsHgCRwBxXDzkx7zGHw3rzQi8UueJqFZX6eMU9UUl?rdid=UEGvOOeCsDPgLH05",
+      "URL_registration": "https://docs.google.com/.../1NCQjxgOZXCWzEHwcDNu.../viewform"
+    },
+    "title": "TALK SHOW “HẠT GIỐNG ĐỎ” – KÍ ỨC, NIỀM TIN & SỰ GẠCH NỐI THẾ HỆ",
+    "domain": null,
+    "start": "2026-10-11T08:00:00+07:00",
+    "end": "2026-10-11T10:00:00+07:00",
+    "registration_deadline": "2026-10-11T08:00:00+07:00",
+    "mode": "offline",
+    "location": "Phòng F104, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (cơ sở Đông Hoà)",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid02XZ9UEstUjWk1HmPL9wxrGm3eLmXznbqkA4WaFofggdWyYTV6vwCdmd3iwWi8MKEUl",
     "source": {
       "publisher": "Đoàn khoa - Liên chi Hội Khoa Địa chất, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -1895,7 +2541,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-b19b010d-01",
+    "activity_id": "pfbid02SXEDSP813Nakurd3SoxwZcyrGeDd6zEmckJB3HMJmNUWYBqmNPQCW4NvxwCEk8oTl",
     "source": {
       "publisher": "Đoàn khoa - Liên chi Hội Khoa Địa chất, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -1916,7 +2562,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-cb81ee00-01",
+    "activity_id": "pfbid02t92pVgHoWRYaV8FjZbebVvmJv9Yq4XaK6WNecBVT43Q56AKux7zZQMDj4VvuMvNsl",
     "source": {
       "publisher": "Đoàn khoa - Liên chi Hội Khoa Địa chất, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -1939,7 +2585,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-0da22741-01",
+    "activity_id": "pfbid037nFyUmhshymd7mrmP2MEYjE9jEy2Dxt5h3nmuxccbnsW98pDuR738ASevRgTdx4el",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -1960,7 +2606,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-795334b7-01",
+    "activity_id": "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -1983,7 +2629,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-7ade63d1-01",
+    "activity_id": "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2004,7 +2650,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-446a2af3-01",
+    "activity_id": "pfbid0219WhKzg2VY5EfQp6HMhoMuEF6Lgh7zsvdovR38vwdVLxtCA2gE2EDfVPteg8SyAwl",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2025,7 +2671,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-41e00a86-01",
+    "activity_id": "pfbid0hHscC6XEmEUXDRjVPmVDaEjtFhkfgwZ5nDGuZjgrcdYicipTWrmazdv5jEoTv9ZDl",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2046,7 +2692,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-d2d51dad-01",
+    "activity_id": "pfbid02MvySj3SMqNNyvECYsRgnAnhyG6QWBTf8qMMb9c2UETuXdwNmEEGPrbRcCjchtjM2l",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2067,7 +2713,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-9037899f-01",
+    "activity_id": "pfbid0XzA4NWd2m3eB1qz6Q7jmmoDrTDjipgRBeRq7rUBrN4DFGLAWRkJrbf1GiyUDaVdNl",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2088,7 +2734,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-53c299fb-01",
+    "activity_id": "pfbid0boR7w7iRdsuvBfCXvESjpRi81S7Js93u4QHY9jXCS7yUF1A2NYoYYewBPaMXdHRYl",
+    "source": {
+      "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/chemusvnu/posts/pfbid0boR7w7iRdsuvBfCXvESjpRi81S7Js93u4QHY9jXCS7yUF1A2NYoYYewBPaMXdHRYl?rdid=5VdS7ghljK0zlfTe",
+      "URL_registration": "https://chemistry.hcmus.edu.vn/.../thong-bao-seminar-khoa"
+    },
+    "title": "SEMINAR | FROM EXERCISE TO MEDICINE: THE POWER OF MITOCHONDRIAL METABOLISM",
+    "domain": "academic",
+    "start": "2026-09-10T09:00:00+07:00",
+    "end": "2026-09-10T11:00:00+07:00",
+    "registration_deadline": "2026-09-08T23:59:00+07:00",
+    "mode": "offline",
+    "location": null,
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid01AAm6S6qVctGQsv4wNGYrx7zWTMJ653yWSnzhqoxnzR9DjeXPcjBMLFrzKycB6Gpl",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2111,7 +2778,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-35987f85-01",
+    "activity_id": "pfbid037dQuUMa8WZycfPidHfFu2ZioZyQiQCNzffpts1NjzD7Nasx9orUaJM1iGuh4a415l",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2134,7 +2801,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-f2eed724-01",
+    "activity_id": "pfbid0pwGRpAPKnSaoim8tfrJCmZXAs14Ne5wPzvqmoLLmXAgiebGwfPUvaohbWsZHbT6Ql",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2155,7 +2822,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-dc6956da-01",
+    "activity_id": "pfbid02oMXdMTsNgYeGkCHTL5eNmjGVpyNwsWmJp4asbnPeMhhgLcbLdLxryaETCvwZLPDYl",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2178,7 +2845,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-f0f5faed-01",
+    "activity_id": "pfbid02Tjn5J53Jvp7ar4gF8F1PLBMQayHYvXg2fMWgRcZK2CBad8uhte3pryhQ7BLz7cWYl",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2199,7 +2866,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-ddde98d6-01",
+    "activity_id": "pfbid0uLbjNmKJUSVtPsvVjmVxkUZ7XBz2gZyffobwGXUz14dNZpVBA9TYP6f7VzJdnuo1l",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
       "platform": "Facebook",
@@ -2222,7 +2889,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-6d935ef5-01",
+    "activity_id": "pfbid02ufAUyzips3EBXmQt4Nm2pLtbahyZZenaWtpUQJ4NS6fVYHbTUipk1hUe5kUxnKEel",
     "source": {
       "publisher": "Khoa Khoa học và Công nghệ Vật liệu/MST Faculty",
       "platform": "Facebook",
@@ -2245,7 +2912,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-60429e74-01",
+    "activity_id": "pfbid02QMkDAHHrWA2uPJjG4s9PHzoRfhmJHDk19RxQ7bfQ76RTPdgZjhXcffG8zX3t3i2jl",
     "source": {
       "publisher": "Khoa Khoa học và Công nghệ Vật liệu/MST Faculty",
       "platform": "Facebook",
@@ -2266,7 +2933,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-2b315523-01",
+    "activity_id": "pfbid0JwSUvE4e65FU1A1k2s9tGU7jjC2YosgNvawJb41X1uDxbxCE7yf6Rbj1uWG1f8k7l",
     "source": {
       "publisher": "Khoa Khoa học và Công nghệ Vật liệu/MST Faculty",
       "platform": "Facebook",
@@ -2287,7 +2954,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-17cb0089-01",
+    "activity_id": "pfbid026Sq6YJVpvZ94HBx364fXmJs2i5jTLFKHE6Yt2XziXy6jcsuuuzM38EPfGBsYUn2gl",
     "source": {
       "publisher": "Đoàn Khoa - Liên Chi Hội Khoa Toán - Tin học HCMUS",
       "platform": "Facebook",
@@ -2310,7 +2977,7 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": 20, \"type\": \"quiz\", \"unit\": \"of 30 questions\"}]"
   },
   {
-    "activity_id": "TMP-f3dd1219-01",
+    "activity_id": "pfbid0y6US561ga4uvo4oHgFg6NQhXhApDKWsAjxYsNJFWBFT2YLHdMbunahgCG81NnGaZl",
     "source": {
       "publisher": "Đoàn Khoa - Liên Chi Hội Khoa Toán - Tin học HCMUS",
       "platform": "Facebook",
@@ -2333,7 +3000,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-f78afb5d-01",
+    "activity_id": "pfbid02R2QY7G7Az76zRtJtgpUZEh9US3tLSKRKCZ8K7oUbKvNojfbjYxioJQC5fCdxkJCDl",
     "source": {
       "publisher": "Đoàn Khoa - Liên Chi Hội Khoa Toán - Tin học HCMUS",
       "platform": "Facebook",
@@ -2356,7 +3023,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-c0dad9f8-01",
+    "activity_id": "pfbid0wqQryW6TVVatK9fMU2Yxg5HDjV6biQZbJ7sFBVcCWJTwKaRvNnYvfZLQXY8RBBGUl",
     "source": {
       "publisher": "Đoàn Khoa - Liên Chi Hội Khoa Toán - Tin học HCMUS",
       "platform": "Facebook",
@@ -2379,7 +3046,7 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": 25, \"type\": \"quiz\", \"unit\": \"of 30 questions\"}]"
   },
   {
-    "activity_id": "TMP-26b300e6-01",
+    "activity_id": "pfbid06exFW2AyQW5HDpHfyMWnECX7HdaZMm7szug6R5JXkU3QE2EuDiCRzqspwxjqTnkpl",
     "source": {
       "publisher": "Đoàn Khoa - Liên Chi Hội Khoa Toán - Tin học HCMUS",
       "platform": "Facebook",
@@ -2402,7 +3069,7 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"proof_upload\", \"unit\": null}]"
   },
   {
-    "activity_id": "TMP-2367670f-01",
+    "activity_id": "pfbid02WVszVBUuvGDcdyBKjmig4KhhZ8j7vpvw8gZV8pUgM8zrhbo7niNNztyL4KsTA39Jl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2423,7 +3090,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-e4208fb8-01",
+    "activity_id": "pfbid0aUCrHq7mHLANjHkGTRUDVKZ6QXfzfDve9v3Y6hiqrUnSXTepxkh6sEKRB27x3aSHl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2444,7 +3111,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-bfdcb6cc-01",
+    "activity_id": "pfbid032ty6V3vVWp3XP1qU2frLhFWnvZPbv2ZsBm6Rbach9QvdcdYGKT3ha2pznQxQvtGWl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2467,7 +3134,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-a274531e-01",
+    "activity_id": "pfbid02WDiXqBnGX2CMAnUs2FuKrZ7kXitvuDDeoB6yG9ZigmWt3VMxGAVvZ5jazmSQKeGWl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2490,7 +3157,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-71e28016-01",
+    "activity_id": "pfbid02gQSArenKumt6jbHtfrhHs3gcuCj7WtPX9K19MqtngN6kxLyoRAeNDcPLvDsEsT9Sl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2511,7 +3178,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-654d871a-01",
+    "activity_id": "pfbid032ty6V3vVWv86ySbmwwVuVoJdzRtp8ho9jWNGfn93PCVUiFw5yq4sA87MUuzc1pjel",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2534,7 +3201,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-f9cb0c4b-01",
+    "activity_id": "pfbid02uqyZt4SWmoJme1y2HHWtaigR3vsESsgeeq4v97BJTJGvWhvPDcfuy9d79Z1qF81gl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2555,7 +3222,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-fc65ac80-01",
+    "activity_id": "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2576,7 +3243,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-78a959a0-01",
+    "activity_id": "pfbid02FRDX3FT2Sgwx1Bc76q6kskVkegZczF4CLqz8nrwHhrqMVUzsMVEWKuYDqQ1ZN2Yhl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2597,7 +3264,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-253a957c-01",
+    "activity_id": "pfbid032KfAjEjEMxdFFsj7Cy9vSEGuUQKRa4f3gECk4dTN1gSTb8SMXtgjk2BnqDNQUw6Zl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2618,7 +3285,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-08c68c35-01",
+    "activity_id": "pfbid034HtkaTpbHATZQf2FNfLkY1u78X7ocS3Ym3et2BmXVhtAaFZq1W9ANr9Kbkf31zetl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2639,7 +3306,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-98e84a20-01",
+    "activity_id": "pfbid02d8dMYR42QFsvyt8NtRf9PnnZykLp5asyvJibUUu9xjhEHsn824m9wKparUSouwsml",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2660,7 +3327,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-e09e5fe6-01",
+    "activity_id": "pfbid04sy8x96bnq2Kns58R6Jgjdr1LfLrsgSexXbfG6so7kLJWCeUCZDLMrDqZ4czaUZbl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2681,7 +3348,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-7718dbb8-01",
+    "activity_id": "pfbid06qL2JWWfSVKvDaiZMJggoz2BK5GFA3KvchYDTBAFzNJck59vNqgM7TckBtcm8gZDl",
+    "source": {
+      "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoatoantinhoc/posts/pfbid06qL2JWWfSVKvDaiZMJggoz2BK5GFA3KvchYDTBAFzNJck59vNqgM7TckBtcm8gZDl?rdid=nmrNGc2oqRTrJnuE",
+      "URL_registration": null
+    },
+    "title": "[SEMINAR] Image Analysis Hub: Trung tâm phân tích hình ảnh trong nghiên cứu sinh học",
+    "domain": "academic",
+    "start": "2026-08-12T10:00:00+07:00",
+    "end": "2026-08-12T12:00:00+07:00",
+    "registration_deadline": "2026-08-12T10:00:00+07:00",
+    "mode": "offline",
+    "location": "Phòng E202B, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (Cơ sở 1), 227 Nguyễn Văn Cừ, Phường Chợ Quán, Thành phố Hồ Chí Minh",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0cppwcbvvWWjzU4XaYEWELKBSGsukoi7ZzoKQNWZrFoRtSK7aUGaMQk7p4gHp8V2Zl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2702,7 +3390,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-0fe1ad90-01",
+    "activity_id": "pfbid02yyN6zJpVkzoUEtVwR1yXjsYwmno8Zn6ErCUYFKNn5iMxq1MoyeaiQWiM1k7bGLgQl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2723,7 +3411,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-9616f85b-01",
+    "activity_id": "pfbid02WqKUdFpoAdWQNe4ZLgf9gQBZtKqmkFUWiaid3jcXV9sazNq2MkTxz5DzHvtq8cwsl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2744,7 +3432,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-10432603-01",
+    "activity_id": "pfbid02DCZpfGjQzAAYMT1iGMTLMT1ZhupsrtjzP976EHHMxXjyftf9o1hCdXFGxLKKg89wl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2765,7 +3453,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-7ff8daca-01",
+    "activity_id": "pfbid04TWHCk35qTYcTge6Y9MegsAB75pzxkkNt8eBcVvwNaAkAvAYkDHP1FK1B7kLeUjdl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2786,7 +3474,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-568327c1-01",
+    "activity_id": "pfbid02STJBf5x7cuU8UpDzjJHCtyD2DwtPD7o6fGWR3i2BdpExnETcXSUuHryeeJ5uvnA9l",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2807,7 +3495,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-f95da043-01",
+    "activity_id": "pfbid073tRtafeN7CM4HEhct79p942MFANdoLk3ebnXRZEpHUfa1sa3ux6z1BpdpBFntWgl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2828,7 +3516,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-5da3da99-01",
+    "activity_id": "pfbid023BTcksnd8iA2DSSa8drrgiFWmZ8jDQRUDzcBAEoy7ooHQDmMMPVgHXNoA42cip1hl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2849,7 +3537,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-52e0aea1-01",
+    "activity_id": "pfbid0YHQrrXsRSecHxmPMzbBkgYTncQh2CYEAWuDAnkqHL1RSySZkeaZFwoa76U9jHxqol",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2870,7 +3558,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-6eb7e1c0-01",
+    "activity_id": "pfbid0iMo6F1TT9i8amU8tcpMynWZnzJWpdFmxFMGZxKonKXuEL3u6WTX5TeoNKiApooM6l",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2891,7 +3579,28 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-707cae9d-01",
+    "activity_id": "pfbid0dYmFBC7HAaW1nMfZuinVHpoyK5vVprV9AK74wpmQWBBwyFcBNUe9sBiAZvSf5CMwl",
+    "source": {
+      "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoatoantinhoc/posts/pfbid0dYmFBC7HAaW1nMfZuinVHpoyK5vVprV9AK74wpmQWBBwyFcBNUe9sBiAZvSf5CMwl?rdid=kKGZtSyVlZADHuox",
+      "URL_registration": "https://forms.gle/TZLED9Gm457AjTJ59"
+    },
+    "title": "[SEMINAR] GRADUATE STUDIES AND RESEARCH OPPORTUNITIES AT CONCORDIA UNIVERSITY AND IN CANADA",
+    "domain": "career",
+    "start": "2026-06-27T10:00:00+07:00",
+    "end": "2026-06-27T12:00:00+07:00",
+    "registration_deadline": "2026-06-27T10:00:00+07:00",
+    "mode": "hybrid",
+    "location": "phòng F207, cơ sở Nguyễn Văn Cừ",
+    "points": null,
+    "mandatory": false,
+    "audience": null,
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid03UiW9MaH5rbtETZ5Yj6c1MqdRgDj1ZDzmpgitawKmbZNc5hqAeHRgAidcAqkK48Kl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2912,7 +3621,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-596b4482-01",
+    "activity_id": "pfbid0fbNCLXPdDNXXDZ6jigFqByEZeXJVCCnavhpVcTZTrxPLM1GFgpSCjHBbqMqZ75arl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2933,7 +3642,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-d594bec4-01",
+    "activity_id": "pfbid02hfH3kbYuHruq3L6aWNwNg2tF1DU6qMDTBYZeCA9Yp89bMLyodk13nExeuooHtDi3l",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2954,7 +3663,30 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-bf77b708-01",
+    "activity_id": "pfbid0y3JjyD8DeZyf6wq46u2jvimz7puoyGc9ETfsduVRHC7buVNq19xSShGVqFu2tLZQl",
+    "source": {
+      "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
+      "platform": "Facebook",
+      "URL_post": "https://www.facebook.com/khoatoantinhoc/posts/pfbid0y3JjyD8DeZyf6wq46u2jvimz7puoyGc9ETfsduVRHC7buVNq19xSShGVqFu2tLZQl?rdid=1XQvYwSSA6rAb3iw",
+      "URL_registration": "https://luma.com/ifjdnc1v"
+    },
+    "title": "AI-NATIVE ENGINEERING: HANDS-ON WORKSHOP VỀ FORWARD DEPLOYED ENGINEERING (FDE",
+    "domain": "career",
+    "start": null,
+    "end": null,
+    "registration_deadline": null,
+    "mode": "offline",
+    "location": "Phòng C24, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (227 Nguyễn Văn Cừ, P.Chợ Quán, TP.HCM)",
+    "points": null,
+    "mandatory": false,
+    "audience": [
+      "Đối tượng tham gia"
+    ],
+    "fee": 0,
+    "completion_requirements": "NOT_STATED"
+  },
+  {
+    "activity_id": "pfbid0LR4V37mwvsshK8KUbKQGqk5C9rnmSZy9McGSyRvMHmKd6RuJGMmTimYv8iavL6KBl",
     "source": {
       "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
       "platform": "Facebook",
@@ -2975,7 +3707,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-ef3a7c48-01",
+    "activity_id": "pfbid02YAXkGYRTXTUcJRZjFSBgaLkew2aghR2ymjvwUsLyShg98GSJ6yDzcZU4hT3L2hwNl",
     "source": {
       "publisher": "CLB Học Thuật Khoa Toán-Tin học, ĐH KHTN, ĐHQG TP.HCM",
       "platform": "Facebook",
@@ -2998,7 +3730,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-c7151c48-01",
+    "activity_id": "pfbid02SaqDdqPTqXpdpZ3kkMRYD9cWSknTBbbkj2v8D17piLdDoMMwo8xN2sz1CwaUhBtXl",
     "source": {
       "publisher": "CLB Học Thuật Khoa Toán-Tin học, ĐH KHTN, ĐHQG TP.HCM",
       "platform": "Facebook",
@@ -3021,7 +3753,7 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "TMP-6c829773-01",
+    "activity_id": "pfbid02bdhLq6HRRQ994GUuGbkfqjGpW3dhu9UrYi1Nq2Kiv1Y6U6F4sdXau9JwdDGPJeEyl",
     "source": {
       "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
       "platform": "Facebook",

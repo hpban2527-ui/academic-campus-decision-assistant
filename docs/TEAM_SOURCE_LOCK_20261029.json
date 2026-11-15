@@ -41,11 +41,11 @@
     },
     {
       "path": "data/drl_rules.json",
-      "blob_sha": "69e62b120fcfe2b8b79bb76e3fc25a516aacd850"
+      "blob_sha": "38d331b704bf0f3dc9a187e2693ff6f4ffd3d793"
     },
     {
       "path": "data/drl_sources.md",
-      "blob_sha": "e6e5443f3688cd8730512adf3dcefae23b82b552"
+      "blob_sha": "b100016aa2572ecd0c06e49f3ddfdfde4b67bc1d"
     },
     {
       "path": "data/drl_test_cases.json",
@@ -213,7 +213,7 @@
     },
     {
       "path": "tests/sp2/test_rule_bridge.py",
-      "blob_sha": "4548e6299f78314728ea4e1dd4235a985742d2ae"
+      "blob_sha": "8477f8eb4843e6643c74148766cd2ddcfcb07615"
     }
   ]
 }

@@ -121,7 +121,9 @@ Run `PYTHONPATH=src python -m pytest -q tests/sp3 tests/integration/test_sp3_flo
 
 Start `python run_server.py`. Tiến's SP3 frontend calls the real `GET /api/sp3/catalog` and `POST /api/sp3/demo/plan`. From **Kế hoạch rèn luyện**, set a 0–100 target, optionally mark busy slots and generate a plan. The replan/what-if steps demonstrate fixed sample scenarios, not personalized continuations of arbitrary calendars.
 
-SP1's source catalog and SP3's November 2026 synthetic fixture are separate datasets. Planner results are `DEMO_ONLY` (`official_award_verified=false`); source activities are not officially recognized DRL points.
+SP1's source catalog and SP3's November 2026 synthetic fixture are separate datasets.
+
+**Real store switch.** Both SP3 screens have a data-source selector. "Dữ liệu giả lập (MVP)" is the default and keeps the fixture above. "Kho bài thật · HK1 2026-2027" adds `?source=real` to `/api/sp3/catalog`, `/api/sp3/demo/plan` and `/api/sp3/personalized/plan` and plans over `data/handover/` (activities from real announcements, rule-based or hand-reviewed bindings; built by `scripts/build_handover.py` and `scripts/build_bindings.py`). The student, baseline and free time (07:00–21:00 daily from 2026-10-01, minus ticked busy slots) are synthetic. "Replan" simulates the slot of the first planned activity becoming busy; "what-if" skips the last activity of the replanned schedule. Restart the server after rebuilding `data/handover/`. Tests: `tests/integration/test_sp3_real_source.py`. Planner results are `DEMO_ONLY` (`official_award_verified=false`); source activities are not officially recognized DRL points.
 
 Acceptance: `PYTHONPATH=src python -m pytest -q tests/sp1 tests/sp2 tests/sp3 tests/integration tests/test_e2e_pipeline.py tests/test_session_flow.py`, `python scripts/check_team_source_integrity.py`, `python scripts/check_sp2_cases.py`, and `python scripts/verify_browser_e2e.py` (requires Playwright Chromium). Browser evidence covers SP1/SP2, SP3 first-plan/replan/what-if, target/busy input changes, catalog labels, and mobile view.
 

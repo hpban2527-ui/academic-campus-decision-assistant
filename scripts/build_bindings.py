@@ -46,13 +46,16 @@ def main(argv=None):
     for activity in activities:
         side = sidecar[activity["activity_id"]]
         match = matcher.match_activity_to_rule(activity, texts[side["post_id"]], rules_config).as_dict()
-        results.append(binding.propose_binding(activity["activity_id"], side.get("activity_type"), match, rules))
+        review = side.get("review") or {}
+        reviewed_rule = review.get("rule_id") if not review.get("stale") else None
+        results.append(binding.propose_binding(activity["activity_id"], side.get("activity_type"), match, rules,
+                                               reviewed_rule=reviewed_rule))
     bound = [r for r in results if r["binding"]]
     out = {"schema": "sp2-bindings/1.0", "label": binding.LABEL, "policy": binding.POLICY,
            "type_rules": {k: list(v) for k, v in binding.TYPE_RULES.items()},
            "ruleset_file": args.rules.name, "n_activities": len(results),
            "bindings": [r["binding"] for r in bound],
-           "explanations": {r["activity_id"]: {k: r[k] for k in ("activity_type", "matcher_rule", "matcher_method",
+           "explanations": {r["activity_id"]: {k: r[k] for k in ("activity_type", "matcher_rule", "matcher_method", "label",
                                                                  "reason", "category_id", "points_from_rules")
                                                if k in r} for r in results}}
     path = ROOT / "data/handover/bindings.json"

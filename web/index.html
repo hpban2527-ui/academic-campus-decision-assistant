@@ -536,6 +536,11 @@
                 </span>
               </div>
               <div class="flex items-center gap-2 shrink-0">
+                <select id="sp3SourceSelectCatalog" onchange="setSp3Source(this.value)" title="Nguồn dữ liệu cho kho hoạt động và kế hoạch" class="px-3 py-2 rounded-xl bg-[#080d18] border border-[#223046] text-xs font-bold text-slate-200 focus:ring-indigo-500">
+                  <option value="synthetic">Dữ liệu giả lập (MVP)</option>
+                  <option value="real">Kho bài thật · HK1 2026-2027</option>
+                  <option value="real_live">Kho bài thật + bài mới đã đăng</option>
+                </select>
                 <button onclick="loadActivitiesFromApi()" class="px-4 py-2 rounded-xl bg-[#162032] hover:bg-[#1f2d46] text-slate-200 border border-[#223046] text-xs font-bold transition flex items-center gap-1.5">
                   <span>↻ Đồng bộ</span>
                 </button>
@@ -778,11 +783,16 @@
                 <span id="planHeaderVerifiedBadge" class="dev-only px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-rose-950/60 text-rose-300 border border-rose-500/40">
                   official_award_verified: false
                 </span>
-                <span class="dev-only px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
+                <span id="planDataSourceBadge" class="dev-only px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
                   SYNTHETIC-DEMO
                 </span>
               </div>
               <div class="flex items-center gap-2 shrink-0">
+                <select id="sp3SourceSelectPlan" onchange="setSp3Source(this.value)" title="Nguồn dữ liệu cho kho hoạt động và kế hoạch" class="px-3 py-2 rounded-xl bg-[#080d18] border border-[#223046] text-xs font-bold text-slate-200 focus:ring-indigo-500">
+                  <option value="synthetic">Dữ liệu giả lập (MVP)</option>
+                  <option value="real">Kho bài thật · HK1 2026-2027</option>
+                  <option value="real_live">Kho bài thật + bài mới đã đăng</option>
+                </select>
                 <span class="text-xs text-slate-400 font-medium">Học kỳ 1 / 2026-2027</span>
                 <span id="planTermLabel" class="dev-only text-xs font-mono text-indigo-300">Fixture Tháng 11/2026</span>
               </div>
@@ -791,7 +801,7 @@
             <!-- One concise disclosure for students; technical status is developer-only. -->
             <div id="planDisclosure" class="px-3 py-2 rounded-xl bg-[#080d18] border border-slate-700/70 text-xs text-slate-400 flex flex-wrap items-center gap-2">
               <span aria-hidden="true">ℹ</span>
-              <span><b class="text-slate-300">Bản đề xuất tham khảo.</b> Điểm chỉ được ghi nhận sau khi nhà trường xác nhận.</span><span class="dev-only font-mono text-amber-300">DEMO_ONLY · official_award_verified: false · SYNTHETIC-DEMO</span>
+              <span><b class="text-slate-300">Bản đề xuất tham khảo.</b> Điểm chỉ được ghi nhận sau khi nhà trường xác nhận.</span><span id="planDisclosureSource" class="dev-only font-mono text-amber-300">DEMO_ONLY · official_award_verified: false · SYNTHETIC-DEMO</span><span id="planRealSourceNote" class="hidden text-sky-300">Đang dùng kho bài thật (hoạt động từ bài đăng thật, sinh viên giả lập, mốc ngày 01/10/2026).</span>
             </div>
 
             <!-- Stepper 3 Bước Hành Trình (Kế hoạch ban đầu -> Khi lịch thay đổi -> Khi bỏ hoạt động) -->
@@ -1967,6 +1977,44 @@
     let planStageError = '';
     // The backend demo always simulates cancelling this activity on top of the replanned schedule.
     const WHAT_IF_SKIP_ACTIVITY_ID = 'QUIZ-L';
+
+    // ---- Data source switch: synthetic MVP fixture (default) or the real SP1 v2 store ----
+    let SP3_SOURCE = 'synthetic';
+    try { const saved = localStorage.getItem('sp3Source'); if (saved === 'real' || saved === 'real_live') SP3_SOURCE = saved; } catch (e) { /* storage unavailable */ }
+    function sp3Query() { return SP3_SOURCE === 'synthetic' ? '' : '?source=' + SP3_SOURCE; }
+    // The real store picks the skipped activity from the replanned schedule; the fixture always uses QUIZ-L.
+    function currentWhatIfSkipId() {
+      return (planStages.whatif && planStages.whatif.what_if_skip_activity_id)
+        || (planStages.replan && planStages.replan.what_if_skip_activity_id)
+        || WHAT_IF_SKIP_ACTIVITY_ID;
+    }
+    function syncSp3SourceUi() {
+      const real = SP3_SOURCE !== 'synthetic';
+      ['sp3SourceSelectCatalog', 'sp3SourceSelectPlan'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = SP3_SOURCE;
+      });
+      const badge = document.getElementById('planDataSourceBadge');
+      if (badge) badge.innerText = SP3_SOURCE === 'real_live' ? 'SP1-STORE-V2+LIVE' : real ? 'SP1-STORE-V2' : 'SYNTHETIC-DEMO';
+      const term = document.getElementById('planTermLabel');
+      if (term) term.innerText = real ? 'Kho thật · từ 01/10/2026' : 'Fixture Tháng 11/2026';
+      const disclosure = document.getElementById('planDisclosureSource');
+      if (disclosure) disclosure.innerText = 'DEMO_ONLY · official_award_verified: false · ' + (SP3_SOURCE === 'real_live' ? 'SP1-STORE-V2+LIVE' : real ? 'SP1-STORE-V2' : 'SYNTHETIC-DEMO');
+      const note = document.getElementById('planRealSourceNote');
+      if (note) note.classList.toggle('hidden', !real);
+    }
+    function setSp3Source(value) {
+      SP3_SOURCE = (value === 'real' || value === 'real_live') ? value : 'synthetic';
+      try { localStorage.setItem('sp3Source', SP3_SOURCE); } catch (e) { /* storage unavailable */ }
+      planStages.first = null; planStages.replan = null; planStages.whatif = null;
+      currentPlanStage = 'first'; planStageError = ''; planInputsDirty = false;
+      showPlanPanels('empty');
+      setPlanButtonLabel(confirmedPreference ? 'Lập kế hoạch cá nhân hóa' : 'Lập kế hoạch đề xuất');
+      syncSp3SourceUi();
+      loadActivitiesFromApi();
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncSp3SourceUi);
+    else syncSp3SourceUi();
     const PLAN_CAT_LABELS = {
       C1: 'Mục 1', C2: 'Mục 2', C3: 'Mục 3', C4: 'Mục 4', C5: 'Mục 5'
     };
@@ -2365,7 +2413,7 @@
     }
 
     async function fetchPersonalizedSp3Plan(scenario, targetTotal, busyIntervals, preference) {
-      const res = await fetch(`${API_BASE}/api/sp3/personalized/plan`, {
+      const res = await fetch(`${API_BASE}/api/sp3/personalized/plan${sp3Query()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ confirmed: true, preference, scenario, total_target: targetTotal, busy_intervals: busyIntervals })
@@ -2379,7 +2427,7 @@
     }
 
     async function fetchSp3Plan(scenario, targetTotal, busyIntervals) {
-      const res = await fetch(`${API_BASE}/api/sp3/demo/plan`, {
+      const res = await fetch(`${API_BASE}/api/sp3/demo/plan${sp3Query()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scenario, total_target: targetTotal, busy_intervals: busyIntervals })
@@ -2694,7 +2742,7 @@
         const scoreLine = (keepOldScore != null && keepOldScore !== newScore)
           ? `Nếu giữ nguyên kế hoạch cũ trong lịch mới, bạn chỉ đạt <b class="text-white">${keepOldScore}đ</b>. Kế hoạch mới giúp bạn đạt <b class="text-emerald-300">${newScore}đ</b>.`
           : `Điểm dự kiến sau khi xếp lại: <b class="text-white">${newScore}đ</b>.`;
-        const skipSelected = (plan.selected_activities || []).some(a => a.activity_id === WHAT_IF_SKIP_ACTIVITY_ID);
+        const skipSelected = (plan.selected_activities || []).some(a => a.activity_id === currentWhatIfSkipId());
 
         el.innerHTML = `
           <div class="${cardCls} border-amber-500/30">
@@ -2713,7 +2761,7 @@
             </div>
             <div class="text-sm text-slate-300">${scoreLine}</div>
             <div class="flex flex-wrap items-center gap-2 pt-1">
-              ${skipSelected ? `<button type="button" onclick="gotoPlanStage('whatif')" class="${btnPrimary}">Thử bỏ “${escapeHTML(titles[WHAT_IF_SKIP_ACTIVITY_ID] || WHAT_IF_SKIP_ACTIVITY_ID)}” →</button>` : ''}
+              ${skipSelected ? `<button type="button" onclick="gotoPlanStage('whatif')" class="${btnPrimary}">Thử bỏ “${escapeHTML(titles[currentWhatIfSkipId()] || currentWhatIfSkipId())}” →</button>` : ''}
               <button type="button" onclick="gotoPlanStage('first')" class="${btnGhost}">← Xem lại kế hoạch ban đầu</button>
             </div>
           </div>`;
@@ -2729,7 +2777,7 @@
         return { cid, before, after, delta: after - before };
       }).filter(c => c.delta !== 0);
       const missing = Object.entries(summary.remaining_by_category || {}).filter(([, v]) => v > 0);
-      const skippedTitle = titles[WHAT_IF_SKIP_ACTIVITY_ID] || WHAT_IF_SKIP_ACTIVITY_ID;
+      const skippedTitle = titles[currentWhatIfSkipId()] || currentWhatIfSkipId();
       const verdict = missing.length > 0
         ? `<div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-sm text-amber-200">
              Nếu bỏ hoạt động này, <b>${missing.map(([cid, v]) => `${PLAN_CAT_LABELS[cid] || cid} (${PLAN_CAT_FULL[cid] || ''}) còn thiếu ${v}đ`).join('; ')}</b> so với mục tiêu ${plan.feasibility_conclusion === 'PROVEN_UNREACHABLE' ? ' — và trong khung giờ rảnh hiện có không còn hoạt động nào khác để bù' : ''}.
@@ -3528,7 +3576,7 @@
       try {
         const [actRes, catRes] = await Promise.all([
           fetch(`${API_BASE}/api/activities`),
-          fetch(`${API_BASE}/api/sp3/catalog`).catch(() => null)
+          fetch(`${API_BASE}/api/sp3/catalog${sp3Query()}`).catch(() => null)
         ]);
 
         const actData = (actRes && actRes.ok) ? await actRes.json() : {};

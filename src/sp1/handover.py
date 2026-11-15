@@ -10,6 +10,10 @@ Team conventions (decided 2026-11-14, pending agreement of the SP3 owner where t
   C2 end missing, start time stated      -> start + duration_minutes (stated or team default)
   C3 registration deadline not stated    -> the activity start
   C4 source / term / eligibility         -> derived by rule, labelled as automatic checks
+
+Identity (D19): the handed-over activity_id is the announcement's post_id, which every other module already
+keys on (Ngoc's activity_features.json, the source store, deduplication). SP1's own TMP- id stays in the
+store and in the sidecar as sp1_activity_id, so a record can still be traced back to its draft.
 """
 
 from __future__ import annotations
@@ -112,7 +116,7 @@ def project(record: dict) -> dict:
     legacy = None
     if not blocked:
         legacy = {
-            "activity_id": a["activity_id"],
+            "activity_id": a["source"]["post_id"],
             "source": {"publisher": a["source"]["publisher"], "platform": a["source"]["platform"],
                        "URL_post": a["source"]["URL_post"], "URL_registration": registration_url},
             "title": a["title"], "domain": a["domain"], "start": start, "end": end,
@@ -127,7 +131,9 @@ def project(record: dict) -> dict:
             blocked.extend(f"contract:{p}" for p in problems)
             legacy = None
     sidecar = {
-        "post_id": a["source"]["post_id"], "activity_type": record.get("activity_type"), "date_posted": a["source"].get("date_posted"),
+        "post_id": a["source"]["post_id"], "sp1_activity_id": a["activity_id"],
+        "activity_type": record.get("activity_type"),
+        "review": record.get("review"), "date_posted": a["source"].get("date_posted"),
         "sources": record.get("sources", [a["source"]]), "status": a["meta"]["status"], "flags": a["meta"]["flags"],
         "campus": a["campus"], "audience": a["audience"], "fee": a["fee"], "join_url": a["join_url"],
         "completion_requirements": a["completion_requirements"], "multi_session": a.get("multi_session"),
@@ -198,6 +204,8 @@ def eligibility(audience: dict, profile: dict) -> str:
         return "INELIGIBLE"
     if programs and profile["program"] not in programs:
         return "INELIGIBLE"
+    if re.search(r"giáo viên", audience.get("text") or "", re.IGNORECASE):
+        return "NEEDS_REVIEW"   # aimed at school teachers: a person confirms that students may take part
     if cohorts or programs or audience.get("all_students"):
         return "ELIGIBLE"
     return "NEEDS_REVIEW"   # restricted in free text only (for example one faculty): not decided by rule

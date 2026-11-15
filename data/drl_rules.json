@@ -480,6 +480,28 @@
       "note": "No independent positive-scoring row for surveys found in QD 1028 appendix section 2; disabled pending school confirmation. Do not reuse course evaluation participation evidence."
     },
     {
+      "rule_id": "R2301",
+      "criterion_id": "2.3",
+      "category_id": "C2",
+      "name": "Tham gia khảo sát, lấy ý kiến, điều tra xã hội",
+      "condition": {
+        "field": "institutional_survey_rounds_completed",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "STSV2025",
+        "location": "Sổ tay Sinh viên 2025, tiêu chí 2.3 (+5 điểm mỗi đợt)",
+        "transcribed_in": "docs/Data_Report.md, Part 2.1 (Minh Tri, 2026-11-12)",
+        "page_cited": false
+      },
+      "status": "verified",
+      "verification_note": "Accepted by the SP2 owner (Thao Duyen, 2026-11-14) from the STSV2025 transcription in the collector's data report. Add the handbook page number before the final report. R23 (QD 1028 appendix, section 2.2) stays needs_review because the two documents differ; R2301 carries the survey award, so R23 must not be enabled together with it."
+    },
+    {
       "rule_id": "R3101",
       "criterion_id": "3.1",
       "category_id": "C3",

@@ -64,7 +64,7 @@ def load_config(root: Path | None = None) -> Config:
             windows[program] = tuple(periods)
         patterns = {
             key: tuple(_location_key(pattern) for pattern in campus["patterns"][key])
-            for key in (*CAMPUSES, "both")
+            for key in (*CAMPUSES, "both", "not_our_campus")
         }
         return Config(windows, patterns, semesters["version"], campus["version"])
     except ConfigError:
@@ -149,6 +149,10 @@ def _place(
             flags.append("campus_unknown")
         return None, []
     text = _location_key(location)
+    # A venue of another institution is never one of our campuses, even inside the university town.
+    if any(_has_token(text, pattern) for pattern in config.campuses["not_our_campus"]):
+        derived["campus"] = f"dict:campus_v{config.campus_version}:other_institution"
+        return location, ["Other"]
     codes = [code for code in CAMPUSES if any(_has_token(text, pattern) for pattern in config.campuses[code])]
     if any(_has_token(text, pattern) for pattern in config.campuses["both"]):
         codes = list(CAMPUSES)
