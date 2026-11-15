@@ -46,6 +46,10 @@ jobs:
           tests/sp3/test_scheduler_properties.py
           tests/sp3/test_planner_cases.py
           tests/sp3/test_planner_replan.py
+      - name: Execute personalization integration tests
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q tests/personalization
       - name: Check SP2 ten expected cases
         env:
           PYTHONPATH: src
