@@ -3,8 +3,10 @@
 Output: data/review/queue.csv (opens in Excel). To record decisions, fill the decision columns
 (reviewer, reviewed_at, set_*, approve, note) and save the rows as data/review/decisions.csv; then rebuild
 the store, the handover and the bindings. Run after build_activity_store, build_handover and build_bindings.
+--out-dir (default: the repo root) is where those outputs are read and the queue is written.
 """
 
+import argparse
 import csv
 import json
 import re
@@ -36,15 +38,18 @@ HINTS = {
 }
 
 
-def read(path):
-    return json.loads((ROOT / path).read_text(encoding="utf-8"))
+def read(path, root=ROOT):
+    return json.loads((root / path).read_text(encoding="utf-8"))
 
 
-def main():
-    store = read("data/activity_store_v2.json")["records"]
-    sidecar = read("data/handover/sidecar.json")["activities"]
-    blocked = {b["post_id"]: b["reasons"] for b in read("data/handover/blocked.json")}
-    bindings = read("data/handover/bindings.json")
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--out-dir", type=Path, default=ROOT)
+    out_dir = parser.parse_args(argv).out_dir
+    store = read("data/activity_store_v2.json", out_dir)["records"]
+    sidecar = read("data/handover/sidecar.json", out_dir)["activities"]
+    blocked = {b["post_id"]: b["reasons"] for b in read("data/handover/blocked.json", out_dir)}
+    bindings = read("data/handover/bindings.json", out_dir)
     explanations = bindings["explanations"]
     config = load_config()
     rows, counts = [], Counter()
@@ -91,7 +96,7 @@ def main():
             "current_location": (a["location"] or "")[:200], "current_campus": "|".join(campus),
             "current_activity_type": record.get("activity_type") or "",
             "current_matcher_rule": explanation.get("matcher_rule") or "", **row})
-    path = ROOT / "data/review/queue.csv"
+    path = out_dir / "data/review/queue.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
     columns = ["position", "URL_post", "title", "reasons", "how_to_fix", "flags", "already_reviewed_by",
                *(f"current_{c}" for c in CURRENT), *DECISION_COLUMNS]
@@ -99,7 +104,7 @@ def main():
         writer = csv.DictWriter(handle, columns)
         writer.writeheader()
         writer.writerows(rows)
-    print(f"Review queue: {len(rows)} of {len(store)} records -> {path.relative_to(ROOT)}")
+    print(f"Review queue: {len(rows)} of {len(store)} records -> {path.relative_to(out_dir)}")
     for reason, n in counts.most_common():
         print(f"  {n:3d}  {reason}")
 

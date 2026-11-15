@@ -1,5 +1,7 @@
 """Incremental ingestion of single free-form announcements (post 190 onwards).
 
+Developer tool, not used by the app: nothing under src/api imports it (admin updates: docs/admin_data_update.md).
+
 Flow: submit (text saved first) -> process (SP1 v2 classify + roles prompts through a served model, hybrid
 merge, normalise) -> admin inspects the draft -> publish (explicit) -> the published activity, its SP2
 binding, personalization features and planner evidence become visible to the planner.

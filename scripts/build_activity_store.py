@@ -6,6 +6,10 @@ Outputs:
   --sample-out CSV                     optional: 20 seeded activities for a non-blind manual check
 
 Reading test posts goes through devdata.final_run_posts(), so a --reason is required and logged.
+
+--llm may be given several times (for example the original run plus a later batch that covers only the new
+posts). Records are merged by post_id; the same post with different content in two files is an error. Every
+post must have LLM output unless --allow-partial is given, which is a dry run and cannot write to the repo root.
 """
 
 import argparse
@@ -54,6 +58,29 @@ def load_llm(path, model_id, allowed):
     return rows
 
 
+# Run measurements that differ between two runs of the same model on the same input; not output content.
+RUN_STATS = ("seconds", "peak_vram_gb")
+DEFAULT_LLM = ROOT / "data/llm_outputs/final/Qwen__Qwen3.5-4B.jsonl"
+
+
+def load_llm_files(paths, model_id, allowed):
+    """load_llm() for one or more files, merged by post_id. The same post in two files must have the same
+    content (run measurements aside); otherwise ValueError, so a later file never silently wins."""
+    merged, origin = {}, {}
+    for path in paths:
+        for pid, row in load_llm(path, model_id, allowed).items():
+            if pid in merged:
+                old = {k: v for k, v in merged[pid].items() if k not in RUN_STATS}
+                new = {k: v for k, v in row.items() if k not in RUN_STATS}
+                if old != new:
+                    fields = sorted(k for k in set(old) | set(new) if old.get(k) != new.get(k))
+                    raise ValueError(f"Post {pid} has different LLM output in {Path(origin[pid]).name} and "
+                                     f"{Path(path).name} (fields: {', '.join(fields)}); keep one of them")
+                continue
+            merged[pid], origin[pid] = row, path
+    return merged
+
+
 def ci(k, n):
     if not n:
         return "n/a"
@@ -66,12 +93,18 @@ def build(llm_path, policy_path, reason, out_dir, allow_partial=False, access_lo
     model_id = policy.get("_model_id")
     if not model_id:
         raise ValueError("Policy has no _model_id")
+    llm_paths = [llm_path] if isinstance(llm_path, (str, Path)) else list(llm_path)
+    if allow_partial and Path(out_dir).resolve() == ROOT.resolve():
+        raise ValueError("--allow-partial is a dry run: pass an --out-dir outside the repository root")
     split = {row["post_id"]: row for row in load_split()["posts"]}
     posts = final_run_posts(reason, log_path=access_log)
-    llm = load_llm(llm_path, model_id, split.keys())
+    llm = load_llm_files(llm_paths, model_id, split.keys())
     missing = [p["post_id"] for p in posts if p["post_id"] not in llm]
     if missing and not allow_partial:
-        raise ValueError(f"{len(missing)} posts have no LLM output; rerun or pass --allow-partial")
+        listed = ", ".join(f"position {split[pid]['position']} ({pid})" for pid in missing)
+        raise ValueError(f"{len(missing)} posts have no LLM output: {listed}. Export them with "
+                         "scripts/export_llm_inputs.py --only-missing, run the notebook and pass the new file "
+                         "with another --llm")
     config = load_config()
     rules_path = ROOT / "data/drl_rules.json"
     rule_ids = ({r["rule_id"] for r in json.loads(rules_path.read_text(encoding="utf-8"))["rules"]
@@ -94,7 +127,7 @@ def build(llm_path, policy_path, reason, out_dir, allow_partial=False, access_lo
     (out_dir / "reports").mkdir(parents=True, exist_ok=True)
     meta = {"schema": "sp1-activity-store/2.0", "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "model_id": model_id, "prompt_versions": PROMPT_VERSIONS, "merge_policy": policy,
-            "llm_file": Path(llm_path).name, "n_posts": len(store), "n_without_llm": len(missing),
+            "llm_file": ", ".join(Path(p).name for p in llm_paths), "n_posts": len(store), "n_without_llm": len(missing),
             "n_duplicate_groups": len(dedup["groups"]), "n_possible_duplicate_pairs": len(dedup["possible"]),
             "n_canonical": sum(r["duplicate_of"] is None for r in store),
             "n_human_reviewed": sum(bool(r["review"]) and not r["review"]["stale"] for r in store),
@@ -174,7 +207,8 @@ def write_sample(store, path, seed=SAMPLE_SEED, exclude=(), n=20):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--llm", type=Path, default=ROOT / "data/llm_outputs/final/Qwen__Qwen3.5-4B.jsonl")
+    parser.add_argument("--llm", type=Path, action="append",
+                        help=f"LLM output .jsonl; repeat for several files (default {DEFAULT_LLM.relative_to(ROOT)})")
     parser.add_argument("--policy", type=Path, default=ROOT / "data/config/merge_policy.json")
     parser.add_argument("--reason", required=True)
     parser.add_argument("--out-dir", type=Path, default=ROOT)
@@ -185,7 +219,7 @@ def main(argv=None):
     parser.add_argument("--access-log", type=Path, help="Override the test-access log (dry runs only)")
     parser.add_argument("--allow-partial", action="store_true", help="Dry run only: posts without LLM output use rules")
     args = parser.parse_args(argv)
-    store, meta = build(args.llm, args.policy, args.reason, args.out_dir, args.allow_partial, args.access_log,
+    store, meta = build(args.llm or [DEFAULT_LLM], args.policy, args.reason, args.out_dir, args.allow_partial, args.access_log,
                         args.decisions)
     if args.sample_out:
         exclude = []

@@ -52,6 +52,10 @@ python scripts/check_team_source_integrity.py
 
 Trên PowerShell, đặt $env:PYTHONPATH = "src" trước khi chạy lệnh pytest. CI: .github/workflows/integration.yml.
 
+## Updating activity data (admin)
+
+Students never submit announcements, and the running app never calls a model: it only reads the committed files in `data/`. New announcements are added by the admin as an offline batch (add posts, run the LLM notebook on Kaggle, `python scripts/admin_rebuild.py --reason "..."`, human review in `data/review/decisions.csv`, rebuild, tests, PR on a `data/` branch). Step-by-step commands: [docs/admin_data_update.md](docs/admin_data_update.md).
+
 ## Bàn giao H4–H5 – bản tích hợp cuối chờ duyệt
 
 PR tổng hợp: https://github.com/hpban2527-ui/academic-campus-decision-assistant/pull/5
