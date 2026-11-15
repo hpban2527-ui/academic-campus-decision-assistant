@@ -1491,11 +1491,6 @@
           `;
         }
 
-        const isMaxCapped = cur >= max;
-        const capBadge = isMaxCapped && proj === 0
-          ? `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">Đạt trần</span>`
-          : "";
-
         return `
           <div class="p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 ${isHighlighted ? 'bg-indigo-950/50 border-indigo-500/60 ring-2 ring-indigo-500/20 shadow-md' : 'bg-[#080d18] hover:bg-[#0c1220] border-[#1b2537]'}">
             <div class="flex items-center justify-between text-sm mb-2 gap-2">
@@ -4429,7 +4424,6 @@
               `;
             }).join("");
 
-        const draftsEl = document.getElementById("sp3NewDraftsList");
         if (draftsEl) {
           draftsEl.innerHTML = newPostDrafts.length === 0
             ? `<div class="p-6 text-center text-slate-400 text-sm bg-[#080d18] rounded-xl border border-dashed border-[#223046]">No new drafts.</div>`
