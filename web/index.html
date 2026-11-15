@@ -34,6 +34,8 @@
     }
   </script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+
     body {
       background-color: #080c14;
       color: #f8fafc;
@@ -68,9 +70,403 @@
     ::-webkit-scrollbar-track { background: #080c14; }
     ::-webkit-scrollbar-thumb { background: #1b2537; border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: #2b3a54; }
+    .page-screen {
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .landing-leaving {
+      opacity: 0;
+      transform: translateY(-12px);
+      pointer-events: none;
+    }
+    #workspaceApp {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    #workspaceApp.workspace-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #workspaceApp.light-theme {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    #workspaceApp.light-theme [class*="bg-[#0b101b]"],
+    #workspaceApp.light-theme [class*="bg-[#0e1524]"],
+    #workspaceApp.light-theme [class*="bg-[#080d18]"],
+    #workspaceApp.light-theme [class*="bg-[#0c1220]"],
+    #workspaceApp.light-theme [class*="bg-[#11192b]"] {
+      background-color: #fff !important;
+    }
+    #workspaceApp.light-theme [class*="bg-[#080c14]"] {
+      background-color: #f1f5f9 !important;
+    }
+    #workspaceApp.light-theme [class*="bg-[#162032]"] {
+      background-color: #e2e8f0 !important;
+    }
+    #workspaceApp.light-theme [class*="border-[#1b2537]"],
+    #workspaceApp.light-theme [class*="border-[#223046]"],
+    #workspaceApp.light-theme [class*="border-[#2b3a54]"] {
+      border-color: #cbd5e1 !important;
+    }
+    #workspaceApp.light-theme [class~="text-white"],
+    #workspaceApp.light-theme [class~="text-slate-100"] {
+      color: #0f172a !important;
+    }
+    #workspaceApp.light-theme [class~="text-slate-200"] {
+      color: #334155 !important;
+    }
+    #workspaceApp.light-theme [class~="text-slate-300"] {
+      color: #475569 !important;
+    }
+    #workspaceApp.light-theme [class~="text-slate-400"],
+    #workspaceApp.light-theme [class~="text-slate-500"] {
+      color: #64748b !important;
+    }
+    #workspaceApp.light-theme [class*="bg-indigo-"][class~="text-white"],
+    #workspaceApp.light-theme [class*="bg-emerald-"][class~="text-white"],
+    #workspaceApp.light-theme [class*="bg-rose-"][class~="text-white"] {
+      color: #fff !important;
+    }
+    #workspaceApp.light-theme .nav-btn-active {
+      background-color: #dbeafe !important;
+      color: #1d4ed8 !important;
+      border-color: #60a5fa !important;
+      box-shadow: none !important;
+    }
+    #workspaceApp.light-theme .nav-btn-inactive {
+      background-color: #fff !important;
+      color: #475569 !important;
+      border-color: #cbd5e1 !important;
+    }
+    #workspaceApp.light-theme .nav-btn-inactive:hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    #workspaceApp.light-theme [class*="divide-[#1b2537]"] > :not([hidden]) ~ :not([hidden]) {
+      border-color: #cbd5e1 !important;
+    }
+    .galaxy-page {
+      min-height: 100vh;
+      background: #020611;
+      color: #fff;
+      font-family: 'Be Vietnam Pro', sans-serif;
+    }
+    .galaxy-bg {
+      position: relative;
+      background:
+        radial-gradient(ellipse at 50% 75%, rgba(0, 91, 255, .16), transparent 42%),
+        radial-gradient(ellipse at 15% 20%, rgba(24, 57, 139, .13), transparent 40%),
+        radial-gradient(ellipse at 85% 35%, rgba(22, 65, 155, .12), transparent 40%),
+        #020611;
+    }
+    .galaxy-stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(1px 1px at 10% 20%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 25% 60%, #8bcaff 100%, transparent),
+        radial-gradient(2px 2px at 50% 15%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 70% 35%, #a8d8ff 100%, transparent),
+        radial-gradient(1px 1px at 85% 75%, #fff 100%, transparent),
+        radial-gradient(1px 1px at 35% 85%, #fff 100%, transparent),
+        radial-gradient(2px 2px at 92% 18%, #8bcaff 100%, transparent),
+        radial-gradient(1px 1px at 60% 55%, #fff 100%, transparent);
+      background-size: 230px 190px;
+      opacity: .65;
+      animation: galaxy-twinkle 5s ease-in-out infinite alternate;
+    }
+    @keyframes galaxy-twinkle {
+      from { opacity: .42; }
+      to { opacity: .78; }
+    }
+    .galaxy-nav {
+      background: rgba(8, 16, 39, .85);
+      border: 1px solid rgba(112, 161, 255, .18);
+      backdrop-filter: blur(18px);
+    }
+    .galaxy-task-menu {
+      position: relative;
+    }
+    .galaxy-task-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      z-index: 60;
+      width: 18rem;
+      padding-top: .75rem;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translate(-50%, .5rem);
+      transition: opacity .18s ease, transform .18s ease, visibility .18s;
+    }
+    .galaxy-task-menu:hover .galaxy-task-dropdown,
+    .galaxy-task-menu:focus-within .galaxy-task-dropdown {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translate(-50%, 0);
+    }
+    .galaxy-task-dropdown-panel {
+      overflow: hidden;
+      border: 1px solid rgba(112, 161, 255, .22);
+      border-radius: 1rem;
+      background: rgba(5, 12, 31, .98);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .45);
+      backdrop-filter: blur(18px);
+    }
+    .galaxy-task-dropdown button {
+      display: block;
+      width: 100%;
+      padding: .7rem 1rem;
+      color: #cbd5e1;
+      text-align: left;
+      transition: background-color .18s ease, color .18s ease;
+    }
+    .galaxy-task-dropdown button:hover,
+    .galaxy-task-dropdown button:focus-visible {
+      color: #fff;
+      background: rgba(37, 99, 235, .2);
+      outline: none;
+    }
+    .galaxy-button {
+      background: linear-gradient(110deg, #155cff, #388dff);
+      box-shadow: 0 0 24px rgba(32, 111, 255, .32);
+      transition: .3s;
+    }
+    .galaxy-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 35px rgba(32, 130, 255, .55);
+    }
+    .galaxy-hero {
+      position: relative;
+      min-height: 680px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 78%, rgba(0, 94, 255, .24), transparent 45%),
+        linear-gradient(180deg, #030817 0%, #06122c 65%, #020611 100%);
+    }
+    .galaxy-horizon {
+      position: absolute;
+      width: 170%;
+      height: 430px;
+      left: -35%;
+      bottom: -315px;
+      border-radius: 50%;
+      border-top: 3px solid #238cff;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(65, 177, 255, .34), rgba(0, 67, 210, .16) 32%, transparent 72%),
+        linear-gradient(180deg, rgba(7, 32, 86, .36), rgba(2, 6, 17, .08) 70%);
+      box-shadow: 0 -8px 35px rgba(0, 115, 255, .55), 0 -22px 65px rgba(0, 75, 255, .22);
+    }
+    .galaxy-about-section {
+      isolation: isolate;
+      overflow: hidden;
+      min-height: 430px;
+    }
+    .galaxy-about-orbit {
+      position: absolute;
+      inset: 0;
+      width: min(100%, 1100px);
+      height: 100%;
+      margin: auto;
+      pointer-events: none;
+    }
+    .galaxy-about-orbit path {
+      fill: none;
+      stroke: rgba(57, 145, 255, .55);
+      stroke-width: 1.5;
+      filter: drop-shadow(0 0 9px rgba(38, 133, 255, .55));
+    }
+    .galaxy-about-orbit path:last-child {
+      stroke: rgba(77, 201, 255, .25);
+      stroke-width: 1;
+    }
+    .galaxy-floating-card {
+      background: linear-gradient(145deg, rgba(20, 53, 110, .8), rgba(5, 17, 42, .85));
+      border: 1px solid rgba(91, 166, 255, .4);
+      box-shadow: 0 0 30px rgba(0, 89, 255, .13);
+      backdrop-filter: blur(10px);
+      transition: .35s;
+    }
+    .galaxy-floating-card:hover {
+      transform: translateY(-8px);
+      border-color: #48aaff;
+      box-shadow: 0 0 30px rgba(0, 130, 255, .28);
+    }
+    .galaxy-feature-card {
+      background: linear-gradient(145deg, rgba(12, 29, 62, .9), rgba(3, 11, 26, .95));
+      border: 1px solid rgba(78, 137, 224, .2);
+      transition: .3s;
+    }
+    .galaxy-feature-card:hover {
+      border-color: rgba(66, 160, 255, .8);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 35px rgba(0, 83, 255, .15);
+    }
+    @media (max-width: 768px) {
+      .galaxy-hero { min-height: 800px; }
+      .galaxy-desktop-nav { display: none; }
+    }
   </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden antialiased bg-[#080c14] text-slate-100 selection:bg-indigo-900 selection:text-white">
+<body class="min-h-screen antialiased bg-[#080c14] text-slate-100 selection:bg-indigo-900 selection:text-white">
+
+  <div id="landingPage" class="galaxy-page page-screen">
+    <header class="fixed top-0 left-0 w-full z-50 px-4 md:px-8 pt-4">
+      <nav class="galaxy-nav max-w-[1500px] mx-auto rounded-2xl px-6 py-4 flex items-center justify-between shadow-2xl">
+        <a href="#home" class="text-3xl font-extrabold tracking-tight">Uni<span class="text-cyan-400">Life</span><span class="text-blue-500">.</span></a>
+        <div class="galaxy-desktop-nav flex items-center gap-10 text-sm font-medium text-slate-300">
+          <a href="#home" class="hover:text-cyan-300 transition">Home</a>
+          <div class="galaxy-task-menu">
+            <a href="#features" aria-haspopup="true" class="hover:text-cyan-300 transition inline-flex items-center gap-1">
+              Tác vụ
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+            </a>
+            <div class="galaxy-task-dropdown">
+              <div class="galaxy-task-dropdown-panel">
+                <button type="button" onclick="showWorkspace('activities', 'discover')"><span class="block text-sm font-semibold">Khám phá hoạt động</span><span class="block text-xs text-slate-400 mt-0.5">Sự kiện và workshop phù hợp</span></button>
+                <button type="button" onclick="showWorkspace('calculator', 'tracker')"><span class="block text-sm font-semibold">Theo dõi điểm rèn luyện</span><span class="block text-xs text-slate-400 mt-0.5">Điểm số và tiến độ của bạn</span></button>
+                <button type="button" onclick="showWorkspace('plan')"><span class="block text-sm font-semibold">Lập lịch thông minh</span><span class="block text-xs text-slate-400 mt-0.5">Lên kế hoạch theo thời gian rảnh</span></button>
+                <button type="button" onclick="showWorkspace('calculator', 'calculate')"><span class="block text-sm font-semibold">Tính điểm hoạt động</span><span class="block text-xs text-slate-400 mt-0.5">Đánh giá theo quy chế ĐRL</span></button>
+                <button type="button" onclick="showWorkspace('activities')"><span class="block text-sm font-semibold">Kho hoạt động</span><span class="block text-xs text-slate-400 mt-0.5">Tra cứu bài đăng đã thu thập</span></button>
+                <button type="button" onclick="showWorkspace('snapshot')"><span class="block text-sm font-semibold">Điểm học vụ</span><span class="block text-xs text-slate-400 mt-0.5">Kết quả học tập và GPA</span></button>
+              </div>
+            </div>
+          </div>
+          <a href="#how-it-works" class="hover:text-cyan-300 transition">How it works?</a>
+          <a href="#about" class="hover:text-cyan-300 transition">About us</a>
+        </div>
+        <button type="button" onclick="showWorkspace()" class="galaxy-button rounded-full px-7 py-3 text-sm font-bold whitespace-nowrap">
+          ĐĂNG NHẬP / ĐĂNG KÝ ↗
+        </button>
+      </nav>
+    </header>
+
+    <section id="home" class="galaxy-hero galaxy-bg flex items-center justify-center pt-32 pb-20">
+      <div class="galaxy-stars"></div>
+      <div class="relative z-10 max-w-6xl w-full mx-auto px-6 text-center">
+        <p class="text-cyan-300 text-xs md:text-sm font-bold tracking-[.35em] mb-6">YOUR UNIVERSITY JOURNEY STARTS HERE</p>
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6">
+          Your University Life<br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-300 to-blue-500">Deserves More.</span>
+        </h1>
+        <p class="text-slate-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+          Hãy để UniLife đồng hành cùng bạn trong hành trình đại học. Tối ưu thời gian, quản lý mục tiêu và khám phá những cơ hội phát triển dành riêng cho bạn.
+        </p>
+        <button type="button" onclick="showWorkspace()" class="galaxy-button inline-flex items-center gap-3 rounded-full px-9 py-4 mt-9 font-bold">
+          Get Started <span>↗</span>
+        </button>
+
+        <div class="relative mt-20 max-w-4xl mx-auto h-[390px] md:h-[430px]">
+          <div class="galaxy-horizon"></div>
+          <div class="galaxy-floating-card absolute left-0 md:left-5 top-16 md:top-20 w-40 md:w-56 rounded-xl p-4 text-left -rotate-6 z-10">
+            <div class="text-blue-300 text-xs font-bold mb-3">YOUR ACTIVITIES</div>
+            <div class="text-sm font-bold mb-2">Hoạt động phù hợp</div>
+            <p class="text-[10px] text-slate-400 leading-relaxed">Khám phá các sự kiện, workshop và cơ hội phát triển.</p>
+            <div class="h-1 rounded-full bg-slate-700 mt-4"><div class="h-1 w-3/4 rounded-full bg-blue-400"></div></div>
+          </div>
+          <div class="galaxy-floating-card absolute right-0 md:right-5 top-20 w-40 md:w-56 rounded-xl p-4 text-left rotate-6 z-10">
+            <div class="text-cyan-300 text-xs font-bold mb-3">YOUR PROGRESS</div>
+            <div class="text-sm font-bold mb-2">Theo dõi tiến độ</div>
+            <p class="text-[10px] text-slate-400 leading-relaxed">Quản lý mục tiêu và theo dõi quá trình hoàn thành.</p>
+            <div class="flex gap-1 mt-4"><div class="h-1.5 flex-1 rounded bg-blue-500"></div><div class="h-1.5 flex-1 rounded bg-blue-500"></div><div class="h-1.5 flex-1 rounded bg-slate-700"></div><div class="h-1.5 flex-1 rounded bg-slate-700"></div></div>
+          </div>
+          <div class="absolute z-20 left-1/2 -translate-x-1/2 bottom-5 w-64 md:w-80" style="filter: drop-shadow(0 0 25px rgba(0,105,255,.35))">
+            <svg viewBox="0 0 320 350" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="galaxySkin" x1="0" y1="0" x2="1" y2="1">
+                  <stop stop-color="#B6DFFF"/><stop offset="1" stop-color="#3975CF"/>
+                </linearGradient>
+                <linearGradient id="galaxyShirt" x1="0" y1="0" x2="1" y2="1">
+                  <stop stop-color="#8BCBFF"/><stop offset="1" stop-color="#3459B8"/>
+                </linearGradient>
+                <linearGradient id="galaxyLaptop" x1="0" y1="0" x2="1" y2="1">
+                  <stop stop-color="#50DFFF"/><stop offset="1" stop-color="#1468FF"/>
+                </linearGradient>
+              </defs>
+              <path d="M119 55 C102 20 134 5 164 15 C200 0 224 35 207 72 L196 105 L112 100 Z" fill="#101C45"/>
+              <path d="M126 53 C127 25 190 20 201 60 L194 111 C185 133 142 132 129 105 Z" fill="url(#galaxySkin)"/>
+              <path d="M119 62 C102 22 146 8 173 19 C200 7 218 43 198 67 L185 51 L161 58 L140 43 Z" fill="#111A3B"/>
+              <path d="M145 113 L144 145 L178 150 L179 112 Z" fill="#669BE1"/>
+              <path d="M103 142 Q128 124 160 128 Q205 125 219 159 L236 224 L202 249 L106 244 L79 217 Z" fill="url(#galaxyShirt)"/>
+              <path d="M111 231 Q65 249 74 280 Q94 304 147 286 L194 260 L174 240 Z" fill="#182B65"/>
+              <path d="M190 239 Q235 251 248 277 Q245 302 190 300 L113 291 Q94 285 111 264 L159 241 Z" fill="#263F8C"/>
+              <path d="M104 159 Q82 174 99 211 L142 252 Q154 265 167 250 Q174 240 158 228 L132 188 Z" fill="url(#galaxySkin)"/>
+              <path d="M211 158 Q229 174 214 207 L184 248 Q173 260 158 249 Q152 239 166 226 L188 184 Z" fill="url(#galaxySkin)"/>
+              <path d="M89 177 L226 177 L211 253 L104 253 Z" fill="url(#galaxyLaptop)" stroke="#9AEFFF" stroke-width="2"/>
+              <path d="M106 188 L210 188 L201 237 L115 237 Z" fill="#123E93" opacity=".65"/>
+              <path d="M104 253 L211 253 L230 267 L85 267 Z" fill="#55CFFF" stroke="#8AEFFF" stroke-width="2"/>
+              <circle cx="157" cy="220" r="5" fill="#C4F7FF"/>
+              <path d="M45 95 L49 106 L60 110 L49 114 L45 125 L41 114 L30 110 L41 106 Z" fill="#65BFFF"/>
+              <path d="M265 116 L269 125 L278 129 L269 133 L265 142 L261 133 L252 129 L261 125 Z" fill="#54C7FF"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="galaxy-bg relative py-24 px-6">
+      <div class="galaxy-stars"></div>
+      <div class="relative z-10 max-w-6xl mx-auto">
+        <div class="text-center mb-14">
+          <p class="text-cyan-400 text-xs font-bold tracking-[.3em] mb-4">EXPLORE UNILIFE</p>
+          <h2 class="text-3xl md:text-4xl font-bold">Everything You Need, <span class="text-blue-400">In One Place.</span></h2>
+          <p class="text-slate-400 mt-4">Khám phá những công cụ giúp cuộc sống đại học dễ dàng hơn.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <button type="button" onclick="showWorkspace('activities', 'discover')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">✦</div><h3 class="text-xl font-bold mb-3">Khám phá hoạt động</h3><p class="text-sm text-slate-400 leading-relaxed">Tìm kiếm sự kiện, workshop và các hoạt động phù hợp với sở thích.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Khám phá ngay ↗</div></button>
+          <button type="button" onclick="showWorkspace('calculator', 'tracker')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">◈</div><h3 class="text-xl font-bold mb-3">Theo dõi điểm rèn luyện</h3><p class="text-sm text-slate-400 leading-relaxed">Theo dõi điểm rèn luyện, tiêu chí và tiến độ hoàn thành.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Theo dõi ngay ↗</div></button>
+          <button type="button" onclick="showWorkspace('plan')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">⌘</div><h3 class="text-xl font-bold mb-3">Lập lịch thông minh</h3><p class="text-sm text-slate-400 leading-relaxed">Sắp xếp lịch trình và lựa chọn hoạt động phù hợp với thời gian.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Lập kế hoạch ↗</div></button>
+          <button type="button" onclick="showWorkspace('calculator', 'calculate')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">◎</div><h3 class="text-xl font-bold mb-3">Tính điểm hoạt động</h3><p class="text-sm text-slate-400 leading-relaxed">Chấm điểm chi tiết từng hoạt động dựa trên quy chế 75 quy tắc.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Tính điểm ngay ↗</div></button>
+          <button type="button" onclick="showWorkspace('activities')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">⌁</div><h3 class="text-xl font-bold mb-3">Kho hoạt động</h3><p class="text-sm text-slate-400 leading-relaxed">Tra cứu danh sách tổng hợp các bài đăng, sự kiện đã thu thập và kiểm duyệt.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Mở kho hoạt động ↗</div></button>
+          <button type="button" onclick="showWorkspace('snapshot')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">✧</div><h3 class="text-xl font-bold mb-3">Điểm học vụ</h3><p class="text-sm text-slate-400 leading-relaxed">Theo dõi kết quả học tập, GPA học kỳ và tiến độ tích lũy.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Xem kết quả ↗</div></button>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="bg-[#030916] py-24 px-6">
+      <div class="max-w-6xl mx-auto text-center">
+        <p class="text-cyan-400 text-xs font-bold tracking-[.3em] mb-4">SIMPLE &amp; SMART</p>
+        <h2 class="text-3xl md:text-4xl font-bold mb-16">How UniLife Works</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div><div class="w-16 h-16 mx-auto rounded-2xl bg-blue-500/10 border border-blue-400/30 flex items-center justify-center text-2xl text-cyan-300 mb-6">01</div><h3 class="font-bold text-lg mb-3">Tell Us About You</h3><p class="text-slate-400 text-sm leading-relaxed">Chia sẻ thông tin, nhu cầu và mục tiêu của bạn.</p></div>
+          <div><div class="w-16 h-16 mx-auto rounded-2xl bg-blue-500/10 border border-blue-400/30 flex items-center justify-center text-2xl text-cyan-300 mb-6">02</div><h3 class="font-bold text-lg mb-3">Get Personalized Suggestions</h3><p class="text-slate-400 text-sm leading-relaxed">UniLife phân tích và đề xuất những lựa chọn phù hợp.</p></div>
+          <div><div class="w-16 h-16 mx-auto rounded-2xl bg-blue-500/10 border border-blue-400/30 flex items-center justify-center text-2xl text-cyan-300 mb-6">03</div><h3 class="font-bold text-lg mb-3">Make Every Moment Count</h3><p class="text-slate-400 text-sm leading-relaxed">Theo dõi tiến độ và tận hưởng hành trình đại học.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="galaxy-bg galaxy-about-section relative py-24 px-6 text-center">
+      <div class="galaxy-stars"></div>
+      <svg class="galaxy-about-orbit" viewBox="0 0 1100 430" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <defs>
+          <linearGradient id="galaxyAboutOrbit" x1="0" y1="0" x2="1" y2="0">
+            <stop stop-color="#278cff" stop-opacity="0" />
+            <stop offset=".5" stop-color="#63d9ff" stop-opacity=".85" />
+            <stop offset="1" stop-color="#278cff" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M 75 430 C 170 46 930 46 1025 430" stroke="url(#galaxyAboutOrbit)" />
+        <path d="M 175 430 C 258 145 842 145 925 430" />
+      </svg>
+      <div class="relative z-10 max-w-3xl mx-auto">
+        <p class="text-cyan-400 text-xs font-bold tracking-[.3em] mb-5">YOUR NEXT CHAPTER</p>
+        <h2 class="text-3xl md:text-5xl font-extrabold leading-tight">Make Your University <span class="text-blue-400">Life Count.</span></h2>
+        <p class="text-slate-400 mt-6 leading-relaxed">Không chỉ là hoàn thành những yêu cầu ở đại học, mà còn là khám phá bản thân và tạo nên những trải nghiệm đáng nhớ.</p>
+        <button type="button" onclick="showWorkspace()" class="galaxy-button inline-block mt-9 px-10 py-4 rounded-full font-bold">Start Your Journey ↗</button>
+      </div>
+    </section>
+    <footer class="bg-[#02040b] border-t border-blue-900/30 py-8 px-6">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="text-2xl font-extrabold">Uni<span class="text-cyan-400">Life</span><span class="text-blue-500">.</span></div>
+        <p class="text-slate-500 text-xs text-center">© 2026 UniLife. Your University Journey Starts Here.</p>
+      </div>
+    </footer>
+  </div>
+
+  <div id="workspaceApp" class="hidden page-screen h-screen flex flex-col overflow-hidden antialiased bg-[#080c14] text-slate-100 selection:bg-indigo-900 selection:text-white">
 
   <!-- ======================================================================== -->
   <!-- 1. TOP STATUS BAR (THANH TRẠNG THÁI TRÊN CÙNG)                           -->
@@ -84,13 +480,8 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
 
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-extrabold text-base shadow-md shadow-indigo-600/40 tracking-tight">
-          U
-        </div>
-        <div>
-          <span class="font-extrabold text-base sm:text-lg text-white tracking-tight block leading-tight">UniLife ĐRL</span>
-        </div>
+      <div class="flex items-center">
+        <span class="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-tight">Uni<span class="text-cyan-400">Life</span><span class="text-blue-500">.</span></span>
       </div>
 
       <div class="hidden sm:block h-5 w-px bg-[#1b2537]"></div>
@@ -104,6 +495,10 @@
           Developer
         </button>
       </div>
+      <button id="btnThemeToggle" type="button" onclick="toggleTheme()" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#0e1524] border border-[#1b2537] text-slate-300 hover:text-white hover:bg-[#11192b] text-xs font-semibold transition flex items-center gap-1.5" aria-label="Chuyển sang chế độ sáng" title="Chuyển sang chế độ sáng">
+        <span id="themeToggleIcon" aria-hidden="true">☀</span>
+        <span id="themeToggleLabel" class="hidden sm:inline">Sáng</span>
+      </button>
 
       <!-- Developer-Only Status Controls in Top Bar -->
       <div class="dev-only hidden xl:flex items-center gap-3">
@@ -180,8 +575,30 @@
             Không gian làm việc
           </div>
           <nav class="space-y-2">
-            
+
             <button id="tabBtnDashboard" onclick="switchTab('dashboard')" class="nav-btn-active w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 11.5 12 4l9 7.5M5.5 10v9.5h13V10M9 19.5v-6h6v6"/></svg>
+              <span class="text-sm font-bold">Tổng quan</span>
+            </button>
+            <button id="tabBtnDiscoverActivities" onclick="switchTab('activities', 'discover')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="m16 16 4 4"/></svg>
+              <span class="text-sm font-bold">Khám phá hoạt động</span>
+            </button>
+
+            <button id="tabBtnDrlTracker" onclick="switchTab('calculator', 'tracker')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 12.5 9 17l10.5-11"/></svg>
+              <span class="text-sm font-bold">Theo dõi điểm rèn luyện</span>
+            </button>
+
+            <button id="tabBtnPlan" onclick="switchTab('plan')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                <span class="text-sm font-bold">Lập lịch thông minh <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP3)</span></span>
+              </div>
+              <span class="dev-only text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-950/70 text-indigo-300 border border-indigo-700/60">SP3</span>
+            </button>
+
+            <button id="tabBtnCalculator" onclick="switchTab('calculator', 'calculate')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
               <span class="text-sm font-bold">Tính điểm hoạt động</span>
             </button>
@@ -197,14 +614,6 @@
             <button id="tabBtnSnapshot" onclick="switchTab('snapshot')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
               <span class="text-sm font-bold">Điểm học vụ</span>
-            </button>
-
-            <button id="tabBtnPlan" onclick="switchTab('plan')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                <span class="text-sm font-bold">Kế hoạch rèn luyện <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP3)</span></span>
-              </div>
-              <span class="dev-only text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-950/70 text-indigo-300 border border-indigo-700/60">SP3</span>
             </button>
 
             <!-- Developer-Only Workspaces -->
@@ -255,61 +664,241 @@
         <!-- ================================================================== -->
         <!-- WORKSPACE 1: TÍNH ĐIỂM HOẠT ĐỘNG (LAYOUT CÂN ĐỐI, TO RÕ, ĐẸP MẮT)  -->
         <!-- ================================================================== -->
-        <div id="viewDashboard" class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+        <div id="viewDashboard" class="space-y-8">
+          <section id="workspaceOverview" class="space-y-6">
+            <div class="relative overflow-hidden rounded-3xl border border-blue-400/20 bg-gradient-to-br from-[#101d3c] via-[#0b1429] to-[#101d3a] px-6 py-7 sm:px-8 sm:py-9 shadow-xl shadow-blue-950/20">
+              <div class="absolute -right-10 -top-20 h-64 w-64 rounded-full border border-blue-300/10 bg-blue-500/5 shadow-[0_0_90px_rgba(37,99,235,0.12)]"></div>
+              <div class="absolute -right-1 -top-10 h-48 w-48 rounded-full border border-cyan-300/10"></div>
+              <div class="relative z-10 max-w-3xl">
+                <p class="text-[11px] font-bold uppercase tracking-[.28em] text-cyan-300">KHÔNG GIAN CỦA BẠN</p>
+                <h1 class="mt-3 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Chào mừng trở lại, <span id="dashboardWelcomeName">bạn</span> ✦</h1>
+                <p class="mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-slate-300">Cùng UniLife theo dõi tiến độ, khám phá cơ hội mới và lên kế hoạch cho một học kỳ thật trọn vẹn.</p>
+              </div>
+              <div class="relative z-10 mt-6 flex flex-wrap items-center gap-2 text-xs">
+                <span class="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 font-semibold text-emerald-200">● Học kỳ 1 · 2026–2027</span>
+                <span class="rounded-full border border-blue-300/20 bg-blue-300/10 px-3 py-1.5 font-semibold text-blue-100">Mỗi bước tiến đều đáng ghi nhận</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4">
+              <article class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 shadow-lg shadow-black/10">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-xs font-semibold text-slate-400">Điểm rèn luyện</p>
+                    <p class="mt-3 text-3xl font-black text-white"><span id="overviewDrlScore">0</span><span class="ml-1 text-sm font-bold text-slate-500">/100</span></p>
+                    <p id="overviewDrlGrade" class="mt-2 text-xs font-semibold text-indigo-300">Chưa có điểm ghi nhận</p>
+                  </div>
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/15 text-xl text-indigo-300" aria-hidden="true">◈</span>
+                </div>
+              </article>
+              <article class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 shadow-lg shadow-black/10">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-xs font-semibold text-slate-400">Hoạt động đã tham gia</p>
+                    <p id="overviewActivityCount" class="mt-3 text-3xl font-black text-white">0</p>
+                    <p id="overviewActivityCaption" class="mt-2 text-xs font-semibold text-emerald-300">Hoạt động đã xác nhận</p>
+                  </div>
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-xl text-emerald-300" aria-hidden="true">✦</span>
+                </div>
+              </article>
+              <article class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 shadow-lg shadow-black/10">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-xs font-semibold text-slate-400">Lịch trình sắp tới</p>
+                    <p id="overviewUpcomingCount" class="mt-3 text-3xl font-black text-white">0</p>
+                    <p id="overviewUpcomingCaption" class="mt-2 text-xs font-semibold text-sky-300">Chưa có kế hoạch</p>
+                  </div>
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/15 text-xl text-sky-300" aria-hidden="true">▦</span>
+                </div>
+              </article>
+              <article class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 shadow-lg shadow-black/10">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-xs font-semibold text-slate-400">Mục tiêu cá nhân</p>
+                    <p class="mt-3 text-3xl font-black text-white"><span id="overviewGoalScore">80</span><span class="ml-1 text-sm font-bold text-slate-500">điểm</span></p>
+                    <p id="overviewGoalCaption" class="mt-2 text-xs font-semibold text-amber-300">Mục tiêu học kỳ</p>
+                  </div>
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-xl text-amber-300" aria-hidden="true">◎</span>
+                </div>
+              </article>
+            </div>
+
+            <section aria-labelledby="quickActionsTitle" class="space-y-3">
+              <div class="flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-[.22em] text-indigo-300">BẮT ĐẦU NGAY</p>
+                  <h2 id="quickActionsTitle" class="mt-1 text-lg sm:text-xl font-extrabold text-white">Bạn muốn làm gì hôm nay?</h2>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                <button type="button" onclick="switchTab('calculator', 'calculate')" class="group rounded-2xl border border-indigo-400/20 bg-[#0e1524] p-4 text-left transition hover:-translate-y-1 hover:border-indigo-400/60 hover:bg-[#11192b]">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/15 text-xl text-indigo-300" aria-hidden="true">◎</span>
+                  <span class="mt-3 block text-sm font-bold text-white">Tính điểm hoạt động</span>
+                  <span class="mt-1 block text-xs leading-relaxed text-slate-400">Kiểm tra điểm theo quy chế ĐRL.</span>
+                </button>
+                <button type="button" onclick="switchTab('activities', 'discover')" class="group rounded-2xl border border-blue-400/20 bg-[#0e1524] p-4 text-left transition hover:-translate-y-1 hover:border-blue-400/60 hover:bg-[#11192b]">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15 text-xl text-blue-300" aria-hidden="true">⌕</span>
+                  <span class="mt-3 block text-sm font-bold text-white">Khám phá hoạt động</span>
+                  <span class="mt-1 block text-xs leading-relaxed text-slate-400">Tìm sự kiện và workshop phù hợp.</span>
+                </button>
+                <button type="button" onclick="switchTab('plan')" class="group rounded-2xl border border-cyan-400/20 bg-[#0e1524] p-4 text-left transition hover:-translate-y-1 hover:border-cyan-400/60 hover:bg-[#11192b]">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/15 text-xl text-cyan-300" aria-hidden="true">⌘</span>
+                  <span class="mt-3 block text-sm font-bold text-white">Lập lịch thông minh</span>
+                  <span class="mt-1 block text-xs leading-relaxed text-slate-400">Lên lộ trình theo mục tiêu của bạn.</span>
+                </button>
+                <button type="button" onclick="switchTab('snapshot')" class="group rounded-2xl border border-violet-400/20 bg-[#0e1524] p-4 text-left transition hover:-translate-y-1 hover:border-violet-400/60 hover:bg-[#11192b]">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/15 text-xl text-violet-300" aria-hidden="true">✧</span>
+                  <span class="mt-3 block text-sm font-bold text-white">Điểm học vụ</span>
+                  <span class="mt-1 block text-xs leading-relaxed text-slate-400">Theo dõi điểm và tiến độ tích lũy.</span>
+                </button>
+              </div>
+            </section>
+
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
+              <section aria-labelledby="semesterProgressTitle" class="xl:col-span-5 rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 sm:p-6">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[.2em] text-cyan-300">TIẾN ĐỘ HỌC KỲ</p>
+                    <h2 id="semesterProgressTitle" class="mt-1 text-base font-extrabold text-white">Hành trình rèn luyện</h2>
+                  </div>
+                  <span id="overviewSemesterPercent" class="text-sm font-extrabold text-cyan-300">0%</span>
+                </div>
+                <div class="mt-5 h-2.5 overflow-hidden rounded-full bg-[#080d18]">
+                  <div id="overviewSemesterBar" class="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-300 transition-all duration-500" style="width:0%"></div>
+                </div>
+                <div class="mt-3 flex items-center justify-between gap-2 text-xs text-slate-400">
+                  <span id="overviewSemesterCaption">0 / 100 điểm đã ghi nhận</span>
+                  <span>Học kỳ 1</span>
+                </div>
+              </section>
+              <section aria-labelledby="recommendedActivitiesTitle" class="xl:col-span-7 rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 sm:p-6">
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[.2em] text-blue-300">GỢI Ý DÀNH CHO BẠN</p>
+                    <h2 id="recommendedActivitiesTitle" class="mt-1 text-base font-extrabold text-white">Hoạt động nên khám phá</h2>
+                  </div>
+                  <button type="button" onclick="switchTab('activities')" class="shrink-0 text-xs font-bold text-cyan-300 hover:text-cyan-200">Xem kho ↗</button>
+                </div>
+                <div id="recommendedActivitiesList" class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <p class="md:col-span-3 rounded-xl border border-dashed border-[#223046] bg-[#080d18] p-4 text-xs text-slate-400">Đang tải hoạt động gợi ý…</p>
+                </div>
+              </section>
+            </div>
+          </section>
+
+        </div>
+        <div id="viewCalculator" class="hidden space-y-6 scroll-mt-6">
+          <div class="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p class="text-[11px] font-bold uppercase tracking-[.22em] text-indigo-300">THEO DÕI ĐIỂM RÈN LUYỆN</p>
+              <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-white">Tính điểm hoạt động</h1>
+              <p class="mt-1 text-sm text-slate-400">Kiểm tra điều kiện, mức điểm và tiến độ theo từng nhóm tiêu chí.</p>
+            </div>
+            <span class="rounded-full border border-indigo-400/20 bg-indigo-400/10 px-3 py-1.5 text-xs font-semibold text-indigo-200">Quy chế ĐRL · UniLife</span>
+          </div>
+          <div id="activityScoringSection" class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start scroll-mt-6">
           
           <!-- CỘT TRÁI (7/12): KHÔNG GIAN NHẬP LIỆU & BÓC TÁCH TO RÕ -->
           <div class="xl:col-span-7 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl divide-y divide-[#1b2537] overflow-hidden">
             
-            <!-- TẦNG 1: NHẬP THÔNG BÁO HOẠT ĐỘNG -->
-            <div class="p-6 lg:p-7 space-y-4">
-              <div class="flex items-center justify-between">
+            <!-- TẦNG 1: NHẬP LIỆU TÍNH ĐIỂM -->
+            <div class="p-6 lg:p-7 space-y-5">
+              <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h2 class="text-xl font-extrabold text-white">Thông báo hoạt động</h2>
+                  <h2 class="text-xl font-extrabold text-white">Kiểm tra hoạt động</h2>
+                  <p class="mt-1 text-sm text-slate-400">Chọn cách nhập thông tin phù hợp với bạn.</p>
                 </div>
+                <span class="text-xs text-slate-400">Có thể để trống thông tin chưa biết</span>
               </div>
 
-              <!-- Large, comfortable Textarea -->
-              <textarea id="inputRawContent" oninput="onRawContentManualEdit()" rows="5" placeholder="Dán nội dung bài đăng thông báo hoạt động vào đây..." class="w-full p-4 rounded-xl bg-[#080d18] border border-[#223046] focus:bg-[#0c1220] focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 text-base text-slate-100 placeholder-slate-500 outline-none transition resize-y"></textarea>
+              <div class="inline-flex max-w-full flex-wrap gap-1 rounded-xl border border-[#223046] bg-[#080d18] p-1" role="tablist" aria-label="Cách nhập hoạt động">
+                <button id="btnInputModePaste" type="button" role="tab" aria-selected="true" onclick="setActivityInputMode('paste')" class="rounded-lg border border-indigo-500 bg-indigo-600/20 px-4 py-2.5 text-sm font-bold text-indigo-200 transition">
+                  ▤ <span class="ml-1.5">Dán thông báo</span>
+                </button>
+                <button id="btnInputModeManual" type="button" role="tab" aria-selected="false" onclick="setActivityInputMode('manual')" class="rounded-lg border border-transparent px-4 py-2.5 text-sm font-semibold text-slate-400 transition hover:bg-[#11192b] hover:text-white">
+                  ✎ <span class="ml-1.5">Nhập thủ công</span>
+                </button>
+              </div>
 
-              <!-- Developer-Only Metadata Drawer -->
-              <details class="dev-only group rounded-xl border border-[#223046] bg-[#080d18] px-4 py-2.5">
-                <summary class="cursor-pointer list-none flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-200">
-                  <span>[Dev] Thông số nguồn &amp; Ghi đè quy tắc (Metadata)</span>
-                  <span class="group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div class="pt-4 pb-2 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-[#1b2537] mt-2.5 text-sm">
-                  <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">Đơn vị đăng (Publisher)</label>
-                    <input id="inputPublisher" type="text" value="Phòng Công tác Sinh viên HCMUS" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition" />
+              <div id="activityPastePanel" class="space-y-4">
+                <label for="inputRawContent" class="block text-sm font-bold text-slate-200">Nội dung thông báo hoạt động</label>
+                <textarea id="inputRawContent" oninput="onRawContentManualEdit()" rows="5" placeholder="Dán nội dung bài đăng thông báo hoạt động vào đây..." class="w-full rounded-xl border border-[#223046] bg-[#080d18] p-4 text-base text-slate-100 placeholder-slate-500 outline-none transition resize-y focus:border-indigo-500 focus:bg-[#0c1220] focus:ring-4 focus:ring-indigo-500/20"></textarea>
+                <p class="text-xs text-slate-500">UniLife sẽ trích xuất tên, thời gian, địa điểm và điều kiện ghi nhận điểm.</p>
+
+                <details class="dev-only group rounded-xl border border-[#223046] bg-[#080d18] px-4 py-2.5">
+                  <summary class="cursor-pointer list-none flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-200">
+                    <span>[Dev] Thông số nguồn &amp; Ghi đè quy tắc (Metadata)</span>
+                    <span class="group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <div class="pt-4 pb-2 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-[#1b2537] mt-2.5 text-sm">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-400 mb-1">Đơn vị đăng (Publisher)</label>
+                      <input id="inputPublisher" type="text" value="Phòng Công tác Sinh viên HCMUS" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-400 mb-1">Ngày đăng</label>
+                      <input id="inputDatePosted" type="date" value="2026-10-25" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-400 mb-1">URL bài viết</label>
+                      <input id="inputUrl" type="text" value="https://www.facebook.com/ctsv.hcmus/posts/101" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-indigo-300 text-sm font-mono focus:border-indigo-500 outline-none transition" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-400 mb-1">Post ID</label>
+                      <input id="inputPostId" type="text" value="pfbid01customPost2026" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-indigo-300 text-sm font-mono focus:border-indigo-500 outline-none transition" />
+                    </div>
+                    <div class="sm:col-span-2">
+                      <label class="block text-xs font-bold text-slate-400 mb-1">Quy tắc ĐRL (Rule Override)</label>
+                      <select id="inputRuleOverride" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition">
+                        <option value="auto">Tự động nhận diện (Auto)</option>
+                        <option value="R19">R19 — Mục 1.9: Học thuật, kỹ năng (+5đ, C1)</option>
+                        <option value="R31">R31 — Mục 3.1: Sự kiện chính trị - xã hội (+5đ, C3)</option>
+                        <option value="R3101">R3101 — Mục 3.1: Thí sinh cuộc thi cấp trường (+10đ, C3)</option>
+                        <option value="R42">R42 — Mục 4.2: Hiến máu / Cộng đồng (+10đ, C4)</option>
+                        <option value="R51">R51 — Mục 5.1: Hỗ trợ tổ chức sự kiện (+10đ, C5)</option>
+                      </select>
+                    </div>
                   </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">Ngày đăng</label>
-                    <input id="inputDatePosted" type="date" value="2026-10-25" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition" />
+                </details>
+              </div>
+
+              <div id="activityManualPanel" class="hidden space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h3 class="text-sm font-bold text-slate-200">Thông tin sự kiện</h3>
+                  <button type="button" onclick="switchTab('inspector')" class="dev-only text-xs font-mono font-bold text-indigo-400 hover:text-indigo-300 hover:underline">
+                    [Dev] Xem 14 trường JSON &rarr;
+                  </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-sm">
+                  <div class="rounded-xl border border-[#223046] bg-[#080d18] p-4 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 sm:col-span-2">
+                    <label for="sp1TitleInput" class="block text-xs font-bold uppercase tracking-wider text-slate-400">Tên hoạt động</label>
+                    <input id="sp1TitleInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: Hội thảo định hướng nghề nghiệp" class="mt-1 w-full bg-transparent text-base font-bold text-white outline-none" />
                   </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">URL bài viết</label>
-                    <input id="inputUrl" type="text" value="https://www.facebook.com/ctsv.hcmus/posts/101" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-indigo-300 text-sm font-mono focus:border-indigo-500 outline-none transition" />
+                  <div class="rounded-xl border border-[#223046] bg-[#080d18] p-4 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20">
+                    <label for="sp1TimeInput" class="block text-xs font-bold uppercase tracking-wider text-slate-400">Thời gian</label>
+                    <input id="sp1TimeInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: 14:00 – 16:30 ngày 28/10/2026" class="mt-1 w-full bg-transparent font-semibold text-slate-100 outline-none" />
                   </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">Post ID</label>
-                    <input id="inputPostId" type="text" value="pfbid01customPost2026" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-indigo-300 text-sm font-mono focus:border-indigo-500 outline-none transition" />
+                  <div class="rounded-xl border border-[#223046] bg-[#080d18] p-4 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20">
+                    <label for="sp1LocationInput" class="block text-xs font-bold uppercase tracking-wider text-slate-400">Địa điểm / Hình thức</label>
+                    <input id="sp1LocationInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: Hội trường I / Trực tuyến" class="mt-1 w-full bg-transparent font-semibold text-slate-100 outline-none" />
                   </div>
-                  <div class="sm:col-span-2">
-                    <label class="block text-xs font-bold text-slate-400 mb-1">Quy tắc ĐRL (Rule Override)</label>
-                    <select id="inputRuleOverride" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition">
-                      <option value="auto">Tự động nhận diện (Auto)</option>
-                      <option value="R19">R19 — Mục 1.9: Học thuật, kỹ năng (+5đ, C1)</option>
-                      <option value="R31">R31 — Mục 3.1: Sự kiện chính trị - xã hội (+5đ, C3)</option>
-                      <option value="R3101">R3101 — Mục 3.1: Thí sinh cuộc thi cấp trường (+10đ, C3)</option>
-                      <option value="R42">R42 — Mục 4.2: Hiến máu / Cộng đồng (+10đ, C4)</option>
-                      <option value="R51">R51 — Mục 5.1: Hỗ trợ tổ chức sự kiện (+10đ, C5)</option>
-                    </select>
+                  <div class="rounded-xl border border-[#223046] bg-[#080d18] p-4 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20">
+                    <label for="sp1PointsInput" class="block text-xs font-bold uppercase tracking-wider text-slate-400">Điểm rèn luyện công bố</label>
+                    <input id="sp1PointsInput" oninput="markEventFieldsDirty()" type="number" min="0" max="100" placeholder="VD: 5 điểm" class="mt-1 w-full bg-transparent text-base font-bold text-indigo-300 outline-none" />
+                  </div>
+                  <div class="rounded-xl border border-[#223046] bg-[#080d18] p-4 transition focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20">
+                    <label for="sp1ReqInput" class="block text-xs font-bold uppercase tracking-wider text-slate-400">Điều kiện ghi nhận điểm</label>
+                    <input id="sp1ReqInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: Điểm danh cuối buổi, hoàn thành khảo sát..." class="mt-1 w-full bg-transparent font-semibold text-slate-100 outline-none" />
+                  </div>
+                  <div class="dev-only rounded-xl border border-[#223046] bg-[#080d18] p-4 sm:col-span-2">
+                    <span class="block text-xs font-mono text-slate-400">[Dev] Trạng thái &amp; Cờ kiểm duyệt SP1</span>
+                    <span id="sp1StatusFlags" class="mt-1 block font-mono text-xs font-semibold text-indigo-300">—</span>
                   </div>
                 </div>
-              </details>
+                <p class="text-xs text-slate-500">Chỉ nhập những thông tin bạn có. Thông tin thiếu sẽ được đánh dấu cần xác minh.</p>
+              </div>
 
-              <!-- Action Row: Evidence Checkbox + Single Reset + Big Action Button -->
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-[#1b2537] pt-5">
                 <label class="flex items-center gap-3 cursor-pointer select-none">
                   <input id="inputEvidence" type="checkbox" onchange="onEvidenceToggle()" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
                   <div>
@@ -393,54 +982,10 @@
               </div>
             </div>
 
-            <!-- TẦNG 3: THÔNG TIN SỰ KIỆN (BÓC TÁCH TỰ ĐỘNG & CHO PHÉP CHỈNH SỬA) -->
-            <div class="p-6 lg:p-7 space-y-4">
-              <div class="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h2 class="text-xl font-extrabold text-white">Thông tin sự kiện</h2>
-                </div>
-                <button onclick="switchTab('inspector')" class="dev-only text-xs font-mono font-bold text-indigo-400 hover:text-indigo-300 hover:underline">
-                  [Dev] Xem 14 trường JSON &rarr;
-                </button>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046] focus-within:bg-[#0c1220] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition sm:col-span-2">
-                  <label for="sp1TitleInput" class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Tên hoạt động</label>
-                  <input id="sp1TitleInput" oninput="markEventFieldsDirty()" type="text" placeholder="Nhập tên hoạt động..." class="w-full bg-transparent text-base font-bold text-white mt-1 outline-none" />
-                </div>
-
-                <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046] focus-within:bg-[#0c1220] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition">
-                  <label for="sp1TimeInput" class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Thời gian</label>
-                  <input id="sp1TimeInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: 14:00 - 16:30 ngày 28/10/2026" class="w-full bg-transparent font-semibold text-slate-100 mt-1 outline-none" />
-                </div>
-
-                <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046] focus-within:bg-[#0c1220] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition">
-                  <label for="sp1LocationInput" class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Địa điểm / Hình thức</label>
-                  <input id="sp1LocationInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: Hội trường I, Cơ sở 227 Nguyễn Văn Cừ" class="w-full bg-transparent font-semibold text-slate-100 mt-1 outline-none" />
-                </div>
-
-                <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046] focus-within:bg-[#0c1220] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition">
-                  <label for="sp1PointsInput" class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Điểm rèn luyện công bố</label>
-                  <input id="sp1PointsInput" oninput="markEventFieldsDirty()" type="number" min="0" max="100" placeholder="VD: 5" class="w-full bg-transparent font-bold text-indigo-400 text-base mt-1 outline-none" />
-                </div>
-
-                <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046] focus-within:bg-[#0c1220] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition">
-                  <label for="sp1ReqInput" class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Điều kiện ghi nhận điểm</label>
-                  <input id="sp1ReqInput" oninput="markEventFieldsDirty()" type="text" placeholder="VD: Điểm danh cuối buổi" class="w-full bg-transparent font-semibold text-slate-100 mt-1 outline-none" />
-                </div>
-
-                <div class="dev-only p-4 rounded-xl bg-[#080d18] border border-[#223046] sm:col-span-2">
-                  <span class="text-xs font-mono text-slate-400 block">[Dev] Trạng thái &amp; Cờ kiểm duyệt SP1</span>
-                  <span id="sp1StatusFlags" class="font-mono text-xs font-semibold text-indigo-300 mt-1 block">—</span>
-                </div>
-              </div>
-            </div>
-
           </div>
 
           <!-- CỘT PHẢI (5/12): BIỂU ĐỒ TRÒN & 5 THANH TIẾN ĐỘ RỘNG RÃI, ĐẸP MẮT -->
-          <div class="xl:col-span-5 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 sm:p-6 lg:p-7 space-y-6 sticky top-6">
+          <div id="drlScorePanel" class="xl:col-span-5 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 sm:p-6 lg:p-7 space-y-6 sticky top-6 scroll-mt-6">
             
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#1b2537] pb-4">
               <div>
@@ -514,6 +1059,7 @@
 
           </div>
 
+        </div>
         </div>
 
         <!-- ================================================================== -->
@@ -1025,57 +1571,59 @@
 
         </div>
 
+  </div>
+
   <!-- ======================================================================== -->
-  <!-- MODAL: ĐỔI TÀI KHOẢN SINH VIÊN                                           -->
+  <!-- MODAL: ĐĂNG NHẬP / ĐĂNG KÝ TÀI KHOẢN CỤC BỘ                           -->
   <!-- ======================================================================== -->
-  <div id="loginModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-[#0e1524] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#1b2537] space-y-5">
+  <div id="loginModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onclick="if (event.target === this) closeLoginModal()">
+    <div class="bg-[#0e1524] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#1b2537] space-y-5" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
       <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
-        <h3 class="text-lg font-extrabold text-white">Đổi tài khoản sinh viên</h3>
-        <button onclick="closeLoginModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#1b2537] transition">✕</button>
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-widest text-indigo-300">UniLife</p>
+          <h3 id="authModalTitle" class="text-lg font-extrabold text-white mt-1">Đăng nhập</h3>
+        </div>
+        <button type="button" onclick="closeLoginModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#1b2537] transition" aria-label="Đóng cửa sổ">✕</button>
       </div>
 
-      <div class="grid grid-cols-2 gap-2.5">
-        <button onclick="loginQuickStudent('25127242')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
-          <div class="font-bold text-sm text-white">Lưu Minh Tiến</div>
-          <div class="text-xs text-slate-500 mt-0.5">25127242 • 25C09</div>
-        </button>
-        <button onclick="loginQuickStudent('25127257')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
-          <div class="font-bold text-sm text-white">Nguyễn Thị Ngọc Tuyền</div>
-          <div class="text-xs text-slate-500 mt-0.5">25127257 • 25C09</div>
-        </button>
-        <button onclick="loginQuickStudent('25127214')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
-          <div class="font-bold text-sm text-white">Lâm Như Ngọc</div>
-          <div class="text-xs text-slate-500 mt-0.5">25127214 • 25C09</div>
-        </button>
-        <button onclick="loginQuickStudent('25127316')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
-          <div class="font-bold text-sm text-white">Bùi Thảo Duyên</div>
-          <div class="text-xs text-slate-500 mt-0.5">25127316 • 25C09</div>
-        </button>
-        <button onclick="loginQuickStudent('25127244')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
-          <div class="font-bold text-sm text-white">Nguyễn Minh Trí</div>
-          <div class="text-xs text-slate-500 mt-0.5">25127244 • 25C09</div>
-        </button>
-        <button onclick="loginQuickStudent('25127009')" class="p-3 rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500 hover:bg-indigo-950/40 text-left transition">
-          <div class="font-bold text-sm text-white">Huỳnh Phương Bình An</div>
-          <div class="text-xs text-slate-500 mt-0.5">25127009 • 25C09</div>
-        </button>
+      <div class="grid grid-cols-2 gap-1 p-1 rounded-xl bg-[#080d18] border border-[#1b2537]" role="tablist" aria-label="Chọn hình thức tài khoản">
+        <button id="authTabLogin" type="button" role="tab" aria-selected="true" onclick="setAuthMode('login')" class="py-2 rounded-lg text-sm font-bold bg-indigo-600 text-white transition">Đăng nhập</button>
+        <button id="authTabRegister" type="button" role="tab" aria-selected="false" onclick="setAuthMode('register')" class="py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white transition">Đăng ký</button>
       </div>
 
-      <form onsubmit="submitCustomLogin(event)" class="space-y-3 pt-3 border-t border-[#1b2537]">
+      <div id="authMessage" class="hidden rounded-xl border px-3.5 py-3 text-sm" role="status" aria-live="polite"></div>
+
+      <form id="loginForm" onsubmit="loginWithLocalAccount(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-400 mb-1">Mã số sinh viên</label>
-          <input id="loginInputMssv" type="text" required placeholder="VD: 25127999" class="w-full px-3.5 py-2 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 outline-none transition" />
+          <label for="loginMssv" class="block text-xs font-bold text-slate-300 mb-1.5">Mã số sinh viên (MSSV)</label>
+          <input id="loginMssv" name="student_id" type="text" required autocomplete="username" autocapitalize="characters" placeholder="Nhập MSSV" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-400 mb-1">Họ và tên</label>
-          <input id="loginInputName" type="text" required placeholder="VD: Nguyễn Văn A" class="w-full px-3.5 py-2 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 outline-none transition" />
+          <label for="loginPassword" class="block text-xs font-bold text-slate-300 mb-1.5">Mật khẩu</label>
+          <input id="loginPassword" name="password" type="password" required autocomplete="current-password" placeholder="Nhập mật khẩu" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
         </div>
-        <input id="loginInputClass" type="hidden" value="25CTT3" />
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition">
-          Sử dụng tài khoản này
-        </button>
+        <button id="btnSubmitLogin" type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition">Đăng nhập</button>
       </form>
+
+      <form id="registerForm" onsubmit="registerLocalAccount(event)" class="hidden space-y-4">
+        <div>
+          <label for="registerName" class="block text-xs font-bold text-slate-300 mb-1.5">Họ và tên</label>
+          <input id="registerName" name="full_name" type="text" required autocomplete="name" maxlength="100" placeholder="Nhập họ và tên" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
+        </div>
+        <div>
+          <label for="registerMssv" class="block text-xs font-bold text-slate-300 mb-1.5">Mã số sinh viên (MSSV)</label>
+          <input id="registerMssv" name="student_id" type="text" required autocomplete="username" autocapitalize="characters" placeholder="Nhập MSSV" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
+        </div>
+        <div>
+          <label for="registerPassword" class="block text-xs font-bold text-slate-300 mb-1.5">Mật khẩu</label>
+          <input id="registerPassword" name="new-password" type="password" required minlength="8" autocomplete="new-password" placeholder="Tối thiểu 8 ký tự" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
+        </div>
+        <button id="btnSubmitRegister" type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition">Tạo tài khoản</button>
+      </form>
+
+      <p class="text-[11px] leading-relaxed text-slate-500">
+        Tài khoản được lưu trên trình duyệt này. Đây là đăng nhập cục bộ để dùng thử, không thay thế hệ thống xác thực an toàn trên máy chủ.
+      </p>
     </div>
   </div>
 
@@ -1083,6 +1631,46 @@
   <!-- JAVASCRIPT CONTROLLER                                                    -->
   <!-- ======================================================================== -->
   <script>
+    const authModal = document.getElementById("loginModal");
+    if (!authModal) throw new Error("The local account dialog is missing from the page.");
+    document.body.appendChild(authModal);
+
+    let workspaceTransitionStarted = false;
+    let pendingWorkspaceTab = null;
+    let pendingWorkspaceAction = null;
+    function showWorkspace(tab, action) {
+      if (!currentStudent) {
+        pendingWorkspaceTab = tab || null;
+        pendingWorkspaceAction = action || null;
+        openLoginModal('login');
+        return;
+      }
+
+      if (workspaceTransitionStarted) {
+        if (tab) switchTab(tab, action);
+        return;
+      }
+
+      const landing = document.getElementById("landingPage");
+      const workspace = document.getElementById("workspaceApp");
+      if (!landing || !workspace) {
+        console.error("Unable to switch to the UniLife workspace: page containers are missing.");
+        return;
+      }
+
+      workspaceTransitionStarted = true;
+      landing.classList.add("landing-leaving");
+      window.setTimeout(() => {
+        landing.classList.add("hidden");
+        workspace.classList.remove("hidden");
+        window.scrollTo(0, 0);
+        window.requestAnimationFrame(() => {
+          workspace.classList.add("workspace-visible");
+          if (tab) switchTab(tab, action);
+        });
+      }, 400);
+    }
+
     const API_BASE = "";
     // Escape data from posts, profile inputs and API responses before HTML template insertion.
     // Only our own hard-coded HTML tags/classes may be interpolated unescaped.
@@ -1104,6 +1692,7 @@
     let activePresetId = null;
     let currentViewMode = "user"; // 'user' | 'dev'
     let eventFieldsEditedByUser = false;
+    let currentActivityInputMode = "paste";
     let savedActivitiesForStudent = [];
 
     // Category metadata only. Current scores are loaded from /api/scores, whose
@@ -1212,6 +1801,28 @@
       withdrawUnsavedPreview();
     }
 
+    function setActivityInputMode(mode) {
+      currentActivityInputMode = mode === "manual" ? "manual" : "paste";
+      const manual = currentActivityInputMode === "manual";
+      document.getElementById("activityPastePanel")?.classList.toggle("hidden", manual);
+      document.getElementById("activityManualPanel")?.classList.toggle("hidden", !manual);
+
+      const pasteButton = document.getElementById("btnInputModePaste");
+      const manualButton = document.getElementById("btnInputModeManual");
+      if (pasteButton) {
+        pasteButton.setAttribute("aria-selected", String(!manual));
+        pasteButton.className = !manual
+          ? "rounded-lg border border-indigo-500 bg-indigo-600/20 px-4 py-2.5 text-sm font-bold text-indigo-200 transition"
+          : "rounded-lg border border-transparent px-4 py-2.5 text-sm font-semibold text-slate-400 transition hover:bg-[#11192b] hover:text-white";
+      }
+      if (manualButton) {
+        manualButton.setAttribute("aria-selected", String(manual));
+        manualButton.className = manual
+          ? "rounded-lg border border-indigo-500 bg-indigo-600/20 px-4 py-2.5 text-sm font-bold text-indigo-200 transition"
+          : "rounded-lg border border-transparent px-4 py-2.5 text-sm font-semibold text-slate-400 transition hover:bg-[#11192b] hover:text-white";
+      }
+    }
+
     function markEventFieldsDirty() {
       eventFieldsEditedByUser = true;
       if (activePresetId !== null) {
@@ -1236,16 +1847,17 @@
     // - If the user manually edited the 5 event boxes (or only typed a 1-line title), merge/build
     //   the announcement from the 5 event boxes.
     function buildEffectiveAnnouncementText() {
+      const manualMode = currentActivityInputMode === "manual";
       const raw = document.getElementById("inputRawContent").value.trim();
       const rawLines = raw ? raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean) : [];
       const hasStructuredLines = rawLines.length >= 2 || /(?:thời gian|địa điểm|hình thức|quyền lợi)\s*[:：]/i.test(raw);
 
-      if (!eventFieldsEditedByUser && hasStructuredLines) {
+      if (!manualMode && !eventFieldsEditedByUser && hasStructuredLines) {
         return raw;
       }
 
-      const firstLine = rawLines[0] || "";
-      const title = (eventFieldsEditedByUser ? document.getElementById("sp1TitleInput").value.trim() : "")
+      const firstLine = manualMode ? "" : rawLines[0] || "";
+      const title = ((manualMode || eventFieldsEditedByUser) ? document.getElementById("sp1TitleInput").value.trim() : "")
         || firstLine
         || document.getElementById("sp1TitleInput").value.trim()
         || "Hoạt động ngoại khóa sinh viên";
@@ -1287,6 +1899,34 @@
     // ========================================================================
     // SWITCH BETWEEN USER MODE AND DEVELOPER MODE
     // ========================================================================
+    function setTheme(theme, persist) {
+      const light = theme === "light";
+      const workspace = document.getElementById("workspaceApp");
+      const button = document.getElementById("btnThemeToggle");
+      const icon = document.getElementById("themeToggleIcon");
+      const label = document.getElementById("themeToggleLabel");
+      workspace.classList.toggle("light-theme", light);
+      if (icon) icon.textContent = light ? "☾" : "☀";
+      if (label) label.textContent = light ? "Tối" : "Sáng";
+      if (button) {
+        const nextLabel = light ? "Chuyển sang chế độ tối" : "Chuyển sang chế độ sáng";
+        button.setAttribute("aria-label", nextLabel);
+        button.title = nextLabel;
+      }
+      if (persist !== false) {
+        try {
+          localStorage.setItem("unilife_theme", light ? "light" : "dark");
+        } catch (error) {
+          console.error("Could not save UniLife theme preference:", error);
+        }
+      }
+    }
+
+    function toggleTheme() {
+      const workspace = document.getElementById("workspaceApp");
+      setTheme(workspace.classList.contains("light-theme") ? "dark" : "light", true);
+    }
+
     function setViewMode(mode) {
       currentViewMode = mode;
       const btnUser = document.getElementById("btnModeUser");
@@ -1494,6 +2134,7 @@
           </div>
         `;
       }).join("");
+      renderWorkspaceOverview();
     }
 
     function applyServerScorePayload(scoreData) {
@@ -1511,6 +2152,7 @@
       savedActivitiesForStudent = scoreData.saved_activities || [];
       renderSavedActivitiesBox();
       updateResetBaselineButton();
+      persistCurrentUserData();
     }
 
     function renderSavedActivitiesBox() {
@@ -1522,6 +2164,7 @@
       if (!savedActivitiesForStudent || savedActivitiesForStudent.length === 0) {
         section.classList.add("hidden");
         listEl.innerHTML = "";
+        renderWorkspaceOverview();
         return;
       }
 
@@ -1543,6 +2186,75 @@
           </div>
         `;
       }).join("");
+      renderWorkspaceOverview();
+    }
+
+    function renderWorkspaceOverview() {
+      if (!document.getElementById("workspaceOverview")) return;
+      const currentScores = Object.values(studentCategoryScores || {});
+      const totalScore = Math.min(100, currentScores.reduce((total, category) => total + Number(category.current || 0), 0));
+      const activities = Array.isArray(savedActivitiesForStudent) ? savedActivitiesForStudent : [];
+      const planData = planStages.first || currentPlannerData;
+      const planItems = planData?.plan?.selected_activities || planData?.selected_activities || [];
+      const plannedActivities = Array.isArray(planItems) ? planItems : [];
+      const targetInput = document.getElementById("inputPlanTarget");
+      const targetScoreRaw = Number(targetInput?.value || 80);
+      const targetScore = Number.isFinite(targetScoreRaw) ? Math.max(0, Math.min(100, targetScoreRaw)) : 80;
+      const progress = Math.round(totalScore);
+      const setText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+      };
+
+      setText("dashboardWelcomeName", currentStudent?.full_name || "bạn");
+      setText("overviewDrlScore", String(progress));
+      setText("overviewDrlGrade", progress > 0 ? `Xếp loại hiện tại: ${getGradeLabel(progress)}` : "Chưa có điểm ghi nhận");
+      setText("overviewActivityCount", String(activities.length));
+      setText("overviewActivityCaption", activities.length
+        ? `${activities.length} hoạt động đã lưu trong kỳ`
+        : "Chưa lưu hoạt động nào");
+      setText("overviewUpcomingCount", String(plannedActivities.length));
+      setText("overviewUpcomingCaption", plannedActivities.length
+        ? "Hoạt động trong lộ trình cá nhân"
+        : "Chưa có kế hoạch sắp tới");
+      setText("overviewGoalScore", String(targetScore));
+      setText("overviewGoalCaption", progress >= targetScore
+        ? "Bạn đã chạm mục tiêu"
+        : `Còn ${Math.max(0, targetScore - progress)}đ đến mục tiêu`);
+      setText("overviewSemesterPercent", `${progress}%`);
+      setText("overviewSemesterCaption", `${progress} / 100 điểm đã ghi nhận`);
+
+      const progressBar = document.getElementById("overviewSemesterBar");
+      if (progressBar) progressBar.style.width = `${progress}%`;
+    }
+
+    function renderRecommendedActivities(rows) {
+      const container = document.getElementById("recommendedActivitiesList");
+      if (!container) return;
+      const recommendations = (Array.isArray(rows) ? rows : [])
+        .map(row => row?.activity || row)
+        .filter(activity => activity && typeof activity === "object")
+        .slice(0, 3);
+
+      if (!recommendations.length) {
+        container.innerHTML = `<p class="md:col-span-3 rounded-xl border border-dashed border-[#223046] bg-[#080d18] p-4 text-xs text-slate-400">Chưa có hoạt động gợi ý. Hãy mở Kho hoạt động để xem danh sách mới nhất.</p>`;
+        return;
+      }
+
+      container.innerHTML = recommendations.map(activity => {
+        const title = activity.title || activity.activity_id || "Hoạt động UniLife";
+        const time = activity.start || activity["4_datetimes"]?.start_datetime || "Thời gian đang cập nhật";
+        const place = activity.location || (activity.mode === "online" ? "Trực tuyến" : "Địa điểm đang cập nhật");
+        const points = activity.points == null ? "Xem chi tiết" : `Tối đa +${safeNumber(activity.points)}đ`;
+        return `
+          <button type="button" onclick="switchTab('activities')" class="rounded-xl border border-[#223046] bg-[#080d18] p-3.5 text-left transition hover:border-blue-400/50 hover:bg-[#11192b]">
+            <span class="block truncate text-xs font-bold text-white">${escapeHTML(title)}</span>
+            <span class="mt-2 block truncate text-[11px] text-slate-400">${escapeHTML(time)}</span>
+            <span class="mt-1 block truncate text-[11px] text-slate-500">${escapeHTML(place)}</span>
+            <span class="mt-3 inline-flex rounded-lg bg-blue-500/10 px-2 py-1 text-[10px] font-bold text-blue-300">${escapeHTML(points)}</span>
+          </button>
+        `;
+      }).join("");
     }
 
     // ========================================================================
@@ -1552,13 +2264,287 @@
       document.getElementById("userDropdown").classList.toggle("hidden");
     }
 
-    function openLoginModal() {
+    const LOCAL_USERS_KEY = "unilife_users";
+    const CURRENT_USER_KEY = "unilife_current_user";
+    const LOCAL_PASSWORD_ITERATIONS = 120000;
+
+    function normalizeMssv(value) {
+      return String(value || "").trim().toUpperCase();
+    }
+
+    function validateMssv(value) {
+      const mssv = normalizeMssv(value);
+      if (!/^[A-Z0-9][A-Z0-9_-]{2,31}$/.test(mssv)) {
+        throw new Error("MSSV chỉ được gồm 3–32 ký tự chữ, số, gạch ngang hoặc gạch dưới.");
+      }
+      return mssv;
+    }
+
+    function readLocalUsers() {
+      const raw = localStorage.getItem(LOCAL_USERS_KEY);
+      if (!raw) return [];
+      const users = JSON.parse(raw);
+      if (!Array.isArray(users)) throw new Error("Danh sách tài khoản trong trình duyệt không hợp lệ.");
+      return users;
+    }
+
+    function localUserDataKey(mssv) {
+      return `unilife_data_${mssv}`;
+    }
+
+    function createDefaultLocalUserData(mssv) {
+      return {
+        student_id: mssv,
+        category_scores: cloneDefaultScores(),
+        default_baseline_total: 0,
+        saved_activities: [],
+        planner: {
+          target_total: 80,
+          plan_stages: { first: null, replan: null, whatif: null },
+          current_stage: "first"
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    function readLocalUserData(mssv) {
+      const raw = localStorage.getItem(localUserDataKey(mssv));
+      if (!raw) {
+        const fresh = createDefaultLocalUserData(mssv);
+        localStorage.setItem(localUserDataKey(mssv), JSON.stringify(fresh));
+        return fresh;
+      }
+      const saved = JSON.parse(raw);
+      if (!saved || typeof saved !== "object" || Array.isArray(saved)) {
+        throw new Error(`Dữ liệu tài khoản ${mssv} trong trình duyệt không hợp lệ.`);
+      }
+      const defaults = createDefaultLocalUserData(mssv);
+      return {
+        ...defaults,
+        ...saved,
+        student_id: mssv,
+        category_scores: saved.category_scores || defaults.category_scores,
+        saved_activities: Array.isArray(saved.saved_activities) ? saved.saved_activities : [],
+        planner: { ...defaults.planner, ...(saved.planner || {}) }
+      };
+    }
+
+    function persistCurrentUserData() {
+      const mssv = currentStudent?.student_id;
+      if (!mssv) return;
+      const saved = readLocalUserData(mssv);
+      const targetInput = document.getElementById("inputPlanTarget");
+      const target = targetInput ? Number(targetInput.value) : Number(saved.planner.target_total || 80);
+      saved.category_scores = JSON.parse(JSON.stringify(studentCategoryScores));
+      saved.default_baseline_total = Number(defaultBaselineTotal || 0);
+      saved.saved_activities = JSON.parse(JSON.stringify(savedActivitiesForStudent || []));
+      saved.planner = {
+        ...saved.planner,
+        target_total: Number.isFinite(target) ? Math.max(0, Math.min(100, target)) : 80,
+        plan_stages: JSON.parse(JSON.stringify(planStages)),
+        current_stage: currentPlanStage
+      };
+      saved.updated_at = new Date().toISOString();
+      localStorage.setItem(localUserDataKey(mssv), JSON.stringify(saved));
+      renderWorkspaceOverview();
+    }
+
+    function normalizeStoredScores(scores) {
+      const fresh = cloneDefaultScores();
+      Object.entries(scores || {}).forEach(([categoryId, score]) => {
+        if (!fresh[categoryId] || !score || typeof score !== "object") return;
+        const max = Number(score.max);
+        const cap = Number.isFinite(max) && max > 0 ? max : fresh[categoryId].max;
+        fresh[categoryId] = {
+          ...fresh[categoryId],
+          current: Math.max(0, Math.min(cap, Number(score.current) || 0)),
+          projected: Math.max(0, Math.min(cap, Number(score.projected) || 0)),
+          max: cap
+        };
+      });
+      return fresh;
+    }
+
+    function bytesToHex(bytes) {
+      return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+    }
+
+    function hexToBytes(hex) {
+      if (!/^(?:[0-9a-f]{2})+$/i.test(hex)) throw new Error("Thông tin xác thực tài khoản không hợp lệ.");
+      return new Uint8Array(hex.match(/.{2}/g).map(byte => parseInt(byte, 16)));
+    }
+
+    async function deriveLocalPasswordHash(password, saltHex) {
+      if (!window.crypto?.subtle) {
+        throw new Error("Trình duyệt không hỗ trợ mã hóa mật khẩu cần thiết. Hãy mở ứng dụng qua localhost bằng run_server.py.");
+      }
+      const salt = saltHex
+        ? hexToBytes(saltHex)
+        : window.crypto.getRandomValues(new Uint8Array(16));
+      const key = await window.crypto.subtle.importKey(
+        "raw",
+        new TextEncoder().encode(password),
+        "PBKDF2",
+        false,
+        ["deriveBits"]
+      );
+      const bits = await window.crypto.subtle.deriveBits(
+        { name: "PBKDF2", salt, iterations: LOCAL_PASSWORD_ITERATIONS, hash: "SHA-256" },
+        key,
+        256
+      );
+      return { salt: bytesToHex(salt), password_hash: bytesToHex(new Uint8Array(bits)) };
+    }
+
+    function constantTimeEqual(left, right) {
+      if (typeof left !== "string" || typeof right !== "string" || left.length !== right.length) return false;
+      let difference = 0;
+      for (let index = 0; index < left.length; index++) {
+        difference |= left.charCodeAt(index) ^ right.charCodeAt(index);
+      }
+      return difference === 0;
+    }
+
+    function showAuthMessage(message, type) {
+      const box = document.getElementById("authMessage");
+      if (!box) return;
+      box.textContent = message;
+      box.className = type === "success"
+        ? "rounded-xl border border-emerald-500/40 bg-emerald-950/40 px-3.5 py-3 text-sm text-emerald-200"
+        : "rounded-xl border border-rose-500/40 bg-rose-950/40 px-3.5 py-3 text-sm text-rose-200";
+    }
+
+    function clearAuthMessage() {
+      const box = document.getElementById("authMessage");
+      if (!box) return;
+      box.textContent = "";
+      box.className = "hidden rounded-xl border px-3.5 py-3 text-sm";
+    }
+
+    function setAuthMode(mode) {
+      const registering = mode === "register";
+      document.getElementById("loginForm").classList.toggle("hidden", registering);
+      document.getElementById("registerForm").classList.toggle("hidden", !registering);
+      document.getElementById("authModalTitle").textContent = registering ? "Tạo tài khoản UniLife" : "Đăng nhập";
+      const loginTab = document.getElementById("authTabLogin");
+      const registerTab = document.getElementById("authTabRegister");
+      loginTab.setAttribute("aria-selected", String(!registering));
+      registerTab.setAttribute("aria-selected", String(registering));
+      loginTab.className = registering
+        ? "py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white transition"
+        : "py-2 rounded-lg text-sm font-bold bg-indigo-600 text-white transition";
+      registerTab.className = registering
+        ? "py-2 rounded-lg text-sm font-bold bg-indigo-600 text-white transition"
+        : "py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white transition";
+      clearAuthMessage();
+    }
+
+    function openLoginModal(mode) {
       document.getElementById("userDropdown").classList.add("hidden");
+      document.getElementById("loginForm").reset();
+      document.getElementById("registerForm").reset();
+      setAuthMode(mode || "login");
       document.getElementById("loginModal").classList.remove("hidden");
+      const firstField = mode === "register" ? "registerName" : "loginMssv";
+      window.setTimeout(() => document.getElementById(firstField)?.focus(), 0);
     }
 
     function closeLoginModal() {
       document.getElementById("loginModal").classList.add("hidden");
+      clearAuthMessage();
+    }
+
+    async function startLocalSession(user) {
+      persistCurrentUserData();
+      readLocalUserData(user.student_id);
+      const student = {
+        student_id: user.student_id,
+        full_name: user.full_name,
+        class: user.class || "",
+        major: user.major || "Sinh viên",
+        demo_only: true
+      };
+      localStorage.setItem("unilife_student", JSON.stringify(student));
+      localStorage.setItem(CURRENT_USER_KEY, student.student_id);
+      currentStudent = student;
+      await applyCurrentStudent(student);
+      closeLoginModal();
+      const tab = pendingWorkspaceTab;
+      const action = pendingWorkspaceAction;
+      pendingWorkspaceTab = null;
+      pendingWorkspaceAction = null;
+      showWorkspace(tab, action);
+    }
+
+    async function loginWithLocalAccount(event) {
+      event.preventDefault();
+      const button = document.getElementById("btnSubmitLogin");
+      button.disabled = true;
+      button.textContent = "Đang xác minh…";
+      try {
+        const mssv = validateMssv(document.getElementById("loginMssv").value);
+        const password = document.getElementById("loginPassword").value;
+        const user = readLocalUsers().find(account => normalizeMssv(account.student_id) === mssv);
+        if (!user || !user.password_salt || !user.password_hash) {
+          showAuthMessage("MSSV hoặc mật khẩu không chính xác.", "error");
+          return;
+        }
+        const passwordCheck = await deriveLocalPasswordHash(password, user.password_salt);
+        if (!constantTimeEqual(passwordCheck.password_hash, user.password_hash)) {
+          showAuthMessage("MSSV hoặc mật khẩu không chính xác.", "error");
+          return;
+        }
+        await startLocalSession(user);
+      } catch (error) {
+        console.error("Local account login failed:", error);
+        showAuthMessage(error.message || "Không thể đăng nhập. Vui lòng thử lại.", "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Đăng nhập";
+      }
+    }
+
+    async function registerLocalAccount(event) {
+      event.preventDefault();
+      const button = document.getElementById("btnSubmitRegister");
+      button.disabled = true;
+      button.textContent = "Đang tạo tài khoản…";
+      try {
+        const fullName = document.getElementById("registerName").value.trim();
+        const mssv = validateMssv(document.getElementById("registerMssv").value);
+        const password = document.getElementById("registerPassword").value;
+        if (!fullName) throw new Error("Vui lòng nhập họ và tên.");
+        if (password.length < 8) throw new Error("Mật khẩu cần có ít nhất 8 ký tự.");
+
+        const users = readLocalUsers();
+        if (users.some(account => normalizeMssv(account.student_id) === mssv)) {
+          showAuthMessage("MSSV này đã được đăng ký. Hãy đăng nhập hoặc dùng MSSV khác.", "error");
+          return;
+        }
+
+        const credentials = await deriveLocalPasswordHash(password);
+        const user = {
+          student_id: mssv,
+          full_name: fullName,
+          class: "",
+          major: "Sinh viên",
+          password_salt: credentials.salt,
+          password_hash: credentials.password_hash,
+          password_algorithm: "PBKDF2-SHA-256",
+          created_at: new Date().toISOString()
+        };
+        const accountData = createDefaultLocalUserData(mssv);
+        localStorage.setItem(localUserDataKey(mssv), JSON.stringify(accountData));
+        localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify([...users, user]));
+        await startLocalSession(user);
+      } catch (error) {
+        console.error("Local account registration failed:", error);
+        showAuthMessage(error.message || "Không thể tạo tài khoản. Vui lòng thử lại.", "error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Tạo tài khoản";
+      }
     }
 
     async function syncScoresFromServer(mssv) {
@@ -1583,13 +2569,26 @@
 
     async function applyCurrentStudent(st) {
       if (!st) return;
+      plannerRequestGeneration++;
+      const plannerButton = document.getElementById("btnRunPlanner");
+      if (plannerButton) plannerButton.disabled = false;
       document.getElementById("headerUserName").innerText = st.full_name || "Sinh viên";
       document.getElementById("headerUserMssv").innerText = st.student_id;
       const initials = (st.full_name || "SV").split(" ").slice(-2).map(w => w[0]).join("").toUpperCase();
       document.getElementById("headerAvatar").innerText = initials || "SV";
+      const accountData = readLocalUserData(st.student_id);
+      studentCategoryScores = normalizeStoredScores(accountData.category_scores);
+      defaultBaselineTotal = Number(accountData.default_baseline_total || 0);
+      savedActivitiesForStudent = accountData.saved_activities;
+      lastRawResponse = null;
+      lastEvaluatedPayload = null;
+      lastPreviewWasSaved = true;
       resetForm();
-      await syncScoresFromServer(st.student_id);
+      renderSavedActivitiesBox();
+      renderCategoryBars(studentCategoryScores);
+      updateResetBaselineButton();
       await loadConfirmedPreferenceForStudent(st.student_id);
+      restoreLocalPlannerState(accountData);
     }
 
     async function syncProfileFromApi(mssv) {
@@ -1602,25 +2601,39 @@
           await applyCurrentStudent(data);
           return;
         }
-      } catch (e) {}
+      } catch (error) {
+        console.error("Could not load student profile from API:", error);
+      }
       await syncScoresFromServer(mssv);
     }
 
-    async function loginQuickStudent(mssv) {
-      await syncProfileFromApi(mssv);
-      closeLoginModal();
-    }
+    function restoreLocalPlannerState(accountData) {
+      const planner = accountData.planner || {};
+      const target = Number.isFinite(Number(planner.target_total)) ? Number(planner.target_total) : 80;
+      const targetInput = document.getElementById("inputPlanTarget");
+      const targetBadge = document.getElementById("targetEchoBadge");
+      if (targetInput) targetInput.value = target;
+      if (targetBadge) targetBadge.textContent = `${target} / 100đ`;
 
-    async function submitCustomLogin(e) {
-      e.preventDefault();
-      const mssv = document.getElementById("loginInputMssv").value.trim();
-      const name = document.getElementById("loginInputName").value.trim();
-      const cls = document.getElementById("loginInputClass").value.trim();
-      if (!mssv || !name) return;
-      currentStudent = { student_id: mssv, full_name: name, class: cls, major: "Công nghệ Thông tin", demo_only: true };
-      localStorage.setItem("unilife_student", JSON.stringify(currentStudent));
-      await applyCurrentStudent(currentStudent);
-      closeLoginModal();
+      const stages = planner.plan_stages || {};
+      planStages.first = stages.first || null;
+      planStages.replan = stages.replan || null;
+      planStages.whatif = stages.whatif || null;
+      currentPlanStage = ["first", "replan", "whatif"].includes(planner.current_stage)
+        ? planner.current_stage
+        : "first";
+      if (!planStages[currentPlanStage]) currentPlanStage = "first";
+      currentPlanTab = "selected";
+      currentPlannerData = planStages[currentPlanStage];
+      planInputsDirty = false;
+      planStageError = "";
+      if (currentPlannerData) {
+        showPlanPanels("active");
+        renderSp3PlanResult();
+      } else {
+        showPlanPanels("empty");
+      }
+      renderWorkspaceOverview();
     }
 
     function onToggleDemoMode() {
@@ -1645,6 +2658,7 @@
       resetForm();
       renderCategoryBars(studentCategoryScores);
       updateResetBaselineButton();
+      persistCurrentUserData();
       await loadActivitiesFromApi();
     }
 
@@ -1662,6 +2676,7 @@
       document.getElementById("sp1LocationInput").value = "";
       document.getElementById("sp1PointsInput").value = "";
       document.getElementById("sp1ReqInput").value = "";
+      setActivityInputMode("paste");
       withdrawUnsavedPreview();
     }
 
@@ -1900,19 +2915,35 @@
     // ========================================================================
     // TAB SWITCHER
     // ========================================================================
-    function switchTab(tab) {
-      const tabs = ['dashboard', 'activities', 'snapshot', 'plan', 'testSuites', 'inspector'];
+    function switchTab(tab, action) {
+      const tabs = ['dashboard', 'calculator', 'activities', 'snapshot', 'plan', 'testSuites', 'inspector'];
+      const taskTabButtons = {
+        dashboard: ['tabBtnDashboard'],
+        calculator: ['tabBtnCalculator', 'tabBtnDrlTracker'],
+        activities: ['tabBtnActivities', 'tabBtnDiscoverActivities'],
+      };
+      const activeTaskButton = action === 'tracker'
+        ? 'tabBtnDrlTracker'
+        : action === 'calculate'
+          ? 'tabBtnCalculator'
+          : action === 'discover'
+          ? 'tabBtnDiscoverActivities'
+          : null;
       tabs.forEach(t => {
         const view = document.getElementById('view' + capitalize(t));
-        const btn = document.getElementById('tabBtn' + capitalize(t));
         const devClass = (t === 'testSuites' || t === 'inspector') ? 'dev-only ' : '';
-        if (t === tab) {
-          view.classList.remove('hidden');
-          btn.className = devClass + "nav-btn-active w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between";
-        } else {
-          view.classList.add('hidden');
-          btn.className = devClass + "nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between";
-        }
+        const buttonIds = taskTabButtons[t] || ['tabBtn' + capitalize(t)];
+        const selectedButton = t === tab
+          ? (buttonIds.includes(activeTaskButton) ? activeTaskButton : 'tabBtn' + capitalize(t))
+          : null;
+        if (t === tab) view.classList.remove('hidden');
+        else view.classList.add('hidden');
+        buttonIds.forEach(id => {
+          const btn = document.getElementById(id);
+          if (!btn) return;
+          const buttonClass = id === selectedButton ? 'nav-btn-active' : 'nav-btn-inactive';
+          btn.className = devClass + buttonClass + " w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between";
+        });
       });
       // Auto-close mobile drawer when tab selected
       toggleMobileSidebar(false);
@@ -1928,6 +2959,14 @@
         // Auto-run first plan with default 80 on first view for seamless experience
         runSp3Planner();
       }
+      if (tab === 'calculator') {
+        const target = action === 'tracker'
+          ? document.getElementById('drlScorePanel')
+          : document.getElementById('viewCalculator');
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (tab === 'dashboard') {
+        document.querySelector('#workspaceApp main')?.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
 
     function capitalize(s) {
@@ -1938,6 +2977,7 @@
     // SP3 PLANNER MODULE
     // ========================================================================
     let currentPlannerData = null;
+    let plannerRequestGeneration = 0;
 
     function setPlannerPreset(score) {
       const input = document.getElementById('inputPlanTarget');
@@ -1965,6 +3005,8 @@
       const badge = document.getElementById('targetEchoBadge');
       if (badge) badge.innerText = `${num} / 100đ`;
       markPlanStale();
+      persistCurrentUserData();
+      renderWorkspaceOverview();
     }
 
     // --- Journey state: 1 = first plan, 2 = schedule change (replan), 3 = what-if skip ---
@@ -2010,6 +3052,7 @@
       showPlanPanels('empty');
       setPlanButtonLabel(confirmedPreference ? 'Lập kế hoạch cá nhân hóa' : 'Lập kế hoạch đề xuất');
       syncSp3SourceUi();
+      persistCurrentUserData();
       loadActivitiesFromApi();
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncSp3SourceUi);
@@ -2371,6 +3414,7 @@
     }
 
     async function loadConfirmedPreferenceForStudent(studentId) {
+      const requestGeneration = plannerRequestGeneration;
       preferenceDraft = null;
       confirmedPreference = null;
       activePlanPreference = null;
@@ -2390,6 +3434,7 @@
       if (textBox) textBox.value = '';
       try {
         const res = await fetch(`${API_BASE}/api/preferences/confirmed?student_id=${encodeURIComponent(studentId)}`);
+        if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
         if (!res.ok) return;
         const data = await res.json();
         const stored = data.confirmed_preference;
@@ -2467,6 +3512,8 @@
       const rawTarget = parseInt(targetInput ? targetInput.value : '80', 10);
       const targetTotal = isNaN(rawTarget) ? 80 : Math.max(0, Math.min(100, rawTarget));
       const busyIntervals = collectBusyIntervals();
+      const studentId = currentStudent?.student_id;
+      const requestGeneration = ++plannerRequestGeneration;
 
       const hasPreferenceText = Boolean((document.getElementById('preferenceText')?.value || '').trim());
       if (hasPreferenceText && !confirmedPreference) {
@@ -2485,6 +3532,7 @@
         const data = confirmedPreference
           ? await fetchPersonalizedSp3Plan('first_plan', targetTotal, busyIntervals, confirmedPreference)
           : await fetchSp3Plan('first_plan', targetTotal, busyIntervals);
+        if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
         planStages.first = data;
         planStages.replan = null;
         planStages.whatif = null;
@@ -2495,14 +3543,18 @@
         planInputsDirty = false;
         planStageError = '';
         renderSp3PlanResult();
+        persistCurrentUserData();
       } catch (err) {
+        if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
         console.error('SP3 Planner error:', err);
         showPlanError(err.message);
       } finally {
-        if (btn) btn.disabled = false;
-        setPlanButtonLabel(planStages.first
-          ? (planInputsDirty ? 'Cập nhật kế hoạch' : (confirmedPreference ? 'Lập lại kế hoạch cá nhân hóa' : 'Lập lại kế hoạch'))
-          : (confirmedPreference ? 'Lập kế hoạch cá nhân hóa' : 'Lập kế hoạch đề xuất'));
+        if (requestGeneration === plannerRequestGeneration) {
+          if (btn) btn.disabled = false;
+          setPlanButtonLabel(planStages.first
+            ? (planInputsDirty ? 'Cập nhật kế hoạch' : (confirmedPreference ? 'Lập lại kế hoạch cá nhân hóa' : 'Lập lại kế hoạch'))
+            : (confirmedPreference ? 'Lập kế hoạch cá nhân hóa' : 'Lập kế hoạch đề xuất'));
+        }
       }
     }
 
@@ -2512,6 +3564,8 @@
       if (stage === 'whatif' && !planStages.replan) return;
       planStageError = '';
       if (stage !== 'first' && !planStages[stage]) {
+        const studentId = currentStudent?.student_id;
+        const requestGeneration = ++plannerRequestGeneration;
         const loadingText = document.getElementById('plannerLoadingText');
         if (loadingText) {
           loadingText.innerText = stage === 'replan'
@@ -2522,10 +3576,13 @@
         try {
           const target = planStages.first.requested_total_target ?? 80;
           const scenario = stage === 'replan' ? 'replan' : 'what_if_skip';
-          planStages[stage] = activePlanPreference
+          const data = activePlanPreference
             ? await fetchPersonalizedSp3Plan(scenario, target, [], activePlanPreference)
             : await fetchSp3Plan(scenario, target, []);
+          if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
+          planStages[stage] = data;
         } catch (err) {
+          if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
           console.error('SP3 stage error:', err);
           planStageError = err.message;
           showPlanPanels('active');
@@ -2536,6 +3593,7 @@
       currentPlanStage = stage;
       currentPlanTab = 'selected';
       renderSp3PlanResult();
+      persistCurrentUserData();
       const main = document.querySelector('main');
       if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -3182,6 +4240,10 @@
     async function runAnalysisPipeline() {
       const rawBox = document.getElementById("inputRawContent").value.trim();
       const titleBox = document.getElementById("sp1TitleInput").value.trim();
+      if (currentActivityInputMode === "manual" && !titleBox) {
+        alert("Vui lòng nhập tên hoạt động trước khi kiểm tra điểm.");
+        return;
+      }
       if (!rawBox && !titleBox) {
         alert("Vui lòng nhập nội dung thông báo hoặc tên hoạt động trước khi kiểm tra điểm.");
         return;
@@ -3541,6 +4603,7 @@
         }
 
         lastPreviewWasSaved = true;
+        persistCurrentUserData();
         await loadActivitiesFromApi();
       } catch (err) {
         alert("Lỗi kết nối máy chủ khi lưu điểm.");
@@ -3642,6 +4705,7 @@
                 </div>
               `;
             }).join("");
+        renderRecommendedActivities(validList);
 
         const draftsEl = document.getElementById("sp3NewDraftsList");
         if (draftsEl) {
@@ -3749,21 +4813,41 @@
       await loadE2ECasesFromApi();
       await loadActivitiesFromApi();
 
-      const savedStudent = localStorage.getItem("unilife_student");
-      if (savedStudent) {
+      let savedStudentId = null;
+      try {
+        const savedTheme = localStorage.getItem("unilife_theme");
+        setTheme(savedTheme === "light" ? "light" : "dark", false);
+        savedStudentId = localStorage.getItem(CURRENT_USER_KEY);
+      } catch (error) {
+        console.error("Could not read UniLife browser settings:", error);
+        openLoginModal("login");
+        showAuthMessage("Không thể đọc dữ liệu trong trình duyệt này. Hãy bật localStorage rồi tải lại trang.", "error");
+        return;
+      }
+
+      if (savedStudentId) {
         try {
-          const parsed = JSON.parse(savedStudent);
-          if (parsed && parsed.student_id && parsed.student_id !== "25127116") {
-            currentStudent = parsed;
-            await applyCurrentStudent(currentStudent);
-          } else {
-            await syncProfileFromApi("25127242");
+          const account = readLocalUsers().find(user => normalizeMssv(user.student_id) === normalizeMssv(savedStudentId));
+          if (!account) {
+            localStorage.removeItem(CURRENT_USER_KEY);
+            openLoginModal("login");
+            showAuthMessage("Không tìm thấy tài khoản của phiên trước. Vui lòng đăng nhập lại hoặc đăng ký.", "error");
+            return;
           }
-        } catch (e) {
-          await syncProfileFromApi("25127242");
+          currentStudent = {
+            student_id: account.student_id,
+            full_name: account.full_name,
+            class: account.class || "",
+            major: account.major || "Sinh viên",
+            demo_only: true
+          };
+          await applyCurrentStudent(currentStudent);
+          showWorkspace();
+        } catch (error) {
+          console.error("Could not restore the local UniLife account:", error);
+          openLoginModal("login");
+          showAuthMessage(error.message || "Không thể khôi phục tài khoản trong trình duyệt.", "error");
         }
-      } else {
-        await syncProfileFromApi("25127242");
       }
     });
   </script>
