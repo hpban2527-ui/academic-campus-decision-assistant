@@ -1,0 +1,176 @@
+{
+  "post_type": "agree_else_review",
+  "activity_type": "rules",
+  "domain": "rules",
+  "mode": "agree_else_review",
+  "title": "rules",
+  "multi_session": "rules",
+  "window_open": "rules",
+  "window_close": "rules",
+  "registration_deadline": "rules",
+  "registration_url": "rules",
+  "join_url": "rules",
+  "_evidence": {
+    "post_type": {
+      "n": 5,
+      "rules": {
+        "correct": 4,
+        "wrong": 1
+      },
+      "llm": {
+        "correct": 4,
+        "wrong": 1
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "activity_type": {
+      "n": 0,
+      "rules": {},
+      "llm": {},
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "domain": {
+      "n": 21,
+      "rules": {
+        "wrong": 4,
+        "missed": 6,
+        "correct": 11
+      },
+      "llm": {
+        "wrong": 4,
+        "missed": 6,
+        "correct": 11
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "mode": {
+      "n": 21,
+      "rules": {
+        "correct": 14,
+        "wrong": 2,
+        "missed": 4,
+        "fabricated": 1
+      },
+      "llm": {
+        "correct": 14,
+        "wrong": 2,
+        "missed": 4,
+        "fabricated": 1
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "title": {
+      "n": 21,
+      "rules": {
+        "correct": 13,
+        "wrong": 8
+      },
+      "llm": {
+        "correct": 13,
+        "wrong": 8
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "multi_session": {
+      "n": 5,
+      "rules": {
+        "correct": 4,
+        "missed": 1
+      },
+      "llm": {
+        "correct": 4,
+        "missed": 1
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "window_open": {
+      "n": 21,
+      "rules": {
+        "correct": 18,
+        "fabricated": 1,
+        "wrong": 2
+      },
+      "llm": {
+        "correct": 18,
+        "fabricated": 1,
+        "wrong": 2
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "window_close": {
+      "n": 21,
+      "rules": {
+        "correct": 20,
+        "missed": 1
+      },
+      "llm": {
+        "correct": 20,
+        "missed": 1
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "registration_deadline": {
+      "n": 21,
+      "rules": {
+        "correct": 20,
+        "missed": 1
+      },
+      "llm": {
+        "correct": 20,
+        "missed": 1
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "registration_url": {
+      "n": 21,
+      "rules": {
+        "correct": 18,
+        "fabricated": 2,
+        "missed": 1
+      },
+      "llm": {
+        "correct": 18,
+        "fabricated": 2,
+        "missed": 1
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "join_url": {
+      "n": 5,
+      "rules": {
+        "correct": 5
+      },
+      "llm": {
+        "correct": 5
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    }
+  },
+  "_model_id": "fake/rules-fallback",
+  "_prompt_versions": {
+    "classify": "sp1_classify_v2 1.0.0",
+    "roles": "sp1_roles_v2 1.0.0"
+  }
+}

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SP1 Labelling Tool v2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  SP1 gold labelling tool, version 2.1.0 (follows docs/labelling_guide_v2.md and ADR-0002).
+  Runs fully offline in the browser. Files are read locally with the file picker; nothing is uploaded.
+  Inputs : data/raw/source.json  +  one task file (data/gold/*_gold_v2_template.json, or a saved labels file).
+  Output : the task file filled in (gold v2 format), downloaded with "Export JSON".
+  Labels describe only what the post states (layer A). "Not stated" = null (lists: []).
+-->
+<style>
+  :root {
+    --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #dedcd6;
+    --accent: #2f5d8a; --accent-soft: #e6eef6; --ok: #2e7d4f; --warn: #b26a00; --bad: #b3261e;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); display: flex; flex-direction: column; }
+  header { flex: 0 0 auto; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding: 10px 14px; background: var(--panel); border-bottom: 1px solid var(--line); z-index: 5; }
+  header h1 { font-size: 15px; margin: 0 8px 0 0; }
+  header label { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); }
+  header input[type=text] { width: 70px; }
+  .btn { border: 1px solid var(--line); background: var(--panel); border-radius: 6px; padding: 5px 10px; cursor: pointer; font: inherit; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.small { padding: 2px 7px; font-size: 12px; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  #status { color: var(--muted); }
+  #msg { flex-basis: 100%; color: var(--warn); }
+  #msg:empty { display: none; }
+  main { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 210px minmax(320px, 1fr) minmax(420px, 1.05fr); }
+  nav { border-right: 1px solid var(--line); overflow: auto; background: var(--panel); }
+  nav .item { display: flex; gap: 6px; padding: 6px 10px; cursor: pointer; border-bottom: 1px solid #f0efeb; font-family: var(--mono); font-size: 12px; }
+  nav .item.active { background: var(--accent-soft); }
+  nav .item .st { width: 14px; text-align: center; }
+  nav .item.done .st { color: var(--ok); }
+  nav .item.wip .st { color: var(--warn); }
+  #post { overflow: auto; padding: 14px 16px; border-right: 1px solid var(--line); }
+  #post .meta { font-size: 12px; color: var(--muted); margin-bottom: 8px; word-break: break-all; }
+  #post pre { white-space: pre-wrap; word-wrap: break-word; font: 14px/1.55 system-ui, sans-serif; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 0; }
+  #post .hint { font-size: 12px; color: var(--muted); margin: 8px 0; }
+  #form { overflow: auto; padding: 12px 16px 80px; }
+  .field { display: grid; grid-template-columns: 170px 1fr auto; gap: 6px 8px; align-items: start; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+  .field > .name { font-family: var(--mono); font-size: 12px; padding-top: 5px; }
+  .field > .name small { display: block; font-family: system-ui, sans-serif; color: var(--muted); font-size: 11px; }
+  .field.untouched > .name { color: var(--bad); }
+  .field.touched > .name::after { content: " ✓"; color: var(--ok); }
+  .field .ctl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-width: 0; }
+  .field .side { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+  .ctl input[type=text], .ctl input[type=url], .ctl textarea { width: 100%; font: inherit; padding: 4px 6px; border: 1px solid var(--line); border-radius: 5px; }
+  .ctl textarea { min-height: 54px; resize: vertical; }
+  .ctl select, .ctl input[type=number], .ctl input[type=date], .ctl input[type=time] { font: inherit; padding: 3px 5px; border: 1px solid var(--line); border-radius: 5px; }
+  .ctl input[type=number] { width: 110px; }
+  .ground { font-size: 11px; }
+  .ground.ok { color: var(--ok); } .ground.no { color: var(--warn); }
+  .nullv { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .unsure { font-size: 11px; color: var(--muted); display: inline-flex; gap: 3px; align-items: center; }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 4px 0; border-bottom: 1px dotted var(--line); width: 100%; }
+  .extras { margin-top: 12px; padding-top: 6px; }
+  .extras h3 { font-size: 13px; margin: 10px 0 4px; }
+  .btn { white-space: nowrap; }
+  .footer { position: sticky; bottom: 0; background: var(--bg); padding: 10px 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid var(--line); margin-top: 12px; }
+  .warnlist { color: var(--bad); font-size: 12px; }
+  .empty { padding: 30px; color: var(--muted); }
+  kbd { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line); border-radius: 3px; padding: 0 3px; background: #fff; }
+  .tk { border-radius: 3px; padding: 0 1px; }
+  .tk.d { background: #fde9b8; cursor: pointer; }
+  .tk.t { background: #d9ecd4; cursor: pointer; }
+  .tk.u { background: #dbe7f5; cursor: pointer; text-decoration: underline; }
+  .tk.k { background: #eee6f7; }
+  b.tk { background: none; color: var(--accent); }
+  .tk.d:hover, .tk.t:hover, .tk.u:hover { outline: 1px solid var(--accent); }
+  #chipmenu { position: fixed; z-index: 20; background: var(--panel); border: 1px solid var(--accent); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 4px 16px rgba(0,0,0,.12); max-width: 260px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SP1 Labelling Tool v2</h1>
+  <label>source.json <input type="file" id="fSource" accept=".json"></label>
+  <label>task file <input type="file" id="fTask" accept=".json"></label>
+  <label>labeller <input type="text" id="labeller" placeholder="initials" maxlength="8"></label>
+  <button class="btn primary" id="btnExport" disabled>Export JSON</button>
+  <span id="status">Load source.json and a task file.</span>
+  <div id="msg"></div>
+</header>
+<main>
+  <nav id="nav"></nav>
+  <section id="post"><div class="empty">The post appears here.</div></section>
+  <section id="form"><div class="empty">The form appears here.</div></section>
+</main>
+
+<script>
+"use strict";
+/* ---------- constants (labelling guide v2 / ADR-0002) ---------- */
+const TOOL_VERSION = "2.1.0";
+const ENUMS = {
+  post_type: ["activity", "info_only", "insufficient"],
+  domain: ["academic", "volunteer", "culture_sports", "skills", "career", "other"],
+  mode: ["online", "offline", "hybrid"],
+  fee_per: ["person", "team", "unknown"],
+  completion_type: ["check_in", "check_out", "quiz", "form", "proof_upload", "min_duration", "other"],
+  programs: ["standard", "high_quality"],
+};
+const NOTE_CODES = ["mandatory_no_participation_cue"];
+// Field order and widget type. Order follows the guide.
+const FIELDS = [
+  ["post_type", "enum", "activity / info_only / insufficient"],
+  ["title", "text", "official name, prefixes kept"],
+  ["domain", "enum", "topic, one value"],
+  ["multi_session", "bool2", "several sessions or rounds"],
+  ["window_open", "datetime", "first session/round start"],
+  ["window_close", "datetime", "first session/round end"],
+  ["duration_minutes_stated", "int", "only if stated"],
+  ["registration_deadline", "datetime", "only if stated as such"],
+  ["mode", "enum", "of the first session/round"],
+  ["location", "text", "as written; online → null"],
+  ["audience_text", "text", "audience sentence as written"],
+  ["audience_scope", "scope", "cohorts K24… / programs"],
+  ["mandatory_stated", "bool3", "true / false only if explicit"],
+  ["recognition_stated", "true_or_null", "explicitly recognised"],
+  ["points_stated", "number", "stated conduct points"],
+  ["fee", "fee", "null / 0 explicitly free / amount"],
+  ["registration_url", "url", "registration link"],
+  ["join_url", "url", "Zoom / Meet / quiz link"],
+  ["completion_requirements", "completion", "list; none stated → []"],
+];
+const FIELD_NAMES = FIELDS.map(f => f[0]);
+const DATE_FIELDS = ["window_open", "window_close", "registration_deadline"];
+
+/* ---------- state ---------- */
+let SOURCE = null;          // post_id -> {post, position}
+let TASK = null;            // {name, raw (array), extraKeys}
+let ITEMS = [];             // [{post_id, entry, touched:Set, done, ms}]
+let CUR = -1;
+let timerStart = null;
+let lastSelection = "";
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, "");
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const c of kids.flat()) if (c != null) e.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  return e;
+};
+const msg = t => { $("msg").textContent = t || ""; };
+const norm = s => (s || "").normalize("NFC").replace(/\s+/g, " ").trim().toLowerCase();
+const today = () => new Date().toLocaleDateString("en-CA");
+function emptyRecord() {
+  return {
+    post_type: null, title: null, domain: null, multi_session: null, window_open: null, window_close: null,
+    duration_minutes_stated: null, registration_deadline: null, mode: null, location: null, audience_text: null,
+    audience_scope: { cohorts: [], programs: [] }, mandatory_stated: null, recognition_stated: null,
+    points_stated: null, fee: null, registration_url: null, join_url: null, completion_requirements: [],
+  };
+}
+function isEmptyValue(v) {
+  if (v == null || v === "") return true;
+  if (Array.isArray(v)) return v.length === 0;
+  if (typeof v === "object") return Object.values(v).every(isEmptyValue);
+  return false;
+}
+function storageKey() { return TASK ? `sp1label:v2:${TASK.name}:${$("labeller").value.trim() || "anon"}` : null; }
+function save() {
+  const key = storageKey(); if (!key) return;
+  try {
+    localStorage.setItem(key, JSON.stringify(ITEMS.map(it => ({
+      post_id: it.post_id, entry: it.entry, touched: [...it.touched], done: it.done, ms: it.ms,
+    }))));
+  } catch (e) { /* storage unavailable: export still works */ }
+}
+function restore() {
+  const key = storageKey(); if (!key) return false;
+  let data = null;
+  try { data = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) { data = null; }
+  if (!Array.isArray(data)) return false;
+  const byId = new Map(data.map(d => [d.post_id, d]));
+  let n = 0;
+  for (const it of ITEMS) {
+    const d = byId.get(it.post_id); if (!d) continue;
+    it.entry = d.entry; it.touched = new Set(d.touched || []); it.done = !!d.done; it.ms = d.ms || 0; n++;
+  }
+  return n > 0;
+}
+
+/* ---------- loading ---------- */
+function readJSON(file) {
+  return file.text().then(t => JSON.parse(t.replace(/^﻿/, "")));
+}
+$("fSource").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const arr = await readJSON(f);
+    if (!Array.isArray(arr)) throw new Error("source.json must be a JSON array");
+    SOURCE = new Map(arr.map((p, i) => [p.post_id, { post: p, position: i + 1 }]));
+    msg(""); refreshStatus(); maybeStart();
+  } catch (err) { msg("Cannot read source.json: " + err.message); }
+});
+$("fTask").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const arr = await readJSON(f);
+    if (!Array.isArray(arr)) throw new Error("task file must be a JSON array");
+    const name = f.name.replace(/\.json$/i, "");
+    const extraKeys = new Set();
+    ITEMS = arr.map(obj => {
+      if (!obj || typeof obj.post_id !== "string") throw new Error("every entry needs a post_id");
+      if ("raw_content" in obj) throw new Error("task file contains raw_content; it must hold IDs and labels only");
+      const rec = Object.assign(emptyRecord(), obj.record || {});
+      for (const k of Object.keys(obj.record || {})) if (!FIELD_NAMES.includes(k)) extraKeys.add("record." + k);
+      const entry = {
+        ...obj,
+        labeller: obj.labeller || "", labelled_at: obj.labelled_at || "", minutes_spent: obj.minutes_spent ?? null,
+        record: rec, year_inferred: obj.year_inferred || [], unsure: obj.unsure || [],
+        notes_codes: obj.notes_codes || [], notes: obj.notes || "",
+      };
+      const done = !!entry.labelled_at;
+      // A finished entry: every field counts as decided. Otherwise only non-empty values count.
+      const touched = new Set(done ? FIELD_NAMES : FIELD_NAMES.filter(k => !isEmptyValue(rec[k])));
+      return { post_id: obj.post_id, entry, touched, done, ms: (entry.minutes_spent || 0) * 60000 };
+    });
+    TASK = { name, extraKeys };
+    const restored = restore();
+    msg(extraKeys.size ? "Template has fields this tool does not know (kept unchanged on export): " + [...extraKeys].join(", ") : "");
+    if (restored) msg(($("msg").textContent + " Restored unsaved progress from this browser.").trim());
+    maybeStart();
+  } catch (err) { msg("Cannot read task file: " + err.message); }
+});
+$("labeller").addEventListener("change", () => {
+  // Only pull saved progress for these initials when nothing has been labelled in this session yet.
+  if (TASK && ITEMS.every(it => it.touched.size === 0) && restore()) { renderNav(); show(CUR); }
+  else save();
+});
+
+function maybeStart() {
+  if (!SOURCE || !TASK) return;
+  const missing = ITEMS.filter(it => !SOURCE.has(it.post_id)).map(it => it.post_id);
+  if (missing.length) msg(`${missing.length} post_id(s) of the task file are not in source.json: ${missing.slice(0, 3).join(", ")}…`);
+  $("btnExport").disabled = false;
+  renderNav();
+  const first = ITEMS.findIndex(it => !it.done);
+  show(first === -1 ? 0 : first);
+}
+
+/* ---------- timer ---------- */
+function stopTimer() {
+  if (CUR >= 0 && timerStart != null && !ITEMS[CUR].done) ITEMS[CUR].ms += Date.now() - timerStart;
+  timerStart = null;
+}
+function startTimer() { timerStart = Date.now(); }
+document.addEventListener("visibilitychange", () => { if (document.hidden) { stopTimer(); save(); } else if (CUR >= 0) startTimer(); });
+
+/* ---------- nav ---------- */
+function renderNav() {
+  const nav = $("nav"); nav.innerHTML = "";
+  ITEMS.forEach((it, i) => {
+    const pos = SOURCE && SOURCE.get(it.post_id) ? SOURCE.get(it.post_id).position : "?";
+    const cls = "item" + (i === CUR ? " active" : "") + (it.done ? " done" : (it.touched.size ? " wip" : ""));
+    nav.append(el("div", { class: cls, onclick: () => show(i), title: it.post_id },
+      el("span", { class: "st" }, it.done ? "✓" : (it.touched.size ? "•" : "")),
+      el("span", {}, `#${pos}`), el("span", { style: "color:var(--muted)" }, it.post_id.slice(0, 12) + "…")));
+  });
+  refreshStatus();
+}
+function refreshStatus() {
+  if (!TASK) { $("status").textContent = SOURCE ? `source.json: ${SOURCE.size} posts. Load a task file.` : "Load source.json and a task file."; return; }
+  const done = ITEMS.filter(i => i.done).length;
+  $("status").textContent = `${TASK.name}: ${done}/${ITEMS.length} done`;
+}
+
+/* ---------- post pane ---------- */
+function renderPost(it) {
+  const pane = $("post"); pane.innerHTML = "";
+  const s = SOURCE.get(it.post_id);
+  if (!s) { pane.append(el("div", { class: "empty" }, "This post_id is not in source.json.")); return; }
+  const p = s.post;
+  pane.append(
+    el("div", { class: "meta" }, `#${s.position} · ${p.publisher || ""} · posted ${p.date_posted || "?"}`, el("br"),
+      el("a", { href: p.url, target: "_blank", rel: "noopener" }, "open original post"), " · ", it.post_id),
+    el("div", { class: "hint" },
+      "Select text, then ⇦ next to a field to copy it exactly. Click a ",
+      el("span", { class: "tk d" }, "date"), " ", el("span", { class: "tk t" }, "time"), " or ",
+      el("span", { class: "tk u" }, "link"), " to put it into a field. ",
+      el("span", { class: "tk k" }, "keywords"), " and ", el("b", {}, "labels"), " are only reading aids: they are not answers. ",
+      el("label", { class: "unsure" }, (() => { const c = el("input", { type: "checkbox" }); c.checked = HIGHLIGHT; c.addEventListener("change", () => { HIGHLIGHT = c.checked; renderPost(it); }); return c; })(), "highlight")),
+    renderPostText(p));
+}
+
+/* ---------- reading aids: tokens in the post (patterns only, never values chosen for the labeller) ---------- */
+let HIGHLIGHT = true;
+const TOKEN_RULES = [
+  ["u", /(https?:\/\/[^\s<>"]+|www\.[^\s<>"]+)/giu],
+  ["d", /(?<![\d/.])(\d{1,2})\s*[\/.\-]\s*(\d{1,2})(?:\s*[\/.\-]\s*(\d{4}|\d{2}))?(?![\d/])/gu],
+  ["d", /ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})(?:\s+năm\s+(\d{4}))?/giu],
+  ["t", /(?<![\d/.:])(\d{1,2})(?:\s*[gh](?!\p{L})\s*(\d{2})?|\s*giờ(?:\s*(\d{2}))?|:(\d{2}))(?![\d/])/giu],
+  ["b", /(^|\n)[^\S\n]*[-•+*–>\d.)\s]*((?:thời gian|địa điểm|đối tượng|hình thức|đăng k[ýí]|hạn đăng k[ýí]|hạn chót|lệ phí|phí tham gia|quyền lợi|ghi nhận|liên hệ|yêu cầu|điều kiện)[^:\n：]{0,25}[:：])/giu],
+  ["k", /(bắt buộc|bị trừ điểm|trừ điểm|ghi nhận|điểm rèn luyện|đrl|quiz|trắc nghiệm|bài thi|\d{1,3}\s*%|\d+\s*\/\s*\d+\s*câu|\bK\s?2\d\b|\bclc\b|chất lượng cao|đại trà|online|trực tuyến|zoom|google meet|miễn phí|lệ phí|đặt cọc|thời lượng|\d+\s*phút)/giu],
+];
+function tokenize(text) {
+  const found = [];
+  for (const [kind, rx] of TOKEN_RULES) {
+    rx.lastIndex = 0; let m;
+    while ((m = rx.exec(text))) {
+      let start = m.index, str = m[0];
+      if (kind === "b") { start = m.index + m[0].length - m[2].length; str = m[2]; }
+      if (kind === "u") str = str.replace(/[).,;!?]+$/u, "");
+      if (kind === "t" && (+m[1] > 23 || +(m[2] || m[3] || m[4] || 0) > 59)) continue;
+      if (kind === "d" && (+m[1] < 1 || +m[1] > 31 || +m[2] < 1 || +m[2] > 12)) continue;
+      found.push({ kind, start, end: start + str.length, str, m });
+      if (m[0].length === 0) rx.lastIndex++;
+    }
+  }
+  const prio = { u: 0, d: 1, t: 2, b: 3, k: 4 };
+  found.sort((a, b) => a.start - b.start || prio[a.kind] - prio[b.kind] || b.end - a.end);
+  const out = []; let last = 0;
+  for (const f of found) if (f.start >= last) { out.push(f); last = f.end; }
+  return out;
+}
+function renderPostText(p) {
+  const text = p.raw_content || "";
+  const pre = el("pre", { id: "postText" });
+  if (!HIGHLIGHT) { pre.textContent = text; return pre; }
+  let pos = 0;
+  for (const t of tokenize(text)) {
+    if (t.start > pos) pre.append(document.createTextNode(text.slice(pos, t.start)));
+    const span = el(t.kind === "b" ? "b" : "span", { class: "tk " + t.kind }, t.str);
+    if (t.kind === "d" || t.kind === "t" || t.kind === "u") span.addEventListener("click", ev => chipMenu(ev, t, p));
+    pre.append(span); pos = t.end;
+  }
+  if (pos < text.length) pre.append(document.createTextNode(text.slice(pos)));
+  return pre;
+}
+function pad(n) { return String(n).padStart(2, "0"); }
+function inferYear(day, month, posted) {
+  // ADR-0001 D11: posted year, or next year if the date would fall more than 60 days before the post.
+  const pd = new Date((posted || "").slice(0, 10) + "T00:00:00");
+  if (isNaN(pd)) return null;
+  let y = pd.getFullYear();
+  const cand = new Date(`${y}-${pad(month)}-${pad(day)}T00:00:00`);
+  if ((pd - cand) / 86400000 > 60) y += 1;
+  return y;
+}
+function chipValue(t, p) {
+  const m = t.m;
+  if (t.kind === "u") return { url: t.str };
+  if (t.kind === "t") return { time: `${pad(+m[1])}:${m[2] || m[3] || m[4] || "00"}` };
+  let y = m[3] ? (m[3].length === 2 ? 2000 + +m[3] : +m[3]) : null; let inferred = false;
+  if (y == null) { y = inferYear(+m[1], +m[2], p.date_posted); inferred = true; }
+  return { date: y ? `${y}-${pad(+m[2])}-${pad(+m[1])}` : null, inferred };
+}
+function closeMenu() { const o = document.getElementById("chipmenu"); if (o) o.remove(); }
+document.addEventListener("click", e => { const o = document.getElementById("chipmenu"); if (o && !o.contains(e.target) && !e.target.classList.contains("tk")) o.remove(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenu(); });
+function chipMenu(ev, t, p) {
+  ev.stopPropagation(); closeMenu();
+  const it = ITEMS[CUR]; const v = chipValue(t, p);
+  const menu = el("div", { id: "chipmenu" });
+  const add = (label, fn) => menu.append(el("button", { class: "btn small", type: "button", onclick: () => { fn(); closeMenu(); show(CUR, true); } }, label));
+  if (v.url) {
+    menu.append(el("div", { class: "nullv" }, v.url.length > 50 ? v.url.slice(0, 50) + "…" : v.url));
+    add("→ registration_url", () => setVal(it, "registration_url", v.url));
+    add("→ join_url", () => setVal(it, "join_url", v.url));
+  } else if (v.time) {
+    menu.append(el("div", { class: "nullv" }, "time " + v.time + " → set the time of:"));
+    for (const k of DATE_FIELDS) add(k, () => {
+      const [d] = splitDT(it.entry.record[k]);
+      if (!d) { msg(`Set the date of ${k} first, then its time.`); return; }
+      setVal(it, k, joinDT(d, v.time));
+    });
+  } else {
+    if (!v.date) { msg("Cannot read this date (no posting date to infer the year)."); return; }
+    menu.append(el("div", { class: "nullv" }, `date ${v.date}${v.inferred ? " (year inferred from posting date)" : ""} → set the date of:`));
+    for (const k of DATE_FIELDS) add(k, () => {
+      const [, tm] = splitDT(it.entry.record[k]);
+      setVal(it, k, joinDT(v.date, tm));
+      const s = new Set(it.entry.year_inferred); v.inferred ? s.add(k) : s.delete(k);
+      it.entry.year_inferred = DATE_FIELDS.filter(x => s.has(x)); save();
+    });
+    add("completion deadline (new row)", () => {
+      const list = Array.isArray(it.entry.record.completion_requirements) ? it.entry.record.completion_requirements.map(x => ({ ...x })) : [];
+      list.push({ type: "other", threshold: null, unit: null, deadline: v.date });
+      setVal(it, "completion_requirements", list);
+      msg("Added a completion requirement row: set its type.");
+    });
+  }
+  const r = ev.target.getBoundingClientRect();
+  menu.style.left = Math.min(r.left, window.innerWidth - 260) + "px"; menu.style.top = (r.bottom + 4) + "px";
+  document.body.append(menu);
+}
+
+/* ---------- "the rest is not stated" ---------- */
+const NULL_OF = { audience_scope: () => ({ cohorts: [], programs: [] }), completion_requirements: () => [] };
+function restNotStated() {
+  const it = ITEMS[CUR];
+  const rest = FIELD_NAMES.filter(k => !it.touched.has(k) && k !== "post_type" && k !== "multi_session");
+  if (!rest.length) { msg("Every field is already decided."); return; }
+  if (!confirm("Set these fields to 'not stated' (null / [])?\n\n" + rest.join(", ") + "\n\npost_type and multi_session are never filled automatically.")) return;
+  for (const k of rest) setVal(it, k, NULL_OF[k] ? NULL_OF[k]() : null);
+  show(CUR, true);
+}
+document.addEventListener("selectionchange", () => {
+  const sel = window.getSelection(); const pre = $("postText");
+  if (pre && sel && sel.rangeCount && pre.contains(sel.anchorNode)) {
+    const t = sel.toString().trim(); if (t) lastSelection = t;
+  }
+});
+function postText(it) { const s = SOURCE.get(it.post_id); return s ? s.post.raw_content || "" : ""; }
+
+/* ---------- form ---------- */
+function setVal(it, key, value) {
+  it.entry.record[key] = value; it.touched.add(key);
+  if ($("msg").textContent.startsWith("Decide every field")) msg("");
+  if (it.done) { it.done = false; it.entry.labelled_at = ""; }
+  save(); markField(it, key); renderNavLight();
+}
+function renderNavLight() { const it = ITEMS[CUR]; const n = $("nav").children[CUR]; if (n && it) { n.className = "item active" + (it.done ? " done" : (it.touched.size ? " wip" : "")); n.firstChild.textContent = it.done ? "✓" : (it.touched.size ? "•" : ""); } refreshStatus(); }
+function markField(it, key) {
+  const box = document.querySelector(`.field[data-key="${key}"]`); if (!box) return;
+  box.classList.toggle("touched", it.touched.has(key)); box.classList.toggle("untouched", !it.touched.has(key));
+  const nv = box.querySelector(".nullv");
+  if (nv) nv.textContent = isEmptyValue(it.entry.record[key]) && it.touched.has(key) ? JSON.stringify(it.entry.record[key]) : "";
+  const g = box.querySelector(".ground");
+  if (g) {
+    const v = it.entry.record[key];
+    if (typeof v === "string" && v) {
+      const found = norm(postText(it)).includes(norm(v));
+      g.className = "ground " + (found ? "ok" : "no"); g.textContent = found ? "found in post" : "not found verbatim";
+    } else g.textContent = "";
+  }
+}
+function nullButton(it, key, value = null, label = "∅ not stated") {
+  return el("button", { class: "btn small", type: "button", title: "Post does not state it", onclick: () => { setVal(it, key, value); show(CUR, true); } }, label);
+}
+function unsureBox(it, key) {
+  const cb = el("input", { type: "checkbox" }); cb.checked = it.entry.unsure.includes(key);
+  cb.addEventListener("change", () => {
+    const u = new Set(it.entry.unsure); cb.checked ? u.add(key) : u.delete(key);
+    it.entry.unsure = FIELD_NAMES.filter(k => u.has(k)).concat([...u].filter(k => !FIELD_NAMES.includes(k))); save();
+  });
+  return el("label", { class: "unsure", title: "Mark as doubtful" }, cb, "unsure");
+}
+function splitDT(v) {
+  if (typeof v !== "string") return ["", ""];
+  const m = v.match(/^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2}))?/); return m ? [m[1], m[2] || ""] : ["", ""];
+}
+function joinDT(d, t) { if (!d) return null; return t ? `${d}T${t}+07:00` : d; }
+
+function widget(it, key, type) {
+  const rec = it.entry.record; const v = rec[key]; const ctl = el("div", { class: "ctl" });
+  const mkSelect = (opts, cur, onChange, withNull = true) => {
+    const s = el("select", {}, el("option", { value: "__unset" }, "— choose —"),
+      withNull ? el("option", { value: "__null" }, "null (not stated)") : null,
+      opts.map(o => el("option", { value: String(o) }, String(o))));
+    s.value = !it.touched.has(key) ? "__unset" : (cur === null ? (withNull ? "__null" : "__unset") : String(cur));
+    s.addEventListener("change", () => { if (s.value !== "__unset") onChange(s.value === "__null" ? null : s.value); });
+    return s;
+  };
+  switch (type) {
+    case "enum":
+      ctl.append(mkSelect(ENUMS[key], v, x => setVal(it, key, x))); break;
+    case "bool2":
+      ctl.append(mkSelect([true, false], v, x => setVal(it, key, x === "true"), false)); break;
+    case "bool3":
+      ctl.append(mkSelect([true, false], v, x => setVal(it, key, x === null ? null : x === "true"))); break;
+    case "true_or_null":
+      ctl.append(mkSelect([true], v, x => setVal(it, key, x === null ? null : true))); break;
+    case "text": case "url": {
+      const inp = el(key === "audience_text" ? "textarea" : "input", { type: type === "url" ? "url" : "text", value: v ?? "" });
+      if (inp.tagName === "TEXTAREA") inp.value = v ?? "";
+      inp.addEventListener("input", () => setVal(it, key, inp.value.trim() === "" ? null : inp.value));
+      const take = el("button", { class: "btn small", type: "button", title: "Copy the selected post text",
+        onclick: () => { if (!lastSelection) { msg("Select text in the post first."); return; } inp.value = lastSelection; setVal(it, key, lastSelection); } }, "⇦ selection");
+      ctl.append(inp, take, nullButton(it, key), el("span", { class: "ground" })); break;
+    }
+    case "int": case "number": {
+      const inp = el("input", { type: "number", step: type === "int" ? "1" : "any", min: "0", value: v ?? "" });
+      inp.addEventListener("input", () => setVal(it, key, inp.value === "" ? null : (type === "int" ? parseInt(inp.value, 10) : parseFloat(inp.value))));
+      ctl.append(inp, nullButton(it, key)); break;
+    }
+    case "datetime": {
+      const [d, t] = splitDT(v);
+      const di = el("input", { type: "date", value: d }); const ti = el("input", { type: "time", value: t });
+      const upd = () => setVal(it, key, joinDT(di.value, ti.value));
+      di.addEventListener("change", upd); ti.addEventListener("change", upd);
+      const yi = el("input", { type: "checkbox" }); yi.checked = it.entry.year_inferred.includes(key);
+      yi.addEventListener("change", () => { const s = new Set(it.entry.year_inferred); yi.checked ? s.add(key) : s.delete(key); it.entry.year_inferred = DATE_FIELDS.filter(k => s.has(k)); save(); });
+      ctl.append(di, ti, el("span", { class: "nullv" }, "time optional"), nullButton(it, key),
+        el("label", { class: "unsure", title: "Year not in the post; taken from the posting date rule" }, yi, "year inferred"));
+      break;
+    }
+    case "scope": {
+      const sc = v || { cohorts: [], programs: [] };
+      const ci = el("input", { type: "text", value: (sc.cohorts || []).join(", "), placeholder: "K24, K25" });
+      const upd = () => {
+        const cohorts = ci.value.split(/[,;\s]+/).map(x => x.trim().toUpperCase()).filter(Boolean)
+          .map(x => /^K20\d\d$/.test(x) ? "K" + x.slice(3) : x);
+        const programs = ENUMS.programs.filter(p => boxes[p].checked);
+        setVal(it, key, { cohorts, programs });
+      };
+      ci.addEventListener("change", upd);
+      const boxes = {};
+      ctl.append(el("span", {}, "cohorts"), ci);
+      for (const p of ENUMS.programs) {
+        boxes[p] = el("input", { type: "checkbox" }); boxes[p].checked = (sc.programs || []).includes(p);
+        boxes[p].addEventListener("change", upd);
+        ctl.append(el("label", { class: "unsure" }, boxes[p], p === "standard" ? "standard (đại trà)" : "high_quality (CLC)"));
+      }
+      ctl.append(nullButton(it, key, { cohorts: [], programs: [] }, "∅ none stated"));
+      break;
+    }
+    case "fee": {
+      const kind = v === null || v === undefined ? (it.touched.has(key) ? "null" : "") : (v === 0 ? "zero" : "amount");
+      const s = el("select", {}, el("option", { value: "" }, "— choose —"), el("option", { value: "null" }, "null (not stated)"),
+        el("option", { value: "zero" }, "0 (explicitly free)"), el("option", { value: "amount" }, "amount"));
+      s.value = kind;
+      const amt = el("input", { type: "number", min: "0", step: "1000", placeholder: "VND", value: v && typeof v === "object" ? (v.amount_vnd ?? "") : "" });
+      const per = el("select", {}, ENUMS.fee_per.map(o => el("option", { value: o }, o)));
+      per.value = v && typeof v === "object" ? (v.per || "person") : "person";
+      const dep = el("input", { type: "checkbox" }); dep.checked = !!(v && typeof v === "object" && v.deposit);
+      const box = el("span", { class: "ctl", style: kind === "amount" ? "" : "display:none" }, amt, per, el("label", { class: "unsure" }, dep, "deposit"));
+      const upd = () => {
+        box.style.display = s.value === "amount" ? "" : "none";
+        if (s.value === "null") setVal(it, key, null);
+        else if (s.value === "zero") setVal(it, key, 0);
+        else if (s.value === "amount") setVal(it, key, { amount_vnd: amt.value === "" ? null : Number(amt.value), per: per.value, deposit: dep.checked });
+      };
+      [s, amt, per, dep].forEach(x => x.addEventListener("change", upd));
+      ctl.append(s, box, el("span", { class: "nullv" }, "several amounts → notes + unsure")); break;
+    }
+    case "completion": {
+      const list = Array.isArray(v) ? v.map(x => ({ ...x })) : [];
+      const commit = () => setVal(it, key, list.map(x => ({ ...x })));
+      const wrap = el("div", { style: "width:100%" });
+      const draw = () => {
+        wrap.innerHTML = "";
+        list.forEach((r, i) => {
+          const t = el("select", {}, ENUMS.completion_type.map(o => el("option", { value: o }, o))); t.value = r.type || "other";
+          const th = el("input", { type: "number", step: "any", placeholder: "threshold", value: r.threshold ?? "" });
+          const un = el("input", { type: "text", placeholder: "unit, e.g. percent", value: r.unit ?? "", style: "width:150px" });
+          const [d, tm] = splitDT(r.deadline); const dd = el("input", { type: "date", value: d }); const dt = el("input", { type: "time", value: tm });
+          const upd = () => { list[i] = { type: t.value, threshold: th.value === "" ? null : Number(th.value), unit: un.value.trim() || null, deadline: joinDT(dd.value, dt.value) }; commit(); };
+          [t, th, un, dd, dt].forEach(x => x.addEventListener("change", upd));
+          wrap.append(el("div", { class: "row" }, t, th, un, el("span", { class: "nullv" }, "deadline"), dd, dt,
+            el("button", { class: "btn small", type: "button", onclick: () => { list.splice(i, 1); commit(); draw(); } }, "remove")));
+        });
+        wrap.append(el("div", { class: "row" },
+          el("button", { class: "btn small", type: "button", onclick: () => { list.push({ type: "other", threshold: null, unit: null, deadline: null }); commit(); draw(); } }, "+ add requirement"),
+          nullButton(it, key, [], "∅ none stated ([])")));
+      };
+      draw(); ctl.append(wrap); break;
+    }
+  }
+  return ctl;
+}
+
+function show(i, keepScroll = false) {
+  if (i < 0 || i >= ITEMS.length) return;
+  const formScroll = $("form").scrollTop;
+  if (i !== CUR) { stopTimer(); CUR = i; startTimer(); }
+  const it = ITEMS[CUR];
+  if (!keepScroll) renderPost(it);
+  const f = $("form"); f.innerHTML = "";
+  for (const [key, type, hint] of FIELDS) {
+    const box = el("div", { class: "field", "data-key": key },
+      el("div", { class: "name" }, key, el("small", {}, hint)),
+      widget(it, key, type),
+      el("div", { class: "side" }, unsureBox(it, key), el("span", { class: "nullv" })));
+    f.append(box);
+  }
+  // extras
+  const nc = el("div", {});
+  for (const code of NOTE_CODES) {
+    const cb = el("input", { type: "checkbox" }); cb.checked = it.entry.notes_codes.includes(code);
+    cb.addEventListener("change", () => { const s = new Set(it.entry.notes_codes); cb.checked ? s.add(code) : s.delete(code); it.entry.notes_codes = [...s]; save(); });
+    nc.append(el("label", { class: "unsure" }, cb, code));
+  }
+  const notes = el("textarea", {}); notes.value = it.entry.notes;
+  notes.addEventListener("input", () => { it.entry.notes = notes.value; save(); });
+  const warn = el("div", { class: "warnlist", id: "warnlist" });
+  f.append(el("div", { class: "extras" },
+    el("h3", {}, "notes_codes"), nc,
+    el("h3", {}, "notes"), el("div", { class: "ctl" }, notes)),
+    el("div", { class: "footer" },
+      el("button", { class: "btn", type: "button", onclick: () => show(CUR - 1) }, "← prev"),
+      el("button", { class: "btn", type: "button", onclick: restNotStated, title: "Ctrl+Shift+Space" }, "∅ rest not stated"),
+      el("button", { class: "btn primary", type: "button", onclick: markDone, title: "Ctrl+Enter" }, it.done ? "Done ✓ (update)" : "Mark done → next"),
+      el("button", { class: "btn", type: "button", onclick: () => show(CUR + 1) }, "next →"),
+      el("span", { class: "nullv" }, el("kbd", {}, "Ctrl+Enter"), " done · ", el("kbd", {}, "Ctrl+Shift+Space"), " rest ∅ · ", el("kbd", {}, "Alt+←/→"), " prev/next"),
+      warn));
+  for (const [key] of FIELDS) markField(it, key);
+  checkConsistency(it);
+  renderNav();
+  if (keepScroll) f.scrollTop = formScroll;
+}
+
+function checkConsistency(it) {
+  const r = it.entry.record; const w = [];
+  const cmp = (a, b) => (a && b && a.slice(0, 10) && b.slice(0, 10) && a.slice(0, 16) > b.slice(0, 16));
+  if (cmp(r.window_open, r.window_close)) w.push("window_close is before window_open");
+  if (r.mode === "online" && r.location) w.push("online but location is set (guide: online → null)");
+  if (r.post_type === "info_only" && (r.registration_url || r.join_url)) w.push("info_only but has a registration/join link: check");
+  if (r.fee && typeof r.fee === "object" && (r.fee.amount_vnd == null)) w.push("fee amount is empty");
+  const wl = $("warnlist"); if (wl) wl.textContent = w.join(" · ");
+  return w;
+}
+
+function markDone() {
+  const it = ITEMS[CUR];
+  const missing = FIELD_NAMES.filter(k => !it.touched.has(k));
+  if (missing.length) { msg("Decide every field first (use ∅ when the post does not state it): " + missing.join(", ")); return; }
+  const w = checkConsistency(it);
+  if (w.length && !confirm("Warnings:\n- " + w.join("\n- ") + "\n\nMark done anyway?")) return;
+  stopTimer();
+  it.done = true;
+  it.entry.labeller = $("labeller").value.trim();
+  it.entry.labelled_at = today();
+  it.entry.minutes_spent = Math.round(it.ms / 6000) / 10;
+  if (!it.entry.labeller) msg("Tip: fill in the labeller initials before exporting.");
+  else msg("");
+  save();
+  const next = ITEMS.findIndex((x, j) => j > CUR && !x.done);
+  if (next !== -1) show(next); else { startTimer(); show(CUR); msg("All posts in this task are done. Export JSON."); }
+}
+document.addEventListener("keydown", e => {
+  if (CUR < 0) return;
+  if (e.ctrlKey && e.key === "Enter") { e.preventDefault(); markDone(); }
+  else if (e.ctrlKey && e.shiftKey && e.code === "Space") { e.preventDefault(); restNotStated(); }
+  else if (e.altKey && e.key === "ArrowRight") { e.preventDefault(); show(CUR + 1); }
+  else if (e.altKey && e.key === "ArrowLeft") { e.preventDefault(); show(CUR - 1); }
+});
+
+/* ---------- export ---------- */
+$("btnExport").addEventListener("click", () => {
+  stopTimer(); startTimer();
+  const lab = $("labeller").value.trim();
+  const out = ITEMS.map(it => {
+    const e = JSON.parse(JSON.stringify(it.entry));
+    if (!e.labeller && it.done) e.labeller = lab;
+    if (!it.done) { e.labelled_at = ""; e.minutes_spent = it.ms ? Math.round(it.ms / 6000) / 10 : null; }
+    // field order as in the guide, unknown record keys kept after
+    const rec = {}; for (const k of FIELD_NAMES) rec[k] = e.record[k];
+    for (const k of Object.keys(e.record)) if (!(k in rec)) rec[k] = e.record[k];
+    return { post_id: e.post_id, labeller: e.labeller, labelled_at: e.labelled_at, minutes_spent: e.minutes_spent, record: rec,
+      year_inferred: e.year_inferred, unsure: e.unsure, notes_codes: e.notes_codes, notes: e.notes,
+      ...Object.fromEntries(Object.entries(e).filter(([k]) => !["post_id","labeller","labelled_at","minutes_spent","record","year_inferred","unsure","notes_codes","notes"].includes(k))) };
+  });
+  const base = TASK.name.replace(/_template$/, "");
+  const fname = `${base}_${lab || "anon"}.json`;
+  const blob = new Blob([JSON.stringify(out, null, 2) + "\n"], { type: "application/json" });
+  const a = el("a", { href: URL.createObjectURL(blob), download: fname }); document.body.append(a); a.click(); a.remove();
+  const done = ITEMS.filter(i => i.done).length;
+  msg(`Exported ${fname}: ${done}/${ITEMS.length} done. Unfinished posts have labelled_at = "".`);
+});
+window.addEventListener("beforeunload", () => { stopTimer(); save(); });
+</script>
+</body>
+</html>

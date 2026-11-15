@@ -1,0 +1,62 @@
+model,id,raw,json_ok,clean,schema_ok,intent_ok,exact,sec
+Qwen3.5-2B,S01,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""Data Structures"", ""prerequisite_courses"": [""Introduction to Programming""]}}
+",True,True,True,True,True,2.66
+Qwen3.5-2B,S06,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""Data Structures"", ""prerequisite_courses"": []}}
+",True,True,True,True,True,2.21
+Qwen3.5-2B,S12,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Database Systems"", ""Web Development""], ""section"": null, ""day"": null, ""period"": null, ""start"": null, ""end"": null}}
+",True,True,True,True,True,3.62
+Qwen3.5-2B,S14,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Operating Systems""], ""section"": null, ""day"": ""wed"", ""period"": ""morning"", ""start"": null, ""end"": null}}
+",True,True,True,True,True,3.6
+Qwen3.5-2B,S23,"{""intent"": ""advise_academic_regulation"", ""params"": {""topic"": ""expulsion_rules"", ""standing"": ""academic_warning"", ""year"": null, ""major"": null, ""gpa"": 1.5, ""credits"": null}}
+",True,True,True,True,False,4.01
+Qwen3.5-2B,S32,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""Software Engineering"", ""prerequisite_courses"": [""Database Systems"", ""Data Structures""]}}
+",True,True,True,True,True,2.62
+Qwen3.5-2B,S34,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Software Engineering""], ""section"": null, ""day"": ""thu"", ""period"": ""evening"", ""start"": ""18:00"", ""end"": ""20:30""}}
+",True,True,True,True,False,4.22
+Qwen3.5-2B,S39,"{""intent"": ""advise_academic_regulation"", ""params"": {""topic"": ""graduation_requirements"", ""standing"": ""normal"", ""year"": ""senior"", ""major"": null, ""gpa"": null, ""credits"": null}}
+",True,True,True,True,False,3.85
+Qwen3.5-2B,S41,"{""intent"": ""unknown"", ""params"": {}}
+",True,True,True,True,True,1.12
+Qwen3.5-2B,S43,"{""intent"": ""unknown"", ""params"": {}}
+",True,True,True,True,True,1.13
+Qwen3.5-4B,S01,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""Data Structures"", ""prerequisite_courses"": [""Introduction to Programming""]}}
+",True,True,True,True,True,3.83
+Qwen3.5-4B,S06,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""Data Structures"", ""prerequisite_courses"": []}}
+",True,True,True,True,True,3.24
+Qwen3.5-4B,S12,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Database Systems"", ""Web Development""], ""section"": null, ""day"": null, ""period"": null, ""start"": null, ""end"": null}}
+",True,True,True,True,True,5.33
+Qwen3.5-4B,S14,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Operating Systems""], ""section"": null, ""day"": ""wed"", ""period"": ""morning"", ""start"": null, ""end"": null}}
+",True,True,True,True,True,5.18
+Qwen3.5-4B,S23,"{""intent"": ""advise_academic_regulation"", ""params"": {""topic"": ""expulsion_rules"", ""standing"": ""academic_warning"", ""year"": null, ""major"": null, ""gpa"": 1.5, ""credits"": null}}
+",True,True,True,True,False,5.71
+Qwen3.5-4B,S32,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""Software Engineering"", ""prerequisite_courses"": [""Database Systems"", ""Data Structures""]}}
+",True,True,True,True,True,3.89
+Qwen3.5-4B,S34,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Software Engineering""], ""section"": null, ""day"": ""thu"", ""period"": null, ""start"": ""18:00"", ""end"": ""20:30""}}
+",True,True,True,True,True,5.91
+Qwen3.5-4B,S39,"{""intent"": ""advise_academic_regulation"", ""params"": {""topic"": ""graduation_requirements"", ""standing"": null, ""year"": null, ""major"": null, ""gpa"": null, ""credits"": null}}
+",True,True,True,True,False,5.26
+Qwen3.5-4B,S41,"{""intent"": ""unknown"", ""params"": {}}
+",True,True,True,True,True,1.82
+Qwen3.5-4B,S43,"{""intent"": ""unknown"", ""params"": {}}
+",True,True,True,True,True,1.82
+Gemma3-4B,S01,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""Data Structures"", ""prerequisite_courses"": [""Introduction to Programming""]}}",True,True,True,True,True,3.76
+Gemma3-4B,S06,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""DSA"", ""prerequisite_courses"": [""Discrete Mathematics""]}}",True,True,False,True,False,3.44
+Gemma3-4B,S12,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Database Systems"", ""Web Development""], ""section"": null, ""day"": null, ""period"": null, ""start"": null, ""end"": null}}",True,True,True,True,True,5.32
+Gemma3-4B,S14,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Operating Systems""], ""section"": null, ""day"": ""wed"", ""period"": ""morning"", ""start"": null, ""end"": null}}",True,True,True,True,True,5.04
+Gemma3-4B,S23,"{""intent"": ""advise_academic_regulation"", ""params"": {""topic"": ""expulsion_rules"", ""standing"": ""academic_warning"", ""year"": null, ""major"": null, ""gpa"": ""1.5"", ""credits"": null}}",True,True,True,True,False,5.87
+Gemma3-4B,S32,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""Software Engineering"", ""prerequisite_courses"": [""Database Systems"", ""Data Structures""]}}",True,True,True,True,True,3.96
+Gemma3-4B,S34,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Software Engineering""], ""section"": null, ""day"": ""thu"", ""period"": null, ""start"": ""18:00"", ""end"": ""20:30""}}",True,True,True,True,True,5.97
+Gemma3-4B,S39,"{""intent"": ""advise_academic_regulation"", ""params"": {""topic"": ""graduation_requirements"", ""standing"": null, ""year"": null, ""major"": null, ""gpa"": null, ""credits"": null}}",True,True,True,True,False,5.18
+Gemma3-4B,S41,"{""intent"": ""unknown"", ""params"": {}}",True,True,True,True,True,1.52
+Gemma3-4B,S43,"{""intent"": ""unknown"", ""params"": {}}
+",True,True,True,True,True,1.68
+Llama3.1-8B,S01,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""Data Structures"", ""prerequisite_courses"": [""Introduction to Programming""]}}",True,True,True,True,True,2.96
+Llama3.1-8B,S06,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""DSA"", ""prerequisite_courses"": [""Introduction to Programming""]}}",True,True,False,True,False,2.9
+Llama3.1-8B,S12,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Database Systems"", ""Web Development""], ""section"": null, ""day"": null, ""period"": null, ""start"": null, ""end"": null}}",True,True,True,True,True,4.23
+Llama3.1-8B,S14,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Operating Systems""], ""section"": null, ""day"": ""wed"", ""period"": ""morning"", ""start"": null, ""end"": null}}",True,True,True,True,True,4.21
+Llama3.1-8B,S23,"{""intent"": ""advise_academic_regulation"", ""params"": {""topic"": ""expulsion_rules"", ""standing"": null, ""year"": null, ""major"": null, ""gpa"": 1.5, ""credits"": null}}",True,True,True,True,True,4.52
+Llama3.1-8B,S32,"{""intent"": ""check_prerequisite"", ""params"": {""target_course"": ""Software Engineering"", ""prerequisite_courses"": [""Database Systems"", ""Data Structures""]}}",True,True,True,True,True,3.22
+Llama3.1-8B,S34,"{""intent"": ""check_schedule_conflict"", ""params"": {""courses"": [""Software Engineering""], ""section"": null, ""day"": ""thu"", ""period"": null, ""start"": ""18:00"", ""end"": ""19:30""}}",True,True,True,True,False,4.62
+Llama3.1-8B,S39,"{""intent"": ""advise_academic_regulation"", ""params"": {""topic"": ""graduation_requirements"", ""standing"": null, ""year"": null, ""major"": null, ""gpa"": null, ""credits"": null}}",True,True,True,True,False,4.28
+Llama3.1-8B,S41,"{""intent"": ""unknown"", ""params"": {}}",True,True,True,True,True,1.69
+Llama3.1-8B,S43,"{""intent"": ""unknown"", ""params"": {}}",True,True,True,True,True,1.74

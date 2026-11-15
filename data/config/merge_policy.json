@@ -1,0 +1,181 @@
+{
+  "post_type": "agree_else_review",
+  "activity_type": "rules",
+  "domain": "rules",
+  "mode": "agree_else_review",
+  "title": "rules",
+  "multi_session": "llm_if_rules_null",
+  "window_open": "llm",
+  "window_close": "llm_if_rules_null",
+  "registration_deadline": "rules",
+  "registration_url": "rules",
+  "join_url": "rules",
+  "_evidence": {
+    "post_type": {
+      "n": 5,
+      "rules": {
+        "correct": 4,
+        "wrong": 1
+      },
+      "llm": {
+        "correct": 3,
+        "wrong": 2
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "activity_type": {
+      "n": 0,
+      "rules": {},
+      "llm": {},
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "domain": {
+      "n": 21,
+      "rules": {
+        "wrong": 4,
+        "missed": 6,
+        "correct": 11
+      },
+      "llm": {
+        "wrong": 10,
+        "correct": 10,
+        "missed": 1
+      },
+      "wins": 2,
+      "null_wins": 1,
+      "null_losses": 0
+    },
+    "mode": {
+      "n": 21,
+      "rules": {
+        "correct": 14,
+        "wrong": 2,
+        "missed": 4,
+        "fabricated": 1
+      },
+      "llm": {
+        "correct": 14,
+        "wrong": 2,
+        "missed": 2,
+        "fabricated": 3
+      },
+      "wins": 3,
+      "null_wins": 3,
+      "null_losses": 2
+    },
+    "title": {
+      "n": 21,
+      "rules": {
+        "correct": 13,
+        "wrong": 8
+      },
+      "llm": {
+        "correct": 12,
+        "wrong": 8,
+        "missed": 1
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "multi_session": {
+      "n": 5,
+      "rules": {
+        "correct": 4,
+        "missed": 1
+      },
+      "llm": {
+        "correct": 4,
+        "missed": 1
+      },
+      "wins": 1,
+      "null_wins": 1,
+      "null_losses": 0
+    },
+    "window_open": {
+      "n": 21,
+      "rules": {
+        "correct": 18,
+        "fabricated": 1,
+        "wrong": 2
+      },
+      "llm": {
+        "correct": 20,
+        "wrong": 1
+      },
+      "wins": 2,
+      "null_wins": 0,
+      "null_losses": 0
+    },
+    "window_close": {
+      "n": 21,
+      "rules": {
+        "correct": 20,
+        "missed": 1
+      },
+      "llm": {
+        "correct": 18,
+        "missed": 2,
+        "wrong": 1
+      },
+      "wins": 1,
+      "null_wins": 1,
+      "null_losses": 0
+    },
+    "registration_deadline": {
+      "n": 21,
+      "rules": {
+        "correct": 20,
+        "missed": 1
+      },
+      "llm": {
+        "wrong": 5,
+        "correct": 15,
+        "fabricated": 1
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 1
+    },
+    "registration_url": {
+      "n": 21,
+      "rules": {
+        "correct": 18,
+        "fabricated": 2,
+        "missed": 1
+      },
+      "llm": {
+        "correct": 16,
+        "fabricated": 2,
+        "missed": 3
+      },
+      "wins": 1,
+      "null_wins": 0,
+      "null_losses": 1
+    },
+    "join_url": {
+      "n": 5,
+      "rules": {
+        "correct": 5
+      },
+      "llm": {
+        "correct": 5
+      },
+      "wins": 0,
+      "null_wins": 0,
+      "null_losses": 0
+    }
+  },
+  "_model_id": "Qwen/Qwen3.5-4B",
+  "_prompt_versions": {
+    "classify": "sp1_classify_v2 1.0.0",
+    "roles": "sp1_roles_v2 1.0.0"
+  },
+  "_notes": [
+    "2026-11-14: kept window_close=llm_if_rules_null after the day-range fix and the open/close consistency rule. Re-running the automatic selector picks 'rules' (hybrid 129/160 correct, 2 fabricated on gold v1), because it does not model the consistency rule; the kept policy measures 130/160 correct, 2 fabricated on the same gold. _evidence is from the 2026-11-14 selection run."
+  ]
+}
