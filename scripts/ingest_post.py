@@ -1,5 +1,7 @@
 """CLI for incremental SP1 ingestion: exercise single-post extraction without the web UI.
 
+Developer tool, not used by the app: nothing under src/api imports it (admin updates: docs/admin_data_update.md).
+
   python scripts/ingest_post.py health
   python scripts/ingest_post.py submit post.json [--post-id live-190] [--no-process]
   python scripts/ingest_post.py show live-190

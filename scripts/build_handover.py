@@ -5,8 +5,11 @@ Outputs:
   data/handover/sidecar.json           per activity: provenance, team defaults used, warnings, schedule evidence
   data/handover/blocked.json           records not handed over, with reasons
   reports/sp1_handover_readiness.md    counts
+
+--out-dir (default: the repo root) is where the store is read from and the outputs are written.
 """
 
+import argparse
 import json
 import sys
 from collections import Counter
@@ -26,19 +29,22 @@ def write(path, value):
     path.write_bytes((json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
 
 
-def main():
-    store = json.loads((ROOT / "data/activity_store_v2.json").read_text(encoding="utf-8"))
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--out-dir", type=Path, default=ROOT)
+    out = parser.parse_args(argv).out_dir
+    store = json.loads((out / "data/activity_store_v2.json").read_text(encoding="utf-8"))
     items = [(record, project(record)) for record in store["records"]]
     passed = [p for _, p in items if p["activity"]]
     evidence = auto_evidence(passed, DEMO_PROFILE, DEMO_TERM)
-    write(ROOT / "data/handover/activities_sp3.json", [p["activity"] for p in passed])
-    write(ROOT / "data/handover/sidecar.json", {
+    write(out / "data/handover/activities_sp3.json", [p["activity"] for p in passed])
+    write(out / "data/handover/sidecar.json", {
         "schema": "sp1-handover-sidecar/1.0", "store_generated_at": store["generated_at"],
         "evidence_label": AUTO_CHECK_LABEL, "demo_profile": DEMO_PROFILE, "demo_term": DEMO_TERM,
         "demo_evidence": evidence,
         "activities": {p["activity"]["activity_id"]: {**p["sidecar"], "derived": p["derived"],
                                                       "warnings": p["warnings"]} for p in passed}})
-    write(ROOT / "data/handover/blocked.json", [
+    write(out / "data/handover/blocked.json", [
         {"position": r["position"], "post_id": r["activity"]["source"]["post_id"], "reasons": p["blocked"]}
         for r, p in items if not p["activity"]])
     blocked = Counter(reason for _, p in items for reason in p["blocked"])
@@ -59,7 +65,8 @@ def main():
     for key in ("eligibility_by_activity", "term_scope_by_activity", "source_review_by_activity"):
         lines.append(f"- {key}: {dict(Counter(str(v) for v in evidence[key].values()))}")
     lines.append(f"- schedule evidence (online flexible window): {len(evidence['schedule_by_activity'])}")
-    (ROOT / "reports/sp1_handover_readiness.md").write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
+    (out / "reports").mkdir(parents=True, exist_ok=True)
+    (out / "reports/sp1_handover_readiness.md").write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
     print("\n".join(lines))
 
 

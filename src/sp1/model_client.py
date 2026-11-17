@@ -1,5 +1,7 @@
 """Model client for SP1 v2's two prompts (classify, roles) against a served Qwen model.
 
+Developer tool, not used by the app: nothing under src/api imports it (admin updates: docs/admin_data_update.md).
+
 The batch run used Qwen/Qwen3.5-4B through transformers on Kaggle: one user message, greedy decoding,
 thinking disabled, at most 256 (classify) / 768 (roles) new tokens. This client sends the same request to
 a served model so a single new post is processed like the batch posts.
