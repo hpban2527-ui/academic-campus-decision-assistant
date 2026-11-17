@@ -37,6 +37,16 @@ def check_health() -> None:
     raise RuntimeError("FastAPI server did not become healthy")
 
 
+def enter_workspace(page) -> None:
+    page.evaluate("showWorkspace()")
+    page.evaluate("setAuthMode('register')")
+    page.locator("#registerName").fill("Sinh viên kiểm thử")
+    page.locator("#registerMssv").fill("TEST2026")
+    page.locator("#registerPassword").fill("TestPass2026!")
+    page.locator("#btnSubmitRegister").click()
+    page.locator("#workspaceApp").wait_for(state="visible", timeout=20000)
+
+
 def main() -> None:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(ROOT / "src")
@@ -55,6 +65,7 @@ def main() -> None:
             page.goto(BASE, wait_until="domcontentloaded")
             page.wait_for_function("document.querySelector('#backendStatusText').textContent.includes('API')", timeout=15000)
             page.evaluate("document.body.classList.add('dev-mode')")
+            enter_workspace(page)
             page.locator("#tabBtnTestSuites").click()
             page.locator("[onclick='runBatchAllTests()']").click()
             page.wait_for_function(
@@ -159,6 +170,7 @@ def main() -> None:
             sp3_errors = []
             sp3.on("pageerror", lambda error: sp3_errors.append(str(error)))
             sp3.goto(BASE, wait_until="domcontentloaded")
+            enter_workspace(sp3)
 
             def is_sp3_response(response):
                 return "/api/sp3/demo/plan" in response.url and response.request.method == "POST"
@@ -173,7 +185,7 @@ def main() -> None:
             assert initial["plan"]["score_summary"]["projected_total"] == 80
             assert len(initial["plan"]["selected_activities"]) == 3
             assert sp3.locator("#planDisclosure").is_visible(), "Demo disclaimer hidden in user mode"
-            assert "chưa phải điểm rèn luyện" in sp3.locator("#planDisclosure").inner_text()
+            assert "Điểm chỉ được ghi nhận sau khi nhà trường xác nhận" in sp3.locator("#planDisclosure").inner_text()
             assert "60 → 80" in sp3.locator("#planScoreOverview").inner_text()
             assert sp3.locator("#planPanelSelected .candidate-card").count() == 3
             sp3.screenshot(path=str(OUT / "04_sp3_first_plan.png"), full_page=True)
@@ -197,7 +209,7 @@ def main() -> None:
             sp3.locator("#planStepper button").first.click()
             sp3.locator("#inputPlanTarget").fill("90")
             sp3.locator("#btnToggleBusySlots").click()
-            sp3.locator("#busySlot2").check()
+            sp3.locator("#availabilityPickerGrid .availability-cell").first.click()
             sp3.locator("#btnToggleBusySlots").click()
             assert sp3.locator("#planStaleNotice").is_visible(), "Changed inputs did not mark plan stale"
             with sp3.expect_response(is_sp3_response, timeout=60000) as adjusted_call:
@@ -236,6 +248,7 @@ def main() -> None:
             mobile_errors = []
             mobile.on("pageerror", lambda error: mobile_errors.append(str(error)))
             mobile.goto(BASE, wait_until="domcontentloaded")
+            enter_workspace(mobile)
             mobile.locator("#btnMobileMenuToggle").click()
             with mobile.expect_response(is_sp3_response, timeout=60000) as mobile_call:
                 mobile.locator("#tabBtnPlan").click()
