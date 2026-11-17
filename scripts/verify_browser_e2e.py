@@ -226,7 +226,7 @@ def main() -> None:
                 "document.querySelector('#validActivitiesList').textContent.includes('Chưa rõ điểm')",
                 timeout=45000,
             )
-            assert "Hoạt động nguồn" in sp3.locator("#viewActivities").inner_text()
+            assert "Hoạt động đã thu thập" in sp3.locator("#viewActivities").inner_text()
             assert "đã công nhận" not in sp3.locator("#viewActivities h3").first.inner_text().lower()
             sp3.screenshot(path=str(OUT / "07_sp3_source_catalog.png"), full_page=True)
 
