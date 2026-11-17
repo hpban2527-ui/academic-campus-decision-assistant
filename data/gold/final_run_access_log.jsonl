@@ -1,0 +1,41 @@
+{"at": "2026-11-14T08:51:00+00:00", "reason": "Final Qwen3.5-4B batch run on all 189 posts to build the SP1 activity store (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T08:52:15+00:00", "reason": "Re-export after adding bank-account masking to preprocess (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:13:30+00:00", "reason": "Build SP1 activity store from final Qwen run (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:15:57+00:00", "reason": "Rebuild SP1 activity store after text-to-ID parser fix (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:21:39+00:00", "reason": "Manual check of 20 sampled activities (evaluation only, no tuning)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:32:27+00:00", "reason": "Rebuild SP1 activity store after day-range, campus and consistency fixes (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:32:56+00:00", "reason": "Rebuild store and draw the after-fix manual-check sample (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:33:13+00:00", "reason": "Manual check of the after-fix sample (evaluation only)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:34:49+00:00", "reason": "Rebuild store after g-time fix; redraw the same after sample (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:45:49+00:00", "reason": "Rebuild store with duplicate grouping (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T10:52:46+00:00", "reason": "Rebuild store after injection-detection and place-over-online changes (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T11:35:53+00:00", "reason": "Rebuild store with activity_type for SP2 binding (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T11:36:01+00:00", "reason": "Propose SP2 bindings for handed-over activities (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:00:07+00:00", "reason": "Rebuild bindings on the integration branch with the SP2 matcher and rules in the repo (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:02:04+00:00", "reason": "Rebuild bindings after R2301 and matcher fixes (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:04:29+00:00", "reason": "Rebuild store with review support and R2301 (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:04:38+00:00", "reason": "Rebuild bindings with survey rule and review support (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:39:56+00:00", "reason": "Rebuild store with the submitted review decisions (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:40:05+00:00", "reason": "Rebuild bindings after review decisions (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:41:26+00:00", "reason": "Rebuild with review decisions, extraction comparison kept separate (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:41:34+00:00", "reason": "Rebuild bindings after review decisions (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:42:31+00:00", "reason": "Rebuild with review decisions, extraction comparison kept separate (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:42:40+00:00", "reason": "Rebuild bindings after review decisions (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T13:51:46+00:00", "reason": "Rebuild bindings after switching the handover id to post_id (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T15:45:05+00:00", "reason": "Rebuild after campus dictionary 1.1.0 (university town) (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T15:45:13+00:00", "reason": "Rebuild bindings after campus and feature rule fixes (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T15:52:08+00:00", "reason": "Rebuild after campus dictionary 1.2.0 (other institutions are Other) (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T15:52:18+00:00", "reason": "Rebuild bindings after campus 1.2.0 (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T16:33:17+00:00", "reason": "Rebuild after D21 rule fixes (matcher order, table, mini-course) (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T16:33:27+00:00", "reason": "Rebuild bindings after D21 rule fixes (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T16:40:42+00:00", "reason": "Rebuild with 13 manual mode/post_type decisions (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T16:41:02+00:00", "reason": "Rebuild bindings after manual mode decisions (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T16:48:47+00:00", "reason": "Rebuild with 13 manual post_type decisions (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T16:48:57+00:00", "reason": "Rebuild bindings after post_type decisions (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T16:53:23+00:00", "reason": "Rebuild with 6 decisions on failed records (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T16:53:33+00:00", "reason": "Rebuild bindings after failed-record decisions (2026-11-14)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T17:11:32+00:00", "reason": "Rebuild with rule and campus review decisions (2026-11-15)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T17:11:39+00:00", "reason": "Rebuild bindings after rule review decisions (2026-11-15)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T17:12:26+00:00", "reason": "Rebuild after excluding hashes from redaction (2026-11-15)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T17:12:36+00:00", "reason": "Rebuild bindings after fingerprint repair (2026-11-15)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-14T18:01:26+00:00", "reason": "Count posts that state conduct-score points, for UI points display (2026-11-15)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}

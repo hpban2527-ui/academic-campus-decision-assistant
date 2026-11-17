@@ -1,4 +1,5 @@
 __pycache__/
+.vscode/
 *.py[cod]
 *$py.class
 .pytest_cache/
@@ -10,3 +11,5 @@ Thumbs.db
 draft/
 data/sessions/
 docs/PROGRESS_TRACKER.md
+
+data/live/
