@@ -586,6 +586,7 @@
             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             Đổi tài khoản sinh viên
           </button>
+          <button onclick="logoutLocalAccount()" class="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-[#11192b] font-medium transition flex items-center gap-2"><span aria-hidden="true">↪</span>Đăng xuất</button>
           <button onclick="resetSessionData()" class="w-full px-4 py-2 text-left text-sm text-rose-400 hover:bg-rose-950/30 font-medium transition flex items-center gap-2">
             <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Khôi phục dữ liệu gốc
@@ -641,7 +642,7 @@
             <button id="tabBtnPlan" onclick="switchTab('plan')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <svg class="w-5 h-5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                <span class="text-sm font-bold">Lập lịch thông minh <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP3)</span></span>
+                <span class="text-sm font-bold">Hồ sơ & Lịch <span class="dev-only font-mono text-xs text-indigo-300 font-normal">(SP3)</span></span>
               </div>
               <span class="dev-only text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-950/70 text-indigo-300 border border-indigo-700/60">SP3</span>
             </button>
@@ -727,37 +728,6 @@
                 <span class="rounded-full border border-blue-300/20 bg-blue-300/10 px-3 py-1.5 font-semibold text-blue-100">Mỗi bước tiến đều đáng ghi nhận</span>
               </div>
             </div>
-
-            <section id="unilifeAssistant" aria-labelledby="assistantHeading" class="rounded-3xl border border-indigo-400/30 bg-gradient-to-br from-[#111a31] via-[#0e1524] to-[#11182b] p-5 sm:p-6 shadow-xl shadow-indigo-950/20">
-              <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
-                <div class="xl:col-span-4 space-y-4">
-                  <span class="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[.18em] text-cyan-200"><span class="h-2 w-2 rounded-full bg-cyan-300"></span>Thực hiện thao tác trên website</span>
-                  <div>
-                    <h2 id="assistantHeading" class="text-xl sm:text-2xl font-black text-white">UniLife Assistant</h2>
-                    <p class="mt-2 text-sm leading-relaxed text-slate-300">Mô tả điều bạn muốn thiết lập, UniLife sẽ giúp điền vào website.</p>
-                    <p class="mt-2 text-xs text-slate-500">Trợ lý cấu hình mục tiêu, lịch và sở thích; không trả lời câu hỏi kiến thức chung.</p>
-                  </div>
-                  <div class="flex flex-wrap gap-2" aria-label="Ví dụ thao tác">
-                    <button type="button" onclick="useAssistantExample('Mình muốn đạt 95 điểm rèn luyện.')" class="min-h-9 rounded-xl border border-indigo-400/30 bg-indigo-500/10 px-3 text-xs font-bold text-indigo-200 hover:bg-indigo-500/20">Đặt mục tiêu ĐRL</button>
-                    <button type="button" onclick="useAssistantExample('Thứ 2 hàng tuần mình học từ 7h30 đến 17h30.')" class="min-h-9 rounded-xl border border-blue-400/30 bg-blue-500/10 px-3 text-xs font-bold text-blue-200 hover:bg-blue-500/20">Nhập lịch học</button>
-                    <button type="button" onclick="useAssistantExample('Mình thích hoạt động online và ưu tiên buổi tối.')" class="min-h-9 rounded-xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-3 text-xs font-bold text-fuchsia-200 hover:bg-fuchsia-500/20">Đặt sở thích</button>
-                    <button type="button" onclick="useAssistantExample('Tạo kế hoạch mục tiêu 90 điểm, ưu tiên hoạt động online.')" class="min-h-9 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-3 text-xs font-bold text-cyan-200 hover:bg-cyan-500/20">Tạo kế hoạch</button>
-                  </div>
-                </div>
-                <div class="xl:col-span-8 space-y-3">
-                  <div id="assistantMessages" role="log" aria-live="polite" class="min-h-24 max-h-64 overflow-y-auto rounded-2xl border border-[#223046] bg-[#080d18] p-4 space-y-2 text-sm">
-                    <div class="max-w-[88%] rounded-2xl rounded-bl-md bg-[#162032] px-4 py-3 text-slate-200">Bạn có thể mô tả mục tiêu, lịch bận, thời gian rảnh và sở thích hoạt động.</div>
-                  </div>
-                  <div id="assistantPreview" class="hidden rounded-2xl border border-indigo-400/30 bg-indigo-950/20 p-4 space-y-3"></div>
-                  <form id="assistantForm" onsubmit="submitAssistantMessage(event)" class="flex flex-col sm:flex-row gap-2">
-                    <label for="assistantInput" class="sr-only">Mô tả thiết lập cần thực hiện</label>
-                    <input id="assistantInput" maxlength="2000" autocomplete="off" placeholder="Ví dụ: Thứ 3 hàng tuần mình rảnh từ 16h30 đến 18h..." class="min-h-11 flex-1 rounded-xl border border-[#2b3a54] bg-[#080d18] px-4 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 outline-none" />
-                    <button id="assistantSendButton" type="submit" class="min-h-11 rounded-xl bg-indigo-600 px-5 text-sm font-extrabold text-white hover:bg-indigo-500 disabled:opacity-50">Gửi</button>
-                  </form>
-                  <div id="assistantStatus" aria-live="polite" class="min-h-5 text-xs text-slate-500"></div>
-                </div>
-              </div>
-            </section>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4">
               <article class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 shadow-lg shadow-black/10">
@@ -1397,7 +1367,7 @@
             <!-- Header Row -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#1b2537]">
               <div class="flex flex-wrap items-center gap-2.5">
-                <h2 class="text-xl font-extrabold text-white tracking-tight">Kế hoạch Rèn luyện Cá nhân <span class="dev-only font-mono text-sm text-indigo-300 font-normal">(SP3)</span></h2>
+                <h2 class="text-xl font-extrabold text-white tracking-tight">Hồ sơ & Lịch <span class="dev-only font-mono text-sm text-indigo-300 font-normal">(SP3)</span></h2>
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">
                   Planner
                 </span>
@@ -1427,12 +1397,27 @@
               <span><b class="text-slate-300">Bản đề xuất tham khảo.</b> Điểm chỉ được ghi nhận sau khi nhà trường xác nhận.</span><span id="planDisclosureSource" class="dev-only font-mono text-amber-300">DEMO_ONLY · official_award_verified: false · SYNTHETIC-DEMO</span><span id="planRealSourceNote" class="hidden text-sky-300">Đang dùng kho bài thật (hoạt động từ bài đăng thật, sinh viên giả lập, mốc ngày 01/10/2026).</span>
             </div>
 
+            <nav class="grid grid-cols-1 gap-2 sm:grid-cols-3" aria-label="Hồ sơ và lịch">
+              <button type="button" onclick="document.getElementById('studentProfileSection').scrollIntoView({behavior:'smooth'})" class="rounded-xl border border-indigo-500/30 bg-indigo-950/20 px-4 py-3 text-left"><span class="block text-sm font-extrabold text-white">Hồ sơ sinh viên</span><span class="text-xs text-slate-400">Thông tin, mục tiêu và AI chỉnh sửa</span></button>
+              <button type="button" onclick="document.getElementById('personalScheduleSection').scrollIntoView({behavior:'smooth'})" class="rounded-xl border border-sky-500/30 bg-sky-950/20 px-4 py-3 text-left"><span class="block text-sm font-extrabold text-white">Lịch cá nhân</span><span class="text-xs text-slate-400">Lịch tuần và ngoại lệ</span></button>
+              <button type="button" onclick="document.getElementById('smartPlanSection').scrollIntoView({behavior:'smooth'})" class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 px-4 py-3 text-left"><span class="block text-sm font-extrabold text-white">Kế hoạch thông minh</span><span class="text-xs text-slate-400">Các phương án và lịch đề xuất</span></button>
+            </nav>
+
+            <section id="studentProfileSection" class="rounded-2xl border border-[#2b3a54] bg-[#080d18] p-4 lg:p-5 space-y-4">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div><h3 class="text-base font-extrabold text-white">Hồ sơ sinh viên</h3><p class="text-xs text-slate-400">Một nguồn dữ liệu đã xác nhận cho onboarding, chỉnh sửa và lập kế hoạch.</p></div><span id="profileConfirmedBadge" class="rounded-full border border-emerald-500/30 bg-emerald-950/30 px-3 py-1 text-xs font-bold text-emerald-300">Đã lưu trên trình duyệt</span></div>
+              <div class="grid gap-3 sm:grid-cols-3"><label class="text-xs text-slate-400">Họ tên<input id="profileFullName" oninput="updateProfileManual()" class="mt-1 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2 text-white" /></label><label class="text-xs text-slate-400">Lớp<input id="profileClass" oninput="updateProfileManual()" class="mt-1 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2 text-white" /></label><label class="text-xs text-slate-400">Ngành<input id="profileMajor" oninput="updateProfileManual()" class="mt-1 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2 text-white" /></label></div>
+              <div class="grid gap-3 sm:grid-cols-2"><label class="text-xs text-slate-400">Mục tiêu ĐRL<input id="profileDrlTarget" type="number" min="0" max="100" oninput="updateProfileManual()" class="mt-1 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2 text-white" /></label><label class="text-xs text-slate-400">Giới hạn tham gia mỗi tuần (giờ, tùy chọn)<input id="profileWeeklyHours" type="number" min="0.5" max="168" step="0.5" oninput="updateProfileManual()" class="mt-1 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2 text-white" /></label></div>
+              <div><h4 class="text-xs font-extrabold uppercase tracking-wide text-slate-400">Điểm hiện có</h4><div id="profileScoresSummary" class="mt-2 grid gap-2 sm:grid-cols-5"></div></div>
+              <div class="rounded-xl border border-[#2b3a54] bg-[#0e1524] p-3"><h4 class="text-xs font-extrabold uppercase tracking-wide text-slate-400">Nguyện vọng đã xác nhận</h4><div id="profilePreferenceSummary" class="mt-1 text-xs text-slate-300">Chưa có nguyện vọng đã xác nhận.</div></div>
+              <details class="rounded-xl border border-violet-500/30 bg-violet-950/15 p-4"><summary class="cursor-pointer text-sm font-extrabold text-violet-200">AI chỉnh sửa hồ sơ</summary><p class="mt-2 text-xs text-slate-400">Mô tả một thay đổi. UniLife luôn hiển thị cũ → mới trước khi lưu.</p><form onsubmit="submitProfileAssistantMessage(event, 'profile')" class="mt-3 flex flex-col gap-2 sm:flex-row"><input id="profileAiInput" maxlength="2000" class="min-h-11 flex-1 rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 text-sm text-white" placeholder="Đổi mục tiêu của mình thành 90 điểm" /><button class="rounded-xl bg-violet-600 px-5 py-2 text-sm font-bold">Phân tích</button></form><div id="profileAiPreview" class="mt-3 hidden rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs"></div></details>
+            </section>
+
             <!-- Stepper 3 Bước Hành Trình (Kế hoạch ban đầu -> Khi lịch thay đổi -> Khi bỏ hoạt động) -->
             <div id="planStepper" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5"></div>
 
             <!-- Day 4: AI-assisted preference review. AI output is never sent
                  to the planner until the student explicitly confirms it. -->
-            <section class="rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-4 lg:p-5 space-y-4" aria-labelledby="preferenceAssistantTitle">
+            <section class="hidden rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-4 lg:p-5 space-y-4" aria-labelledby="preferenceAssistantTitle">
               <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
                 <div>
                   <div class="flex flex-wrap items-center gap-2">
@@ -1510,7 +1495,7 @@
             </section>
 
             <!-- Horizontal Goal & Schedule Setting Bar -->
-            <div class="bg-[#080d18] rounded-xl border border-[#1b2537] p-4 lg:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+            <div id="personalScheduleSection" class="bg-[#080d18] rounded-xl border border-[#1b2537] p-4 lg:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
               
               <!-- Left: Target Selector -->
               <div class="flex flex-wrap items-center gap-3">
@@ -1559,12 +1544,14 @@
                       <p class="sm:hidden text-[11px] text-indigo-300 mb-2">Kéo ngang để xem đủ 7 ngày.</p>
                       <div id="availabilityPickerGrid" class="min-w-[650px]"></div>
                     </div>
+                    <div class="rounded-xl border border-[#223046] bg-[#080d18] p-3 space-y-3"><span class="text-xs font-extrabold text-white">Thêm quy tắc hằng tuần</span><div class="grid grid-cols-2 gap-2 sm:grid-cols-[100px_100px_1fr_1fr_auto]"><select id="profileRuleKind" class="min-h-10 rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 text-xs"><option value="busy">Bận</option><option value="available">Rảnh</option></select><select id="profileRuleWeekday" class="min-h-10 rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 text-xs"><option value="0">Thứ Hai</option><option value="1">Thứ Ba</option><option value="2">Thứ Tư</option><option value="3">Thứ Năm</option><option value="4">Thứ Sáu</option><option value="5">Thứ Bảy</option><option value="6">Chủ nhật</option></select><input id="profileRuleStart" type="time" aria-label="Bắt đầu quy tắc tuần" class="min-h-10 rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 text-xs" /><input id="profileRuleEnd" type="time" aria-label="Kết thúc quy tắc tuần" class="min-h-10 rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 text-xs" /><button type="button" onclick="addProfileWeeklyInterval()" class="min-h-10 rounded-lg bg-sky-600 px-3 text-xs font-bold">Thêm</button></div></div>
                     <div class="rounded-xl border border-[#223046] bg-[#080d18] p-3 space-y-3">
                       <div>
-                        <span class="text-xs font-extrabold text-white">Thêm giờ bận chính xác</span>
-                        <span class="text-[11px] text-slate-500 block">Dùng khi lịch học hoặc việc riêng không trùng trọn một buổi.</span>
+                        <span class="text-xs font-extrabold text-white">Thêm ngoại lệ ngày cụ thể</span>
+                        <span class="text-[11px] text-slate-500 block">Ghi nhận một khoảng bận hoặc rảnh chính xác; ngoại lệ rảnh sẽ thay lịch mặc định của ngày đó.</span>
                       </div>
-                      <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2 items-end">
+                      <div class="grid grid-cols-1 sm:grid-cols-[110px_1fr_1fr_auto] gap-2 items-end">
+                        <label class="text-[11px] text-slate-400">Loại<select id="customIntervalKind" class="mt-1 w-full min-h-10 rounded-lg bg-[#0e1524] border border-[#2b3a54] px-2.5 text-xs text-white"><option value="busy">Bận</option><option value="available">Rảnh</option></select></label>
                         <label class="text-[11px] text-slate-400">Bắt đầu<input id="customBusyStart" type="datetime-local" class="mt-1 w-full min-h-10 rounded-lg bg-[#0e1524] border border-[#2b3a54] px-2.5 text-xs text-white" /></label>
                         <label class="text-[11px] text-slate-400">Kết thúc<input id="customBusyEnd" type="datetime-local" class="mt-1 w-full min-h-10 rounded-lg bg-[#0e1524] border border-[#2b3a54] px-2.5 text-xs text-white" /></label>
                         <button type="button" onclick="addCustomBusyInterval()" class="min-h-10 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white">Thêm</button>
@@ -1604,6 +1591,7 @@
 
             <!-- Active Results Container -->
             <div id="plannerActiveResult" class="hidden space-y-5">
+              <section id="smartPlanSection" class="rounded-2xl border border-emerald-500/30 bg-emerald-950/10 p-4"><div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div><h3 class="font-extrabold text-white">Kế hoạch thông minh</h3><p id="planOptionsMessage" class="text-xs text-slate-400">Chuyển phương án tức thì, không tính lại.</p></div><button id="undoCustomPlanButton" type="button" onclick="undoCustomPlan()" class="hidden rounded-lg border border-amber-500/40 px-3 py-2 text-xs font-bold text-amber-300">Hoàn tác lịch tùy chỉnh</button></div><div id="planOptionsSelector" class="mt-3 grid gap-2 sm:grid-cols-3"></div></section>
 
               <!-- Stale Notice -->
               <div id="planStaleNotice" class="hidden p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-sm text-amber-200">
@@ -1713,6 +1701,45 @@
   <!-- ======================================================================== -->
   <!-- MODAL: ĐĂNG NHẬP / ĐĂNG KÝ TÀI KHOẢN CỤC BỘ                           -->
   <!-- ======================================================================== -->
+  <div id="onboardingWizard" class="hidden fixed inset-0 z-[120] overflow-y-auto bg-[#080d18] text-white" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+    <div class="min-h-full px-4 py-8 sm:px-8">
+      <div class="mx-auto max-w-6xl space-y-6">
+        <header class="flex flex-col gap-4 border-b border-[#223046] pb-6 sm:flex-row sm:items-center sm:justify-between">
+          <div><p class="text-xs font-bold uppercase tracking-[.2em] text-indigo-300">UniLife AI · thiết lập một lần</p><h1 id="onboardingTitle" class="mt-2 text-2xl font-black">Tạo hồ sơ học kỳ của bạn</h1><p class="mt-2 text-sm text-slate-400">Dữ liệu được lưu cho tài khoản này trong trình duyệt hiện tại.</p></div>
+          <div id="onboardingProgress" class="text-sm font-bold text-indigo-300">Bước 1 / 4</div>
+        </header>
+        <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <main class="rounded-3xl border border-[#223046] bg-[#0e1524] p-5 sm:p-7">
+            <section class="onboarding-step space-y-4" data-onboarding-step="1">
+              <div><h2 class="text-xl font-extrabold">1. Thông tin</h2><p class="mt-1 text-sm text-slate-400">Bạn có thể bổ sung hoặc chỉnh sửa sau.</p></div>
+              <div class="grid gap-4 sm:grid-cols-2"><label class="text-xs font-bold text-slate-300 sm:col-span-2">Họ và tên<input id="onboardingFullName" maxlength="100" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3 text-sm text-white" /></label><label class="text-xs font-bold text-slate-300">Lớp<input id="onboardingClass" maxlength="64" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3 text-sm text-white" /></label><label class="text-xs font-bold text-slate-300">Ngành<input id="onboardingMajor" maxlength="100" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3 text-sm text-white" /></label></div>
+            </section>
+            <section class="onboarding-step hidden space-y-4" data-onboarding-step="2">
+              <div><h2 class="text-xl font-extrabold">2. Lịch bận</h2><p class="mt-1 text-sm text-slate-400">Thêm một lịch lặp hằng tuần; các ngoại lệ có thể chỉnh ở Lịch cá nhân.</p></div>
+              <div class="grid gap-3 sm:grid-cols-4"><label class="text-xs text-slate-300">Loại<select id="onboardingIntervalKind" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 py-3"><option value="busy">Bận</option><option value="available">Rảnh rõ ràng</option></select></label><label class="text-xs text-slate-300">Thứ<select id="onboardingWeekday" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 py-3"><option value="0">Thứ Hai</option><option value="1">Thứ Ba</option><option value="2">Thứ Tư</option><option value="3">Thứ Năm</option><option value="4">Thứ Sáu</option><option value="5">Thứ Bảy</option><option value="6">Chủ nhật</option></select></label><label class="text-xs text-slate-300">Từ<input id="onboardingStart" type="time" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 py-3" /></label><label class="text-xs text-slate-300">Đến<input id="onboardingEnd" type="time" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 py-3" /></label></div>
+              <button type="button" onclick="addOnboardingInterval()" class="rounded-xl border border-indigo-500/40 px-4 py-2 text-sm font-bold text-indigo-200">Thêm vào lịch tuần</button><div id="onboardingIntervals" class="space-y-2"></div>
+            </section>
+            <section class="onboarding-step hidden space-y-4" data-onboarding-step="3">
+              <div><h2 class="text-xl font-extrabold">3. Điểm hiện có</h2><p class="mt-1 text-sm text-slate-400">Không biết thì để trống. Chọn đúng nguồn để tránh coi điểm tự khai là đã xác nhận.</p></div>
+              <div id="onboardingScores" class="grid gap-3 sm:grid-cols-2"></div>
+            </section>
+            <section class="onboarding-step hidden space-y-4" data-onboarding-step="4">
+              <div><h2 class="text-xl font-extrabold">4. Mục tiêu</h2><p class="mt-1 text-sm text-slate-400">Kiểm tra lần cuối trước khi lưu hồ sơ.</p></div>
+              <div class="grid gap-4 sm:grid-cols-2"><label class="text-xs font-bold text-slate-300">Mục tiêu ĐRL<input id="onboardingTarget" type="number" min="0" max="100" value="80" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Tối đa hoạt động<input id="onboardingMaxActivities" type="number" min="1" max="20" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Giờ tham gia tối đa/tuần<input id="onboardingWeeklyHours" type="number" min="0.5" max="168" step="0.5" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Nhóm ưu tiên<select id="onboardingCategories" multiple class="mt-1.5 min-h-28 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-2"><option value="C1">C1 · Học tập</option><option value="C2">C2 · Nội quy</option><option value="C3">C3 · Văn hóa</option><option value="C4">C4 · Cộng đồng</option><option value="C5">C5 · Cán bộ/CLB</option></select></label><label class="text-xs font-bold text-slate-300 sm:col-span-2">Sở thích hoạt động<input id="onboardingInterests" placeholder="Ví dụ: tình nguyện, AI" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label></div>
+              <fieldset class="rounded-xl border border-[#2b3a54] p-3"><legend class="px-1 text-xs font-bold text-slate-300">Hình thức và cơ sở ưu tiên</legend><div class="flex flex-wrap gap-4 text-xs text-slate-300"><label><input type="checkbox" name="onboardingMode" value="online" class="mr-1" />Online</label><label><input type="checkbox" name="onboardingMode" value="offline" class="mr-1" />Trực tiếp</label><label><input type="checkbox" name="onboardingMode" value="hybrid" class="mr-1" />Kết hợp</label><label><input type="checkbox" name="onboardingCampus" value="NVC" class="mr-1" />Nguyễn Văn Cừ</label><label><input type="checkbox" name="onboardingCampus" value="DONG_HOA" class="mr-1" />Đông Hòa</label><label><input type="checkbox" name="onboardingCampus" value="ONLINE" class="mr-1" />Online</label></div></fieldset><div id="onboardingReview" class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 text-sm text-slate-300"></div>
+            </section>
+            <div class="mt-7 flex items-center justify-between border-t border-[#223046] pt-5"><button id="onboardingBack" type="button" onclick="changeOnboardingStep(-1)" class="rounded-xl border border-[#2b3a54] px-4 py-2.5 text-sm font-bold text-slate-300">Quay lại</button><button id="onboardingNext" type="button" onclick="changeOnboardingStep(1)" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-extrabold">Tiếp tục</button><button id="onboardingComplete" type="button" onclick="completeOnboarding()" class="hidden rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-extrabold">Xác nhận và lưu</button></div>
+          </main>
+          <aside class="rounded-3xl border border-indigo-500/30 bg-indigo-950/20 p-5">
+            <h2 class="font-extrabold">AI hỗ trợ điền hồ sơ</h2><p class="mt-1 text-xs text-slate-400">AI đề xuất thay đổi; chỉ lưu sau khi bạn xác nhận.</p><div id="onboardingAiMessages" class="mt-4 min-h-32 max-h-64 space-y-2 overflow-y-auto rounded-xl border border-[#223046] bg-[#080d18] p-3 text-xs"><p class="text-slate-300">Hãy mô tả mục tiêu, lịch và sở thích của bạn.</p></div><form class="mt-3 space-y-2" onsubmit="submitProfileAssistantMessage(event, 'onboarding')"><textarea id="onboardingAiInput" maxlength="2000" rows="4" class="w-full rounded-xl border border-[#2b3a54] bg-[#080d18] p-3 text-sm" placeholder="Mình muốn đạt 95 điểm, thứ Hai học 7h30–17h30..."></textarea><button class="w-full rounded-xl bg-violet-600 py-2.5 text-sm font-bold">Phân tích bằng AI</button></form><div id="onboardingAiPreview" class="mt-3 hidden rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs"></div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="smartSwapModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4" onclick="if(event.target===this)this.classList.add('hidden')"><div class="w-full max-w-2xl rounded-2xl border border-[#2b3a54] bg-[#0e1524] p-5"><div class="flex items-center justify-between"><h2 class="text-lg font-extrabold text-white">Hoạt động thay thế</h2><button onclick="document.getElementById('smartSwapModal').classList.add('hidden')" class="text-slate-400">✕</button></div><div id="smartSwapContent" class="mt-4 space-y-3 text-sm text-slate-300"></div></div></div>
+
   <div id="loginModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onclick="if (event.target === this) closeLoginModal()">
     <div class="bg-[#0e1524] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#1b2537] space-y-5" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
       <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
@@ -1816,6 +1843,12 @@
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
       })[ch]);
     }
+    function activityToken(value) {
+      return btoa(unescape(encodeURIComponent(String(value || ""))));
+    }
+    function activityFromToken(value) {
+      return decodeURIComponent(escape(atob(value)));
+    }
     function safeNumber(value) {
       const n = Number(value);
       return Number.isFinite(n) ? n : 0;
@@ -1831,6 +1864,14 @@
     let eventFieldsEditedByUser = false;
     let currentActivityInputMode = "paste";
     let savedActivitiesForStudent = [];
+    let currentProfileDraft = { profile: {}, drl_target: 80, weekly_intervals: [], exceptions: [], preference_patch: {} };
+    let pendingProfileProposal = null;
+    let profileAssistantConversation = [];
+    let onboardingStep = 1;
+    let cachedPlanOptions = [];
+    let selectedPlanOptionIndex = 0;
+    let customPlanBackup = null;
+    let pendingSwapPreview = null;
 
     // Category metadata only. Current scores are loaded from /api/scores, whose
     // baseline is calculated by SP2 from rules marked default_awarded.
@@ -2429,20 +2470,59 @@
       return `unilife_data_${mssv}`;
     }
 
-    function createDefaultLocalUserData(mssv) {
+    function createDefaultLocalUserData(mssv, isNewRegistration = false) {
       return {
+        schema_version: 2,
         student_id: mssv,
+        onboarding_status: isNewRegistration ? "NOT_STARTED" : "COMPLETED",
+        onboarding_step: 1,
+        profile: {
+          profile: { full_name: "", class_name: "", major: "" },
+          drl_target: 80,
+          weekly_intervals: [],
+          exceptions: [],
+          preference_patch: { preferred_topics: [], preferred_categories: [], preferred_modes: [], preferred_campuses: [], max_activities: null, weekly_participation_hours: null }
+        },
+        score_sources: {},
+        canonical_availability: { timezone: "Asia/Ho_Chi_Minh", apply_scope: "SEMESTER_WEEKLY", effective_from: "2026-11-09", effective_until: "2027-03-31", weekly_blocks: [], exceptions: [], busy_intervals: [], weekly_participation_hours: null },
+        manual_busy_intervals: [],
+        unavailable_slots: [],
+        profile_assistant_history: [],
+        confirmed_preference: null,
         category_scores: cloneDefaultScores(),
         default_baseline_total: 0,
         saved_activities: [],
         planner: {
           target_total: 80,
           plan_stages: { first: null, replan: null, whatif: null },
-          current_stage: "first"
+          current_stage: "first",
+          cached_plan_options: [],
+          selected_plan_option: 0,
+          custom_plan_backup: null
         },
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
+    }
+
+    function migrateLocalUserData(mssv, saved) {
+      const defaults = createDefaultLocalUserData(mssv, false);
+      const legacy = !saved.schema_version;
+      const needsMigration = Number(saved.schema_version) !== 2;
+      const migrated = {
+        ...defaults,
+        ...saved,
+        schema_version: 2,
+        student_id: mssv,
+        onboarding_status: legacy ? "COMPLETED" : (["NOT_STARTED", "IN_PROGRESS", "COMPLETED"].includes(saved.onboarding_status) ? saved.onboarding_status : "COMPLETED"),
+        profile: { ...defaults.profile, ...(saved.profile || {}), profile: { ...defaults.profile.profile, ...(saved.profile?.profile || {}) } },
+        canonical_availability: { ...defaults.canonical_availability, ...(saved.canonical_availability || {}) },
+        category_scores: saved.category_scores || defaults.category_scores,
+        saved_activities: Array.isArray(saved.saved_activities) ? saved.saved_activities : [],
+        planner: { ...defaults.planner, ...(saved.planner || {}) }
+      };
+      if (needsMigration) localStorage.setItem(localUserDataKey(mssv), JSON.stringify(migrated));
+      return migrated;
     }
 
     function readLocalUserData(mssv) {
@@ -2456,15 +2536,294 @@
       if (!saved || typeof saved !== "object" || Array.isArray(saved)) {
         throw new Error(`Dữ liệu tài khoản ${mssv} trong trình duyệt không hợp lệ.`);
       }
-      const defaults = createDefaultLocalUserData(mssv);
-      return {
-        ...defaults,
-        ...saved,
-        student_id: mssv,
-        category_scores: saved.category_scores || defaults.category_scores,
-        saved_activities: Array.isArray(saved.saved_activities) ? saved.saved_activities : [],
-        planner: { ...defaults.planner, ...(saved.planner || {}) }
+      return migrateLocalUserData(mssv, saved);
+    }
+
+    function maybeStartOnboarding() {
+      if (!currentStudent?.student_id) return false;
+      const data = readLocalUserData(currentStudent.student_id);
+      if (data.onboarding_status === "COMPLETED") return false;
+      data.onboarding_status = "IN_PROGRESS";
+      onboardingStep = Math.max(1, Math.min(4, Number(data.onboarding_step || 1)));
+      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      document.getElementById("onboardingFullName").value = currentProfileDraft.profile.full_name || currentStudent.full_name || "";
+      document.getElementById("onboardingClass").value = currentProfileDraft.profile.class_name || "";
+      document.getElementById("onboardingMajor").value = currentProfileDraft.profile.major || "";
+      document.getElementById("onboardingTarget").value = currentProfileDraft.drl_target ?? 80;
+      document.getElementById("onboardingMaxActivities").value = currentProfileDraft.preference_patch?.max_activities || "";
+      document.getElementById("onboardingWeeklyHours").value = currentProfileDraft.preference_patch?.weekly_participation_hours || "";
+      document.getElementById("onboardingInterests").value = (currentProfileDraft.preference_patch?.preferred_topics || []).join(", ");
+      const categories = new Set(currentProfileDraft.preference_patch?.preferred_categories || []);
+      [...document.getElementById("onboardingCategories").options].forEach(option => { option.selected = categories.has(option.value); });
+      const modes = new Set(currentProfileDraft.preference_patch?.preferred_modes || []);
+      document.querySelectorAll('input[name="onboardingMode"]').forEach(input => { input.checked = modes.has(input.value); });
+      const campuses = new Set(currentProfileDraft.preference_patch?.preferred_campuses || []);
+      document.querySelectorAll('input[name="onboardingCampus"]').forEach(input => { input.checked = campuses.has(input.value); });
+      renderOnboardingScores(data.score_sources || {});
+      renderOnboardingIntervals();
+      renderOnboardingStep();
+      document.getElementById("onboardingWizard").classList.remove("hidden");
+      return true;
+    }
+
+    function renderOnboardingScores(scoreSources = {}) {
+      const box = document.getElementById("onboardingScores");
+      if (!box) return;
+      box.innerHTML = Object.keys(DEFAULT_SCORES_TEMPLATE).map(category => {
+        const profileScore = currentProfileDraft.scores?.[category];
+        const storedValue = profileScore ? profileScore.value : scoreSources[category]?.value;
+        const rawValue = Number(storedValue);
+        const value = storedValue !== null && storedValue !== '' && Number.isFinite(rawValue) ? Math.max(0, Math.min(DEFAULT_SCORES_TEMPLATE[category].max, rawValue)) : '';
+        const proposedSource = profileScore ? profileScore.source : scoreSources[category]?.source;
+        const source = ['unknown', 'self_reported', 'confirmed'].includes(proposedSource) ? proposedSource : 'unknown';
+        return `<div class="rounded-xl border border-[#2b3a54] bg-[#080d18] p-3"><label class="text-xs font-bold text-slate-300">${category}<input id="onboardingScore${category}" type="number" min="0" max="${DEFAULT_SCORES_TEMPLATE[category].max}" value="${value}" class="mt-1.5 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2" /></label><select id="onboardingScoreSource${category}" class="mt-2 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 py-2 text-xs"><option value="unknown">Chưa biết</option><option value="self_reported" ${source === 'self_reported' ? 'selected' : ''}>Tự khai</option><option value="confirmed" ${source === 'confirmed' ? 'selected' : ''}>Đã xác nhận</option></select></div>`;
+      }).join("");
+    }
+
+    function saveOnboardingStep() {
+      if (!currentStudent?.student_id) return;
+      currentProfileDraft.profile = {
+        full_name: document.getElementById("onboardingFullName").value.trim(),
+        class_name: document.getElementById("onboardingClass").value.trim(),
+        major: document.getElementById("onboardingMajor").value.trim()
       };
+      currentProfileDraft.drl_target = Math.max(0, Math.min(100, Number(document.getElementById("onboardingTarget").value || 80)));
+      currentProfileDraft.preference_patch = currentProfileDraft.preference_patch || {};
+      currentProfileDraft.preference_patch.max_activities = Number(document.getElementById("onboardingMaxActivities").value) || null;
+      currentProfileDraft.preference_patch.weekly_participation_hours = Number(document.getElementById("onboardingWeeklyHours").value) || null;
+      currentProfileDraft.preference_patch.preferred_topics = document.getElementById("onboardingInterests").value.split(",").map(value => value.trim()).filter(Boolean);
+      currentProfileDraft.preference_patch.preferred_categories = [...document.getElementById("onboardingCategories").selectedOptions].map(option => option.value);
+      currentProfileDraft.preference_patch.preferred_modes = [...document.querySelectorAll('input[name="onboardingMode"]:checked')].map(input => input.value);
+      currentProfileDraft.preference_patch.preferred_campuses = [...document.querySelectorAll('input[name="onboardingCampus"]:checked')].map(input => input.value);
+      const data = readLocalUserData(currentStudent.student_id);
+      data.onboarding_status = "IN_PROGRESS";
+      data.onboarding_step = onboardingStep;
+      const scoreSources = Object.fromEntries(Object.keys(DEFAULT_SCORES_TEMPLATE).map(category => {
+        const raw = document.getElementById(`onboardingScore${category}`)?.value;
+        return [category, { value: raw === "" ? null : Number(raw), source: document.getElementById(`onboardingScoreSource${category}`)?.value || "unknown" }];
+      }));
+      currentProfileDraft.scores = JSON.parse(JSON.stringify(scoreSources));
+      data.profile = JSON.parse(JSON.stringify(currentProfileDraft));
+      data.score_sources = scoreSources;
+      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+    }
+
+    function changeOnboardingStep(direction) {
+      saveOnboardingStep();
+      onboardingStep = Math.max(1, Math.min(4, onboardingStep + direction));
+      const data = readLocalUserData(currentStudent.student_id);
+      data.onboarding_step = onboardingStep;
+      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      renderOnboardingStep();
+    }
+
+    function renderOnboardingStep() {
+      document.querySelectorAll(".onboarding-step").forEach(section => section.classList.toggle("hidden", Number(section.dataset.onboardingStep) !== onboardingStep));
+      document.getElementById("onboardingProgress").textContent = `Bước ${onboardingStep} / 4`;
+      document.getElementById("onboardingBack").classList.toggle("invisible", onboardingStep === 1);
+      document.getElementById("onboardingNext").classList.toggle("hidden", onboardingStep === 4);
+      document.getElementById("onboardingComplete").classList.toggle("hidden", onboardingStep !== 4);
+      if (onboardingStep === 4) {
+        const knownScores = Object.values(currentProfileDraft.scores || {}).filter(score => score.value != null && score.source !== "unknown").length;
+        const patch = currentProfileDraft.preference_patch || {};
+        const preferences = [...(patch.preferred_topics || []), ...(patch.preferred_categories || []), ...(patch.preferred_modes || []), ...(patch.preferred_campuses || [])];
+        document.getElementById("onboardingReview").innerHTML = `<b>${escapeHTML(currentProfileDraft.profile.full_name || "Chưa có tên")}</b><br>Mục tiêu: ${Number(document.getElementById("onboardingTarget").value || 80)} điểm · ${currentProfileDraft.weekly_intervals.length} quy tắc tuần · ${(currentProfileDraft.exceptions || []).length} ngoại lệ · ${knownScores} nhóm điểm có nguồn.<br><span class="text-slate-400">Ưu tiên: ${escapeHTML(preferences.join(", ") || "chưa chọn")}. Mọi giá trị AI đề xuất đều cần được xác nhận trước khi lưu.</span>`;
+      }
+    }
+
+    function addOnboardingInterval() {
+      const start = document.getElementById("onboardingStart").value;
+      const end = document.getElementById("onboardingEnd").value;
+      if (!start || !end || start >= end) return;
+      currentProfileDraft.weekly_intervals.push({ kind: document.getElementById("onboardingIntervalKind").value, weekday: Number(document.getElementById("onboardingWeekday").value), start, end, recurrence: "weekly", source: "manual", confirmed: false });
+      renderOnboardingIntervals();
+    }
+
+    function renderOnboardingIntervals() {
+      const box = document.getElementById("onboardingIntervals");
+      if (!box) return;
+      box.innerHTML = currentProfileDraft.weekly_intervals.map((item, index) => `<div class="flex items-center justify-between rounded-lg border border-[#2b3a54] px-3 py-2 text-xs"><span>${item.kind === 'busy' ? 'Bận' : 'Rảnh'} · ${AVAILABILITY_DAYS[item.weekday]} · ${item.start}–${item.end} · hằng tuần</span><button type="button" onclick="currentProfileDraft.weekly_intervals.splice(${index},1);renderOnboardingIntervals()" class="text-rose-300">Xóa</button></div>`).join("") || '<p class="text-xs text-slate-500">Chưa thêm lịch tuần; bạn có thể bỏ qua và nhập thủ công sau.</p>';
+    }
+
+    async function completeOnboarding() {
+      saveOnboardingStep();
+      if (!currentProfileDraft.profile.full_name) return;
+      currentProfileDraft.weekly_intervals = (currentProfileDraft.weekly_intervals || []).map(item => ({ ...item, confirmed: true }));
+      currentProfileDraft.exceptions = (currentProfileDraft.exceptions || []).map(item => ({ ...item, confirmed: true }));
+      const data = readLocalUserData(currentStudent.student_id);
+      data.profile = JSON.parse(JSON.stringify(currentProfileDraft));
+      data.onboarding_status = "COMPLETED";
+      data.onboarding_step = 4;
+      data.canonical_availability = buildCanonicalAvailability();
+      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      await persistOnboardingPreference();
+      currentStudent.full_name = currentProfileDraft.profile.full_name;
+      document.getElementById("onboardingWizard").classList.add("hidden");
+      renderProfileWorkspace();
+      await applyCurrentStudent(currentStudent);
+      showWorkspace("plan");
+    }
+
+    async function persistOnboardingPreference() {
+      const patch = currentProfileDraft.preference_patch || {};
+      const pieces = [];
+      if ((patch.preferred_topics || []).length) pieces.push(`Mình thích ${(patch.preferred_topics || []).join(', ')}`);
+      if ((patch.preferred_modes || []).length) pieces.push(`ưu tiên ${(patch.preferred_modes || []).join(', ')}`);
+      if ((patch.preferred_categories || []).length) pieces.push(`ưu tiên nhóm ${(patch.preferred_categories || []).join(', ')}`);
+      if ((patch.preferred_campuses || []).length) pieces.push(`ưu tiên cơ sở ${(patch.preferred_campuses || []).join(', ')}`);
+      if (patch.max_activities) pieces.push(`tối đa ${patch.max_activities} hoạt động`);
+      if (!currentStudent?.student_id) return;
+      let resolvedPreference = {
+        topic_preferences: [],
+        category_priorities: (patch.preferred_categories || []).map(category_id => ({ category_id, weight: 5 })),
+        campus_preferences: (patch.preferred_campuses || []).map(campus_id => ({ campus_id, weight: 5 })),
+        mode_preferences: (patch.preferred_modes || []).map(mode => ({ mode, weight: 5 })),
+        time_preferences: [],
+        limits: { max_activities: patch.max_activities || null, max_duration_minutes: null, max_fee: null },
+        hard_exclusions: { campus_ids: [], modes: [], time_slots: [] },
+        strategy: "BALANCED"
+      };
+      try {
+        if (pieces.length) {
+          const interpreted = await fetch(`${API_BASE}/api/preferences/interpret`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: pieces.join('; ') }) });
+          const payload = await interpreted.json();
+          if (!interpreted.ok || !payload.preference) throw new Error(payload.detail?.message || 'AI không thể chuẩn hóa nguyện vọng.');
+          resolvedPreference = payload.preference;
+        }
+      } catch (error) {
+        const preview = document.getElementById("onboardingAiPreview");
+        if (preview) {
+          preview.classList.remove("hidden");
+          preview.innerHTML = `<span class="text-amber-300">${escapeHTML(error.message)} Các lựa chọn cấu trúc vẫn được lưu cục bộ; sở thích văn bản có thể chỉnh lại sau.</span>`;
+        }
+      }
+      confirmedPreference = JSON.parse(JSON.stringify(resolvedPreference));
+      preferenceDraft = JSON.parse(JSON.stringify(resolvedPreference));
+      persistCurrentUserData();
+      try {
+        await fetch(`${API_BASE}/api/preferences/confirmed`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ student_id: currentStudent.student_id, confirmed: true, preference: resolvedPreference, source_text: pieces.join('; ') || null }) });
+      } catch (_) { /* The browser-local confirmed preference remains available. */ }
+    }
+
+    function renderProfileWorkspace() {
+      const fields = { profileFullName: currentProfileDraft.profile?.full_name, profileClass: currentProfileDraft.profile?.class_name, profileMajor: currentProfileDraft.profile?.major };
+      Object.entries(fields).forEach(([id, value]) => { const input = document.getElementById(id); if (input) input.value = value || ""; });
+      const target = document.getElementById("profileDrlTarget");
+      const weeklyHours = document.getElementById("profileWeeklyHours");
+      if (target) target.value = currentProfileDraft.drl_target ?? 80;
+      if (weeklyHours) weeklyHours.value = currentProfileDraft.preference_patch?.weekly_participation_hours ?? "";
+      const scoreBox = document.getElementById("profileScoresSummary");
+      if (scoreBox) {
+        const sourceLabels = { confirmed: "Đã xác nhận", self_reported: "Tự khai", unknown: "Chưa biết" };
+        scoreBox.innerHTML = Object.keys(DEFAULT_SCORES_TEMPLATE).map(category => {
+          const score = currentProfileDraft.scores?.[category] || { value: null, source: "unknown" };
+          return `<div class="rounded-lg border border-[#2b3a54] p-2"><b class="text-white">${category}: ${score.value == null ? "—" : escapeHTML(score.value)}</b><span class="mt-1 block text-[10px] text-slate-500">${sourceLabels[score.source] || sourceLabels.unknown}</span></div>`;
+        }).join("");
+      }
+      renderConfirmedPreferenceSummary();
+    }
+
+    function updateProfileManual() {
+      currentProfileDraft.profile = { full_name: document.getElementById("profileFullName")?.value.trim() || "", class_name: document.getElementById("profileClass")?.value.trim() || "", major: document.getElementById("profileMajor")?.value.trim() || "" };
+      currentProfileDraft.drl_target = Math.max(0, Math.min(100, Number(document.getElementById("profileDrlTarget")?.value || 80)));
+      currentProfileDraft.preference_patch = currentProfileDraft.preference_patch || {};
+      const weeklyHours = Number(document.getElementById("profileWeeklyHours")?.value);
+      currentProfileDraft.preference_patch.weekly_participation_hours = Number.isFinite(weeklyHours) && weeklyHours > 0 ? weeklyHours : null;
+      const plannerTarget = document.getElementById("inputPlanTarget");
+      const targetBadge = document.getElementById("targetEchoBadge");
+      if (plannerTarget) plannerTarget.value = currentProfileDraft.drl_target;
+      if (targetBadge) targetBadge.textContent = `${currentProfileDraft.drl_target} / 100đ`;
+      markPlanStale();
+      persistCurrentUserData();
+    }
+
+    function renderConfirmedPreferenceSummary() {
+      const box = document.getElementById("profilePreferenceSummary");
+      if (!box) return;
+      if (!confirmedPreference) {
+        box.textContent = "Chưa có nguyện vọng đã xác nhận.";
+        return;
+      }
+      const labels = [];
+      const addValues = (items, key) => (items || []).forEach(item => labels.push(`${item[key]} (ưu tiên ${item.weight})`));
+      addValues(confirmedPreference.topic_preferences, "topic_id");
+      addValues(confirmedPreference.category_priorities, "category_id");
+      addValues(confirmedPreference.mode_preferences, "mode");
+      addValues(confirmedPreference.campus_preferences, "campus_id");
+      box.textContent = labels.join(" · ") || "Đã xác nhận; không có ưu tiên cụ thể.";
+    }
+
+    async function submitProfileAssistantMessage(event, source) {
+      event.preventDefault();
+      const input = document.getElementById(source === "onboarding" ? "onboardingAiInput" : "profileAiInput");
+      const preview = document.getElementById(source === "onboarding" ? "onboardingAiPreview" : "profileAiPreview");
+      const message = input?.value.trim();
+      if (!message || !preview) return;
+      const studentId = currentStudent?.student_id;
+      const requestGeneration = plannerRequestGeneration;
+      preview.classList.remove("hidden");
+      preview.textContent = "Đang phân tích bằng Ollama…";
+      try {
+        const response = await fetch(`${API_BASE}/api/profile-assistant/interpret`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message, draft: currentProfileDraft, conversation: profileAssistantConversation }) });
+        const data = await response.json().catch(() => ({}));
+        if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
+        if (!response.ok) throw new Error(data.detail?.message || data.detail || "AI chưa sẵn sàng; hãy chỉnh thủ công.");
+        profileAssistantConversation.push({ role: "user", content: message });
+        if (data.questions?.length && !data.changes?.length) {
+          profileAssistantConversation.push({ role: "assistant", content: data.questions.join(" ") });
+          preview.innerHTML = `<b>Cần làm rõ:</b> ${escapeHTML(data.questions.join(" "))}`;
+          return;
+        }
+        pendingProfileProposal = { source, draft: data.proposed_draft, changes: data.changes || [] };
+        preview.innerHTML = `<div class="space-y-2"><b class="text-amber-200">Thay đổi đề xuất (chưa lưu)</b>${pendingProfileProposal.changes.map(change => `<div>${escapeHTML(change.field)}: <span class="text-slate-500">${escapeHTML(JSON.stringify(change.old))}</span> → <span class="text-emerald-300">${escapeHTML(JSON.stringify(change.new))}</span></div>`).join("")}<button type="button" onclick="confirmProfileProposal()" class="mt-2 rounded-lg bg-emerald-600 px-3 py-2 font-bold text-white">Xác nhận thay đổi</button></div>`;
+      } catch (error) {
+        preview.innerHTML = `<span class="text-rose-300">${escapeHTML(error.message)} Dữ liệu chưa thay đổi; bạn vẫn có thể nhập thủ công.</span>`;
+      }
+    }
+
+    function confirmProfileProposal() {
+      if (!pendingProfileProposal) return;
+      const source = pendingProfileProposal.source;
+      const changes = pendingProfileProposal.changes || [];
+      currentProfileDraft = JSON.parse(JSON.stringify(pendingProfileProposal.draft));
+      currentProfileDraft.weekly_intervals = (currentProfileDraft.weekly_intervals || []).map(item => ({ ...item, confirmed: true }));
+      currentProfileDraft.exceptions = (currentProfileDraft.exceptions || []).map(item => ({ ...item, confirmed: true }));
+      const preview = document.getElementById(source === "onboarding" ? "onboardingAiPreview" : "profileAiPreview");
+      if (preview) preview.innerHTML = '<span class="text-emerald-300 font-bold">Đã xác nhận thay đổi.</span>';
+      pendingProfileProposal = null;
+      renderOnboardingIntervals();
+      if (source === "onboarding") renderOnboardingScores(currentProfileDraft.scores || {});
+      renderProfileWorkspace();
+      if (source === "profile" && changes.some(change => change.field === "preference_patch")) {
+        syncConfirmedPreferenceFromProfile();
+      }
+      markPlanStale();
+      persistCurrentUserData();
+    }
+
+    function syncConfirmedPreferenceFromProfile() {
+      const patch = currentProfileDraft.preference_patch || {};
+      const allowedTopics = new Set(["mathematics", "physics", "chemistry", "biology", "computer_science", "foreign_language", "economics_finance", "artificial_intelligence", "technology", "research", "soft_skills", "career", "volunteer", "environment", "culture", "sports", "health", "safety", "civic_education"]);
+      const base = confirmedPreference ? JSON.parse(JSON.stringify(confirmedPreference)) : {
+        topic_preferences: [], category_priorities: [], campus_preferences: [], mode_preferences: [], time_preferences: [],
+        limits: { max_activities: null, max_duration_minutes: null, max_fee: null },
+        hard_exclusions: { campus_ids: [], modes: [], time_slots: [] }, strategy: "BALANCED"
+      };
+      base.topic_preferences = (patch.preferred_topics || []).filter(topic => allowedTopics.has(topic)).map(topic_id => ({ topic_id, weight: 5 }));
+      base.category_priorities = (patch.preferred_categories || []).map(category_id => ({ category_id, weight: 5 }));
+      base.campus_preferences = (patch.preferred_campuses || []).map(campus_id => ({ campus_id, weight: 5 }));
+      base.mode_preferences = (patch.preferred_modes || []).map(mode => ({ mode, weight: 5 }));
+      base.limits = base.limits || { max_activities: null, max_duration_minutes: null, max_fee: null };
+      base.limits.max_activities = patch.max_activities || null;
+      confirmedPreference = base;
+      preferenceDraft = JSON.parse(JSON.stringify(base));
+      renderConfirmedPreferenceSummary();
+      if (currentStudent?.student_id) {
+        fetch(`${API_BASE}/api/preferences/confirmed`, {
+          method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ student_id: currentStudent.student_id, confirmed: true, preference: base, source_text: "AI chỉnh sửa hồ sơ đã được người dùng xác nhận" })
+        }).catch(() => {});
+      }
     }
 
     function persistCurrentUserData() {
@@ -2476,11 +2835,20 @@
       saved.category_scores = JSON.parse(JSON.stringify(studentCategoryScores));
       saved.default_baseline_total = Number(defaultBaselineTotal || 0);
       saved.saved_activities = JSON.parse(JSON.stringify(savedActivitiesForStudent || []));
+      saved.profile = JSON.parse(JSON.stringify(currentProfileDraft));
+      saved.profile_assistant_history = JSON.parse(JSON.stringify(profileAssistantConversation.slice(-20)));
+      saved.confirmed_preference = confirmedPreference ? JSON.parse(JSON.stringify(confirmedPreference)) : null;
+      saved.canonical_availability = buildCanonicalAvailability();
+      saved.manual_busy_intervals = JSON.parse(JSON.stringify(customBusyIntervals));
+      saved.unavailable_slots = [...unavailableAvailabilitySlots];
       saved.planner = {
         ...saved.planner,
         target_total: Number.isFinite(target) ? Math.max(0, Math.min(100, target)) : 80,
         plan_stages: JSON.parse(JSON.stringify(planStages)),
-        current_stage: currentPlanStage
+        current_stage: currentPlanStage,
+        cached_plan_options: JSON.parse(JSON.stringify(cachedPlanOptions)),
+        selected_plan_option: selectedPlanOptionIndex,
+        custom_plan_backup: customPlanBackup ? JSON.parse(JSON.stringify(customPlanBackup)) : null
       };
       saved.updated_at = new Date().toISOString();
       localStorage.setItem(localUserDataKey(mssv), JSON.stringify(saved));
@@ -2607,11 +2975,31 @@
       currentStudent = student;
       await applyCurrentStudent(student);
       closeLoginModal();
+      const needsOnboarding = maybeStartOnboarding();
       const tab = pendingWorkspaceTab;
       const action = pendingWorkspaceAction;
       pendingWorkspaceTab = null;
       pendingWorkspaceAction = null;
-      showWorkspace(tab, action);
+      if (!needsOnboarding) showWorkspace(tab, action);
+    }
+
+    function logoutLocalAccount() {
+      persistCurrentUserData();
+      plannerRequestGeneration++;
+      localStorage.removeItem(CURRENT_USER_KEY);
+      localStorage.removeItem("unilife_student");
+      currentStudent = null;
+      pendingProfileProposal = null;
+      profileAssistantConversation = [];
+      cachedPlanOptions = [];
+      currentPlannerData = null;
+      document.getElementById("onboardingWizard")?.classList.add("hidden");
+      document.getElementById("userDropdown")?.classList.add("hidden");
+      document.getElementById("workspaceApp")?.classList.add("hidden");
+      const landing = document.getElementById("landingPage");
+      landing?.classList.remove("hidden", "landing-leaving");
+      workspaceTransitionStarted = false;
+      openLoginModal("login");
     }
 
     async function loginWithLocalAccount(event) {
@@ -2671,7 +3059,8 @@
           password_algorithm: "PBKDF2-SHA-256",
           created_at: new Date().toISOString()
         };
-        const accountData = createDefaultLocalUserData(mssv);
+        const accountData = createDefaultLocalUserData(mssv, true);
+        accountData.profile.profile.full_name = fullName;
         localStorage.setItem(localUserDataKey(mssv), JSON.stringify(accountData));
         localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify([...users, user]));
         await startLocalSession(user);
@@ -2714,6 +3103,18 @@
       const initials = (st.full_name || "SV").split(" ").slice(-2).map(w => w[0]).join("").toUpperCase();
       document.getElementById("headerAvatar").innerText = initials || "SV";
       const accountData = readLocalUserData(st.student_id);
+      currentProfileDraft = JSON.parse(JSON.stringify(accountData.profile));
+      if (!currentProfileDraft.profile.full_name) currentProfileDraft.profile.full_name = st.full_name || "";
+      profileAssistantConversation = Array.isArray(accountData.profile_assistant_history) ? accountData.profile_assistant_history : [];
+      pendingProfileProposal = null;
+      preferenceDraft = null;
+      confirmedPreference = null;
+      activePlanPreference = null;
+      customBusyIntervals = Array.isArray(accountData.manual_busy_intervals) ? JSON.parse(JSON.stringify(accountData.manual_busy_intervals)) : [];
+      assistantAvailableIntervals = [];
+      unavailableAvailabilitySlots.clear();
+      (accountData.unavailable_slots || []).forEach(key => unavailableAvailabilitySlots.add(String(key)));
+      renderProfileWorkspace();
       studentCategoryScores = normalizeStoredScores(accountData.category_scores);
       defaultBaselineTotal = Number(accountData.default_baseline_total || 0);
       savedActivitiesForStudent = accountData.saved_activities;
@@ -2725,6 +3126,12 @@
       renderCategoryBars(studentCategoryScores);
       updateResetBaselineButton();
       await loadConfirmedPreferenceForStudent(st.student_id);
+      if (!confirmedPreference && accountData.confirmed_preference) {
+        confirmedPreference = JSON.parse(JSON.stringify(accountData.confirmed_preference));
+        preferenceDraft = JSON.parse(JSON.stringify(accountData.confirmed_preference));
+        renderConfirmedPreferenceSummary();
+        updatePreferenceConfirmButton();
+      }
       restoreLocalPlannerState(accountData);
     }
 
@@ -2746,7 +3153,8 @@
 
     function restoreLocalPlannerState(accountData) {
       const planner = accountData.planner || {};
-      const target = Number.isFinite(Number(planner.target_total)) ? Number(planner.target_total) : 80;
+      const profileTarget = Number(currentProfileDraft?.drl_target);
+      const target = Number.isFinite(profileTarget) ? profileTarget : (Number.isFinite(Number(planner.target_total)) ? Number(planner.target_total) : 80);
       const targetInput = document.getElementById("inputPlanTarget");
       const targetBadge = document.getElementById("targetEchoBadge");
       if (targetInput) targetInput.value = target;
@@ -2762,6 +3170,9 @@
       if (!planStages[currentPlanStage]) currentPlanStage = "first";
       currentPlanTab = "selected";
       currentPlannerData = planStages[currentPlanStage];
+      cachedPlanOptions = Array.isArray(planner.cached_plan_options) ? planner.cached_plan_options : [];
+      selectedPlanOptionIndex = Number.isInteger(planner.selected_plan_option) ? planner.selected_plan_option : 0;
+      customPlanBackup = planner.custom_plan_backup || null;
       planInputsDirty = false;
       planStageError = "";
       if (currentPlannerData) {
@@ -2771,6 +3182,7 @@
         showPlanPanels("empty");
       }
       renderWorkspaceOverview();
+      renderPlanOptionsSelector();
     }
 
     function onToggleDemoMode() {
@@ -3141,6 +3553,9 @@
       num = Math.max(0, Math.min(100, num));
       const badge = document.getElementById('targetEchoBadge');
       if (badge) badge.innerText = `${num} / 100đ`;
+      if (currentProfileDraft) currentProfileDraft.drl_target = num;
+      const profileTarget = document.getElementById('profileDrlTarget');
+      if (profileTarget) profileTarget.value = num;
       markPlanStale();
       persistCurrentUserData();
       renderWorkspaceOverview();
@@ -3326,8 +3741,7 @@
     }
 
     function expandAssistantInterval(interval) {
-      const date = addDaysToIsoDate(availabilityWeekStart, Number(interval.weekday));
-      return { start: `${date}T${interval.start}:00+07:00`, end: `${date}T${interval.end}:00+07:00`, source: 'assistant' };
+      return expandWeeklyProfileIntervals([interval], availabilityWeekStart, addDaysToIsoDate(availabilityWeekStart, 84));
     }
 
     function assistantPreferenceText(draft) {
@@ -3393,8 +3807,8 @@
       assistantAvailableIntervals = [];
       (draft.intervals || []).forEach(interval => {
         const expanded = expandAssistantInterval(interval);
-        if (interval.kind === 'busy') customBusyIntervals.push(expanded);
-        else assistantAvailableIntervals.push(expanded);
+        if (interval.kind === 'busy') customBusyIntervals.push(...expanded);
+        else assistantAvailableIntervals.push(...expanded);
       });
       customBusyIntervals.sort((left, right) => left.start.localeCompare(right.start));
       await applyAssistantPreference(draft);
@@ -3407,14 +3821,48 @@
       assistantAvailableIntervals.splice(index, 1);
       renderAssistantAvailableIntervals();
       markPlanStale();
+      persistCurrentUserData();
     }
 
     function renderAssistantAvailableIntervals() {
       const container = document.getElementById('assistantAvailableSummary');
       if (!container) return;
-      container.innerHTML = assistantAvailableIntervals.length
-        ? `<span class="w-full text-[11px] font-bold text-emerald-300">Thời gian rảnh xác nhận (không chuyển thành lịch bận)</span>` + assistantAvailableIntervals.map((slot, index) => `<span class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-950/30 px-2.5 py-1.5 text-[11px] text-emerald-200 planner-number">${escapeHTML(formatPlanTimeRange(slot.start, slot.end))}<button type="button" onclick="removeAssistantAvailableInterval(${index})" aria-label="Xóa thời gian rảnh" class="h-5 w-5 rounded text-emerald-300 hover:bg-emerald-900/60">×</button></span>`).join('')
-        : '';
+      const weekly = (currentProfileDraft.weekly_intervals || []).map((slot, index) => `<span class="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-950/30 px-2.5 py-1.5 text-[11px] text-sky-200">${slot.kind === 'busy' ? 'Bận' : 'Rảnh'} · ${AVAILABILITY_DAYS[slot.weekday]} · ${escapeHTML(slot.start)}–${escapeHTML(slot.end)} · hằng tuần<button type="button" onclick="removeProfileWeeklyInterval(${index})" aria-label="Xóa quy tắc lịch tuần" class="h-5 w-5 rounded text-sky-300 hover:bg-sky-900/60">×</button></span>`);
+      const exceptions = (currentProfileDraft.exceptions || []).map((slot, index) => `<span class="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/30 bg-violet-950/30 px-2.5 py-1.5 text-[11px] text-violet-200">${slot.kind === 'busy' ? 'Bận' : 'Rảnh'} · ${escapeHTML(slot.date)} · ${escapeHTML(slot.start)}–${escapeHTML(slot.end)}<button type="button" onclick="removeProfileException(${index})" aria-label="Xóa ngoại lệ ngày" class="h-5 w-5 rounded text-violet-300 hover:bg-violet-900/60">×</button></span>`);
+      const legacyAvailable = assistantAvailableIntervals.map((slot, index) => `<span class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-950/30 px-2.5 py-1.5 text-[11px] text-emerald-200 planner-number">${escapeHTML(formatPlanTimeRange(slot.start, slot.end))}<button type="button" onclick="removeAssistantAvailableInterval(${index})" aria-label="Xóa thời gian rảnh" class="h-5 w-5 rounded text-emerald-300 hover:bg-emerald-900/60">×</button></span>`);
+      const rows = [...weekly, ...exceptions, ...legacyAvailable];
+      container.innerHTML = rows.length ? `<span class="w-full text-[11px] font-bold text-sky-300">Quy tắc lặp lại và ngoại lệ đã xác nhận</span>${rows.join('')}` : '';
+    }
+
+    function removeProfileWeeklyInterval(index) {
+      currentProfileDraft.weekly_intervals.splice(index, 1);
+      renderAssistantAvailableIntervals();
+      markPlanStale();
+      persistCurrentUserData();
+    }
+
+    function addProfileWeeklyInterval() {
+      const start = document.getElementById('profileRuleStart')?.value || '';
+      const end = document.getElementById('profileRuleEnd')?.value || '';
+      if (!start || !end || start >= end) {
+        showPreferenceMessage('Giờ kết thúc quy tắc tuần phải sau giờ bắt đầu.', 'error');
+        return;
+      }
+      currentProfileDraft.weekly_intervals = currentProfileDraft.weekly_intervals || [];
+      const interval = { kind: document.getElementById('profileRuleKind')?.value || 'busy', weekday: Number(document.getElementById('profileRuleWeekday')?.value || 0), start, end, recurrence: 'weekly', source: 'manual', confirmed: true };
+      if (!currentProfileDraft.weekly_intervals.some(item => item.kind === interval.kind && item.weekday === interval.weekday && item.start === interval.start && item.end === interval.end)) {
+        currentProfileDraft.weekly_intervals.push(interval);
+      }
+      renderAssistantAvailableIntervals();
+      markPlanStale();
+      persistCurrentUserData();
+    }
+
+    function removeProfileException(index) {
+      currentProfileDraft.exceptions.splice(index, 1);
+      renderAssistantAvailableIntervals();
+      markPlanStale();
+      persistCurrentUserData();
     }
 
     const PLAN_CAT_LABELS = {
@@ -3480,6 +3928,7 @@
       else unavailableAvailabilitySlots.add(key);
       renderAvailabilityPicker();
       markPlanStale();
+      persistCurrentUserData();
     }
 
     function resetAvailabilityPicker() {
@@ -3493,6 +3942,7 @@
       if (end) end.value = '';
       renderAvailabilityPicker();
       markPlanStale();
+      persistCurrentUserData();
     }
 
     function localDateTimeToIso(value) {
@@ -3502,24 +3952,38 @@
     function addCustomBusyInterval() {
       const startInput = document.getElementById('customBusyStart');
       const endInput = document.getElementById('customBusyEnd');
+      const kind = document.getElementById('customIntervalKind')?.value || 'busy';
       const start = localDateTimeToIso(startInput?.value || '');
       const end = localDateTimeToIso(endInput?.value || '');
       if (!start || !end || new Date(end) <= new Date(start)) {
         showPreferenceMessage('Giờ kết thúc của khoảng bận phải sau giờ bắt đầu.', 'error');
         return;
       }
-      customBusyIntervals.push({ start, end });
-      customBusyIntervals.sort((a, b) => a.start.localeCompare(b.start));
+      if (kind === 'available') {
+        const startDate = (startInput?.value || '').slice(0, 10);
+        const endDate = (endInput?.value || '').slice(0, 10);
+        if (!startDate || startDate !== endDate) {
+          showPreferenceMessage('Ngoại lệ rảnh phải bắt đầu và kết thúc trong cùng một ngày.', 'error');
+          return;
+        }
+        currentProfileDraft.exceptions = currentProfileDraft.exceptions || [];
+        currentProfileDraft.exceptions.push({ date: startDate, kind: 'available', start: (startInput.value || '').slice(11, 16), end: (endInput.value || '').slice(11, 16), source: 'manual', confirmed: true });
+      } else {
+        customBusyIntervals.push({ start, end });
+        customBusyIntervals.sort((a, b) => a.start.localeCompare(b.start));
+      }
       if (startInput) startInput.value = '';
       if (endInput) endInput.value = '';
       renderAvailabilityPicker();
       markPlanStale();
+      persistCurrentUserData();
     }
 
     function removeCustomBusyInterval(index) {
       customBusyIntervals.splice(index, 1);
       renderAvailabilityPicker();
       markPlanStale();
+      persistCurrentUserData();
     }
 
     function renderCustomBusySlots() {
@@ -3582,7 +4046,69 @@
         if (!period || !date) return;
         intervals.push({ start: `${date}T${period.start}:00+07:00`, end: `${date}T${period.end}:00+07:00` });
       });
+      intervals.push(...expandWeeklyProfileIntervals(
+        (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'busy'),
+        '2026-11-09',
+        '2027-03-31'
+      ));
+      (currentProfileDraft.exceptions || []).filter(item => item.kind === 'busy').forEach(item => intervals.push({ start: `${item.date}T${item.start}:00+07:00`, end: `${item.date}T${item.end}:00+07:00`, source: 'profile_exception' }));
       return intervals.sort((a, b) => a.start.localeCompare(b.start));
+    }
+
+    function expandWeeklyProfileIntervals(rules, fromDate, untilDate) {
+      const results = [];
+      const cursor = new Date(`${fromDate}T00:00:00+07:00`);
+      const end = new Date(`${untilDate}T23:59:59+07:00`);
+      while (cursor <= end) {
+        const jsDay = cursor.getDay();
+        const weekday = jsDay === 0 ? 6 : jsDay - 1;
+        const date = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
+        rules.filter(rule => Number(rule.weekday) === weekday).forEach(rule => results.push({ start: `${date}T${rule.start}:00+07:00`, end: `${date}T${rule.end}:00+07:00`, source: 'profile_weekly' }));
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      return results;
+    }
+
+    function buildCanonicalAvailability() {
+      const dayNames = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+      const policyDefaultBlocks = dayNames.map(day => ({ day_of_week: day, start_time: '07:00', end_time: '21:00' }));
+      const availableExceptionDays = new Map();
+      (currentProfileDraft.exceptions || []).filter(item => item.kind === 'available').forEach(item => {
+        const blocks = availableExceptionDays.get(item.date) || [];
+        blocks.push({ start_time: item.start, end_time: item.end });
+        availableExceptionDays.set(item.date, blocks);
+      });
+      return {
+        availability_version: 'sp3-availability/0.2',
+        timezone: 'Asia/Ho_Chi_Minh',
+        week_start: AVAILABILITY_DEFAULT_WEEK_START,
+        apply_scope: 'SEMESTER_WEEKLY',
+        effective_from: '2026-11-09',
+        effective_until: '2027-03-31',
+        weekly_blocks: policyDefaultBlocks.concat((currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'available').map(item => ({ day_of_week: dayNames[item.weekday], start_time: item.start, end_time: item.end }))),
+        exceptions: [...availableExceptionDays.entries()].map(([date, blocks]) => ({ date, blocks })),
+        busy_intervals: collectBusyIntervals().map(item => ({ start: item.start, end: item.end })),
+        weekly_participation_hours: currentProfileDraft.preference_patch?.weekly_participation_hours ?? null
+      };
+    }
+
+    function plannerAvailabilityPayload() {
+      const payload = buildCanonicalAvailability();
+      delete payload.weekly_participation_hours;
+      return payload;
+    }
+
+    function plannerPreferencePayload(preference) {
+      const payload = JSON.parse(JSON.stringify(preference));
+      const weeklyHours = Number(currentProfileDraft.preference_patch?.weekly_participation_hours);
+      if (!Number.isFinite(weeklyHours) || weeklyHours <= 0) return payload;
+      const weeklyMinutes = Math.round(weeklyHours * 60);
+      payload.limits = payload.limits || {};
+      const existingLimit = Number(payload.limits.max_duration_minutes);
+      payload.limits.max_duration_minutes = Number.isFinite(existingLimit) && existingLimit > 0
+        ? Math.min(existingLimit, weeklyMinutes)
+        : weeklyMinutes;
+      return payload;
     }
 
     // ---- Day 4: AI preference review and explicit confirmation ----
@@ -3819,6 +4345,7 @@
     async function confirmPreference() {
       if (!preferenceDraft || !document.getElementById('confirmPreferenceCheck')?.checked) return;
       confirmedPreference = JSON.parse(JSON.stringify(preferenceDraft));
+      renderConfirmedPreferenceSummary();
       updatePreferenceConfirmButton();
       const badge = document.getElementById('preferenceConfirmedBadge');
       badge?.classList.add('scale-110', 'ring-2', 'ring-emerald-400/40');
@@ -3858,17 +4385,20 @@
       );
       setPlanButtonLabel('Lập kế hoạch cá nhân hóa');
       markPlanStale();
+      persistCurrentUserData();
     }
 
     function clearPreferenceDraft() {
       preferenceDraft = null;
       confirmedPreference = null;
+      renderConfirmedPreferenceSummary();
       document.getElementById('preferenceReview')?.classList.add('hidden');
       document.getElementById('preferenceConfirmedBadge')?.classList.add('hidden');
       document.getElementById('preferenceMessage')?.classList.add('hidden');
       const box = document.getElementById('preferenceText');
       if (box) box.value = '';
       markPlanStale();
+      persistCurrentUserData();
     }
 
     async function deleteSavedPreference() {
@@ -3893,6 +4423,7 @@
       preferenceDraft = null;
       confirmedPreference = null;
       activePlanPreference = null;
+      renderConfirmedPreferenceSummary();
       persistedPreferenceVersion = null;
       planStages.first = null;
       planStages.replan = null;
@@ -3918,6 +4449,7 @@
         if (textBox) textBox.value = stored.source_text || '';
         renderPreferenceEditor();
         confirmedPreference = JSON.parse(JSON.stringify(stored.preference));
+        renderConfirmedPreferenceSummary();
         persistedPreferenceVersion = stored.preference_version || null;
         const check = document.getElementById('confirmPreferenceCheck');
         if (check) check.checked = true;
@@ -3935,7 +4467,7 @@
       const res = await fetch(`${API_BASE}/api/sp3/personalized/plan${sp3Query()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ confirmed: true, preference, scenario, total_target: targetTotal, busy_intervals: busyIntervals })
+        body: JSON.stringify({ confirmed: true, preference: plannerPreferencePayload(preference), scenario, total_target: targetTotal, busy_intervals: [], availability: plannerAvailabilityPayload() })
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -3943,6 +4475,39 @@
         throw new Error(typeof detail === 'string' ? detail : `Không thể lập kế hoạch cá nhân hóa (mã ${res.status})`);
       }
       return res.json();
+    }
+
+    async function fetchPersonalizedSp3Options(targetTotal, busyIntervals, preference) {
+      const res = await fetch(`${API_BASE}/api/sp3/personalized/options${sp3Query()}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmed: true, preference: plannerPreferencePayload(preference), scenario: 'first_plan', total_target: targetTotal, busy_intervals: [], availability: plannerAvailabilityPayload() })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(typeof data.detail === 'string' ? data.detail : `Không thể tạo các phương án (mã ${res.status})`);
+      return data;
+    }
+
+    function renderPlanOptionsSelector() {
+      const box = document.getElementById('planOptionsSelector');
+      const message = document.getElementById('planOptionsMessage');
+      if (!box) return;
+      const labels = { MINIMUM_EFFORT: 'Ít thời gian', BALANCED: 'Cân bằng', PREFERENCE_FIRST: 'Theo sở thích' };
+      box.innerHTML = cachedPlanOptions.map((option, index) => `<button type="button" onclick="selectCachedPlanOption(${index})" class="rounded-xl border p-3 text-left ${index === selectedPlanOptionIndex ? 'border-emerald-400 bg-emerald-950/30' : 'border-[#2b3a54] bg-[#080d18]'}"><span class="block text-sm font-extrabold text-white">${labels[option.strategy] || option.strategy}</span><span class="mt-1 block text-[11px] text-slate-400">${option.projected_total ?? '—'}đ · ${option.activity_count} hoạt động · ${Math.round((option.duration_minutes || 0) / 60 * 10) / 10} giờ · phù hợp ${option.utility}</span><span class="text-[11px] ${option.target_met ? 'text-emerald-300' : 'text-amber-300'}">${option.target_met ? 'Đạt mục tiêu' : 'Chưa đạt đủ mục tiêu'}</span></button>`).join('');
+      if (message) message.textContent = cachedPlanOptions.length < 3 ? 'Một số chiến lược cho cùng lịch khả thi nên đã được gộp; chuyển phương án không tính lại.' : 'Ba phương án đã lưu; chuyển tức thì không tính lại.';
+    }
+
+    function selectCachedPlanOption(index) {
+      const option = cachedPlanOptions[index];
+      if (!option?.result) return;
+      selectedPlanOptionIndex = index;
+      currentPlannerData = JSON.parse(JSON.stringify(option.result));
+      planStages.first = currentPlannerData;
+      currentPlanStage = 'first';
+      customPlanBackup = null;
+      document.getElementById('undoCustomPlanButton')?.classList.add('hidden');
+      renderPlanOptionsSelector();
+      renderSp3PlanResult();
+      persistCurrentUserData();
     }
 
     async function fetchSp3Plan(scenario, targetTotal, busyIntervals) {
@@ -4004,9 +4569,18 @@
       setPlanButtonLabel('Đang tối ưu lộ trình...');
 
       try {
-        const data = confirmedPreference
-          ? await fetchPersonalizedSp3Plan('first_plan', targetTotal, busyIntervals, confirmedPreference)
-          : await fetchSp3Plan('first_plan', targetTotal, busyIntervals);
+        let data;
+        if (confirmedPreference) {
+          const optionPayload = await fetchPersonalizedSp3Options(targetTotal, busyIntervals, confirmedPreference);
+          cachedPlanOptions = optionPayload.options || [];
+          selectedPlanOptionIndex = Math.max(0, cachedPlanOptions.findIndex(option => option.strategy === confirmedPreference.strategy));
+          data = cachedPlanOptions[selectedPlanOptionIndex]?.result;
+          if (!data) throw new Error('Không có phương án khả thi sau khi áp dụng các ràng buộc.');
+        } else {
+          cachedPlanOptions = [];
+          selectedPlanOptionIndex = 0;
+          data = await fetchSp3Plan('first_plan', targetTotal, busyIntervals);
+        }
         if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
         planStages.first = data;
         planStages.replan = null;
@@ -4018,6 +4592,7 @@
         planInputsDirty = false;
         planStageError = '';
         renderSp3PlanResult();
+        renderPlanOptionsSelector();
         persistCurrentUserData();
       } catch (err) {
         if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
@@ -4444,6 +5019,7 @@
           return `<article class="rounded-xl border border-[#223046] bg-[#080d18] p-3" style="border-left:3px solid ${color.border}">
             <div class="flex items-start justify-between gap-2"><h5 class="text-xs font-extrabold text-white leading-snug planner-copy">${escapeHTML(title)}</h5>${gain ? `<span class="px-2 py-0.5 rounded-md bg-indigo-950/70 text-indigo-300 text-[10px] font-extrabold shrink-0 planner-number">+${gain}đ</span>` : ''}</div>
             <div class="mt-2 space-y-1 text-[11px] text-slate-400">${firstBlock ? `<div class="planner-number">◷ ${escapeHTML(formatPlanTimeRange(firstBlock.start, firstBlock.end))}</div>` : '<div>Thời gian linh hoạt</div>'}${categories ? `<div class="text-slate-500">${escapeHTML(categories)}</div>` : ''}</div>
+            <button type="button" onclick="openActivityAlternatives(activityFromToken('${activityToken(item.activity_id)}'))" class="mt-2 text-[11px] font-bold text-indigo-300 hover:text-indigo-200">Xem hoạt động thay thế</button>
           </article>`;
         }).join('') : '<div class="rounded-xl border border-dashed border-[#2b3a54] p-5 text-center text-xs text-slate-500">Không cần thêm hoạt động để đạt mục tiêu hiện tại.</div>';
       }
@@ -4451,6 +5027,68 @@
       const legend = document.getElementById('planCalendarLegend');
       if (legend) legend.innerHTML = `<span class="inline-flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-indigo-500"></i>Hoạt động đã xếp</span><span class="inline-flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-slate-600"></i>Khung nền trống chưa có hoạt động</span>${weeks.length > 1 ? `<span class="ml-auto text-indigo-300 planner-number">${weeks.indexOf(planCalendarWeekStart) + 1}/${weeks.length} tuần có hoạt động</span>` : ''}`;
       setPlannerResultMode(plannerResultMode);
+    }
+
+    function openActivityAlternatives(activityId) {
+      const modal = document.getElementById('smartSwapModal');
+      const content = document.getElementById('smartSwapContent');
+      if (!modal || !content || !currentPlannerData) return;
+      const selected = new Set((currentPlannerData.plan?.selected_activities || []).map(item => item.activity_id));
+      const candidates = (currentPlannerData.feasibility?.candidates || []).filter(item => item.feasibility?.status === 'FEASIBLE' && !selected.has(item.activity?.activity_id));
+      const utilityByActivity = new Map((currentPlannerData.personalization?.candidate_breakdown || []).map(item => [item.activity_id, item]));
+      content.innerHTML = candidates.length ? candidates.map(item => {
+        const activity = item.activity || {};
+        const schedule = item.schedule || {};
+        const utility = utilityByActivity.get(activity.activity_id) || { utility: 0, matches: [] };
+        const matches = (utility.matches || []).map(match => `${match.dimension}: ${match.value}`).join(', ');
+        const fixed = schedule.fixed_blocks?.[0];
+        const time = fixed ? formatPlanTimeRange(fixed.start, fixed.end) : (schedule.window_start ? `${formatPlanTimeRange(schedule.window_start, schedule.window_end)} · ${schedule.duration_minutes || 0} phút` : 'Thời gian linh hoạt');
+        return `<article class="rounded-xl border border-[#2b3a54] bg-[#080d18] p-3"><div class="flex items-start justify-between gap-3"><div><b class="text-white">${escapeHTML(activity.title || activity.activity_id)}</b><div class="mt-1 text-xs text-slate-400">${escapeHTML(time)} · ${escapeHTML(activity.mode || '')}</div><div class="mt-1 text-[11px] text-violet-300">Phù hợp: ${escapeHTML(utility.utility)}${matches ? ` · ${escapeHTML(matches)}` : ''}. Điểm và tác động sẽ được SP3 tính lại trên toàn kế hoạch.</div></div><button type="button" onclick="previewSmartSwap(activityFromToken('${activityToken(activityId)}'),activityFromToken('${activityToken(activity.activity_id)}'))" class="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white">Chọn</button></div></article>`;
+      }).join('') : '<p class="rounded-xl border border-dashed border-[#2b3a54] p-5 text-center text-slate-500">Không có hoạt động thay thế đủ điều kiện.</p>';
+      modal.classList.remove('hidden');
+    }
+
+    async function previewSmartSwap(removeActivityId, addActivityId) {
+      const content = document.getElementById('smartSwapContent');
+      if (!content || !confirmedPreference) {
+        if (content) content.innerHTML = '<p class="text-amber-300">Hãy xác nhận hồ sơ sở thích trước khi Smart Swap.</p>';
+        return;
+      }
+      content.innerHTML = '<p>Đang kiểm tra khả thi và tính lại toàn bộ điểm dự kiến…</p>';
+      try {
+        const response = await fetch(`${API_BASE}/api/sp3/personalized/swap-preview${sp3Query()}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ confirmed_profile: true, preference: plannerPreferencePayload(confirmedPreference), base_result: currentPlannerData, remove_activity_id: removeActivityId, add_activity_id: addActivityId }) });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.detail || 'Không thể tạo bản xem trước thay thế.');
+        pendingSwapPreview = data;
+        content.innerHTML = `<div class="grid gap-3 sm:grid-cols-2"><div class="rounded-xl border border-[#2b3a54] p-3"><b>Trước</b><div class="mt-2 text-xs">${data.before.projected_total ?? '—'}đ · ${data.before.activity_count} hoạt động · ${data.before.duration_minutes} phút</div></div><div class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3"><b>Sau</b><div class="mt-2 text-xs">${data.after.projected_total ?? '—'}đ · ${data.after.activity_count} hoạt động · ${data.after.duration_minutes} phút</div></div></div><p class="text-xs text-slate-400">Bỏ: ${escapeHTML(data.dropped_activity_ids.join(', ')) || '—'} · Thêm: ${escapeHTML(data.added_activity_ids.join(', ')) || '—'}</p><button type="button" onclick="applySmartSwapPreview()" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white">Xác nhận lưu Lịch tùy chỉnh</button>`;
+      } catch (error) {
+        content.innerHTML = `<p class="text-rose-300">${escapeHTML(error.message)}</p><p class="mt-2 text-xs text-slate-500">Không có thay đổi nào được áp dụng.</p>`;
+      }
+    }
+
+    function applySmartSwapPreview() {
+      if (!pendingSwapPreview?.result) return;
+      customPlanBackup = JSON.parse(JSON.stringify(currentPlannerData));
+      currentPlannerData = JSON.parse(JSON.stringify(pendingSwapPreview.result));
+      currentPlannerData.custom_plan_name = 'Lịch tùy chỉnh';
+      planStages.first = currentPlannerData;
+      currentPlanStage = 'first';
+      pendingSwapPreview = null;
+      document.getElementById('smartSwapModal')?.classList.add('hidden');
+      document.getElementById('undoCustomPlanButton')?.classList.remove('hidden');
+      renderSp3PlanResult();
+      persistCurrentUserData();
+    }
+
+    function undoCustomPlan() {
+      if (!customPlanBackup) return;
+      currentPlannerData = JSON.parse(JSON.stringify(customPlanBackup));
+      planStages.first = currentPlannerData;
+      currentPlanStage = 'first';
+      customPlanBackup = null;
+      document.getElementById('undoCustomPlanButton')?.classList.add('hidden');
+      renderSp3PlanResult();
+      persistCurrentUserData();
     }
 
     // ---- main renderer: draws whichever journey step is currently selected ----
@@ -5431,7 +6069,7 @@
             demo_only: true
           };
           await applyCurrentStudent(currentStudent);
-          showWorkspace();
+          if (!maybeStartOnboarding()) showWorkspace();
         } catch (error) {
           console.error("Could not restore the local UniLife account:", error);
           openLoginModal("login");
