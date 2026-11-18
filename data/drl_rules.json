@@ -114,7 +114,7 @@
       "condition": {
         "field": "semester_gpa",
         "operator": "range",
-        "min_inclusive": 5.0,
+        "min_inclusive": 5,
         "max_exclusive": 6.5
       },
       "points": 5,
@@ -135,7 +135,7 @@
         "field": "semester_gpa",
         "operator": "range",
         "min_inclusive": 6.5,
-        "max_exclusive": 8.0
+        "max_exclusive": 8
       },
       "points": 7,
       "unit": "per_semester",
@@ -154,8 +154,8 @@
       "condition": {
         "field": "semester_gpa",
         "operator": "range",
-        "min_inclusive": 8.0,
-        "max_exclusive": 9.0
+        "min_inclusive": 8,
+        "max_exclusive": 9
       },
       "points": 10,
       "unit": "per_semester",
@@ -174,8 +174,8 @@
       "condition": {
         "field": "semester_gpa",
         "operator": "range",
-        "min_inclusive": 9.0,
-        "max_inclusive": 10.0
+        "min_inclusive": 9,
+        "max_inclusive": 10
       },
       "points": 15,
       "unit": "per_semester",
@@ -461,22 +461,45 @@
     },
     {
       "rule_id": "R23",
-      "criterion_id": "2.3",
+      "criterion_id": "2.2",
       "category_id": "C2",
       "name": "Tham gia các đợt khảo sát, điều tra xã hội",
       "condition": {
-        "field": "social_survey_participation",
-        "operator": "count_greater_than",
-        "value": 0
+        "field": "institutional_social_survey_participation",
+        "operator": "equals",
+        "value": true
       },
       "points": 5,
       "unit": "per_semester",
       "evidence_required": true,
       "source": {
         "document_id": "1028/QD-KHTN-CTSV",
-        "location": "Phụ lục, mục 2.3"
+        "location": "Phụ lục, mục 2.2"
       },
-      "status": "verified"
+      "status": "needs_review",
+      "note": "No independent positive-scoring row for surveys found in QD 1028 appendix section 2; disabled pending school confirmation. Do not reuse course evaluation participation evidence."
+    },
+    {
+      "rule_id": "R2301",
+      "criterion_id": "2.3",
+      "category_id": "C2",
+      "name": "Tham gia khảo sát, lấy ý kiến, điều tra xã hội",
+      "condition": {
+        "field": "institutional_survey_rounds_completed",
+        "operator": "count_greater_than",
+        "value": 0
+      },
+      "points": 5,
+      "unit": "per_activity",
+      "evidence_required": true,
+      "source": {
+        "document_id": "STSV2025",
+        "location": "Sổ tay Sinh viên 2025, tiêu chí 2.3 (+5 điểm mỗi đợt)",
+        "transcribed_in": "docs/Data_Report.md, Part 2.1 (Minh Tri, 2026-11-12)",
+        "page_cited": false
+      },
+      "status": "verified",
+      "verification_note": "Accepted by the SP2 owner (Thao Duyen, 2026-11-14) from the STSV2025 transcription in the collector's data report. Add the handbook page number before the final report. R23 (QD 1028 appendix, section 2.2) stays needs_review because the two documents differ; R2301 carries the survey award, so R23 must not be enabled together with it."
     },
     {
       "rule_id": "R3101",
@@ -720,7 +743,7 @@
       "condition": {
         "field": "officially_selected_international_exchange_delegate",
         "operator": "count_greater_than",
-        "value": 0 
+        "value": 0
       },
       "points": 15,
       "unit": "per_activity",
@@ -892,10 +915,9 @@
       "category_id": "C4",
       "name": "Tình nguyện viên hoạt động cộng đồng trung hạn, từ 24 giờ đến dưới 1 tuần",
       "condition": {
-        "field": "volunteer_hours_per_activity",
-        "operator": "range",
-        "min_inclusive": 24,
-        "max_exclusive": 168
+        "field": "volunteer_duration_bucket",
+        "operator": "equals",
+        "value": "24_hours_to_under_one_week"
       },
       "points": 10,
       "unit": "per_activity",
@@ -904,7 +926,8 @@
         "document_id": "1028/QD-KHTN-CTSV",
         "location": "Phụ lục, mục 4.3"
       },
-      "status": "verified"
+      "status": "verified",
+      "note": "Manual evidence classification of under-one-week tier; never convert one calendar week to 168 verified work hours."
     },
     {
       "rule_id": "R4303",
@@ -914,7 +937,7 @@
       "condition": {
         "field": "volunteer_duration",
         "operator": "greater_than_or_equal",
-        "value": 168
+        "value": "one_week"
       },
       "points": 15,
       "unit": "per_activity",

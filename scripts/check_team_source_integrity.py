@@ -6,8 +6,8 @@ change in the same PR.
 """
 from __future__ import annotations
 
-import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,8 +23,14 @@ def main() -> None:
         if not path.is_file():
             failures.append(f"MISSING {relpath}")
             continue
-        raw = path.read_bytes()
-        digest = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
+        # Ask Git to apply the repository's clean filters before hashing. This
+        # produces the canonical blob ID on both LF (CI) and CRLF (Windows)
+        # checkouts instead of treating line-ending conversion as tampering.
+        digest = subprocess.check_output(
+            ["git", "hash-object", f"--path={relpath}", str(path)],
+            cwd=ROOT,
+            text=True,
+        ).strip()
         if digest != item["blob_sha"]:
             failures.append(f"CHANGED {relpath} expected={item['blob_sha']} actual={digest}")
     print(f"Team source integrity: {len(manifest['files'])-len(failures)}/{len(manifest['files'])} unchanged")

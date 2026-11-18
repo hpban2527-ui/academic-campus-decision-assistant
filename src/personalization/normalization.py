@@ -44,7 +44,13 @@ _MODE_TERMS = {
 }
 
 _TOPIC_TERMS = {
-    TopicId.MATHEMATICS: ("toán", "mathematics"),
+    TopicId.MATHEMATICS: ("toán", "toán học", "mathematics", "math"),
+    TopicId.PHYSICS: ("vật lý", "vật lí", "physics", "lượng tử", "quantum"),
+    TopicId.CHEMISTRY: ("hóa học", "hoá học", "chemistry"),
+    TopicId.BIOLOGY: ("sinh học", "công nghệ sinh học", "biology", "biotech"),
+    TopicId.COMPUTER_SCIENCE: ("tin học", "khoa học máy tính", "công nghệ thông tin", "lập trình", "computer science"),
+    TopicId.FOREIGN_LANGUAGE: ("ngoại ngữ", "tiếng anh", "english", "foreign language"),
+    TopicId.ECONOMICS_FINANCE: ("kinh tế", "tài chính", "economics", "finance"),
     TopicId.ARTIFICIAL_INTELLIGENCE: ("trí tuệ nhân tạo", "ai"),
     TopicId.TECHNOLOGY: ("công nghệ", "technology"),
     TopicId.RESEARCH: ("nghiên cứu", "nckh", "research"),

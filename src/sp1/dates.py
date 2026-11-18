@@ -30,9 +30,14 @@ TZ_SUFFIX = "+07:00"
 DEFAULT_START = (0, 0)
 DEFAULT_END = (23, 59)
 
-# dd/mm[/yyyy] or dd-mm[-yyyy]; not glued to digits, "h" or ":" (avoids "14h00-16h00").
+# dd/mm[/yyyy] or dd-mm[-yyyy]; not glued to digits, "h", "g" or ":" (avoids "14h00-16h00", "7g30 - 11g00").
 _DATE_SLASH = re.compile(
-    r"(?<![\d:hH])(\d{1,2})\s*([/-])\s*(\d{1,2})(?:\s*\2\s*(\d{4}|\d{2}))?(?![\d:hH])"
+    r"(?<![\d:hHgG])(\d{1,2})\s*([/-])\s*(\d{1,2})(?:\s*\2\s*(\d{4}|\d{2}))?(?![\d:hHgG])"
+)
+# Same-month day range "06-08/11/2026", "05–08/10": two dates sharing month (and year).
+# Without this, "06-08" was read as dd-mm (6 August) and "/11/2026" was lost.
+_DAY_RANGE = re.compile(
+    r"(?<![\d/.:hHgG])(\d{1,2})\s*[-–—]\s*(\d{1,2})\s*/\s*(\d{1,2})(?:\s*/\s*(\d{4}|\d{2}))?(?![\d/:hHgG])"
 )
 # dd.mm.yyyy only with a year (avoids "1.5 điểm").
 _DATE_DOT = re.compile(r"(?<![\d.])(\d{1,2})\.(\d{1,2})\.(\d{4})(?![\d.])")
@@ -108,6 +113,16 @@ def _year(raw: str | None) -> int | None:
     return 2000 + y if y < 100 else y
 
 
+def _valid_day_range(m: re.Match) -> bool:
+    first, last, month = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    return 1 <= first < last <= 31 and 1 <= month <= 12
+
+
+def day_range_spans(text: str) -> list[tuple[int, int]]:
+    """Spans of valid same-month day ranges, on the money/score-masked text."""
+    return [m.span() for m in _DAY_RANGE.finditer(mask_non_dates(text)) if _valid_day_range(m)]
+
+
 def _find_dates(span: str) -> list[_Date]:
     found: list[_Date] = []
     taken: list[tuple[int, int]] = []
@@ -115,7 +130,15 @@ def _find_dates(span: str) -> list[_Date]:
     def free(m: re.Match) -> bool:
         return all(m.end() <= a or m.start() >= b for a, b in taken)
 
+    for m in _DAY_RANGE.finditer(span):
+        if _valid_day_range(m):
+            month, year = int(m.group(3)), _year(m.group(4))
+            found.append(_Date(m.start(1), int(m.group(1)), month, year))
+            found.append(_Date(m.start(2), int(m.group(2)), month, year))
+            taken.append((m.start(), m.end()))
     for m in _DATE_WORDS.finditer(span):
+        if not free(m):
+            continue
         found.append(_Date(m.start(), int(m.group(1)), int(m.group(2)), _year(m.group(3))))
         taken.append((m.start(), m.end()))
     for m in _DATE_DOT.finditer(span):
@@ -151,7 +174,7 @@ def _find_times(span: str, date_ranges: list[tuple[int, int]]) -> list[_Time]:
 
 def _date_spans(span: str) -> list[tuple[int, int]]:
     spans = []
-    for rx in (_DATE_WORDS, _DATE_DOT, _DATE_SLASH):
+    for rx in (_DAY_RANGE, _DATE_WORDS, _DATE_DOT, _DATE_SLASH):
         spans += [(m.start(), m.end()) for m in rx.finditer(span)]
     return spans
 
@@ -219,16 +242,20 @@ def parse_range(span: str, posted: dt.date | None = None) -> RangeResult:
     return RangeResult(start, not times, _iso(end_date, end_hm), not has_end_time, from_posted)
 
 
-def parse_point(span: str, posted: dt.date | None = None) -> PointResult:
-    """Parse a single moment such as a registration deadline (last date/time in the span)."""
+def parse_point(span: str, posted: dt.date | None = None, pick: str = "last") -> PointResult:
+    """Parse a single moment such as a registration deadline (last date/time in the span).
+
+    pick="first" takes the first date and time instead (start of a stated range).
+    """
     span = mask_non_dates(span)
     dates = _find_dates(span)
     if not dates:
         raise DateParseError("no date in the span")
     dates, from_posted = _fill_years(dates, posted)
     times = _find_times(span, _date_spans(span))
-    hm = (times[-1].hour, times[-1].minute) if times else DEFAULT_END
-    return PointResult(_iso(dates[-1], hm), not times, from_posted)
+    index = 0 if pick == "first" else -1
+    hm = (times[index].hour, times[index].minute) if times else (DEFAULT_START if pick == "first" else DEFAULT_END)
+    return PointResult(_iso(dates[index], hm), not times, from_posted)
 
 
 def parse_rounds(spans: list[str], posted: dt.date | None = None) -> RangeResult:

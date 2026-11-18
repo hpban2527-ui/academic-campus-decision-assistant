@@ -40,7 +40,7 @@ def actual_rules():
 
 def test_actual_rules_file_can_be_checked(actual_rules):
     issues = audit_rules_config(actual_rules)
-    assert len(actual_rules["rules"]) == 75
+    assert len(actual_rules["rules"]) == 76  # 75 + R2301 (criterion 2.3, STSV2025)
     assert issues == []
 
 

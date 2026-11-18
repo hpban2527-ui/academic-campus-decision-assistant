@@ -70,6 +70,7 @@ def schedule_set(
     previous_blocks: Mapping[str, Sequence[Interval]] | None = None,
     keep: Iterable[str] = (),
     max_flexible_per_set: int = MAX_FLEXIBLE_PER_SET,
+    fast_flexible: bool = False,
 ) -> ScheduleResult:
     """Schedule every activity of ``activities`` together, or prove it impossible.
 
@@ -123,21 +124,32 @@ def schedule_set(
         if _earliest_fit(item, item.start, free) is None:
             return _unschedulable("A flexible activity fits in no free interval on its own.")
         items.append(item)
-    if len(items) > max_flexible_per_set:
+    if len(items) > max_flexible_per_set and not fast_flexible:
         return ScheduleResult(ScheduleStatus.UNDETERMINED, reason="More flexible activities than the scheduling limit.")
 
-    placement = _place(items, free)
-    if placement is None:
-        return _unschedulable("No non-overlapping placement exists for the flexible activities.")
-    held: tuple[_Flexible, ...] = ()
-    minimal = True
-    keepable = [item for item in items if item.activity_id in previous and _fits_previous(item, previous[item.activity_id], free)]
-    if keepable:
-        outcome = _keep_most(items, keepable, previous, free, max_flexible_per_set * (1 << max_flexible_per_set))
-        if outcome is None:
-            minimal = False
-        elif outcome[0]:
-            held, placement = outcome
+    total_free = sum(e - s for s, e in zip(free[0], free[1]))
+    if sum(item.duration for item in items) > total_free:
+        return _unschedulable("Total flexible duration exceeds remaining free time.")
+
+    if len(items) <= max_flexible_per_set:
+        placement = _place(items, free)
+        if placement is None:
+            return _unschedulable("No non-overlapping placement exists for the flexible activities.")
+        held: tuple[_Flexible, ...] = ()
+        minimal = True
+        keepable = [item for item in items if item.activity_id in previous and _fits_previous(item, previous[item.activity_id], free)]
+        if keepable:
+            outcome = _keep_most(items, keepable, previous, free, max_flexible_per_set * (1 << max_flexible_per_set))
+            if outcome is None:
+                minimal = False
+            elif outcome[0]:
+                held, placement = outcome
+    else:
+        placement = _place_greedy_edf(items, free)
+        if placement is None:
+            return ScheduleResult(ScheduleStatus.UNDETERMINED, reason="Heuristic placement could not determine a valid schedule.")
+        held = ()
+        minimal = False
 
     zone = window_start.tzinfo
     held_ids = {item.activity_id for item in held}
@@ -289,3 +301,58 @@ def _keep_most(
             if placement is not None:
                 return group, placement
     return (), {}
+
+
+def _place_greedy_edf(
+    items: Sequence[_Flexible],
+    free: tuple[list[int], list[int]],
+) -> dict[str, tuple[int, int]] | None:
+    """Fast O(k^2) placement using multi-rule dispatch (Earliest Finish, EDF, Least Slack)."""
+    if not items:
+        return {}
+    # Rule 1: Left-shifted dynamic Earliest-Completion-Time + Earliest-Deadline tie-break
+    remaining = list(enumerate(items))
+    cursor = min(item.start for item in items)
+    placement: dict[str, tuple[int, int]] = {}
+    ok = True
+    while remaining:
+        best_choice: tuple[int, int, int, int, _Flexible] | None = None
+        for idx, item in remaining:
+            begin = _earliest_fit(item, cursor, free)
+            if begin is None:
+                ok = False
+                break
+            finish = begin + item.duration
+            candidate_key = (finish, item.end, -idx, begin, item)
+            if best_choice is None or candidate_key[:3] < best_choice[:3]:
+                best_choice = candidate_key
+        if not ok or best_choice is None:
+            break
+        finish, _, neg_idx, begin, chosen_item = best_choice
+        chosen_idx = -neg_idx
+        placement[chosen_item.activity_id] = (begin, finish)
+        cursor = finish
+        remaining = [(i, it) for i, it in remaining if i != chosen_idx]
+    if ok and len(placement) == len(items):
+        return placement
+
+    # Rule 2 & 3: Interval-carving with Earliest Deadline First (EDF) and Least Slack First
+    indexed = list(enumerate(items))
+    orders = (
+        sorted(indexed, key=lambda pair: (pair[1].end, pair[1].start, pair[1].duration, -pair[0])),
+        sorted(indexed, key=lambda pair: (pair[1].end - pair[1].start - pair[1].duration, pair[1].end, -pair[0])),
+        sorted(indexed, key=lambda pair: (pair[1].start, pair[1].end, pair[1].duration, -pair[0])),
+    )
+    for order in orders:
+        cur_free = (list(free[0]), list(free[1]))
+        carved: dict[str, tuple[int, int]] = {}
+        for _, item in order:
+            begin = _earliest_fit(item, item.start, cur_free)
+            if begin is None:
+                break
+            end = begin + item.duration
+            carved[item.activity_id] = (begin, end)
+            cur_free = _subtract(list(zip(cur_free[0], cur_free[1])), [(begin, end)])
+        else:
+            return carved
+    return None

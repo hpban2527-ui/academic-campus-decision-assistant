@@ -270,7 +270,7 @@ def _scores_payload(student_id: str) -> dict[str, Any]:
         "total_projected": _clean_num(total_projected),
         "total_hypothetical": _clean_num(min(100, total_current + total_projected)),
         "saved_activities": [
-            {k: c.get(k) for k in ("commit_id", "title", "category_id", "confirmed_added", "projected_added", "committed_at", "raw_content")}
+            {k: c.get(k) for k in ("commit_id", "title", "category_id", "confirmed_added", "projected_added", "committed_at")}
             for c in session_committed
             if c.get("kind") == "score" and c.get("student_id") == student_id
         ],
@@ -1323,11 +1323,6 @@ def commit_evaluation(req: CommitRequest):
             "url": rec.get("source", {}).get("URL_post"),
             "fingerprint": _review_fingerprint(req.raw_content),
             "submitted_at": _now_iso(),
-            "raw_content": req.raw_content,
-            "category_id": sp2.get("category_id") or "C4",
-            "rule_id": (sp2.get("rule") or {}).get("rule_id"),
-            "rule_points": sp2.get("rule_points"),
-            "reason": sp2.get("explanation") or "Cần đối chiếu với quy chế ĐRL.",
         }
         review_queue.append(entry)
         _save_session_to_disk()
@@ -1410,132 +1405,6 @@ def commit_evaluation(req: CommitRequest):
         "category_id": category_id,
         "confirmed_added": confirmed_added,
         "projected_added": projected_added,
-        "scores": _scores_payload(student_id),
-    }
-
-
-class RecordedConfirmRequest(BaseModel):
-    commit_id: str
-    student_id: Optional[str] = None
-
-
-@app.post("/api/recorded/confirm")
-def confirm_recorded_activity(req: RecordedConfirmRequest):
-    """Directly confirms attendance proof for an already saved projected activity in the session."""
-    global session_committed
-    student_id = req.student_id or DEFAULT_STUDENT_ID
-    item = next((c for c in session_committed if c.get("commit_id") == req.commit_id), None)
-    if not item:
-        raise HTTPException(status_code=404, detail="Recorded activity not found")
-
-    cat_id = item.get("category_id") or "C1"
-    proj_pts = float(item.get("projected_added") or 0)
-    cap = CATEGORY_META.get(cat_id, {}).get("max", 30)
-    state = _get_student_scores(student_id)
-
-    if proj_pts > 0:
-        state["projected"][cat_id] = _clean_num(max(0, state["projected"].get(cat_id, 0) - proj_pts))
-        cur = state["current"].get(cat_id, 0)
-        new_cur = _clean_num(min(cap, cur + proj_pts))
-        effective = _clean_num(new_cur - cur)
-        state["current"][cat_id] = new_cur
-
-        item["confirmed_added"] = effective
-        item["projected_added"] = 0
-        item["confirmed_at"] = _now_iso()
-        if "catalog_entry" in item:
-            item["catalog_entry"]["points_awarded"] = f"+{effective}đ (Đã xác nhận)"
-        _save_session_to_disk()
-
-    return {
-        "status": "confirmed",
-        "commit_id": req.commit_id,
-        "category_id": cat_id,
-        "confirmed_added": item.get("confirmed_added", 0),
-        "scores": _scores_payload(student_id),
-    }
-
-
-class ReviewDismissRequest(BaseModel):
-    commit_id: str
-    student_id: Optional[str] = None
-
-
-@app.post("/api/review/dismiss")
-def dismiss_review_item(req: ReviewDismissRequest):
-    global review_queue
-    review_queue[:] = [x for x in review_queue if x.get("commit_id") != req.commit_id]
-    _save_session_to_disk()
-    student_id = req.student_id or DEFAULT_STUDENT_ID
-    return {
-        "status": "dismissed",
-        "commit_id": req.commit_id,
-        "total_review_queue": len(review_queue),
-        "scores": _scores_payload(student_id),
-    }
-
-
-class ReviewAwardRequest(BaseModel):
-    commit_id: str
-    student_id: Optional[str] = None
-    category_id: str
-    points: float
-    reason: Optional[str] = "Manual review award"
-
-
-@app.post("/api/review/award")
-def award_review_item(req: ReviewAwardRequest):
-    global review_queue
-    student_id = req.student_id or DEFAULT_STUDENT_ID
-    item = next((x for x in review_queue if x.get("commit_id") == req.commit_id), None)
-    if not item:
-        raise HTTPException(status_code=404, detail="Review item not found")
-
-    review_queue[:] = [x for x in review_queue if x.get("commit_id") != req.commit_id]
-
-    category_id = req.category_id if req.category_id in CATEGORY_META else "C4"
-    cap = CATEGORY_META[category_id]["max"]
-    state = _get_student_scores(student_id)
-
-    per_activity_limits = {"C1": 15, "C2": 15, "C3": 10, "C4": 10, "C5": 5}
-    act_max = per_activity_limits.get(category_id, 10)
-    award_pts = min(float(req.points), float(act_max))
-
-    cur = state["current"].get(category_id, 0)
-    new_cur = _clean_num(min(cap, cur + award_pts))
-    effective_added = _clean_num(new_cur - cur)
-    state["current"][category_id] = new_cur
-
-    room = max(0, cap - state["current"][category_id])
-    state["projected"][category_id] = _clean_num(min(state["projected"].get(category_id, 0), room))
-
-    commit_entry = {
-        "commit_id": f"commit_{uuid.uuid4().hex[:10]}",
-        "kind": "score",
-        "student_id": student_id,
-        "activity_id": item.get("activity_id") or f"act_review_{req.commit_id}",
-        "title": item.get("title") or "Hoạt động đã duyệt rà soát",
-        "category_id": category_id,
-        "confirmed_added": effective_added,
-        "projected_added": 0,
-        "raw_content": item.get("raw_content", ""),
-        "committed_at": _now_iso(),
-        "catalog_entry": {
-            "title": item.get("title"),
-            "category_id": category_id,
-            "points_awarded": f"+{effective_added}đ (Đã duyệt rà soát)",
-            "saved_by": student_id,
-        },
-    }
-    session_committed.insert(0, commit_entry)
-    _save_session_to_disk()
-
-    return {
-        "status": "awarded",
-        "commit_id": req.commit_id,
-        "category_id": category_id,
-        "confirmed_added": effective_added,
-        "total_review_queue": len(review_queue),
         "scores": _scores_payload(student_id),
     }
 
@@ -1728,40 +1597,58 @@ from api.sp3_service import (
     personalized_demo_plan as _sp3_personalized_plan,
     sp1_catalog as _sp3_catalog,
 )
+from api.sp3_real import real_catalog as _sp3_real_catalog, real_plan as _sp3_real_plan
+
+# ?source=real switches the SP3 screens to the SP1 v2 store (HK1 2026-2027, synthetic student).
+# The default stays the synthetic MVP fixture so existing demos and tests are unchanged.
+# The app only reads committed data files; new announcements arrive through the admin batch
+# (scripts/admin_rebuild.py, docs/admin_data_update.md), never through a model call at runtime.
+SP3_SOURCES = ("synthetic", "real")
+
+
+def _sp3_source(source: str) -> str:
+    if source not in SP3_SOURCES:
+        raise HTTPException(status_code=422, detail="source must be 'synthetic' or 'real'")
+    return source
 
 
 class SP3DemoPlanRequest(BaseModel):
     scenario: str = "first_plan"
     total_target: Optional[int] = Field(default=None, ge=0, le=100)
     busy_intervals: list[dict[str, str]] = Field(default_factory=list)
-    skip_activity_id: Optional[str] = None
 
 
 @app.get("/api/sp3/catalog")
-def get_sp3_catalog():
+def get_sp3_catalog(source: str = "synthetic"):
     """Read SP1 activity records and QA without awarding points."""
+    if _sp3_source(source) == "real":
+        return _sp3_real_catalog()
     return _sp3_catalog()
 
 
 @app.post("/api/sp3/demo/plan")
-def run_sp3_demo_plan(req: SP3DemoPlanRequest):
+def run_sp3_demo_plan(req: SP3DemoPlanRequest, source: str = "synthetic"):
     """Read-only complete SP1-format -> feasibility -> planner -> SP2 demo."""
     try:
-        return _sp3_demo_plan(
-            req.scenario,
-            target_total=req.total_target,
-            busy_intervals=req.busy_intervals,
-            skip_activity_id=req.skip_activity_id,
-        )
+        if _sp3_source(source) == "real":
+            return _sp3_real_plan(req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals)
+        return _sp3_demo_plan(req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.post("/api/sp3/personalized/plan")
-def run_sp3_personalized_plan(req: PersonalizedPlanRequest):
+def run_sp3_personalized_plan(req: PersonalizedPlanRequest, source: str = "synthetic"):
     """Rank the demo SP3 schedule using a student-confirmed preference only."""
 
     try:
+        if _sp3_source(source) == "real":
+            return _sp3_real_plan(
+                req.scenario,
+                target_total=req.total_target,
+                busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
+                preference=req.preference,
+            )
         return _sp3_personalized_plan(
             req.preference,
             scenario=req.scenario,

@@ -659,7 +659,9 @@ def test_share_url_does_not_replace_required_url():
 def test_tri_source_file_is_accepted_without_preprocessing():
     path = SCHEMA_PATH.parents[1] / "data" / "raw" / "source.json"
     posts = json.loads(path.read_text(encoding="utf-8"))
-    assert len(posts) == 189 and len({p["post_id"] for p in posts}) == 189
+    # The collector file grew from 20 to 189 posts (Minh_Tri d4fae8f); its exact content is pinned by
+    # data/gold/split_v2.json and tests/data/test_split_v2.py, so only uniqueness is checked here.
+    assert len(posts) >= 20 and len({p["post_id"] for p in posts}) == len(posts)
     assert all("share_url" in p for p in posts)
     results = run_posts(posts)
     assert len(results) == len(posts)

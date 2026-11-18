@@ -138,7 +138,34 @@ def match_activity_to_rule(
     if _contains(text, "hiến máu", "hiến máu tình nguyện", "giọt hồng"):
         return choose("R42", 0.98, "Nội dung xác định hoạt động hiến máu tình nguyện.")
 
-    if _contains(text, "quyên góp", "ủng hộ", "gây quỹ"):
+    # Legal content is read before the volunteer and contest signals: "cuộc thi tìm hiểu pháp luật" is
+    # R46 by the wording of the rule, not an academic contest (R16). Only the rule's own words count;
+    # general safety topics (fire safety, traffic, scams) fall through to the seminar signals below.
+    if _contains(text, "pháp luật", "hiến pháp", "phòng chống tệ nạn", "phòng chống dịch", "ma túy", "ma tuý"):
+        return choose("R46", 0.88, "Nội dung tuyên truyền pháp luật hoặc phòng chống tệ nạn/dịch bệnh.")
+
+    # A seminar-type title outranks signals found only in the body: a seminar that mentions an exam,
+    # a contest or a feedback form is still a seminar.
+    title_text = _normalize(record.get("title"))
+    if (_contains(title_text, "hội thảo", "chuyên đề", "workshop", "tọa đàm", "toạ đàm", "talkshow",
+                  "tập huấn", "mini-course", "mini course")
+            or _has_token(title_text, "seminar", "webinar")) and not _contains(
+                title_text, "cuộc thi", "hội thi", "olympic", "hackathon", "giải đấu"):
+        return choose("R19", 0.9, "Tiêu đề xác định đây là hội thảo/chuyên đề/workshop.")
+
+    # Criterion 2.3 (STSV2025): survey rounds.  Only explicit survey/opinion
+    # phrases count; "khảo sát thực địa" (field trip) and course evaluation
+    # (R22) are different activities.
+    if _contains(
+        text,
+        "tham gia khảo sát", "phiếu khảo sát", "khảo sát ý kiến", "khảo sát sinh viên",
+        "khảo sát chất lượng", "lấy ý kiến", "điều tra xã hội",
+    ) and not _contains(text, "khảo sát thực địa", "đi thực địa"):
+        return choose("R2301", 0.88, "Nội dung mời sinh viên tham gia khảo sát/lấy ý kiến (tiêu chí 2.3, STSV2025).")
+
+    # "ủng hộ" alone is too broad: announcements use it for general support ("cảm ơn sự ủng hộ"),
+    # which bound seminars to the donation rule. Only explicit donation wording counts.
+    if _contains(text, "quyên góp", "gây quỹ", "kêu gọi ủng hộ", "ủng hộ đồng bào", "ủng hộ quỹ"):
         return choose("R45", 0.9, "Nội dung mô tả hoạt động quyên góp/gây quỹ.")
 
     if _contains(text, "tình nguyện", "thiện nguyện", "mùa hè xanh", "suất cơm từ thiện"):
@@ -162,7 +189,8 @@ def match_activity_to_rule(
             return choose("R16", 0.86, "Nội dung mô tả cuộc thi học thuật/kỹ năng từ cấp Khoa trở lên.", ("R19",))
         return choose("R16", 0.65, "Nhận diện được cuộc thi nhưng chưa rõ lĩnh vực và cấp tổ chức.", ("R3102",))
 
-    if _contains(text, "tư vấn tuyển sinh", "ngày hội việc làm", "hội chợ việc làm"):
+    if _contains(text, "tư vấn tuyển sinh", "ngày hội việc làm", "hội chợ việc làm", "ngày hội tuyển dụng",
+                 "ngày hội sinh viên và doanh nghiệp", "ngày hội sinh viên & doanh nghiệp", "career fair", "job fair"):
         return choose("R38", 0.94, "Nội dung là hoạt động tư vấn tuyển sinh/việc làm.")
 
     if _contains(text, "chạy bộ", "thanh niên khỏe", "thử thách sức khỏe", "ngày hội thể dục thể thao"):
@@ -171,7 +199,10 @@ def match_activity_to_rule(
     if _contains(text, "pháp luật", "hiến pháp", "phòng chống tệ nạn", "phòng chống dịch"):
         return choose("R46", 0.88, "Nội dung tuyên truyền pháp luật hoặc phòng chống tệ nạn/dịch bệnh.")
 
-    if _contains(text, "hội thảo", "chuyên đề", "workshop", "tập huấn", "kỹ năng", "hướng nghiệp", "pccc", "phòng cháy"):
+    if _contains(
+        text, "hội thảo", "chuyên đề", "workshop", "tập huấn", "kỹ năng", "hướng nghiệp", "pccc", "phòng cháy",
+        "tọa đàm", "toạ đàm", "talkshow",
+    ) or _has_token(text, "seminar", "webinar"):
         return choose("R19", 0.9, "Nội dung là hội thảo/chuyên đề/tập huấn học thuật hoặc kỹ năng.")
 
     # Data-driven fallback: compare meaningful tokens in the announcement with
@@ -185,6 +216,11 @@ def match_activity_to_rule(
     scored: list[tuple[float, dict[str, Any]]] = []
     for rule in rules.values():
         if rule.get("unit") not in allowed_units:
+            continue
+        # The fallback may only propose plain participation rules (a count of attended activities).
+        # Rules about a role, a level or a duration (organiser membership, delegate, long-term
+        # volunteering) need facts an announcement cannot give, so they are never guessed from words.
+        if (rule.get("condition") or {}).get("operator") != "count_greater_than":
             continue
         name_tokens = set(_normalize(rule.get("name")).split()) - stop
         overlap = text_tokens & name_tokens

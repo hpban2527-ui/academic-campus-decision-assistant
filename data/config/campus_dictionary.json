@@ -1,0 +1,58 @@
+{
+  "version": "1.3.0",
+  "patterns": {
+    "CS1": [
+      "nguyễn văn cừ",
+      "nguyen van cu",
+      "chợ quán",
+      "cho quan",
+      "cơ sở 1",
+      "cs1",
+      "cơ sở nguyễn văn cừ"
+    ],
+    "CS2": [
+      "linh trung",
+      "đông hòa",
+      "đông hoà",
+      "dong hoa",
+      "cơ sở 2",
+      "cs2",
+      "cơ sở linh trung",
+      "khu đô thị đhqg",
+      "khu đô thị đại học quốc gia",
+      "khu do thi dhqg",
+      "khu đô thị đhqg-hcm",
+      "khu đô thị đhqg tp.hcm",
+      "vnuhcm urban area",
+      "vnu-hcm urban area",
+      "urban area campus"
+    ],
+    "both": [
+      "một trong hai cơ sở",
+      "1 trong 2 cơ sở",
+      "hai cơ sở"
+    ],
+    "not_our_campus": [
+      "đại học công nghệ thông tin",
+      "trường đại học công nghệ thông tin",
+      "uit",
+      "đại học bách khoa",
+      "trường đại học bách khoa",
+      "đại học kinh tế - luật",
+      "đại học kinh tế luật",
+      "trường đại học kinh tế - luật",
+      "đại học quốc tế",
+      "trường đại học quốc tế",
+      "đại học khoa học xã hội và nhân văn",
+      "trường đại học khoa học xã hội và nhân văn",
+      "đại học an giang",
+      "trường đại học an giang",
+      "khoa y",
+      "nhà văn hóa sinh viên",
+      "nhà văn hoá sinh viên",
+      "trung tâm giáo dục quốc phòng",
+      "ký túc xá"
+    ]
+  },
+  "source": "rule set 2026-11-13 + new ward names Cho Quan / Dong Hoa, confirmed by Thao Duyen 2026-11-14; 2026-11-14: added the Khu do thi DHQG (university town) wording for CS2, found on 19 announcements of which 7 were falling through to Other; 2026-11-14 (v1.2.0): a venue of another institution or a shared facility in the university town is Other, not one of our campuses (decided by Thao Duyen); 2026-11-14 (v1.3.0): English name of the university town (VNUHCM Urban Area) maps to CS2"
+}

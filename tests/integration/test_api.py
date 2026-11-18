@@ -30,7 +30,7 @@ def _announcement(case_number: int = 1, *, has_evidence: bool = True):
 def test_health_reports_actual_rule_inventory():
     response = client.get("/api/health")
     assert response.status_code == 200
-    assert response.json()["total_rules"] == 75
+    assert response.json()["total_rules"] == 76  # 75 + R2301 (criterion 2.3, STSV2025)
 
 
 def test_user_checkbox_cannot_confirm_an_official_score():
