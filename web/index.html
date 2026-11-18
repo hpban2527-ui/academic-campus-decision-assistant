@@ -4369,7 +4369,7 @@
                       ${regDeadline ? `<div><b class="text-slate-400">Hạn đăng ký:</b> <span class="text-amber-300 font-medium">${escapeHTML(regDeadline)}</span></div>` : ''}
                       <div><b class="text-slate-400">Quyền lợi ĐRL:</b> <span class="text-emerald-400 font-bold">${gains.map(r => `+${r.projected_added}đ ${PLAN_CAT_LABELS[r.category_id] || r.category_id}`).join(', ') || 'Cộng điểm theo quy chế'}</span></div>
                     </div>
-                    ${candAct.completion_requirements ? `<div class="p-2.5 rounded-lg bg-[#080d18] border border-[#223046] text-slate-300"><b>Minh chứng hoàn thành:</b> ${escapeHTML(candAct.completion_requirements === 'NOT_STATED' ? 'Bài không nêu' : candAct.completion_requirements)}</div>` : ''}
+                    ${candAct.completion_requirements ? `<div class="p-2.5 rounded-lg bg-[#080d18] border border-[#223046] text-slate-300"><b>Minh chứng hoàn thành:</b> ${escapeHTML(candAct.completion_requirements === 'NOT_STATED' ? 'Bài không nêu' : candAct.completion_requirements === 'UNKNOWN' ? 'Chưa rõ' : candAct.completion_requirements)}</div>` : ''}
                     ${(data.activity_warnings && data.activity_warnings[item.activity_id] || []).length ? `<ul class="p-2.5 rounded-lg bg-amber-950/30 border border-amber-500/30 text-amber-200 list-disc pl-6 space-y-0.5">${data.activity_warnings[item.activity_id].map(w => `<li>${escapeHTML(w.message)}</li>`).join('')}</ul>` : ''}
                   </div>
                 </div>`;

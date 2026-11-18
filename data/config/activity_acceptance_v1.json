@@ -1,10 +1,11 @@
 {
-  "version": "activity-acceptance/1.1",
+  "version": "activity-acceptance/1.2",
   "agreed_by": "user",
   "agreed_on": "2026-11-18",
   "soft_fields": ["domain", "fee", "activity_type", "location", "registration_url", "join_url", "registration_deadline", "multi_session", "duration_minutes_stated", "completion_requirements"],
   "default_fixed_duration_minutes": {"offline": 120, "online": 30, "hybrid": 30},
   "default_quiz_duration_minutes": 30,
+  "plausibility": {"max_fixed_hours": 12, "max_flexible_window_days": 62, "max_days_event_from_post": 400, "inferred_year_lookback_days": 60},
   "quiz_pattern": "quiz|trắc nghiệm|trac nghiem|đường dẫn dự thi|duong dan du thi",
   "live_pattern": "webinar|zoom|google meet|microsoft teams",
   "warnings": {
@@ -16,6 +17,8 @@
     "location_unknown": "Chưa rõ địa điểm; chưa bảo đảm phù hợp cơ sở hoặc di chuyển.",
     "fixed_duration_default": "Thời lượng xếp lịch dùng mặc định của nhóm, không phải dữ kiện BTC công bố.",
     "quiz_duration_default": "Quiz dùng thời lượng mặc định 30 phút của nhóm.",
+    "registration_deadline_after_start": "Hạn đăng ký được nêu muộn hơn giờ bắt đầu; chỉ cảnh báo, không đổi lịch.",
+    "online_window_treated_as_flexible": "Hoạt động trực tuyến có thời lượng được nêu ngắn hơn cửa sổ; xếp như một lượt làm bài linh hoạt trong cửa sổ.",
     "uncertain_end_time_default_used": "Giờ kết thúc chưa chắc nên bị bỏ qua; dùng thời lượng đã nêu hoặc mặc định của nhóm, không phải dữ kiện BTC công bố.",
     "multiple_sessions": "Bản ghi chỉ xét buổi/vòng đầu; nguồn nhiều buổi được giữ trong ghi chú.",
     "mandatory_unscheduled": "Nguồn có nghĩa vụ bắt buộc nhưng chưa xếp được lịch; vẫn phải hiển thị cảnh báo.",

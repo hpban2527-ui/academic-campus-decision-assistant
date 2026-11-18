@@ -30,7 +30,7 @@ the application reads only `data/operational/activity_dataset.json`. Evaluation 
 | AI-assisted annotations | `data/sp1_annotations/ai_annotations_20261118.json` | 129 non-test posts, 19 stated-fact fields + activity type, evidence spans, uncertainty; label `AI_EXTRACTED_POLICY_CHECKED_NOT_GOLD`; provenance in `data/sp1_annotations/provenance/` |
 | Human decisions | `data/review/decisions.csv` | genuine corrections (63 applied), bound to the text fingerprint |
 | Recorded model replies | `data/llm_outputs/final/*.jsonl`, `data/llm_outputs/operational/*.jsonl` | Qwen/Qwen3.5-4B replies, replayed only when the prompt digest matches |
-| Acceptance policy | `data/config/activity_acceptance_v1.json` + `src/sp1/acceptance.py` | data readiness and schedule (`activity-acceptance/1.1`) |
+| Acceptance policy | `data/config/activity_acceptance_v1.json` + `src/sp1/acceptance.py` | data readiness and schedule (`activity-acceptance/1.2`) |
 | Rules | `data/drl_rules.json` | SP2 rule catalog (points come only from here) |
 
 `artifacts/` is a delivery folder and is not read by any build. `scripts/import_ai_annotations.py` copied the

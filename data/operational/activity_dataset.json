@@ -1,7 +1,7 @@
 {
  "schema": "unilife-operational-dataset/1.0",
- "dataset_version": "dc457569c065a947",
- "generated_at": "2026-11-18T13:11:59+00:00",
+ "dataset_version": "b1b293901cdbbd30",
+ "generated_at": "2026-11-18T16:15:20+00:00",
  "label": "DEMO_ONLY: data readiness and proposed bindings; not gold, not an official DRL decision",
  "activity_contract": "sp3-activity/0.3",
  "inputs": {
@@ -27,15 +27,15 @@
   ],
   "rules_sha256": "3a1620fb3f9c6a4b4f53a64859c348acdb929a808dcbab45bcf22f8b82b18a34",
   "merge_policy_sha256": "f283fb202ae793855bb110888fc703114b10f3d6eeae60f178c9286189960378",
-  "acceptance_policy": "activity-acceptance/1.1",
+  "acceptance_policy": "activity-acceptance/1.2",
   "decision_problems": []
  },
  "summary": {
   "posts": 189,
   "by_status": {
    "READY": 1,
-   "READY_WITH_WARNINGS": 134,
-   "NOT_SCHEDULABLE": 49,
+   "READY_WITH_WARNINGS": 126,
+   "NOT_SCHEDULABLE": 57,
    "NOT_AN_ACTIVITY": 4,
    "DUPLICATE": 0,
    "EXTRACTION_PENDING": 1
@@ -51,33 +51,33 @@
    "ai_annotation": 129,
    "sp1_v2_model_replay": 59
   },
-  "schedulable_canonical": 135,
+  "schedulable_canonical": 127,
   "schedule_types": {
-   "FIXED": 128,
+   "FIXED": 120,
    "FLEXIBLE_WINDOW": 7
   },
-  "with_supported_score_binding": 125,
+  "with_supported_score_binding": 117,
   "bindings_by_rule": {
    "R16": 3,
-   "R19": 99,
+   "R19": 94,
    "R3102": 6,
    "R31402": 1,
    "R33": 1,
    "R38": 2,
    "R39": 1,
    "R42": 2,
-   "R4302": 2,
-   "R46": 8
+   "R46": 7
   },
   "eligibility_basis_of_schedulable": {
-   "NOT_STATED": 47,
-   "OPEN_TO_STUDENTS": 64,
-   "RESTRICTED_FREE_TEXT": 17,
-   "RESTRICTED_TO_FIT": 2,
+   "NOT_STATED": 41,
+   "OPEN_TO_STUDENTS": 66,
+   "RESTRICTED_FREE_TEXT": 15,
+   "RESTRICTED_TO_FIT": 1,
    "STRUCTURED_SCOPE": 2,
-   "UNCLEAR": 3
+   "UNCLEAR": 2
   },
   "not_schedulable_reasons": {
+   "fixed_duration_over_12h": 3,
    "missing_activity_date": 13,
    "missing_duration": 1,
    "missing_fixed_start_time": 23,
@@ -87,34 +87,35 @@
    "uncertain:audience_scope": 2,
    "uncertain:audience_text": 1,
    "uncertain:mandatory_stated": 1,
-   "uncertain:mode": 14,
-   "uncertain:post_type": 2,
+   "uncertain:mode": 18,
+   "uncertain:post_type": 7,
    "uncertain:title": 2,
-   "uncertain:window_close": 13,
-   "uncertain:window_open": 16
+   "uncertain:window_close": 17,
+   "uncertain:window_open": 20
   },
   "warnings_on_schedulable": {
    "activity_type_unknown": 1,
-   "audience_not_stated": 47,
-   "audience_restriction_unresolved": 20,
-   "bounded_cost_unknown": 127,
-   "domain_unknown": 13,
+   "audience_not_stated": 41,
+   "audience_restriction_unresolved": 17,
+   "bounded_cost_unknown": 119,
+   "domain_unknown": 12,
    "fee_not_per_person": 3,
-   "fee_unknown": 127,
-   "fixed_duration_default": 58,
-   "location_unknown": 2,
+   "fee_unknown": 119,
+   "fixed_duration_default": 56,
+   "location_unknown": 1,
    "multiple_sessions": 13,
+   "online_window_treated_as_flexible": 1,
    "quiz_duration_default": 1,
-   "registration_deadline_missing": 97,
-   "registration_link_missing": 30,
+   "registration_deadline_missing": 93,
+   "registration_link_missing": 28,
    "score_binding_unsupported": 10,
    "uncertain_soft:activity_type": 1,
    "uncertain_soft:completion_requirements": 3,
    "uncertain_soft:domain": 7,
    "uncertain_soft:duration_minutes_stated": 1,
-   "uncertain_soft:fee": 5,
+   "uncertain_soft:fee": 4,
    "uncertain_soft:location": 1,
-   "uncertain_soft:multi_session": 2,
+   "uncertain_soft:multi_session": 3,
    "uncertain_soft:registration_deadline": 2,
    "uncertain_soft:registration_url": 9
   },
@@ -158,7 +159,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-30T14:00:00+07:00",
@@ -434,7 +435,7 @@
    "possible_duplicates": [],
    "activity_type": "culture_sports_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -654,7 +655,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode",
@@ -817,7 +818,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "window_close"
@@ -1038,7 +1039,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "multi_session",
@@ -1231,7 +1232,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FLEXIBLE_WINDOW",
      "window_start": "2026-10-19T08:00:00+07:00",
@@ -1507,7 +1508,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-17T08:00:00+07:00",
@@ -1772,7 +1773,7 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-27T07:30:00+07:00",
@@ -2033,13 +2034,8 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
-    "schedule": {
-     "type": "FIXED",
-     "start": "2026-05-16T06:00:00+07:00",
-     "end": "2026-05-17T12:30:00+07:00",
-     "duration_source": "stated_window"
-    },
+    "policy_version": "activity-acceptance/1.2",
+    "schedule": null,
     "uncertain_fields": [
      "fee"
     ],
@@ -2180,69 +2176,19 @@
     "registration_deadline": "2026-05-12T20:00:00+07:00",
     "time_defaults": {}
    },
-   "sp3_activity": {
-    "activity_id": "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
-    "source": {
-     "publisher": "Đội Sinh Viên Tình Nguyện - Khoa Toán Tin Học",
-     "platform": "Facebook",
-     "URL_post": "https://www.facebook.com/doisvtnkhoatoantin/posts/pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl?rdid=OHbLft1qLD5mGcmk",
-     "URL_registration": "https://forms.gle/2MpDsrvqSFTcGH3W8"
-    },
-    "title": "HOA MÙA HÈ - VÌ TRẺ EM NGOẠI THÀNH 2026 - MỞ FORM ĐĂNG KÍ",
-    "domain": "volunteer",
-    "start": "2026-05-16T06:00:00+07:00",
-    "end": "2026-05-17T12:30:00+07:00",
-    "registration_deadline": "2026-05-12T20:00:00+07:00",
-    "mode": "offline",
-    "location": "Trường Tiểu học Sông Thao (xã Bàu Hàm, tỉnh Đồng Nai).",
-    "points": null,
-    "mandatory": false,
-    "audience": null,
-    "fee": null,
-    "completion_requirements": "NOT_STATED"
-   },
-   "sp3_derived": {
-    "fee": "budget_basis:unknown",
-    "mandatory": "team_default:mandatory_false_when_unstated",
-    "completion_requirements": "marker:not_stated"
-   },
-   "sp3_schedule": {
-    "type": "FIXED",
-    "fixed_blocks": [
-     {
-      "start": "2026-05-16T06:00:00+07:00",
-      "end": "2026-05-17T12:30:00+07:00"
-     }
-    ]
-   },
-   "binding": {
-    "activity_id": "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
-    "binding_ref": "auto-R4302-pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
-    "rule_id": "R4302",
-    "field": "volunteer_duration_bucket",
-    "operation": "SET",
-    "value": "24_hours_to_under_one_week"
-   },
+   "sp3_activity": null,
+   "sp3_derived": null,
+   "sp3_schedule": null,
+   "binding": null,
    "binding_decision": {
-    "reason": "sources_agree",
-    "label": "auto_proposed_not_human_reviewed",
-    "matcher_rule": "R4302",
-    "matcher_method": "catalog_signal_match",
-    "category_id": "C4",
-    "points_from_rules": 10
+    "reason": "not_data_ready"
    },
-   "features": {
-    "topics": [
-     "volunteer"
-    ],
-    "campus_id": "OTHER",
-    "time_tags": [
-     "weekend_morning"
-    ]
-   },
-   "status": "READY_WITH_WARNINGS",
-   "ready_for_scheduling": true,
-   "reasons": [],
+   "features": null,
+   "status": "NOT_SCHEDULABLE",
+   "ready_for_scheduling": false,
+   "reasons": [
+    "fixed_duration_over_12h"
+   ],
    "warnings": [
     "fee_unknown",
     "bounded_cost_unknown",
@@ -2250,8 +2196,8 @@
     "audience_not_stated"
    ],
    "dimensions": {
-    "data_ready_for_scheduling": true,
-    "score_binding_supported": true,
+    "data_ready_for_scheduling": false,
+    "score_binding_supported": false,
     "student_eligibility_basis": "NOT_STATED",
     "human_reviewed": false,
     "official_award_verified": false
@@ -2305,7 +2251,7 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-04-12T15:00:00+07:00",
@@ -2591,7 +2537,7 @@
    "possible_duplicates": [],
    "activity_type": "culture_sports_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "fee",
@@ -2803,7 +2749,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -3014,7 +2960,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-25T07:30:00+07:00",
@@ -3271,7 +3217,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "domain",
@@ -3447,7 +3393,7 @@
    "possible_duplicates": [],
    "activity_type": null,
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FLEXIBLE_WINDOW",
      "window_start": "2026-06-05T20:00:00+07:00",
@@ -3728,7 +3674,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "fee",
@@ -3933,7 +3879,7 @@
    "possible_duplicates": [],
    "activity_type": "mobilization",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-30T08:00:00+07:00",
@@ -4193,7 +4139,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-14T13:30:00+07:00",
@@ -4450,7 +4396,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-14T08:30:00+07:00",
@@ -4719,7 +4665,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-07T08:30:00+07:00",
@@ -4994,7 +4940,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-07T13:30:00+07:00",
@@ -5271,7 +5217,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-06T08:00:00+07:00",
@@ -5550,7 +5496,9 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:mode",
+     "model_reply_unusable_field_unknown:post_type"
     ]
    },
    "human_decision": null,
@@ -5559,14 +5507,12 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
-    "schedule": {
-     "type": "FIXED",
-     "start": "2026-05-30T13:30:00+07:00",
-     "end": "2026-05-30T15:30:00+07:00",
-     "duration_source": "team_default"
-    },
-    "uncertain_fields": [],
+    "policy_version": "activity-acceptance/1.2",
+    "schedule": null,
+    "uncertain_fields": [
+     "mode",
+     "post_type"
+    ],
     "budget_known": false,
     "accepted_record": {
      "post_type": "activity",
@@ -5703,72 +5649,20 @@
      "registration_deadline": "date_only_2359"
     }
    },
-   "sp3_activity": {
-    "activity_id": "pfbid0348peH7andUqAfothwtJxbr5BQnQKPbTUZWjoGcuba4gMHMeBazFxpUseEBGd78xwl",
-    "source": {
-     "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
-     "platform": "Facebook",
-     "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid0348peH7andUqAfothwtJxbr5BQnQKPbTUZWjoGcuba4gMHMeBazFxpUseEBGd78xwl?rdid=QpYd1Vxz4Ngk1Ge3",
-     "URL_registration": "https://forms.office.com/r/LjebPPYUkP"
-    },
-    "title": "CHUỖI HOẠT ĐỘNG NÂNG CAO NĂNG LỰC SỐ DÀNH CHO SINH VIÊN",
-    "domain": "skills",
-    "start": "2026-05-30T13:30:00+07:00",
-    "end": "2026-05-30T15:30:00+07:00",
-    "registration_deadline": "2026-05-26T23:59:00+07:00",
-    "mode": "offline",
-    "location": "Giảng đường 1, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM, cơ sở Nguyễn Văn Cừ",
-    "points": null,
-    "mandatory": false,
-    "audience": null,
-    "fee": null,
-    "completion_requirements": "NOT_STATED"
-   },
-   "sp3_derived": {
-    "end": "team_default:start_plus_default_duration",
-    "registration_deadline": "rule:date_only_end_of_day",
-    "fee": "budget_basis:unknown",
-    "mandatory": "team_default:mandatory_false_when_unstated",
-    "completion_requirements": "marker:not_stated"
-   },
-   "sp3_schedule": {
-    "type": "FIXED",
-    "fixed_blocks": [
-     {
-      "start": "2026-05-30T13:30:00+07:00",
-      "end": "2026-05-30T15:30:00+07:00"
-     }
-    ]
-   },
-   "binding": {
-    "activity_id": "pfbid0348peH7andUqAfothwtJxbr5BQnQKPbTUZWjoGcuba4gMHMeBazFxpUseEBGd78xwl",
-    "binding_ref": "auto-R19-pfbid0348peH7andUqAfothwtJxbr5BQnQKPbTUZWjoGcuba4gMHMeBazFxpUseEBGd78xwl",
-    "rule_id": "R19",
-    "field": "eligible_academic_seminars",
-    "operation": "INCREMENT",
-    "value": 1
-   },
+   "sp3_activity": null,
+   "sp3_derived": null,
+   "sp3_schedule": null,
+   "binding": null,
    "binding_decision": {
-    "reason": "sources_agree",
-    "label": "auto_proposed_not_human_reviewed",
-    "matcher_rule": "R19",
-    "matcher_method": "catalog_signal_match",
-    "category_id": "C1",
-    "points_from_rules": 5
+    "reason": "not_data_ready"
    },
-   "features": {
-    "topics": [
-     "technology",
-     "soft_skills"
-    ],
-    "campus_id": "NVC",
-    "time_tags": [
-     "weekend_afternoon"
-    ]
-   },
-   "status": "READY_WITH_WARNINGS",
-   "ready_for_scheduling": true,
-   "reasons": [],
+   "features": null,
+   "status": "NOT_SCHEDULABLE",
+   "ready_for_scheduling": false,
+   "reasons": [
+    "uncertain:mode",
+    "uncertain:post_type"
+   ],
    "warnings": [
     "fee_unknown",
     "bounded_cost_unknown",
@@ -5776,8 +5670,8 @@
     "audience_not_stated"
    ],
    "dimensions": {
-    "data_ready_for_scheduling": true,
-    "score_binding_supported": true,
+    "data_ready_for_scheduling": false,
+    "score_binding_supported": false,
     "student_eligibility_basis": "NOT_STATED",
     "human_reviewed": false,
     "official_award_verified": false
@@ -5851,7 +5745,7 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-05-24T06:15:00+07:00",
@@ -6144,7 +6038,7 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-05-31T06:00:00+07:00",
@@ -6399,7 +6293,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "multi_session",
@@ -6607,7 +6501,9 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:mode",
+     "model_reply_unusable_field_unknown:post_type"
     ]
    },
    "human_decision": null,
@@ -6616,14 +6512,12 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
-    "schedule": {
-     "type": "FIXED",
-     "start": "2026-05-23T04:00:00+07:00",
-     "end": "2026-05-24T20:30:00+07:00",
-     "duration_source": "stated_window"
-    },
-    "uncertain_fields": [],
+    "policy_version": "activity-acceptance/1.2",
+    "schedule": null,
+    "uncertain_fields": [
+     "mode",
+     "post_type"
+    ],
     "budget_known": false,
     "accepted_record": {
      "post_type": "activity",
@@ -6738,69 +6632,21 @@
     "registration_deadline": null,
     "time_defaults": {}
    },
-   "sp3_activity": {
-    "activity_id": "pfbid02nBhkYKDvQr3jTEnDwyyykJ6eEWWiJmjqTDt6KBbeTm7ucnwnLftxyFRSaYfXjBbDl",
-    "source": {
-     "publisher": "SAB in HCMUS",
-     "platform": "Facebook",
-     "URL_post": "https://www.facebook.com/sab.ctda/posts/pfbid02nBhkYKDvQr3jTEnDwyyykJ6eEWWiJmjqTDt6KBbeTm7ucnwnLftxyFRSaYfXjBbDl?rdid=d7SOmtmZwErxRtxz",
-     "URL_registration": "https://t.sab.edu.vn/bcyt26_form"
-    },
-    "title": "BƯỚC CHÂN YÊU THƯƠNG",
-    "domain": "volunteer",
-    "start": "2026-05-23T04:00:00+07:00",
-    "end": "2026-05-24T20:30:00+07:00",
-    "registration_deadline": null,
-    "mode": "offline",
-    "location": "Trường THCS Phú Khánh, đường huyện 24, ấp Phú Lợi, xã Đại Điền, tỉnh Vĩnh Long",
-    "points": null,
-    "mandatory": false,
-    "audience": null,
-    "fee": null,
-    "completion_requirements": "NOT_STATED"
-   },
-   "sp3_derived": {
-    "fee": "budget_basis:unknown",
-    "mandatory": "team_default:mandatory_false_when_unstated",
-    "completion_requirements": "marker:not_stated"
-   },
-   "sp3_schedule": {
-    "type": "FIXED",
-    "fixed_blocks": [
-     {
-      "start": "2026-05-23T04:00:00+07:00",
-      "end": "2026-05-24T20:30:00+07:00"
-     }
-    ]
-   },
-   "binding": {
-    "activity_id": "pfbid02nBhkYKDvQr3jTEnDwyyykJ6eEWWiJmjqTDt6KBbeTm7ucnwnLftxyFRSaYfXjBbDl",
-    "binding_ref": "auto-R4302-pfbid02nBhkYKDvQr3jTEnDwyyykJ6eEWWiJmjqTDt6KBbeTm7ucnwnLftxyFRSaYfXjBbDl",
-    "rule_id": "R4302",
-    "field": "volunteer_duration_bucket",
-    "operation": "SET",
-    "value": "24_hours_to_under_one_week"
-   },
+   "sp3_activity": null,
+   "sp3_derived": null,
+   "sp3_schedule": null,
+   "binding": null,
    "binding_decision": {
-    "reason": "sources_agree",
-    "label": "auto_proposed_not_human_reviewed",
-    "matcher_rule": "R4302",
-    "matcher_method": "catalog_signal_match",
-    "category_id": "C4",
-    "points_from_rules": 10
+    "reason": "not_data_ready"
    },
-   "features": {
-    "topics": [
-     "volunteer"
-    ],
-    "campus_id": "OTHER",
-    "time_tags": [
-     "weekend_morning"
-    ]
-   },
-   "status": "READY_WITH_WARNINGS",
-   "ready_for_scheduling": true,
-   "reasons": [],
+   "features": null,
+   "status": "NOT_SCHEDULABLE",
+   "ready_for_scheduling": false,
+   "reasons": [
+    "uncertain:mode",
+    "uncertain:post_type",
+    "fixed_duration_over_12h"
+   ],
    "warnings": [
     "fee_unknown",
     "bounded_cost_unknown",
@@ -6808,8 +6654,8 @@
     "audience_not_stated"
    ],
    "dimensions": {
-    "data_ready_for_scheduling": true,
-    "score_binding_supported": true,
+    "data_ready_for_scheduling": false,
+    "score_binding_supported": false,
     "student_eligibility_basis": "NOT_STATED",
     "human_reviewed": false,
     "official_award_verified": false
@@ -6859,7 +6705,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-05-22T13:30:00+07:00",
@@ -7153,7 +6999,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-25T14:00:00+07:00",
@@ -7380,7 +7226,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-26T14:00:00+07:00",
@@ -7660,7 +7506,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-08T09:00:00+07:00",
@@ -7779,11 +7625,11 @@
     "year_inferred": []
    },
    "audience": {
-    "basis": "RESTRICTED_TO_FIT",
+    "basis": "OPEN_TO_STUDENTS",
     "lines": [
      "Sinh viên toàn Trường và giảng viên Khoa Công nghệ thông tin"
     ],
-    "matched": "khoa c",
+    "matched": null,
     "cohorts": [],
     "programs": []
    },
@@ -7878,7 +7724,7 @@
    "dimensions": {
     "data_ready_for_scheduling": true,
     "score_binding_supported": true,
-    "student_eligibility_basis": "RESTRICTED_TO_FIT",
+    "student_eligibility_basis": "OPEN_TO_STUDENTS",
     "human_reviewed": false,
     "official_award_verified": false
    }
@@ -7941,7 +7787,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-05T09:30:00+07:00",
@@ -8182,7 +8028,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-24T13:30:00+07:00",
@@ -8467,7 +8313,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-08T09:30:00+07:00",
@@ -8710,7 +8556,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FLEXIBLE_WINDOW",
      "window_start": "2026-11-09T20:00:00+07:00",
@@ -8987,7 +8833,7 @@
    "possible_duplicates": [],
    "activity_type": "fundraising",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "window_close",
@@ -9178,7 +9024,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-27T08:00:00+07:00",
@@ -9486,7 +9332,9 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:mode",
+     "model_reply_unusable_field_unknown:post_type"
     ]
    },
    "human_decision": null,
@@ -9495,9 +9343,12 @@
    "possible_duplicates": [],
    "activity_type": "fundraising",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
-    "uncertain_fields": [],
+    "uncertain_fields": [
+     "mode",
+     "post_type"
+    ],
     "budget_known": false,
     "accepted_record": {
      "post_type": "activity",
@@ -9622,6 +9473,8 @@
    "status": "NOT_SCHEDULABLE",
    "ready_for_scheduling": false,
    "reasons": [
+    "uncertain:mode",
+    "uncertain:post_type",
     "missing_activity_date"
    ],
    "warnings": [
@@ -9670,7 +9523,7 @@
    "possible_duplicates": [],
    "activity_type": "club_membership",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode"
@@ -9877,7 +9730,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-25T07:45:00+07:00",
@@ -10118,7 +9971,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-08T08:00:00+07:00",
@@ -10386,7 +10239,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-08T07:30:00+07:00",
@@ -10645,7 +10498,7 @@
    "possible_duplicates": [],
    "activity_type": "culture_sports_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -10812,7 +10665,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-25T15:00:00+07:00",
@@ -11054,7 +10907,7 @@
    "possible_duplicates": [],
    "activity_type": "blood_donation",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-28T07:30:00+07:00",
@@ -11311,7 +11164,7 @@
    "possible_duplicates": [],
    "activity_type": "blood_donation",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-27T07:30:00+07:00",
@@ -11573,7 +11426,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-19T13:00:00+07:00",
@@ -11823,7 +11676,7 @@
    "possible_duplicates": [],
    "activity_type": "career_admissions_event",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-11T08:00:00+07:00",
@@ -12089,7 +11942,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-10T07:30:00+07:00",
@@ -12335,7 +12188,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-02T07:30:00+07:00",
@@ -12606,7 +12459,9 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:mode",
+     "model_reply_unusable_field_unknown:post_type"
     ]
    },
    "human_decision": null,
@@ -12615,10 +12470,11 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
-     "mode"
+     "mode",
+     "post_type"
     ],
     "budget_known": true,
     "accepted_record": {
@@ -12780,7 +12636,8 @@
    "status": "NOT_SCHEDULABLE",
    "ready_for_scheduling": false,
    "reasons": [
-    "uncertain:mode"
+    "uncertain:mode",
+    "uncertain:post_type"
    ],
    "warnings": [
     "registration_deadline_missing"
@@ -12828,7 +12685,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-22T14:00:00+07:00",
@@ -13111,7 +12968,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "multi_session",
@@ -13339,7 +13196,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode",
@@ -13533,7 +13390,7 @@
    ],
    "activity_type": "culture_sports_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-26T08:00:00+07:00",
@@ -13786,7 +13643,7 @@
    ],
    "activity_type": "culture_sports_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-26T08:00:00+07:00",
@@ -14058,7 +13915,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-05T08:00:00+07:00",
@@ -14321,7 +14178,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-10T17:30:00+07:00",
@@ -14590,7 +14447,7 @@
    "possible_duplicates": [],
    "activity_type": "club_membership",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-08T17:30:00+07:00",
@@ -14871,7 +14728,7 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-08T07:30:00+07:00",
@@ -15114,7 +14971,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -15295,7 +15152,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -15494,7 +15351,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-20T07:30:00+07:00",
@@ -15769,7 +15626,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -15996,7 +15853,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -16200,7 +16057,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-21T08:00:00+07:00",
@@ -16533,7 +16390,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-05-28T14:00:00+07:00",
@@ -16811,7 +16668,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FLEXIBLE_WINDOW",
      "window_start": "2026-11-09T09:00:00+07:00",
@@ -17083,7 +16940,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-22T18:00:00+07:00",
@@ -17354,7 +17211,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "audience_scope",
@@ -17580,7 +17437,7 @@
    "possible_duplicates": [],
    "activity_type": null,
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "activity_type",
@@ -17820,7 +17677,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "audience_scope",
@@ -18097,7 +17954,7 @@
    "possible_duplicates": [],
    "activity_type": "career_admissions_event",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-13T13:30:00+07:00",
@@ -18359,7 +18216,9 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:mode",
+     "model_reply_unusable_field_unknown:post_type"
     ]
    },
    "human_decision": null,
@@ -18368,14 +18227,12 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
-    "schedule": {
-     "type": "FIXED",
-     "start": "2026-05-20T09:30:00+07:00",
-     "end": "2026-05-20T11:00:00+07:00",
-     "duration_source": "stated_window"
-    },
-    "uncertain_fields": [],
+    "policy_version": "activity-acceptance/1.2",
+    "schedule": null,
+    "uncertain_fields": [
+     "mode",
+     "post_type"
+    ],
     "budget_known": false,
     "accepted_record": {
      "post_type": "activity",
@@ -18492,71 +18349,20 @@
     "registration_deadline": null,
     "time_defaults": {}
    },
-   "sp3_activity": {
-    "activity_id": "pfbid0HSj8yJoaxt3xytoxrhDDsnBXbzqoKXCNJooAbB9zusiNDkSWg1Cj1Mz2cJf676mml",
-    "source": {
-     "publisher": "Khoa Môi Trường - Trường ĐH Khoa học Tự nhiên - ĐHQG HCM",
-     "platform": "Facebook",
-     "URL_post": "https://www.facebook.com/khoamoitruongKHTN/posts/pfbid0HSj8yJoaxt3xytoxrhDDsnBXbzqoKXCNJooAbB9zusiNDkSWg1Cj1Mz2cJf676mml?rdid=0Sc343kMF3ZKHMFj",
-     "URL_registration": null
-    },
-    "title": "THÔNG BÁO SEMINAR",
-    "domain": "academic",
-    "start": "2026-05-20T09:30:00+07:00",
-    "end": "2026-05-20T11:00:00+07:00",
-    "registration_deadline": null,
-    "mode": "offline",
-    "location": "Giảng đường 1 - Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
-    "points": null,
-    "mandatory": false,
-    "audience": [
-     "ĐỐI TƯỢNG THAM DỰ"
-    ],
-    "fee": null,
-    "completion_requirements": "NOT_STATED"
-   },
-   "sp3_derived": {
-    "fee": "budget_basis:unknown",
-    "mandatory": "team_default:mandatory_false_when_unstated",
-    "completion_requirements": "marker:not_stated"
-   },
-   "sp3_schedule": {
-    "type": "FIXED",
-    "fixed_blocks": [
-     {
-      "start": "2026-05-20T09:30:00+07:00",
-      "end": "2026-05-20T11:00:00+07:00"
-     }
-    ]
-   },
-   "binding": {
-    "activity_id": "pfbid0HSj8yJoaxt3xytoxrhDDsnBXbzqoKXCNJooAbB9zusiNDkSWg1Cj1Mz2cJf676mml",
-    "binding_ref": "auto-R19-pfbid0HSj8yJoaxt3xytoxrhDDsnBXbzqoKXCNJooAbB9zusiNDkSWg1Cj1Mz2cJf676mml",
-    "rule_id": "R19",
-    "field": "eligible_academic_seminars",
-    "operation": "INCREMENT",
-    "value": 1
-   },
+   "sp3_activity": null,
+   "sp3_derived": null,
+   "sp3_schedule": null,
+   "binding": null,
    "binding_decision": {
-    "reason": "sources_agree",
-    "label": "auto_proposed_not_human_reviewed",
-    "matcher_rule": "R19",
-    "matcher_method": "catalog_signal_match",
-    "category_id": "C1",
-    "points_from_rules": 5
+    "reason": "not_data_ready"
    },
-   "features": {
-    "topics": [
-     "research"
-    ],
-    "campus_id": "OTHER",
-    "time_tags": [
-     "weekday_morning"
-    ]
-   },
-   "status": "READY_WITH_WARNINGS",
-   "ready_for_scheduling": true,
-   "reasons": [],
+   "features": null,
+   "status": "NOT_SCHEDULABLE",
+   "ready_for_scheduling": false,
+   "reasons": [
+    "uncertain:mode",
+    "uncertain:post_type"
+   ],
    "warnings": [
     "fee_unknown",
     "bounded_cost_unknown",
@@ -18565,8 +18371,8 @@
     "audience_restriction_unresolved"
    ],
    "dimensions": {
-    "data_ready_for_scheduling": true,
-    "score_binding_supported": true,
+    "data_ready_for_scheduling": false,
+    "score_binding_supported": false,
     "student_eligibility_basis": "UNCLEAR",
     "human_reviewed": false,
     "official_award_verified": false
@@ -18613,7 +18419,7 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-05-22T18:00:00+07:00",
@@ -18870,7 +18676,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "completion_requirements",
@@ -19109,7 +18915,10 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:multi_session",
+     "model_reply_unusable_field_unknown:window_close",
+     "model_reply_unusable_field_unknown:window_open"
     ]
    },
    "human_decision": {
@@ -19130,11 +18939,14 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode",
-     "registration_deadline"
+     "multi_session",
+     "registration_deadline",
+     "window_close",
+     "window_open"
     ],
     "budget_known": false,
     "accepted_record": {
@@ -19222,12 +19034,15 @@
     "not_an_activity",
     "missing_mode",
     "uncertain:mode",
+    "uncertain:window_close",
+    "uncertain:window_open",
     "missing_activity_date"
    ],
    "warnings": [
     "fee_unknown",
     "bounded_cost_unknown",
     "registration_deadline_missing",
+    "uncertain_soft:multi_session",
     "uncertain_soft:registration_deadline",
     "audience_not_stated"
    ],
@@ -19287,7 +19102,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-16T09:00:00+07:00",
@@ -19535,7 +19350,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-18T09:00:00+07:00",
@@ -19844,7 +19659,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-10T08:00:00+07:00",
@@ -20102,7 +19917,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode",
@@ -20313,7 +20128,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-09T14:00:00+07:00",
@@ -20436,11 +20251,11 @@
     "year_inferred": []
    },
    "audience": {
-    "basis": "RESTRICTED_FREE_TEXT",
+    "basis": "OPEN_TO_STUDENTS",
     "lines": [
      "Quý Giảng viên, nghiên cứu sinh, học viên cao học và sinh viên các chuyên ngành liên quan, các nhà khoa học cùng các nhà nghiên cứu có quan tâm đến lĩnh vực Sinh học không gian."
     ],
-    "matched": "ngành l",
+    "matched": null,
     "cohorts": [],
     "programs": []
    },
@@ -20531,13 +20346,12 @@
    "reasons": [],
    "warnings": [
     "fee_unknown",
-    "bounded_cost_unknown",
-    "audience_restriction_unresolved"
+    "bounded_cost_unknown"
    ],
    "dimensions": {
     "data_ready_for_scheduling": true,
     "score_binding_supported": true,
-    "student_eligibility_basis": "RESTRICTED_FREE_TEXT",
+    "student_eligibility_basis": "OPEN_TO_STUDENTS",
     "human_reviewed": false,
     "official_award_verified": false
    }
@@ -20576,7 +20390,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-05T09:00:00+07:00",
@@ -20814,7 +20628,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-05T14:00:00+07:00",
@@ -21077,7 +20891,7 @@
    "possible_duplicates": [],
    "activity_type": "career_admissions_event",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "audience_text",
@@ -21294,7 +21108,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-03T14:00:00+07:00",
@@ -21547,7 +21361,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-02T08:30:00+07:00",
@@ -21895,7 +21709,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": true,
@@ -22074,7 +21888,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "window_open"
@@ -22290,7 +22104,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode"
@@ -22468,7 +22282,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-24T10:00:00+07:00",
@@ -22734,7 +22548,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-01T20:00:00+07:00",
@@ -22994,7 +22808,7 @@
    "possible_duplicates": [],
    "activity_type": "club_membership",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -23245,7 +23059,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-21T14:00:00+07:00",
@@ -23507,7 +23321,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode"
@@ -23658,7 +23472,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -23862,7 +23676,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "window_open"
@@ -24061,7 +23875,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "location",
@@ -24269,7 +24083,10 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:multi_session",
+     "model_reply_unusable_field_unknown:window_close",
+     "model_reply_unusable_field_unknown:window_open"
     ]
    },
    "human_decision": {
@@ -24293,14 +24110,16 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-27T07:30:00+07:00",
      "end": "2026-08-27T12:00:00+07:00",
      "duration_source": "stated_window"
     },
-    "uncertain_fields": [],
+    "uncertain_fields": [
+     "multi_session"
+    ],
     "budget_known": false,
     "accepted_record": {
      "post_type": "activity",
@@ -24449,6 +24268,7 @@
     "fee_unknown",
     "bounded_cost_unknown",
     "registration_deadline_missing",
+    "uncertain_soft:multi_session",
     "audience_not_stated"
    ],
    "dimensions": {
@@ -24529,7 +24349,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-17T14:00:00+07:00",
@@ -24793,7 +24613,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode",
@@ -24951,7 +24771,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-01T13:30:00+07:00",
@@ -25227,7 +25047,7 @@
    "possible_duplicates": [],
    "activity_type": "club_membership",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode",
@@ -25399,7 +25219,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "completion_requirements",
@@ -25627,7 +25447,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-09T14:00:00+07:00",
@@ -25902,7 +25722,10 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:multi_session",
+     "model_reply_unusable_field_unknown:window_close",
+     "model_reply_unusable_field_unknown:window_open"
     ]
    },
    "human_decision": null,
@@ -25911,14 +25734,13 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
-    "schedule": {
-     "type": "FIXED",
-     "start": "2026-06-11T14:00:00+07:00",
-     "end": "2026-06-11T16:00:00+07:00",
-     "duration_source": "stated_window"
-    },
-    "uncertain_fields": [],
+    "policy_version": "activity-acceptance/1.2",
+    "schedule": null,
+    "uncertain_fields": [
+     "multi_session",
+     "window_close",
+     "window_open"
+    ],
     "budget_known": false,
     "accepted_record": {
      "post_type": "activity",
@@ -26028,79 +25850,30 @@
     "registration_deadline": null,
     "time_defaults": {}
    },
-   "sp3_activity": {
-    "activity_id": "pfbid02zyFDsiq3o68YGWrRuhvSitLHd5SK4segqABuRCRhSq8Y9orEo7sEjs6Tx6LbgVxLl",
-    "source": {
-     "publisher": "Khoa Sinh học - Công nghệ Sinh học, Trường ĐH KHTN, ĐHQG HCM",
-     "platform": "Facebook",
-     "URL_post": "https://www.facebook.com/khoashcnsh/posts/pfbid02zyFDsiq3o68YGWrRuhvSitLHd5SK4segqABuRCRhSq8Y9orEo7sEjs6Tx6LbgVxLl?rdid=e45ohYkR4lLLTQgu",
-     "URL_registration": null
-    },
-    "title": "SEMINAR: KHÁM PHÁ CÔNG NGHỆ GIẢI TRÌNH TỰ AVIDITY TRÊN HỆ THỐNG AVITI",
-    "domain": "academic",
-    "start": "2026-06-11T14:00:00+07:00",
-    "end": "2026-06-11T16:00:00+07:00",
-    "registration_deadline": null,
-    "mode": "offline",
-    "location": "Phòng B.42, 227 Nguyễn Văn Cừ, Phường Chợ Quán, TP. HCM",
-    "points": null,
-    "mandatory": false,
-    "audience": null,
-    "fee": null,
-    "completion_requirements": "NOT_STATED"
-   },
-   "sp3_derived": {
-    "fee": "budget_basis:unknown",
-    "mandatory": "team_default:mandatory_false_when_unstated",
-    "completion_requirements": "marker:not_stated"
-   },
-   "sp3_schedule": {
-    "type": "FIXED",
-    "fixed_blocks": [
-     {
-      "start": "2026-06-11T14:00:00+07:00",
-      "end": "2026-06-11T16:00:00+07:00"
-     }
-    ]
-   },
-   "binding": {
-    "activity_id": "pfbid02zyFDsiq3o68YGWrRuhvSitLHd5SK4segqABuRCRhSq8Y9orEo7sEjs6Tx6LbgVxLl",
-    "binding_ref": "auto-R19-pfbid02zyFDsiq3o68YGWrRuhvSitLHd5SK4segqABuRCRhSq8Y9orEo7sEjs6Tx6LbgVxLl",
-    "rule_id": "R19",
-    "field": "eligible_academic_seminars",
-    "operation": "INCREMENT",
-    "value": 1
-   },
+   "sp3_activity": null,
+   "sp3_derived": null,
+   "sp3_schedule": null,
+   "binding": null,
    "binding_decision": {
-    "reason": "sources_agree",
-    "label": "auto_proposed_not_human_reviewed",
-    "matcher_rule": "R19",
-    "matcher_method": "catalog_signal_match",
-    "category_id": "C1",
-    "points_from_rules": 5
+    "reason": "not_data_ready"
    },
-   "features": {
-    "topics": [
-     "technology",
-     "research"
-    ],
-    "campus_id": "NVC",
-    "time_tags": [
-     "weekday_afternoon"
-    ]
-   },
-   "status": "READY_WITH_WARNINGS",
-   "ready_for_scheduling": true,
-   "reasons": [],
+   "features": null,
+   "status": "NOT_SCHEDULABLE",
+   "ready_for_scheduling": false,
+   "reasons": [
+    "uncertain:window_close",
+    "uncertain:window_open"
+   ],
    "warnings": [
     "fee_unknown",
     "bounded_cost_unknown",
     "registration_deadline_missing",
+    "uncertain_soft:multi_session",
     "audience_not_stated"
    ],
    "dimensions": {
-    "data_ready_for_scheduling": true,
-    "score_binding_supported": true,
+    "data_ready_for_scheduling": false,
+    "score_binding_supported": false,
     "student_eligibility_basis": "NOT_STATED",
     "human_reviewed": false,
     "official_award_verified": false
@@ -26164,7 +25937,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-02T14:00:00+07:00",
@@ -26421,7 +26194,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -26581,7 +26354,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-03T14:00:00+07:00",
@@ -26847,7 +26620,10 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:multi_session",
+     "model_reply_unusable_field_unknown:window_close",
+     "model_reply_unusable_field_unknown:window_open"
     ]
    },
    "human_decision": null,
@@ -26856,10 +26632,13 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
-     "mode"
+     "mode",
+     "multi_session",
+     "window_close",
+     "window_open"
     ],
     "budget_known": false,
     "accepted_record": {
@@ -26981,12 +26760,15 @@
    "status": "NOT_SCHEDULABLE",
    "ready_for_scheduling": false,
    "reasons": [
-    "uncertain:mode"
+    "uncertain:mode",
+    "uncertain:window_close",
+    "uncertain:window_open"
    ],
    "warnings": [
     "fee_unknown",
     "bounded_cost_unknown",
     "registration_deadline_missing",
+    "uncertain_soft:multi_session",
     "fixed_duration_default",
     "audience_not_stated"
    ],
@@ -27031,7 +26813,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-06T08:00:00+07:00",
@@ -27319,7 +27101,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-05-17T13:30:00+07:00",
@@ -27567,7 +27349,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-05-16T08:00:00+07:00",
@@ -27843,7 +27625,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "title",
@@ -28053,7 +27835,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-04T13:15:00+07:00",
@@ -28316,7 +28098,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-06T08:00:00+07:00",
@@ -28580,7 +28362,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-02T14:00:00+07:00",
@@ -28870,7 +28652,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-10T14:00:00+07:00",
@@ -29100,7 +28882,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-24T07:30:00+07:00",
@@ -29409,7 +29191,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-12T08:30:00+07:00",
@@ -29685,7 +29467,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode"
@@ -29888,7 +29670,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-08T14:00:00+07:00",
@@ -30149,7 +29931,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-12T13:30:00+07:00",
@@ -30417,7 +30199,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "domain"
@@ -30614,7 +30396,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FLEXIBLE_WINDOW",
      "window_start": "2026-10-01T08:00:00+07:00",
@@ -30889,7 +30671,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-24T08:00:00+07:00",
@@ -31165,7 +30947,7 @@
    "possible_duplicates": [],
    "activity_type": "culture_sports_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-25T07:30:00+07:00",
@@ -31434,7 +31216,7 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "registration_url",
@@ -31640,7 +31422,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-11T08:00:00+07:00",
@@ -31917,7 +31699,7 @@
    "possible_duplicates": [],
    "activity_type": "fundraising",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "registration_url",
@@ -32143,7 +31925,7 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-23T17:00:00+07:00",
@@ -32408,7 +32190,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode"
@@ -32549,6 +32331,7 @@
     "fee_unknown",
     "bounded_cost_unknown",
     "multiple_sessions",
+    "registration_deadline_after_start",
     "audience_restriction_unresolved"
    ],
    "dimensions": {
@@ -32605,7 +32388,7 @@
    "possible_duplicates": [],
    "activity_type": "volunteer",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-05-17T14:00:00+07:00",
@@ -32862,7 +32645,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-18T09:00:00+07:00",
@@ -33201,7 +32984,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-03T14:00:00+07:00",
@@ -33458,7 +33241,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-27T14:00:00+07:00",
@@ -33689,7 +33472,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "window_close"
@@ -33889,7 +33672,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-01T10:00:00+07:00",
@@ -34140,7 +33923,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-09-28T13:00:00+07:00",
@@ -34411,7 +34194,10 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:multi_session",
+     "model_reply_unusable_field_unknown:window_close",
+     "model_reply_unusable_field_unknown:window_open"
     ]
    },
    "human_decision": {
@@ -34432,14 +34218,13 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
-    "schedule": {
-     "type": "FIXED",
-     "start": "2026-09-10T09:00:00+07:00",
-     "end": "2026-09-10T11:00:00+07:00",
-     "duration_source": "team_default"
-    },
-    "uncertain_fields": [],
+    "policy_version": "activity-acceptance/1.2",
+    "schedule": null,
+    "uncertain_fields": [
+     "multi_session",
+     "window_close",
+     "window_open"
+    ],
     "budget_known": false,
     "accepted_record": {
      "post_type": "activity",
@@ -34542,81 +34327,31 @@
      "registration_deadline": "date_only_2359"
     }
    },
-   "sp3_activity": {
-    "activity_id": "pfbid0boR7w7iRdsuvBfCXvESjpRi81S7Js93u4QHY9jXCS7yUF1A2NYoYYewBPaMXdHRYl",
-    "source": {
-     "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
-     "platform": "Facebook",
-     "URL_post": "https://www.facebook.com/chemusvnu/posts/pfbid0boR7w7iRdsuvBfCXvESjpRi81S7Js93u4QHY9jXCS7yUF1A2NYoYYewBPaMXdHRYl?rdid=5VdS7ghljK0zlfTe",
-     "URL_registration": "https://chemistry.hcmus.edu.vn/.../thong-bao-seminar-khoa"
-    },
-    "title": "SEMINAR | FROM EXERCISE TO MEDICINE: THE POWER OF MITOCHONDRIAL METABOLISM",
-    "domain": "academic",
-    "start": "2026-09-10T09:00:00+07:00",
-    "end": "2026-09-10T11:00:00+07:00",
-    "registration_deadline": "2026-09-08T23:59:00+07:00",
-    "mode": "offline",
-    "location": null,
-    "points": null,
-    "mandatory": false,
-    "audience": null,
-    "fee": null,
-    "completion_requirements": "NOT_STATED"
-   },
-   "sp3_derived": {
-    "end": "team_default:start_plus_default_duration",
-    "registration_deadline": "rule:date_only_end_of_day",
-    "fee": "budget_basis:unknown",
-    "mandatory": "team_default:mandatory_false_when_unstated",
-    "completion_requirements": "marker:not_stated"
-   },
-   "sp3_schedule": {
-    "type": "FIXED",
-    "fixed_blocks": [
-     {
-      "start": "2026-09-10T09:00:00+07:00",
-      "end": "2026-09-10T11:00:00+07:00"
-     }
-    ]
-   },
-   "binding": {
-    "activity_id": "pfbid0boR7w7iRdsuvBfCXvESjpRi81S7Js93u4QHY9jXCS7yUF1A2NYoYYewBPaMXdHRYl",
-    "binding_ref": "auto-R19-pfbid0boR7w7iRdsuvBfCXvESjpRi81S7Js93u4QHY9jXCS7yUF1A2NYoYYewBPaMXdHRYl",
-    "rule_id": "R19",
-    "field": "eligible_academic_seminars",
-    "operation": "INCREMENT",
-    "value": 1
-   },
+   "sp3_activity": null,
+   "sp3_derived": null,
+   "sp3_schedule": null,
+   "binding": null,
    "binding_decision": {
-    "reason": "sources_agree",
-    "label": "auto_proposed_not_human_reviewed",
-    "matcher_rule": "R19",
-    "matcher_method": "catalog_signal_match",
-    "category_id": "C1",
-    "points_from_rules": 5
+    "reason": "not_data_ready"
    },
-   "features": {
-    "topics": [
-     "research"
-    ],
-    "campus_id": null,
-    "time_tags": [
-     "weekday_morning"
-    ]
-   },
-   "status": "READY_WITH_WARNINGS",
-   "ready_for_scheduling": true,
-   "reasons": [],
+   "features": null,
+   "status": "NOT_SCHEDULABLE",
+   "ready_for_scheduling": false,
+   "reasons": [
+    "uncertain:window_close",
+    "uncertain:window_open"
+   ],
    "warnings": [
     "fee_unknown",
     "bounded_cost_unknown",
     "location_unknown",
+    "uncertain_soft:multi_session",
     "fixed_duration_default",
     "audience_not_stated"
    ],
    "dimensions": {
-    "data_ready_for_scheduling": true,
-    "score_binding_supported": true,
+    "data_ready_for_scheduling": false,
+    "score_binding_supported": false,
     "student_eligibility_basis": "NOT_STATED",
     "human_reviewed": true,
     "official_award_verified": false
@@ -34658,7 +34393,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-25T09:00:00+07:00",
@@ -34922,7 +34657,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "registration_url",
@@ -35125,7 +34860,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-24T14:00:00+07:00",
@@ -35381,7 +35116,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-09T14:00:00+07:00",
@@ -35644,7 +35379,7 @@
    "possible_duplicates": [],
    "activity_type": "career_admissions_event",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-20T08:30:00+07:00",
@@ -35905,7 +35640,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-02T09:00:00+07:00",
@@ -36167,7 +35902,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-31T14:00:00+07:00",
@@ -36421,7 +36156,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-03T14:00:00+07:00",
@@ -36679,7 +36414,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-05-26T13:30:00+07:00",
@@ -36954,7 +36689,10 @@
      ]
     },
     "notes": [
-     "model_reply_partly_unusable"
+     "model_reply_partly_unusable",
+     "model_reply_unusable_field_unknown:multi_session",
+     "model_reply_unusable_field_unknown:window_close",
+     "model_reply_unusable_field_unknown:window_open"
     ]
    },
    "human_decision": null,
@@ -36963,16 +36701,13 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
-    "schedule": {
-     "type": "FLEXIBLE_WINDOW",
-     "window_start": "2026-11-05T00:00:00+07:00",
-     "window_end": "2026-11-10T23:59:00+07:00",
-     "duration_minutes": 20,
-     "duration_source": "stated",
-     "bounds_precision": "date_only"
-    },
-    "uncertain_fields": [],
+    "policy_version": "activity-acceptance/1.2",
+    "schedule": null,
+    "uncertain_fields": [
+     "multi_session",
+     "window_close",
+     "window_open"
+    ],
     "budget_known": false,
     "accepted_record": {
      "post_type": "activity",
@@ -37099,72 +36834,31 @@
      "window_close": "date_only_2359"
     }
    },
-   "sp3_activity": {
-    "activity_id": "pfbid026Sq6YJVpvZ94HBx364fXmJs2i5jTLFKHE6Yt2XziXy6jcsuuuzM38EPfGBsYUn2gl",
-    "source": {
-     "publisher": "Đoàn Khoa - Liên Chi Hội Khoa Toán - Tin học HCMUS",
-     "platform": "Facebook",
-     "URL_post": "https://www.facebook.com/DK.LCH.ToanTinHoc.HCMUS/posts/pfbid026Sq6YJVpvZ94HBx364fXmJs2i5jTLFKHE6Yt2XziXy6jcsuuuzM38EPfGBsYUn2gl?rdid=VtOfRRwSm4j0aMLw",
-     "URL_registration": null
-    },
-    "title": "CUỘC THI “HIỂU ĐÚNG - NẮM CHUẨN LUẬT CƯ TRÚ",
-    "domain": null,
-    "start": "2026-11-05T00:00:00+07:00",
-    "end": "2026-11-10T23:59:00+07:00",
-    "registration_deadline": null,
-    "mode": "online",
-    "location": null,
-    "points": null,
-    "mandatory": false,
-    "audience": [
-     "Sinh viên Trường Đại học Khoa học tự nhiên, ĐHQG-HCM."
-    ],
-    "fee": null,
-    "completion_requirements": "[{\"deadline\": null, \"threshold\": 20, \"type\": \"quiz\", \"unit\": \"of 30 questions\"}]"
-   },
-   "sp3_derived": {
-    "start_end": "flexible_window_bounds",
-    "fee": "budget_basis:unknown",
-    "mandatory": "team_default:mandatory_false_when_unstated"
-   },
-   "sp3_schedule": {
-    "type": "FLEXIBLE_WINDOW",
-    "duration_minutes": 20
-   },
-   "binding": {
-    "activity_id": "pfbid026Sq6YJVpvZ94HBx364fXmJs2i5jTLFKHE6Yt2XziXy6jcsuuuzM38EPfGBsYUn2gl",
-    "binding_ref": "auto-R46-pfbid026Sq6YJVpvZ94HBx364fXmJs2i5jTLFKHE6Yt2XziXy6jcsuuuzM38EPfGBsYUn2gl",
-    "rule_id": "R46",
-    "field": "legal_health_communication_activities",
-    "operation": "INCREMENT",
-    "value": 1
-   },
+   "sp3_activity": null,
+   "sp3_derived": null,
+   "sp3_schedule": null,
+   "binding": null,
    "binding_decision": {
-    "reason": "sources_agree",
-    "label": "auto_proposed_not_human_reviewed",
-    "matcher_rule": "R46",
-    "matcher_method": "catalog_signal_match",
-    "category_id": "C4",
-    "points_from_rules": 10
+    "reason": "not_data_ready"
    },
-   "features": {
-    "topics": [],
-    "campus_id": "ONLINE",
-    "time_tags": []
-   },
-   "status": "READY_WITH_WARNINGS",
-   "ready_for_scheduling": true,
-   "reasons": [],
+   "features": null,
+   "status": "NOT_SCHEDULABLE",
+   "ready_for_scheduling": false,
+   "reasons": [
+    "uncertain:window_close",
+    "uncertain:window_open"
+   ],
    "warnings": [
     "domain_unknown",
     "fee_unknown",
     "bounded_cost_unknown",
     "registration_link_missing",
-    "registration_deadline_missing"
+    "registration_deadline_missing",
+    "uncertain_soft:multi_session"
    ],
    "dimensions": {
-    "data_ready_for_scheduling": true,
-    "score_binding_supported": true,
+    "data_ready_for_scheduling": false,
+    "score_binding_supported": false,
     "student_eligibility_basis": "OPEN_TO_STUDENTS",
     "human_reviewed": false,
     "official_award_verified": false
@@ -37203,7 +36897,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-25T08:00:00+07:00",
@@ -37479,7 +37173,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-18T08:00:00+07:00",
@@ -37754,7 +37448,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FLEXIBLE_WINDOW",
      "window_start": "2026-09-20T00:00:00+07:00",
@@ -38065,7 +37759,7 @@
    "possible_duplicates": [],
    "activity_type": "other",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mode"
@@ -38234,12 +37928,14 @@
    "possible_duplicates": [],
    "activity_type": "culture_sports_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
-     "type": "FIXED",
-     "start": "2026-07-30T09:00:00+07:00",
-     "end": "2026-08-03T23:00:00+07:00",
-     "duration_source": "stated_window"
+     "type": "FLEXIBLE_WINDOW",
+     "window_start": "2026-07-30T09:00:00+07:00",
+     "window_end": "2026-08-03T23:00:00+07:00",
+     "duration_minutes": 45,
+     "duration_source": "stated",
+     "bounds_precision": "time"
     },
     "uncertain_fields": [],
     "budget_known": false,
@@ -38428,17 +38124,13 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": 30, \"type\": \"quiz\", \"unit\": \"of 40 questions\"}, {\"deadline\": null, \"threshold\": 1, \"type\": \"other\", \"unit\": \"maximum attempts\"}]"
    },
    "sp3_derived": {
+    "start_end": "flexible_window_bounds",
     "fee": "budget_basis:unknown",
     "mandatory": "team_default:mandatory_false_when_unstated"
    },
    "sp3_schedule": {
-    "type": "FIXED",
-    "fixed_blocks": [
-     {
-      "start": "2026-07-30T09:00:00+07:00",
-      "end": "2026-08-03T23:00:00+07:00"
-     }
-    ]
+    "type": "FLEXIBLE_WINDOW",
+    "duration_minutes": 45
    },
    "binding": {
     "activity_id": "pfbid06exFW2AyQW5HDpHfyMWnECX7HdaZMm7szug6R5JXkU3QE2EuDiCRzqspwxjqTnkpl",
@@ -38461,9 +38153,7 @@
      "culture"
     ],
     "campus_id": "ONLINE",
-    "time_tags": [
-     "weekday_morning"
-    ]
+    "time_tags": []
    },
    "status": "READY_WITH_WARNINGS",
    "ready_for_scheduling": true,
@@ -38472,7 +38162,8 @@
     "fee_unknown",
     "bounded_cost_unknown",
     "registration_link_missing",
-    "registration_deadline_missing"
+    "registration_deadline_missing",
+    "online_window_treated_as_flexible"
    ],
    "dimensions": {
     "data_ready_for_scheduling": true,
@@ -38540,7 +38231,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-15T08:00:00+07:00",
@@ -38778,7 +38469,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-06T14:00:00+07:00",
@@ -39024,7 +38715,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-31T09:30:00+07:00",
@@ -39281,7 +38972,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "location",
@@ -39492,7 +39183,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-19T09:00:00+07:00",
@@ -39743,7 +39434,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "mandatory_stated"
@@ -39954,7 +39645,7 @@
    "possible_duplicates": [],
    "activity_type": "career_admissions_event",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-11T08:00:00+07:00",
@@ -40063,11 +39754,11 @@
     "year_inferred": []
    },
    "audience": {
-    "basis": "RESTRICTED_FREE_TEXT",
+    "basis": "OPEN_TO_STUDENTS",
     "lines": [
      "Nếu bạn đang quan tâm đến \"nghề giáo\" hoặc muốn hiểu rõ hơn về con đường trở thành giáo viên Toán tại các trường công lập"
     ],
-    "matched": "giáo viên",
+    "matched": null,
     "cohorts": [],
     "programs": []
    },
@@ -40158,13 +39849,12 @@
     "fee_unknown",
     "bounded_cost_unknown",
     "registration_deadline_missing",
-    "fixed_duration_default",
-    "audience_restriction_unresolved"
+    "fixed_duration_default"
    ],
    "dimensions": {
     "data_ready_for_scheduling": true,
     "score_binding_supported": true,
-    "student_eligibility_basis": "RESTRICTED_FREE_TEXT",
+    "student_eligibility_basis": "OPEN_TO_STUDENTS",
     "human_reviewed": false,
     "official_award_verified": false
    }
@@ -40205,7 +39895,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-10-15T07:30:00+07:00",
@@ -40478,7 +40168,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-25T10:30:00+07:00",
@@ -40732,7 +40422,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-25T08:30:00+07:00",
@@ -41009,7 +40699,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-22T09:00:00+07:00",
@@ -41264,7 +40954,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-24T10:00:00+07:00",
@@ -41493,7 +41183,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-18T10:00:00+07:00",
@@ -41758,7 +41448,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-12T10:00:00+07:00",
@@ -42004,7 +41694,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-15T10:00:00+07:00",
@@ -42258,7 +41948,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-07T10:00:00+07:00",
@@ -42512,7 +42202,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-06T10:00:00+07:00",
@@ -42768,7 +42458,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-29T09:00:00+07:00",
@@ -43028,7 +42718,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-08-04T09:00:00+07:00",
@@ -43281,7 +42971,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-23T10:00:00+07:00",
@@ -43534,7 +43224,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-22T09:30:00+07:00",
@@ -43810,7 +43500,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-16T14:00:00+07:00",
@@ -44040,7 +43730,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-20T10:00:00+07:00",
@@ -44293,7 +43983,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-10T09:30:00+07:00",
@@ -44560,7 +44250,7 @@
    "possible_duplicates": [],
    "activity_type": "career_admissions_event",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-27T10:00:00+07:00",
@@ -44856,13 +44546,8 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
-    "schedule": {
-     "type": "FIXED",
-     "start": "2026-07-02T08:00:00+07:00",
-     "end": "2026-07-03T13:00:00+07:00",
-     "duration_source": "stated_window"
-    },
+    "policy_version": "activity-acceptance/1.2",
+    "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
     "accepted_record": {
@@ -45007,79 +44692,27 @@
      "registration_deadline": "date_only_2359"
     }
    },
-   "sp3_activity": {
-    "activity_id": "pfbid03UiW9MaH5rbtETZ5Yj6c1MqdRgDj1ZDzmpgitawKmbZNc5hqAeHRgAidcAqkK48Kl",
-    "source": {
-     "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
-     "platform": "Facebook",
-     "URL_post": "https://www.facebook.com/khoatoantinhoc/posts/pfbid03UiW9MaH5rbtETZ5Yj6c1MqdRgDj1ZDzmpgitawKmbZNc5hqAeHRgAidcAqkK48Kl?rdid=vw56Ywf5gblKFqSe",
-     "URL_registration": "https://documents.uow.edu.au/~hduong/workshop/"
-    },
-    "title": "THÔNG BÁO: HỘI THẢO TOÁN HỌC VÀ MẬT MÃ 2026",
-    "domain": "academic",
-    "start": "2026-07-02T08:00:00+07:00",
-    "end": "2026-07-03T13:00:00+07:00",
-    "registration_deadline": "2026-06-29T23:59:00+07:00",
-    "mode": "offline",
-    "location": "Phòng B44 (ngày 02/7) và phòng B11a (ngày 03/7), Trường Đại học Khoa học tự nhiên, ĐHQG-HCM cơ sở 1 (227 Nguyễn Văn Cừ, Phường Chợ Quán, Thành phố Hồ Chí Minh)",
-    "points": null,
-    "mandatory": false,
-    "audience": null,
-    "fee": null,
-    "completion_requirements": "NOT_STATED"
-   },
-   "sp3_derived": {
-    "registration_deadline": "rule:date_only_end_of_day",
-    "fee": "budget_basis:unknown",
-    "mandatory": "team_default:mandatory_false_when_unstated",
-    "completion_requirements": "marker:not_stated"
-   },
-   "sp3_schedule": {
-    "type": "FIXED",
-    "fixed_blocks": [
-     {
-      "start": "2026-07-02T08:00:00+07:00",
-      "end": "2026-07-03T13:00:00+07:00"
-     }
-    ]
-   },
-   "binding": {
-    "activity_id": "pfbid03UiW9MaH5rbtETZ5Yj6c1MqdRgDj1ZDzmpgitawKmbZNc5hqAeHRgAidcAqkK48Kl",
-    "binding_ref": "auto-R19-pfbid03UiW9MaH5rbtETZ5Yj6c1MqdRgDj1ZDzmpgitawKmbZNc5hqAeHRgAidcAqkK48Kl",
-    "rule_id": "R19",
-    "field": "eligible_academic_seminars",
-    "operation": "INCREMENT",
-    "value": 1
-   },
+   "sp3_activity": null,
+   "sp3_derived": null,
+   "sp3_schedule": null,
+   "binding": null,
    "binding_decision": {
-    "reason": "sources_agree",
-    "label": "auto_proposed_not_human_reviewed",
-    "matcher_rule": "R19",
-    "matcher_method": "catalog_signal_match",
-    "category_id": "C1",
-    "points_from_rules": 5
+    "reason": "not_data_ready"
    },
-   "features": {
-    "topics": [
-     "mathematics",
-     "research"
-    ],
-    "campus_id": "NVC",
-    "time_tags": [
-     "weekday_morning"
-    ]
-   },
-   "status": "READY_WITH_WARNINGS",
-   "ready_for_scheduling": true,
-   "reasons": [],
+   "features": null,
+   "status": "NOT_SCHEDULABLE",
+   "ready_for_scheduling": false,
+   "reasons": [
+    "fixed_duration_over_12h"
+   ],
    "warnings": [
     "fee_unknown",
     "bounded_cost_unknown",
     "audience_not_stated"
    ],
    "dimensions": {
-    "data_ready_for_scheduling": true,
-    "score_binding_supported": true,
+    "data_ready_for_scheduling": false,
+    "score_binding_supported": false,
     "student_eligibility_basis": "NOT_STATED",
     "human_reviewed": false,
     "official_award_verified": false
@@ -45119,7 +44752,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-02T08:30:00+07:00",
@@ -45382,7 +45015,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-07-01T08:30:00+07:00",
@@ -45679,7 +45312,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [
      "window_close",
@@ -45858,7 +45491,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-06-29T09:00:00+07:00",
@@ -46151,7 +45784,7 @@
    "possible_duplicates": [],
    "activity_type": "academic_competition",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": null,
     "uncertain_fields": [],
     "budget_known": false,
@@ -46361,7 +45994,7 @@
    "possible_duplicates": [],
    "activity_type": "seminar_workshop",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-05-24T13:30:00+07:00",
@@ -46619,7 +46252,7 @@
    "possible_duplicates": [],
    "activity_type": "legal_health_campaign",
    "acceptance": {
-    "policy_version": "activity-acceptance/1.1",
+    "policy_version": "activity-acceptance/1.2",
     "schedule": {
      "type": "FIXED",
      "start": "2026-11-08T13:30:00+07:00",

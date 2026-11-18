@@ -1,6 +1,6 @@
 # Hợp đồng sử dụng dữ liệu hoạt động v1
 
-Thống nhất với người dùng ngày 18/11/2026. Phiên bản hiện hành: `activity-acceptance/1.1` (xem mục "1.1 changes"; bản 1.0 là nội dung còn lại).
+Thống nhất với người dùng ngày 18/11/2026. Phiên bản hiện hành: `activity-acceptance/1.2` (xem mục "1.1 changes" và "1.2 changes"; bản 1.0 là nội dung còn lại).
 Triển khai: `src/sp1/acceptance.py`, cấu hình `data/config/activity_acceptance_v1.json`.
 
 ## Nguyên tắc
@@ -59,3 +59,21 @@ Các trạng thái nói về độ sẵn sàng dữ liệu, không bảo đảm 
   which means the post says nothing). It is never treated as completed or as "none required".
 - **Review path.** The offline viewer and human-export import were removed; `data/review/decisions.csv` is the
   only correction mechanism.
+
+## 1.2 changes
+
+Plausibility checks (limits in `plausibility` of `data/config/activity_acceptance_v1.json`). Every hit carries a
+machine-readable code; none invents a time, deadline or cost.
+
+| Check | Code | Effect |
+| --- | --- | --- |
+| End not after start | `end_before_start`, `invalid_quiz_window` | excluded |
+| FIXED block longer than 12 h unless the stated duration covers it | `fixed_duration_over_12h` | excluded |
+| FLEXIBLE window longer than 62 whole days | `flexible_window_over_62_days` | excluded |
+| Event more than 400 days from `date_posted` | `event_far_from_post_date` | excluded |
+| Date whose year was inferred from the post date lies outside [post - 60 days, post + 400 days] | `inferred_year_inconsistent_with_post_date` | excluded |
+| Stated registration deadline after the event start | `registration_deadline_after_start` | warning only |
+
+An online, non-live activity with a stated sitting shorter than a long timed window ("40 questions in 45 minutes",
+open for several days) is scheduled as a flexible window (warning `online_window_treated_as_flexible`) instead of
+one long FIXED block.

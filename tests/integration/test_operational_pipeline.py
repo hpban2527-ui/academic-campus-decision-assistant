@@ -407,3 +407,62 @@ def test_api_catalog_and_plan_read_the_same_dataset_version(dataset):
     assert catalog["dataset"]["dataset_version"] == plan["dataset"]["dataset_version"] == op.load_dataset()["dataset_version"]
     assert catalog["activity_count"] + len(catalog["excluded"]) == dataset["summary"]["posts"]
     assert plan["clock"]["label"] == "historical_demo_clock"
+
+
+# ---------------------------------------------------------------- plausibility, unknown fields, pending post
+
+def _moment(value):
+    return op.datetime.fromisoformat(value)
+
+
+def test_every_schedulable_record_passes_the_plausibility_limits(dataset):
+    limits = load_policy()["plausibility"]
+    for record in ready(dataset):
+        schedule, accepted = record["sp3_schedule"], record["acceptance"]["accepted_record"]
+        block = record["acceptance"]["schedule"]
+        if schedule["type"] == "FIXED":
+            hours = (_moment(block["end"]) - _moment(block["start"])).total_seconds() / 3600
+            stated = accepted.get("duration_minutes_stated")
+            assert 0 < hours and (hours <= limits["max_fixed_hours"] or (stated and stated / 60 >= hours)), record["post_id"]
+        else:
+            assert 0 < (_moment(block["window_end"]) - _moment(block["window_start"])).days <= limits["max_flexible_window_days"]
+        posted = op.datetime.fromisoformat(record["source"]["date_posted"]).date()
+        assert abs((_moment(block.get("start") or block["window_start"]).date() - posted).days) <= limits["max_days_event_from_post"]
+        for field in record["acceptance"]["year_inferred"]:
+            if field in ("window_open", "window_close", "registration_deadline") and accepted.get(field):
+                delta = (op.datetime.fromisoformat(accepted[field][:10]).date() - posted).days
+                assert -limits["inferred_year_lookback_days"] <= delta <= limits["max_days_event_from_post"]
+
+
+def test_fields_of_an_unusable_model_reply_or_ungrounded_evidence_are_unknown(dataset):
+    soft = set(load_policy()["soft_fields"])
+    checked = 0
+    for record in dataset["records"]:
+        notes = record["extraction"]["notes"]
+        fields = [n.split(":", 1)[1] for n in notes if n.startswith(("model_reply_unusable_field_unknown:",
+                                                                      "evidence_not_grounded:"))]
+        if "model_reply_partly_unusable" in notes:
+            fallback = record["extraction"]["provenance"]["field_methods"]
+            assert {f for f, how in fallback.items() if how == "rules_fallback"} <= set(fields), record["post_id"]
+        decision = record["human_decision"]
+        resolved = set(decision["fields_set"]) if decision and not decision["stale"] else set()   # a real human fix
+        for field in fields:
+            if field in resolved:
+                continue
+            checked += 1
+            assert field in record["acceptance"]["uncertain_fields"], (record["post_id"], field)
+            if field in soft:
+                assert f"uncertain_soft:{field}" in record["warnings"]
+            else:
+                assert f"uncertain:{field}" in record["reasons"] and not record["ready_for_scheduling"]
+    assert checked, "the corpus contains unusable model replies and ungrounded evidence"
+
+
+def test_post_135_stays_pending_and_its_prompt_is_exported(dataset, corpus):
+    record = next(r for r in dataset["records"] if r["position"] == 135)
+    assert record["status"] == "EXTRACTION_PENDING" and record["extraction"]["state"] == "EXTRACTION_PENDING"
+    post = next(p for p in corpus if p["position"] == 135)
+    exported = [json.loads(line) for line in
+                (ROOT / "data/llm_inputs/pending_operational.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    row = next(r for r in exported if r["post_id"] == post["post_id"])
+    assert row["position"] == 135 and row["input_sha256"] == input_digest(prompts_for(post))

@@ -19,7 +19,7 @@ annotation of the 129 non-test posts and an agreed acceptance policy existed onl
 2. Extraction source order: AI annotation (non-test), recorded model reply with a
    matching prompt digest, otherwise `EXTRACTION_PENDING`. Human decisions apply last. Every source is
    bound to the text fingerprint.
-3. Data readiness follows `activity-acceptance/1.1`. Missing organizer facts stay unknown and exclude the
+3. Data readiness follows `activity-acceptance/1.2`. Missing organizer facts stay unknown and exclude the
    activity only from the operation that needs them.
 4. SP3 activity contract `sp3-activity/0.3`: nullable fee; unstated deadline signalled by evidence
    (`deadline_unstated_by_activity`) instead of a `MISSING_DEADLINE` gate; planner accepts it.

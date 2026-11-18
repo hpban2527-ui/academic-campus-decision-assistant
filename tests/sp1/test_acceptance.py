@@ -1,4 +1,5 @@
 from copy import deepcopy
+from datetime import datetime, timedelta
 
 from sp1.acceptance import assess_activity
 
@@ -187,9 +188,122 @@ def test_sp3_marker_is_unknown_for_uncertain_completion_and_not_stated_for_silen
     assert activity["completion_requirements"] not in {"UNKNOWN", "NOT_STATED"}
 
 
-def test_policy_version_is_1_1():
+def test_policy_keeps_the_1_1_rules():
     from sp1.acceptance import load_policy
     policy = load_policy()
-    assert policy["version"] == "activity-acceptance/1.1"
+    assert policy["version"] >= "activity-acceptance/1.1"                # pinned exactly in the 1.2 test below
     assert "completion_requirements" in policy["soft_fields"]
     assert "uncertain_end_time_default_used" in policy["warnings"]
+
+
+# ---------------------------------------------------------------- policy 1.2: plausibility checks
+
+def test_fixed_block_over_12_hours_is_excluded_unless_the_duration_is_stated():
+    overnight = row(window_open="2026-05-23T04:00+07:00", window_close="2026-05-24T20:30+07:00")
+    result = assess_activity(overnight)
+    assert not result["ready_for_scheduling"] and result["schedule"] is None
+    assert "fixed_duration_over_12h" in result["reasons"]
+    edge = assess_activity(row(window_open="2026-05-23T08:00+07:00", window_close="2026-05-23T20:00+07:00"))
+    assert edge["ready_for_scheduling"] and edge["schedule"]["type"] == "FIXED"       # exactly 12 h is plausible
+    over = assess_activity(row(window_open="2026-05-23T08:00+07:00", window_close="2026-05-23T20:01+07:00"))
+    assert "fixed_duration_over_12h" in over["reasons"]
+    stated = assess_activity(row(window_open="2026-05-23T04:00+07:00", window_close="2026-05-24T20:30+07:00",
+                                 duration_minutes_stated=40 * 60 + 30))
+    assert stated["ready_for_scheduling"] and stated["schedule"]["type"] == "FIXED"
+
+
+def test_a_stated_duration_shorter_than_a_long_offline_window_does_not_justify_one_long_block():
+    item = row(window_open="2026-05-23T04:00+07:00", window_close="2026-05-24T20:30+07:00", duration_minutes_stated=45)
+    assert "fixed_duration_over_12h" in assess_activity(item)["reasons"]
+
+
+def test_online_contest_with_a_stated_sitting_inside_a_long_window_is_flexible():
+    # Regression: "from 09:00 30/07 to 23:00 03/08 ... 40 questions in 45 minutes" was a 110 h FIXED block.
+    item = row(mode="online", location=None, window_open="2026-07-30T09:00+07:00",
+               window_close="2026-08-03T23:00+07:00", duration_minutes_stated=45)
+    item["source_text"] = "Cuộc thi trực tuyến trên nền tảng Myaloha. Thí sinh trả lời 40 câu hỏi trong vòng 45 phút."
+    result = assess_activity(item)
+    assert result["ready_for_scheduling"]
+    assert result["schedule"] == {"type": "FLEXIBLE_WINDOW", "window_start": "2026-07-30T09:00:00+07:00",
+                                  "window_end": "2026-08-03T23:00:00+07:00", "duration_minutes": 45,
+                                  "duration_source": "stated", "bounds_precision": "time"}
+    assert "online_window_treated_as_flexible" in result["warnings"]
+    item["source_text"] += " Tổ chức qua Zoom."
+    live = assess_activity(item)                                   # a live session is not a free-choice attempt
+    assert not live["ready_for_scheduling"] and "fixed_duration_over_12h" in live["reasons"]
+    item["record"]["duration_minutes_stated"] = None
+    item["source_text"] = "Cuộc thi trực tuyến."
+    assert "fixed_duration_over_12h" in assess_activity(item)["reasons"]     # no stated sitting: nothing to flex
+
+
+def test_flexible_window_longer_than_62_days_is_excluded():
+    def quiz(days):
+        item = row(mode="online", location=None, window_open="2026-09-01", window_close=None)
+        end = (datetime.fromisoformat("2026-09-01") + timedelta(days=days)).date().isoformat()
+        item["record"]["window_close"] = end
+        item["source_text"] = "Thi trắc nghiệm trực tuyến."
+        return assess_activity(item)
+    assert quiz(61)["schedule"]["type"] == "FLEXIBLE_WINDOW"
+    assert quiz(62)["schedule"]["type"] == "FLEXIBLE_WINDOW"          # 62 whole days (+ the 23:59 bound)
+    long = quiz(63)
+    assert "flexible_window_over_62_days" in long["reasons"] and long["schedule"] is None
+
+
+def test_end_not_after_start_is_excluded():
+    assert "end_before_start" in assess_activity(row(window_close="2026-10-30T14:00+07:00"))["reasons"]
+    assert "end_before_start" in assess_activity(row(window_close="2026-10-30T09:00+07:00"))["reasons"]
+    item = row(mode="online", location=None, window_open="2026-11-08", window_close="2026-11-02")
+    item["source_text"] = "Thi trắc nghiệm trực tuyến."
+    assert "invalid_quiz_window" in assess_activity(item)["reasons"]
+
+
+def test_deadline_after_start_is_a_warning_only():
+    late = assess_activity(row(registration_deadline="2026-10-31T09:00+07:00"))
+    assert late["ready_for_scheduling"] and "registration_deadline_after_start" in late["warnings"]
+    date_late = assess_activity(row(registration_deadline="2026-11-02"))
+    assert date_late["ready_for_scheduling"] and "registration_deadline_after_start" in date_late["warnings"]
+    same_day = assess_activity(row(registration_deadline="2026-10-30"))              # date-only on the event day
+    assert "registration_deadline_after_start" not in same_day["warnings"]
+    before = assess_activity(row(registration_deadline="2026-10-29T12:00+07:00"))
+    assert "registration_deadline_after_start" not in before["warnings"]
+
+
+def _posted(posted, **updates):
+    item = row(**updates)
+    item["date_posted"] = posted
+    return item
+
+
+def test_event_must_be_within_400_days_of_the_post_date():
+    ok = assess_activity(_posted("2025-09-26T00:00:00"))                              # 399 days later
+    assert ok["ready_for_scheduling"]
+    far = assess_activity(_posted("2025-09-25T00:00:00"))                             # 400 days later is the limit
+    assert far["ready_for_scheduling"]
+    too_far = assess_activity(_posted("2025-09-24T00:00:00"))
+    assert not too_far["ready_for_scheduling"] and "event_far_from_post_date" in too_far["reasons"]
+    stale = assess_activity(_posted("2028-01-01T00:00:00"))                           # 428 days before the post
+    assert "event_far_from_post_date" in stale["reasons"]
+    unknown = assess_activity(row())                                                  # no posting date: not checked
+    assert "event_far_from_post_date" not in unknown["reasons"]
+
+
+def test_inferred_year_must_agree_with_the_post_date():
+    item = _posted("2026-12-20T00:00:00", window_open="2026-10-30T14:00+07:00", window_close="2026-10-30T16:00+07:00")
+    item["year_inferred"] = ["window_open"]                       # 51 days before the post: inside the 60-day look-back
+    assert "inferred_year_inconsistent_with_post_date" not in assess_activity(item)["reasons"]
+    item["date_posted"] = "2027-01-20T00:00:00"                   # 82 days before the post: the rule would have chosen 2027
+    result = assess_activity(item)
+    assert not result["ready_for_scheduling"] and "inferred_year_inconsistent_with_post_date" in result["reasons"]
+    item["year_inferred"] = []                                    # a stated year is not judged by this rule
+    assert "inferred_year_inconsistent_with_post_date" not in assess_activity(item)["reasons"]
+    late = _posted("2025-06-01T00:00:00", registration_deadline="2026-10-01")
+    late["year_inferred"] = ["registration_deadline"]
+    assert "inferred_year_inconsistent_with_post_date" in assess_activity(late)["reasons"]
+
+
+def test_policy_version_is_1_2_and_has_the_plausibility_limits():
+    from sp1.acceptance import load_policy
+    policy = load_policy()
+    assert policy["version"] == "activity-acceptance/1.2"
+    assert policy["plausibility"] == {"max_fixed_hours": 12, "max_flexible_window_days": 62,
+                                      "max_days_event_from_post": 400, "inferred_year_lookback_days": 60}

@@ -24,6 +24,13 @@ BASIS_UNCLEAR = "UNCLEAR"
 
 _PRIORITY = re.compile(r"ưu tiên[^.;\n]*", re.IGNORECASE)
 _FIT = re.compile(r"công nghệ thông tin|\bcntt\b|\bfit\b|khoa học máy tính", re.IGNORECASE)
+# "ngành liên quan", "các ngành khác": a vague reference to other fields, not a named programme.
+# "trở thành giáo viên": the goal the activity is about, not who may attend.
+_NOT_A_RESTRICTION = re.compile(r"ngành\s+(?:có\s+)?liên quan|ngành\s+(?:khác|phù hợp)|trở thành\s+(?:một\s+)?(?:giáo viên|chiến sĩ)")
+# An explicit all-students marker, and staff named with their faculty ("giảng viên Khoa CNTT"): the faculty then
+# describes the lecturers invited, not a restriction on students.
+_ALL_STUDENTS = re.compile(r"toàn trường|toàn thể sinh viên|tất cả sinh viên|mọi sinh viên|toàn bộ sinh viên")
+_STAFF_CLAUSE = re.compile(r"(?:giảng viên|cán bộ|nhân viên|thầy cô|giáo sư)\b(?:(?!\s(?:và|hoặc)\s)[^,;\n])*")
 _RESTRICTIVE = re.compile(
     r"\bkhoa\s+(?!học\b|các\b)\w|\bngành\s+\w|\blớp\s+\w*\d|\bsinh viên (nam|nữ)\b|năm cuối|tân sinh viên|tân binh"
     r"|chiến sĩ|thành viên (đội|clb|câu lạc bộ|ban)\b|thiếu nhi|sư phạm|giáo viên|chưa đủ 18|dưới 18"
@@ -44,7 +51,9 @@ def classify(audience_text: str | None, scope: dict | None) -> dict:
         return {"basis": BASIS_STRUCTURED, "lines": lines, "matched": None}
     if not lines:
         return {"basis": BASIS_NOT_STATED, "lines": [], "matched": None}
-    text = _PRIORITY.sub(" ", _fold(" \n".join(lines)))
+    text = _NOT_A_RESTRICTION.sub(" ", _PRIORITY.sub(" ", _fold(" \n".join(lines))))
+    if _ALL_STUDENTS.search(text):
+        text = _STAFF_CLAUSE.sub(" ", text)
     restriction = _RESTRICTIVE.search(text)
     if restriction:
         basis = BASIS_FIT if _FIT.search(text) and not re.search(r"\bkhoa\s+(?!học\b|các\b|công nghệ thông tin)\w",

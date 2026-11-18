@@ -175,6 +175,11 @@ def _extract(post: dict, ctx: dict) -> dict:
     unsure = sorted({m.group(1) for flag in layer_a["flags"] if (m := _UNSURE_FLAG.match(flag))})
     if decision["errors"]:
         notes.append("model_reply_partly_unusable")
+        # A field the merge policy leaves to the model, answered by the unusable reply, fell back to the rules
+        # alone without the model's confirmation: it is unknown, not a confirmed value.
+        fallback = sorted(field for field, how in hybrid["field_methods"].items() if how == "rules_fallback")
+        unsure = sorted(set(unsure) | set(fallback))
+        notes.extend(f"model_reply_unusable_field_unknown:{field}" for field in fallback)
     provenance.update(file=row["_file"], field_methods=hybrid.get("field_methods", {}),
                       reply_errors=decision["errors"])
     return {"layer_a": layer_a, "activity_type": hybrid["classification"]["activity_type"], "unsure": unsure,
@@ -341,7 +346,8 @@ def process_post(post: dict, ctx: dict) -> dict:
     if activity_type not in ACTIVITY_TYPES:
         activity_type = None
     row = {"record": {**layer_a["record"], "activity_type": activity_type}, "unsure": sorted(unsure),
-           "source_text": pre.text, "review": {}}
+           "source_text": pre.text, "review": {}, "date_posted": post.get("date_posted"),
+           "year_inferred": layer_a["year_inferred"]}
     assessed = assess_activity(row, ctx["policy"])
     reasons, warnings = list(assessed["reasons"]), list(assessed["warnings"])
     if blocking:
@@ -647,6 +653,11 @@ EXTRA_MESSAGES = {
     "candidates_truncated": "Bài quá dài để trích xuất đầy đủ; không tự dùng.",
     "invalid_schedule_value": "Giá trị thời gian không hợp lệ.",
     "end_before_start": "Giờ kết thúc trước giờ bắt đầu.",
+    "fixed_duration_over_12h": "Khối giờ cố định dài quá 12 giờ mà bài không nêu thời lượng tương ứng "
+                               "(thường là sự kiện nhiều ngày); không tự xếp lịch.",
+    "flexible_window_over_62_days": "Cửa sổ tham gia dài quá 62 ngày; không tự xếp lịch.",
+    "event_far_from_post_date": "Ngày diễn ra cách ngày đăng bài hơn 400 ngày; không tự xếp lịch.",
+    "inferred_year_inconsistent_with_post_date": "Năm suy ra từ ngày đăng không khớp ngày đăng bài; không tự xếp lịch.",
 }
 
 

@@ -29,6 +29,47 @@ def _moment(value, *, closing=False):
 # Schedule inputs: when window_close is the only one of these that is uncertain, a fixed event can still
 # be scheduled from its certain start (policy 1.1).
 TIMING_FIELDS = {"window_open", "window_close", "duration_minutes_stated"}
+# Fields whose year may have been taken from the posting date (sp1.dates); see _inferred_year_problems.
+YEAR_INFERRED_FIELDS = ("window_open", "window_close", "registration_deadline")
+
+
+def _posted_date(value):
+    """The posting day as a date, or None when it is missing or unreadable."""
+    if not isinstance(value, str):
+        return None
+    try:
+        return datetime.fromisoformat(value).date()
+    except ValueError:
+        return None
+
+
+def _inferred_year_problems(record: dict, inferred: set, posted, limits: dict) -> list[str]:
+    """A date whose year was inferred from the posting date must lie between the look-back used by that rule
+    (a date more than N days before the post moves to the next year) and the maximum distance from the post."""
+    for field in YEAR_INFERRED_FIELDS:
+        value = record.get(field)
+        if field not in inferred or not isinstance(value, str):
+            continue
+        try:
+            day = _moment(value, closing=field != "window_open").date()
+        except ValueError:
+            continue
+        delta = (day - posted).days
+        if delta < -limits["inferred_year_lookback_days"] or delta > limits["max_days_event_from_post"]:
+            return ["inferred_year_inconsistent_with_post_date"]
+    return []
+
+
+def _deadline_after_start(deadline, start) -> bool:
+    """A stated registration deadline later than the event start (compared by day unless both have a time)."""
+    if not isinstance(deadline, str) or not isinstance(start, str):
+        return False
+    try:
+        if "T" in deadline and "T" in start:
+            return datetime.fromisoformat(deadline) > datetime.fromisoformat(start)
+    except ValueError:
+        return False
+    return deadline[:10] > start[:10]
 
 
 def assess_activity(row: dict, policy: dict | None = None) -> dict:
@@ -37,8 +78,8 @@ def assess_activity(row: dict, policy: dict | None = None) -> dict:
     unsure = set(row.get("unsure", []))
     source = row.get("source_text", "")
     mode = record.get("mode")
-    quiz = (mode == "online" and bool(re.search(policy["quiz_pattern"], source, re.I))
-            and not re.search(policy["live_pattern"], source, re.I))
+    live = bool(re.search(policy["live_pattern"], source, re.I))
+    quiz = mode == "online" and bool(re.search(policy["quiz_pattern"], source, re.I)) and not live
     # Policy 1.1: a certain start date+time with an uncertain end only (fixed events, not quizzes): the end is
     # ignored and replaced by the stated duration or the team default. A flexible quiz still needs its end.
     start_value = record.get("window_open")
@@ -91,6 +132,28 @@ def assess_activity(row: dict, policy: dict | None = None) -> dict:
         valid_minutes = isinstance(minutes, int) and not isinstance(minutes, bool) and minutes > 0
         if ignore_close:
             warnings.append("uncertain_end_time_default_used")
+        limits = policy.get("plausibility", {})
+        posted = _posted_date(row.get("date_posted"))
+        if opening is not None and posted is not None and limits:
+            if abs((opening.date() - posted).days) > limits["max_days_event_from_post"]:
+                reasons.append("event_far_from_post_date")
+        if posted is not None and limits:
+            reasons.extend(_inferred_year_problems(record, set(row.get("year_inferred", [])), posted, limits))
+        if opening is not None and record.get("registration_deadline") and _deadline_after_start(
+                record["registration_deadline"], start):
+            warnings.append("registration_deadline_after_start")
+
+        def flexible(duration, duration_source):
+            """FLEXIBLE_WINDOW schedule, or None with the reason when the window is implausibly long."""
+            # Whole days: a date-only end already carries the 23:59 bound, which must not count as an extra day.
+            if limits and (closing - opening).days > limits["max_flexible_window_days"]:
+                reasons.append("flexible_window_over_62_days")
+                return None
+            return {"type": "FLEXIBLE_WINDOW", "window_start": opening.isoformat(),
+                    "window_end": closing.isoformat(), "duration_minutes": duration,
+                    "duration_source": duration_source,
+                    "bounds_precision": "date_only" if "T" not in start or "T" not in end else "time"}
+
         if opening is None:
             reasons.append("missing_activity_date")
         elif quiz:
@@ -105,10 +168,7 @@ def assess_activity(row: dict, policy: dict | None = None) -> dict:
                 if closing - opening < timedelta(minutes=minutes):
                     reasons.append("quiz_duration_exceeds_window")
                 else:
-                    schedule = {"type": "FLEXIBLE_WINDOW", "window_start": opening.isoformat(),
-                                "window_end": closing.isoformat(), "duration_minutes": minutes,
-                                "duration_source": "stated" if valid_minutes else "team_default",
-                                "bounds_precision": "date_only" if "T" not in start or "T" not in end else "time"}
+                    schedule = flexible(minutes, "stated" if valid_minutes else "team_default")
         elif "T" not in start:
             reasons.append("missing_fixed_start_time")
         else:
@@ -125,11 +185,22 @@ def assess_activity(row: dict, policy: dict | None = None) -> dict:
                         warnings.append("fixed_duration_default")
                     duration_source = "stated_duration" if valid_minutes else "team_default"
                     closing = opening + timedelta(minutes=minutes) if minutes else None
-                if closing:
+                if not closing:
+                    reasons.append("missing_duration")
+                elif (limits and closing - opening > timedelta(hours=limits["max_fixed_hours"])
+                      and not (valid_minutes and timedelta(minutes=minutes) >= closing - opening)):
+                    # A block this long is not a plausible single sitting unless the post states that duration.
+                    if mode == "online" and not live and valid_minutes:
+                        # Online, no live platform, a stated sitting shorter than the window: one attempt anywhere
+                        # inside the window (e.g. "40 questions in 45 minutes" open for several days).
+                        schedule = flexible(minutes, "stated")
+                        if schedule:
+                            warnings.append("online_window_treated_as_flexible")
+                    else:
+                        reasons.append("fixed_duration_over_12h")
+                else:
                     schedule = {"type": "FIXED", "start": opening.isoformat(), "end": closing.isoformat(),
                                 "duration_source": duration_source}
-                else:
-                    reasons.append("missing_duration")
     except (TypeError, ValueError, OverflowError):
         reasons.append("invalid_schedule_value")
     reasons = list(dict.fromkeys(reasons))
