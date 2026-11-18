@@ -21,7 +21,7 @@ from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 from time import perf_counter
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -45,6 +45,8 @@ from personalization import (
     PreferenceProviderInvalidResponse,
     PreferenceProviderUnavailable,
     StudentPreference,
+    ProfileAssistantDraft,
+    merge_profile_extraction,
     preference_provider_from_env,
 )
 from personalization.fast_interpreter import interpret_explicit_preference
@@ -73,7 +75,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[],
+    allow_origin_regex=r"^https?://(?:localhost|127\.0\.0\.1)(?::\d+)?$".replace("\\\\", "\\"),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -534,6 +537,19 @@ class AssistantInterpretRequest(BaseModel):
     model_config = {"extra": "forbid"}
     message: str = Field(min_length=1, max_length=2_000)
     draft: Optional[dict[str, Any]] = None
+
+
+class ProfileAssistantInterpretRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+    message: str = Field(min_length=1, max_length=2_000)
+    draft: dict[str, Any] = Field(default_factory=dict)
+    conversation: list["ProfileConversationTurn"] = Field(default_factory=list, max_length=20)
+
+
+class ProfileConversationTurn(BaseModel):
+    model_config = {"extra": "forbid"}
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=2_000)
 
 
 def get_grade_label(score: float) -> str:
@@ -1461,6 +1477,36 @@ def interpret_assistant_action(req: AssistantInterpretRequest):
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+@app.post("/api/profile-assistant/interpret")
+def interpret_profile_assistant(req: ProfileAssistantInterpretRequest):
+    """Use Ollama to propose validated profile patches without persisting them."""
+
+    try:
+        current = ProfileAssistantDraft.model_validate(req.draft)
+        provider = _get_preference_provider()
+        extraction = provider.interpret_profile(
+            req.message,
+            current.model_dump(mode="json"),
+            [turn.model_dump() for turn in req.conversation],
+        )
+        proposed, changes = merge_profile_extraction(current, extraction)
+    except PreferenceProviderUnavailable as exc:
+        raise HTTPException(status_code=503, detail=_preference_error_detail(exc)) from exc
+    except PreferenceProviderInvalidResponse as exc:
+        raise HTTPException(status_code=502, detail=_preference_error_detail(exc)) from exc
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return {
+        "status": "CLARIFICATION" if extraction.questions and not changes else "PREVIEW",
+        "provider": provider.provider_name,
+        "model": provider.model,
+        "requires_confirmation": True,
+        "proposed_draft": proposed.model_dump(mode="json"),
+        "changes": [item.model_dump(mode="json") for item in changes],
+        "questions": extraction.questions,
+    }
+
+
 class AvailabilityResolveRequest(BaseModel):
     availability: dict[str, Any]
     window_start: str
@@ -1610,7 +1656,9 @@ def lead_data_audit():
 # Serve Frontend static files if web directory exists
 from api.sp3_service import (
     demo_plan as _sp3_demo_plan,
+    personalized_plan_options as _sp3_personalized_options,
     personalized_demo_plan as _sp3_personalized_plan,
+    preview_personalized_swap as _sp3_preview_swap,
     sp1_catalog as _sp3_catalog,
 )
 from api.sp3_real import real_catalog as _sp3_real_catalog, real_plan as _sp3_real_plan
@@ -1659,6 +1707,8 @@ def run_sp3_personalized_plan(req: PersonalizedPlanRequest, source: str = "synth
 
     try:
         if _sp3_source(source) == "real":
+            if req.availability is not None:
+                raise HTTPException(status_code=422, detail="canonical availability is not yet supported for source=real")
             return _sp3_real_plan(
                 req.scenario,
                 target_total=req.total_target,
@@ -1670,6 +1720,52 @@ def run_sp3_personalized_plan(req: PersonalizedPlanRequest, source: str = "synth
             scenario=req.scenario,
             target_total=req.total_target,
             busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
+            availability_request=req.availability,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/sp3/personalized/options")
+def run_sp3_personalized_options(req: PersonalizedPlanRequest, source: str = "synthetic"):
+    """Return all distinct feasible strategy results in one cacheable response."""
+
+    if req.scenario != "first_plan":
+        raise HTTPException(status_code=422, detail="plan options are available for first_plan only")
+    if _sp3_source(source) != "synthetic":
+        raise HTTPException(status_code=422, detail="multi-strategy options are not yet available for source=real")
+    try:
+        return _sp3_personalized_options(
+            req.preference,
+            target_total=req.total_target,
+            busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
+            availability_request=req.availability,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+class SmartSwapRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+    confirmed_profile: Literal[True]
+    preference: StudentPreference
+    base_result: dict[str, Any]
+    remove_activity_id: str = Field(min_length=1, max_length=100)
+    add_activity_id: str = Field(min_length=1, max_length=100)
+
+
+@app.post("/api/sp3/personalized/swap-preview")
+def preview_sp3_smart_swap(req: SmartSwapRequest, source: str = "synthetic"):
+    """Preview a whole-plan rescored swap; never persists or applies it."""
+
+    if _sp3_source(source) != "synthetic":
+        raise HTTPException(status_code=422, detail="smart swap is not yet available for source=real")
+    try:
+        return _sp3_preview_swap(
+            req.preference,
+            req.base_result,
+            req.remove_activity_id,
+            req.add_activity_id,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
