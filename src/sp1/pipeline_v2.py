@@ -1,9 +1,9 @@
-"""Per-post SP1 v2 processing shared by the batch store build and incremental ingestion.
+"""Per-post SP1 v2 processing helpers (source projection, redaction, plannability check).
 
 One announcement goes through the same steps everywhere: rules extraction, the LLM decision
 (recorded replies or a live client), the hybrid merge under the merge policy, an optional human
-review decision, normalisation and the plannability check. scripts/build_activity_store.py runs
-this for the frozen 189-post dataset; sp1.live_ingest runs it for new posts one at a time.
+review decision, normalisation and the plannability check. sp1.operational builds the runtime dataset
+and uses post_source and redact from here.
 """
 
 from __future__ import annotations

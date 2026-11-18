@@ -1602,7 +1602,7 @@ from api.sp3_real import real_catalog as _sp3_real_catalog, real_plan as _sp3_re
 # ?source=real switches the SP3 screens to the SP1 v2 store (HK1 2026-2027, synthetic student).
 # The default stays the synthetic MVP fixture so existing demos and tests are unchanged.
 # The app only reads committed data files; new announcements arrive through the admin batch
-# (scripts/admin_rebuild.py, docs/admin_data_update.md), never through a model call at runtime.
+# (scripts/update_activity_data.py, docs/OPERATIONAL_DATA_PIPELINE.md), never through a model call at runtime.
 SP3_SOURCES = ("synthetic", "real")
 
 

@@ -17,9 +17,9 @@ data/operational/activity_dataset.json      schema unilife-operational-dataset/1
 build replaces it. Catalog and planning use the same loaded object, and every response carries
 `dataset.dataset_version`. The synthetic MVP fixture stays the default source and is unchanged.
 
-`data/handover/*` and `data/activity_store_v2.json` are the legacy SP1 v2 outputs (Qwen-only, the 14-field
-v0.2 handover). They are still rebuilt by `scripts/admin_rebuild.py` and tested, but **the application no
-longer reads them**.
+The legacy SP1 v2 store and handover (`data/activity_store_v2.json`, `data/handover/*`, `data/review/queue.csv`,
+`src/sp1/handover.py`, `src/sp1/live_ingest.py` and their build scripts and tests) were removed on 2026-11-18;
+the application reads only `data/operational/activity_dataset.json`. Evaluation scripts moved to `scripts/eval/`.
 
 ## 2. Inputs (authoritative, versioned in `data/`)
 

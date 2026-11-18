@@ -54,7 +54,7 @@ Trên PowerShell, đặt $env:PYTHONPATH = "src" trước khi chạy lệnh pyte
 
 ## Updating activity data (admin)
 
-Students never submit announcements, and the running app never calls a model: it only reads the committed files in `data/`. New announcements are added by the admin as an offline batch (add posts, run the LLM notebook on Kaggle, `python scripts/admin_rebuild.py --reason "..."`, human review in `data/review/decisions.csv`, rebuild, tests, PR on a `data/` branch). Step-by-step commands: [docs/admin_data_update.md](docs/admin_data_update.md).
+Students never submit announcements, and the running app never calls a model: it only reads the committed files in `data/`. New announcements are added by the admin as an offline batch (add posts to `data/raw/operational_updates.json`, run `python scripts/update_activity_data.py --reason "..."`, optional correction in `data/review/decisions.csv`, tests, PR on a `data/` branch). Step-by-step commands: [docs/OPERATIONAL_DATA_PIPELINE.md](docs/OPERATIONAL_DATA_PIPELINE.md).
 
 ## Bàn giao H4–H5 – bản tích hợp cuối chờ duyệt
 

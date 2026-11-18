@@ -1,10 +1,13 @@
-"""Incremental LLM outputs: several --llm files merged by post_id, conflicts and missing posts fail loudly,
-and export_llm_inputs --only-missing exports only the posts that still need a model run."""
+"""Incremental LLM outputs: several recorded-reply files merge by (post_id, input digest), conflicting replies
+fail loudly, and export_llm_inputs --only-missing exports only the posts that still need a model run."""
 import importlib.util
 import json
 from pathlib import Path
 
 import pytest
+
+from sp1.devdata import load_split
+from sp1.llm_cache import CacheError, load_replies
 
 ROOT = Path(__file__).resolve().parents[2]
 FINAL = ROOT / "data/llm_outputs/final/Qwen__Qwen3.5-4B.jsonl"
@@ -18,11 +21,10 @@ def _load(name):
     return module
 
 
-store = _load("build_activity_store")
 exporter = _load("export_llm_inputs")
 LINES = [line for line in FINAL.read_text(encoding="utf-8").splitlines() if line.strip()]
 MODEL = json.loads((ROOT / "data/config/merge_policy.json").read_text(encoding="utf-8"))["_model_id"]
-SPLIT = {row["post_id"]: row for row in store.load_split()["posts"]}
+SPLIT = {row["post_id"]: row for row in load_split()["posts"]}
 
 
 def _stale_ids():
@@ -52,58 +54,33 @@ def write(path, lines):
     return path
 
 
-def test_two_files_merge_to_the_same_records_as_one(tmp_path):
+def _plain(index):
+    return {key: {k: v for k, v in row.items() if k != "_file"} for key, row in index.items()}
+
+
+def test_two_files_merge_to_the_same_replies_as_one(tmp_path):
     first = write(tmp_path / "a.jsonl", LINES[:120])
     second = write(tmp_path / "b.jsonl", LINES[100:])          # 20 posts in both files, same content
-    merged = store.load_llm_files([first, second], MODEL, SPLIT.keys())
-    assert merged == store.load_llm(FINAL, MODEL, SPLIT.keys())
+    assert _plain(load_replies([first, second], MODEL)) == _plain(load_replies([FINAL], MODEL))
 
 
 def test_same_post_with_only_different_run_timings_is_not_a_conflict(tmp_path):
     row = json.loads(LINES[0])
     rerun = {**row, "seconds": {"classify": 1.0, "roles": 2.0}, "peak_vram_gb": 9.9}
-    merged = store.load_llm_files([write(tmp_path / "a.jsonl", [LINES[0]]),
-                                   write(tmp_path / "b.jsonl", [json.dumps(rerun)])], MODEL, SPLIT.keys())
-    assert merged[row["post_id"]]["seconds"] == row["seconds"]          # first file kept, nothing overwritten
+    merged = load_replies([write(tmp_path / "a.jsonl", [LINES[0]]),
+                           write(tmp_path / "b.jsonl", [json.dumps(rerun)])], MODEL)
+    kept = merged[(row["post_id"], row["input_sha256"])]
+    assert kept["seconds"] == row["seconds"] and kept["_file"] == "a.jsonl"     # first file kept, nothing overwritten
 
 
 def test_same_post_with_different_content_is_an_error(tmp_path):
     row = json.loads(LINES[0])
     changed = {**row, "replies": {**row["replies"], "classify": row["replies"]["classify"].replace("activity", "info_only", 1)}}
-    with pytest.raises(ValueError) as caught:
-        store.load_llm_files([write(tmp_path / "old.jsonl", LINES[:3]),
-                              write(tmp_path / "new.jsonl", [json.dumps(changed)])], MODEL, SPLIT.keys())
+    with pytest.raises(CacheError) as caught:
+        load_replies([write(tmp_path / "old.jsonl", LINES[:3]),
+                      write(tmp_path / "new.jsonl", [json.dumps(changed)])], MODEL)
     message = str(caught.value)
-    assert row["post_id"] in message and "old.jsonl" in message and "new.jsonl" in message and "replies" in message
-
-
-def test_a_post_without_llm_output_fails_the_build_and_is_listed(tmp_path):
-    missing = [json.loads(line)["post_id"] for line in LINES[-2:]]
-    with pytest.raises(ValueError) as caught:
-        store.build([write(tmp_path / "partial.jsonl", LINES[:-2])], ROOT / "data/config/merge_policy.json", REASON,
-                    tmp_path / "out", access_log=tmp_path / "access.jsonl")
-    message = str(caught.value)
-    assert message.startswith("2 posts have no LLM output")
-    for pid in missing:
-        assert f"position {SPLIT[pid]['position']} ({pid})" in message
-    assert not (tmp_path / "out").exists()                               # nothing written
-
-
-def test_allow_partial_is_a_dry_run_only(tmp_path):
-    with pytest.raises(ValueError, match="dry run"):
-        store.build([FINAL], ROOT / "data/config/merge_policy.json", REASON, ROOT, allow_partial=True,
-                    access_log=tmp_path / "access.jsonl")
-    assert not (tmp_path / "access.jsonl").exists()                      # refused before reading the corpus
-
-
-def test_cli_accepts_repeated_llm(tmp_path, capsys):
-    store.main(["--reason", REASON, "--out-dir", str(tmp_path), "--access-log", str(tmp_path / "access.jsonl"),
-                "--llm", str(write(tmp_path / "a.jsonl", LINES[:100])), "--llm", str(write(tmp_path / "b.jsonl", LINES[100:]))])
-    meta = json.loads((tmp_path / "data/activity_store_v2.json").read_text(encoding="utf-8"))
-    # Every post has a recorded reply; replies whose prompts changed since the run are stale, not replayed.
-    assert meta["n_without_llm"] == meta["n_llm_output_stale"] == len(meta["llm_output_stale"])
-    assert meta["llm_file"] == "a.jsonl, b.jsonl"
-    assert f"{len(LINES)} posts" in capsys.readouterr().out
+    assert row["post_id"] in message and "old.jsonl" in message and "new.jsonl" in message
 
 
 def _export(tmp_path, *extra):

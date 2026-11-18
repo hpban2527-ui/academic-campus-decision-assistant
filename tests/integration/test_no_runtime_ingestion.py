@@ -1,6 +1,6 @@
 """The running app never ingests posts or calls the SP1 model: no /api/sp1 router, no real_live source.
 
-New announcements reach the app only through the admin offline batch (scripts/admin_rebuild.py). There is no
+New announcements reach the app only through the admin offline batch (scripts/update_activity_data.py). There is no
 SP1_LIVE_INGEST switch: setting it (or any value) must not bring the router back.
 """
 import ast

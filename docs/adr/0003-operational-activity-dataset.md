@@ -30,6 +30,6 @@ annotation of the 129 non-test posts and an agreed acceptance policy existed onl
 ## Consequences
 
 * 189/189 posts accounted for; the counts are read from the dataset (`reports/operational_dataset_report.md`).
-* The legacy store/handover remains buildable and tested but is not used at runtime.
+* The legacy store/handover and their build scripts were removed (2026-11-18); nothing reads them at runtime.
 * A post with stale or missing model output is visible as pending until the next offline run.
 * SP3, personalization and UI owners must review the listed contract changes before merging.
