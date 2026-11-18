@@ -18,12 +18,17 @@ def test_sp1_catalog_preserves_review_status():
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["activity_count"] == 20
-    assert body["unstructured_new_posts"] == 18
+    assert body["source_dataset"]["path"] == "data/raw/source.json"
+    assert body["source_dataset"]["total_posts"] == 189
+    assert body["source_dataset"]["status"] == "RAW_REVIEW_REQUIRED"
+    assert body["source_dataset"]["matched_reviewed_activities"] == 16
+    assert len(body["source_dataset"]["missing_reviewed_activity_ids"]) == 4
+    assert body["unstructured_new_posts"] == 173
     assert body["term"]["id"] == "HK3_2025_2026"
     assert all(item["publication_status"] == "REVIEW_REQUIRED" for item in body["activities"])
     assert all(item["score_binding_verified"] is False for item in body["activities"])
     assert all(item["data_qa"]["activity_id"] == item["activity"]["activity_id"] for item in body["activities"])
-    assert body["new_post_drafts"]
+    assert len(body["new_post_drafts"]) == 173
     assert all(item["publication_status"] == "REVIEW_REQUIRED" for item in body["new_post_drafts"])
     assert all(item["score_binding_verified"] is False for item in body["new_post_drafts"])
 

@@ -1,0 +1,464 @@
+{
+  "schema": "sp1-features-provenance/1.0",
+  "label": "auto_derived_not_human_reviewed",
+  "note": "Every value in the output file is derived by the documented rules (D19), including for the activities that also appear in data/activity_features.json. The differences list shows where that file says something else, for its owner to reconcile. That file is never written here, and no value here is human reviewed.",
+  "output_file": "data/handover/activity_features_sp1.json",
+  "policy": "rules_decide",
+  "also_in_activity_features_json": [
+    "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al",
+    "pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l",
+    "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl",
+    "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
+    "pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl",
+    "pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl",
+    "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl",
+    "pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl",
+    "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl",
+    "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
+    "pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l",
+    "pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l",
+    "pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl"
+  ],
+  "reviewed_not_handed_over": [
+    "pfbid026SJmz8cRXUkDwHvJrZyZv4bsikCC1t4pdDBt46gTuwxaTkBKtSHvCPvwJH1KJ47l",
+    "pfbid02EJmkk2oaZJuBw5VqRhEUeSUNqVW6dav9qSV4AZsK661vLikur7U4PPBqJcPDBYHzl",
+    "pfbid02buju6UWyad8k9Z4xH1tR5eNwpWsuaZtnwfesY2o8UQzdFh3p7cHemVx24dkaHSdFl",
+    "pfbid02fsjfr4MEtTjN9TpVw3DvfWumQm7Wx2GGE56n7J51Y8sh4brg3p4k1uwhX41h26FFl",
+    "pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl",
+    "pfbid02o8CK5Ziex6z2ZjnEhnv49RyHkZwMxEcLkpF49QmVymQp3N2hghbSAcrvzFram89Pl",
+    "pfbid0dmRU1XavPQ3rzXsGMSTaL69GEcdsmKnXeVaWA4LYybFFgsJDfg3qtMetBGfn7zKkl"
+  ],
+  "generated_by_sp1": [
+    "pfbid01AAm6S6qVctGQsv4wNGYrx7zWTMJ653yWSnzhqoxnzR9DjeXPcjBMLFrzKycB6Gpl",
+    "pfbid0219WhKzg2VY5EfQp6HMhoMuEF6Lgh7zsvdovR38vwdVLxtCA2gE2EDfVPteg8SyAwl",
+    "pfbid0224hSkhEGcN3QxsHdmmUNP115JkFUAzZ2SbBdWmmFsGwt375fAnrq1PoCoXj3c1KMl",
+    "pfbid02285ocydHPVMww7euZXHZq6sqfKstCRijWuA1byprpGga4YynxFJsd9TwMvvVBiD2l",
+    "pfbid023BTcksnd8iA2DSSa8drrgiFWmZ8jDQRUDzcBAEoy7ooHQDmMMPVgHXNoA42cip1hl",
+    "pfbid025erNwk7cF1tMs1kos2bfv64bXQ5ucFuZXFjWTJrkq61bCFrmx2sN56pFmuCodtyyl",
+    "pfbid025fBQXb22sDH9ZNzBhXEYXozzFwAswPCg8dzZfvxSx831ERBzcxmXXC7VtwvtdJoTl",
+    "pfbid026Sq6YJVpvZ94HBx364fXmJs2i5jTLFKHE6Yt2XziXy6jcsuuuzM38EPfGBsYUn2gl",
+    "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
+    "pfbid026qSFM265Ft8XG2VwUNw6YoooAKBLtBzDAAMDdv9HdL78aqBx91MALHnWrENVh6QMl",
+    "pfbid026tGxjXMKEfjUcKGxJrJPcAxuaqEv2B4VGJQDaX4Gk7U3tjHs2B5KL4QhdiERvZigl",
+    "pfbid027nUhiQ7aznU2x99pKZq59VRcUmfAdvheW9QZFLUg6UWDGckVTsgBN919cdp5WQCql",
+    "pfbid0285J7o94gHZcTDZ3T7g9t2rUyZaopXD2xCpCQevjusKo49EXM7mmycf3beX6tkqWxl",
+    "pfbid0289LXq7GYKD9KR5A73sWwd6w3HsY1eknyMjZJwkRTbVbDhK8CzRJtaTiYPgFj7vF2l",
+    "pfbid028nU9z1suxgWj7baVZuSjfF1YbGT3VY39wNQRcWytEKNxVaCLuenpxGpdUpuNQYHYl",
+    "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"
+  ],
+  "needs_review": {
+    "no_topic": [
+      "pfbid026Sq6YJVpvZ94HBx364fXmJs2i5jTLFKHE6Yt2XziXy6jcsuuuzM38EPfGBsYUn2gl",
+      "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
+      "pfbid02fGUGmmeFVfurrKSD5o4vZHViiLRkCqJEEQbyMCiS41JAm5uStkEB1gaGRA7pBAZGl",
+      "pfbid02kR3wMs65f7GQ89ojixmKDysEPt77nEd6hv4UgBar99NoQghQZoDbK5PiyqKUsJP3l",
+      "pfbid02nCN8N4M5aEeETae34vgQgVPNgsHgCRwBxXDzkx7zGHw3rzQi8UueJqFZX6eMU9UUl",
+      "pfbid02nHiUgkgwE7APBtveTm5vuZQrqmyirBLQh3jreNrTMkoRCxXn1D7hrci4yuvy3zkLl",
+      "pfbid02sJS5iFnzYXizYKqEMWkYCyB8ZBnQixEnohVWxPPQRZSn6QC5d2aMYdo8YXZcu5Wdl",
+      "pfbid03X1XBcRYamue2CtNT1nBHGsuPwqeHEfArVYBTKkEaZkPgVoRwf5XkTBDR4ba65uTl",
+      "pfbid05g494RxPj45X3dAdedowc2ZtR7VmqyuXXtXvmEHYR65ptYHV8zUsPCMnArf5VDsol",
+      "pfbid0BpJELJG8E2fN28dp63xuopmJpK1Q8nLkNXAgSk9QzKAfM1XDt1yZDDtLhmFTSqxhl",
+      "pfbid0FyyqMGmaPaHsEV5fTrNZgCcgx38FpETvUCg1MuobJNHcgRhfRgRAiTyEupBH6Uiel"
+    ],
+    "campus_not_determined": [
+      "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al",
+      "pfbid02k1a64HpY4MFwMBRqhHbsczAVbKwmV3xUa3pPAX6V8zeUXKiFADFuyKnAoCXmv1TCl",
+      "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl",
+      "pfbid0boR7w7iRdsuvBfCXvESjpRi81S7Js93u4QHY9jXCS7yUF1A2NYoYYewBPaMXdHRYl",
+      "pfbid0rWnRjXaG5b2ZYJfRm3KTFERyVrApzzSbY9kbxSn7cNvoXJLgR4sZpJyeHd29fRJcl"
+    ]
+  },
+  "differences_vs_activity_features_json": [
+    {
+      "post_id": "pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l",
+      "in_activity_features_json": {
+        "topics": [
+          "culture"
+        ],
+        "campus_id": "NVC",
+        "time_tags": [
+          "weekend_evening"
+        ]
+      },
+      "rule_value_used": {
+        "topics": [
+          "culture"
+        ],
+        "campus_id": "NVC",
+        "time_tags": []
+      }
+    },
+    {
+      "post_id": "pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l",
+      "in_activity_features_json": {
+        "topics": [
+          "technology",
+          "career",
+          "soft_skills"
+        ],
+        "campus_id": "OTHER",
+        "time_tags": []
+      },
+      "rule_value_used": {
+        "topics": [
+          "research",
+          "technology",
+          "soft_skills"
+        ],
+        "campus_id": "ONLINE",
+        "time_tags": []
+      }
+    },
+    {
+      "post_id": "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl",
+      "in_activity_features_json": {
+        "topics": [
+          "civic_education"
+        ],
+        "campus_id": "ONLINE",
+        "time_tags": []
+      },
+      "rule_value_used": {
+        "topics": [
+          "soft_skills"
+        ],
+        "campus_id": "ONLINE",
+        "time_tags": [
+          "weekday_morning"
+        ]
+      }
+    },
+    {
+      "post_id": "pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl",
+      "in_activity_features_json": {
+        "topics": [
+          "safety",
+          "soft_skills",
+          "civic_education"
+        ],
+        "campus_id": "DONG_HOA",
+        "time_tags": [
+          "weekday_morning"
+        ]
+      },
+      "rule_value_used": {
+        "topics": [
+          "safety",
+          "soft_skills"
+        ],
+        "campus_id": "DONG_HOA",
+        "time_tags": [
+          "weekend_morning"
+        ]
+      }
+    },
+    {
+      "post_id": "pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl",
+      "in_activity_features_json": {
+        "topics": [
+          "volunteer",
+          "culture"
+        ],
+        "campus_id": "DONG_HOA",
+        "time_tags": []
+      },
+      "rule_value_used": {
+        "topics": [
+          "volunteer"
+        ],
+        "campus_id": "DONG_HOA",
+        "time_tags": [
+          "weekend_morning"
+        ]
+      }
+    },
+    {
+      "post_id": "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl",
+      "in_activity_features_json": {
+        "topics": [
+          "volunteer",
+          "environment"
+        ],
+        "campus_id": "OTHER",
+        "time_tags": []
+      },
+      "rule_value_used": {
+        "topics": [
+          "volunteer"
+        ],
+        "campus_id": "OTHER",
+        "time_tags": [
+          "weekend_morning"
+        ]
+      }
+    },
+    {
+      "post_id": "pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl",
+      "in_activity_features_json": {
+        "topics": [
+          "volunteer"
+        ],
+        "campus_id": "OTHER",
+        "time_tags": [
+          "weekday_evening"
+        ]
+      },
+      "rule_value_used": {
+        "topics": [
+          "volunteer"
+        ],
+        "campus_id": "OTHER",
+        "time_tags": [
+          "weekend_afternoon"
+        ]
+      }
+    },
+    {
+      "post_id": "pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l",
+      "in_activity_features_json": {
+        "topics": [
+          "sports"
+        ],
+        "campus_id": "OTHER",
+        "time_tags": []
+      },
+      "rule_value_used": {
+        "topics": [
+          "research",
+          "soft_skills"
+        ],
+        "campus_id": "OTHER",
+        "time_tags": [
+          "weekend_evening"
+        ]
+      }
+    },
+    {
+      "post_id": "pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl",
+      "in_activity_features_json": {
+        "topics": [
+          "artificial_intelligence",
+          "mathematics",
+          "technology",
+          "research"
+        ],
+        "campus_id": "NVC",
+        "time_tags": []
+      },
+      "rule_value_used": {
+        "topics": [
+          "research",
+          "artificial_intelligence"
+        ],
+        "campus_id": "NVC",
+        "time_tags": []
+      }
+    },
+    {
+      "post_id": "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl",
+      "in_activity_features_json": {
+        "topics": [
+          "mathematics",
+          "technology",
+          "research"
+        ],
+        "campus_id": "OTHER",
+        "time_tags": []
+      },
+      "rule_value_used": {
+        "topics": [
+          "research",
+          "technology"
+        ],
+        "campus_id": null,
+        "time_tags": [
+          "weekend_morning"
+        ]
+      }
+    },
+    {
+      "post_id": "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
+      "in_activity_features_json": {
+        "topics": [
+          "civic_education",
+          "culture"
+        ],
+        "campus_id": "ONLINE",
+        "time_tags": []
+      },
+      "rule_value_used": {
+        "topics": [
+          "research"
+        ],
+        "campus_id": "ONLINE",
+        "time_tags": [
+          "weekday_evening"
+        ]
+      }
+    },
+    {
+      "post_id": "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al",
+      "in_activity_features_json": {
+        "topics": [
+          "technology",
+          "soft_skills"
+        ],
+        "campus_id": "OTHER",
+        "time_tags": []
+      },
+      "rule_value_used": {
+        "topics": [
+          "research",
+          "soft_skills"
+        ],
+        "campus_id": null,
+        "time_tags": []
+      }
+    }
+  ]
+}

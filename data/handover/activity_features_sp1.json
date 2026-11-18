@@ -1,0 +1,1618 @@
+{
+  "schema_version": "personalization-features/0.1",
+  "catalog": {
+    "topics": [
+      "mathematics",
+      "artificial_intelligence",
+      "technology",
+      "research",
+      "soft_skills",
+      "career",
+      "volunteer",
+      "environment",
+      "culture",
+      "sports",
+      "health",
+      "safety",
+      "civic_education"
+    ],
+    "campuses": [
+      "NVC",
+      "DONG_HOA",
+      "ONLINE",
+      "OTHER"
+    ],
+    "time_slots": [
+      "weekday_morning",
+      "weekday_afternoon",
+      "weekday_evening",
+      "weekend_morning",
+      "weekend_afternoon",
+      "weekend_evening"
+    ]
+  },
+  "label": "auto_derived_not_human_reviewed",
+  "source": "data/activity_store_v2.json via scripts/build_features.py; reviewed entries from data/activity_features.json are copied unchanged",
+  "activities": {
+    "pfbid01AAm6S6qVctGQsv4wNGYrx7zWTMJ653yWSnzhqoxnzR9DjeXPcjBMLFrzKycB6Gpl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0219WhKzg2VY5EfQp6HMhoMuEF6Lgh7zsvdovR38vwdVLxtCA2gE2EDfVPteg8SyAwl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0224hSkhEGcN3QxsHdmmUNP115JkFUAzZ2SbBdWmmFsGwt375fAnrq1PoCoXj3c1KMl": {
+      "topics": [
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02285ocydHPVMww7euZXHZq6sqfKstCRijWuA1byprpGga4YynxFJsd9TwMvvVBiD2l": {
+      "topics": [
+        "technology",
+        "research",
+        "soft_skills"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid023BTcksnd8iA2DSSa8drrgiFWmZ8jDQRUDzcBAEoy7ooHQDmMMPVgHXNoA42cip1hl": {
+      "topics": [
+        "artificial_intelligence",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid025erNwk7cF1tMs1kos2bfv64bXQ5ucFuZXFjWTJrkq61bCFrmx2sN56pFmuCodtyyl": {
+      "topics": [
+        "culture"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid025fBQXb22sDH9ZNzBhXEYXozzFwAswPCg8dzZfvxSx831ERBzcxmXXC7VtwvtdJoTl": {
+      "topics": [
+        "environment"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid026Sq6YJVpvZ94HBx364fXmJs2i5jTLFKHE6Yt2XziXy6jcsuuuzM38EPfGBsYUn2gl": {
+      "topics": [],
+      "campus_id": "ONLINE",
+      "time_tags": []
+    },
+    "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl": {
+      "topics": [],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid026qSFM265Ft8XG2VwUNw6YoooAKBLtBzDAAMDdv9HdL78aqBx91MALHnWrENVh6QMl": {
+      "topics": [
+        "environment"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": [
+        "weekday_evening"
+      ]
+    },
+    "pfbid026tGxjXMKEfjUcKGxJrJPcAxuaqEv2B4VGJQDaX4Gk7U3tjHs2B5KL4QhdiERvZigl": {
+      "topics": [
+        "technology",
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid027nUhiQ7aznU2x99pKZq59VRcUmfAdvheW9QZFLUg6UWDGckVTsgBN919cdp5WQCql": {
+      "topics": [
+        "culture"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0285J7o94gHZcTDZ3T7g9t2rUyZaopXD2xCpCQevjusKo49EXM7mmycf3beX6tkqWxl": {
+      "topics": [
+        "culture",
+        "sports",
+        "civic_education"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0289LXq7GYKD9KR5A73sWwd6w3HsY1eknyMjZJwkRTbVbDhK8CzRJtaTiYPgFj7vF2l": {
+      "topics": [
+        "civic_education"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_evening"
+      ]
+    },
+    "pfbid028nU9z1suxgWj7baVZuSjfF1YbGT3VY39wNQRcWytEKNxVaCLuenpxGpdUpuNQYHYl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid029Jij29wV7kgrAX9S3gAYGwJqsF3anMhxQJTTMCgPgT9YPzf8U2Gu6LKrgQwTzPPEl": {
+      "topics": [
+        "mathematics",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al": {
+      "topics": [
+        "research",
+        "soft_skills"
+      ],
+      "campus_id": null,
+      "time_tags": []
+    },
+    "pfbid02DCZpfGjQzAAYMT1iGMTLMT1ZhupsrtjzP976EHHMxXjyftf9o1hCdXFGxLKKg89wl": {
+      "topics": [
+        "mathematics",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02DSEr8WQJzpdWxaA3x9fsG2mqZ7H8tTPjvkWyc2nKTumE2NRhrFDWNX7U8MQvxZ1l": {
+      "topics": [
+        "artificial_intelligence",
+        "research"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02DfS2q8PyN6jgKAtMV8961vKUSUS6daTwGd7XAtStMn3RE4mbTzTKXusqpG3CkoTUl": {
+      "topics": [
+        "volunteer"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02DtyVjVd8KapWdeZfjuKWzkAkLYh7zKYNGvVYVhgaWJJykCdafquexAYMvrWWf7k2l": {
+      "topics": [
+        "civic_education"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": [
+        "weekday_evening"
+      ]
+    },
+    "pfbid02FMWA2Mngt1A7nFcKZwJnMoiBft7U5PfbR9oSVc3XEAPPFB7qPskSHjnKicQBdo5ql": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02FRDX3FT2Sgwx1Bc76q6kskVkegZczF4CLqz8nrwHhrqMVUzsMVEWKuYDqQ1ZN2Yhl": {
+      "topics": [
+        "mathematics",
+        "artificial_intelligence",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02Hbu9f7JVWqGnUURwKSQFtzAt2LR83s4KA52ybyfBQyhNCFGJCKtJ1jrfxxFdtJzAl": {
+      "topics": [
+        "artificial_intelligence",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02KYphUfhTSv343V1AHeqLJtuRvoWKF6ue7ChUFkPAoMs9zvfgosyY4xuGj9o4JDeDl": {
+      "topics": [
+        "civic_education",
+        "soft_skills"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02LE91HdQKfQTU4APo1zkPAbp2ehNvSWkje3GhUEMw4HauC4CSki4h7yxVTPkXBfZ2l": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02MvySj3SMqNNyvECYsRgnAnhyG6QWBTf8qMMb9c2UETuXdwNmEEGPrbRcCjchtjM2l": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02QMkDAHHrWA2uPJjG4s9PHzoRfhmJHDk19RxQ7bfQ76RTPdgZjhXcffG8zX3t3i2jl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02R2QY7G7Az76zRtJtgpUZEh9US3tLSKRKCZ8K7oUbKvNojfbjYxioJQC5fCdxkJCDl": {
+      "topics": [
+        "mathematics",
+        "soft_skills"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02STJBf5x7cuU8UpDzjJHCtyD2DwtPD7o6fGWR3i2BdpExnETcXSUuHryeeJ5uvnA9l": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02SXEDSP813Nakurd3SoxwZcyrGeDd6zEmckJB3HMJmNUWYBqmNPQCW4NvxwCEk8oTl": {
+      "topics": [
+        "volunteer",
+        "culture"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_evening"
+      ]
+    },
+    "pfbid02SaqDdqPTqXpdpZ3kkMRYD9cWSknTBbbkj2v8D17piLdDoMMwo8xN2sz1CwaUhBtXl": {
+      "topics": [
+        "soft_skills"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid02Tjn5J53Jvp7ar4gF8F1PLBMQayHYvXg2fMWgRcZK2CBad8uhte3pryhQ7BLz7cWYl": {
+      "topics": [
+        "artificial_intelligence",
+        "technology"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02TrYpTsUSKzgxih7JW8WBQb6FThavaGZH3H2SU1kHNkY78e6nRVQKXqFFU77oBR4Bl": {
+      "topics": [
+        "volunteer"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_evening"
+      ]
+    },
+    "pfbid02WDiXqBnGX2CMAnUs2FuKrZ7kXitvuDDeoB6yG9ZigmWt3VMxGAVvZ5jazmSQKeGWl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": []
+    },
+    "pfbid02WVszVBUuvGDcdyBKjmig4KhhZ8j7vpvw8gZV8pUgM8zrhbo7niNNztyL4KsTA39Jl": {
+      "topics": [
+        "mathematics",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02WqKUdFpoAdWQNe4ZLgf9gQBZtKqmkFUWiaid3jcXV9sazNq2MkTxz5DzHvtq8cwsl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02XZ9UEstUjWk1HmPL9wxrGm3eLmXznbqkA4WaFofggdWyYTV6vwCdmd3iwWi8MKEUl": {
+      "topics": [
+        "soft_skills"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02YAXkGYRTXTUcJRZjFSBgaLkew2aghR2ymjvwUsLyShg98GSJ6yDzcZU4hT3L2hwNl": {
+      "topics": [
+        "research",
+        "mathematics"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": []
+    },
+    "pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l": {
+      "topics": [
+        "research",
+        "soft_skills"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_evening"
+      ]
+    },
+    "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl": {
+      "topics": [
+        "health",
+        "volunteer"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02bVcZdd9u3YkPwKABb5ofe5SjtcdV7kB2DjyoGEzhbmuLwobMuKwF1QPxrP2xaoaKl": {
+      "topics": [
+        "mathematics",
+        "artificial_intelligence",
+        "research"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02bdhLq6HRRQ994GUuGbkfqjGpW3dhu9UrYi1Nq2Kiv1Y6U6F4sdXau9JwdDGPJeEyl": {
+      "topics": [
+        "civic_education",
+        "career"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl": {
+      "topics": [
+        "safety",
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02d8dMYR42QFsvyt8NtRf9PnnZykLp5asyvJibUUu9xjhEHsn824m9wKparUSouwsml": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02eBT6oYCt55hLyxTL2seDNVSvkurP61h2M7CRNs524Ydt9ASonyXPzGzTnYmr8zJGl": {
+      "topics": [
+        "technology",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02eMqDhKVyrocNhXZ8AR5ugCNRj1MHZCdGjXJ6GYFo8ZVGNqAQcixVqeCMPDP2PtUPl": {
+      "topics": [
+        "environment",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_evening"
+      ]
+    },
+    "pfbid02eQzrvj7F749ehTidCzne4rUP9NnrBi8stCoaSRwYFjg5ErhuqmzQ4w2ckN3ATT1Fl": {
+      "topics": [
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl": {
+      "topics": [
+        "artificial_intelligence",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid02fGUGmmeFVfurrKSD5o4vZHViiLRkCqJEEQbyMCiS41JAm5uStkEB1gaGRA7pBAZGl": {
+      "topics": [],
+      "campus_id": "DONG_HOA",
+      "time_tags": []
+    },
+    "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl": {
+      "topics": [
+        "volunteer"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02gQSArenKumt6jbHtfrhHs3gcuCj7WtPX9K19MqtngN6kxLyoRAeNDcPLvDsEsT9Sl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02gk5voNQ9aqW4p4jaYsdK2hiiWkcAPrHoghJpUogA6HangBq7apjqKASPb6oYAXjEl": {
+      "topics": [
+        "technology",
+        "safety",
+        "civic_education"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid02hJkDnVfGkv83TzXoq8XKNPRkKmdxcKaM3QyUwa2X1tgtdxonqyoWkjYCsfHCQNAVl": {
+      "topics": [
+        "career"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02hUMc36SLcoeJQj2eqhy8eYzmS7MWjaatrm1otqAYAzbLxL4spU4r3B8rVUyUi7Rgl": {
+      "topics": [
+        "mathematics",
+        "research"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02hfH3kbYuHruq3L6aWNwNg2tF1DU6qMDTBYZeCA9Yp89bMLyodk13nExeuooHtDi3l": {
+      "topics": [
+        "mathematics",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02ib6XiRibHb5pBX27ym3QMs1QJMgqiSjJUtPRp4w7ipghZ5MpZRQ4brHn7VVkrw8l": {
+      "topics": [
+        "artificial_intelligence",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02k1a64HpY4MFwMBRqhHbsczAVbKwmV3xUa3pPAX6V8zeUXKiFADFuyKnAoCXmv1TCl": {
+      "topics": [
+        "career"
+      ],
+      "campus_id": null,
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02kR3wMs65f7GQ89ojixmKDysEPt77nEd6hv4UgBar99NoQghQZoDbK5PiyqKUsJP3l": {
+      "topics": [],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02kutBrbygb4ncZwC53vzgyBAv4hztCjB5FmxBAMeDqfPu8w1M57nvEseypp6skHeLl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02nBhkYKDvQr3jTEnDwyyykJ6eEWWiJmjqTDt6KBbeTm7ucnwnLftxyFRSaYfXjBbDl": {
+      "topics": [
+        "volunteer"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02nCN8N4M5aEeETae34vgQgVPNgsHgCRwBxXDzkx7zGHw3rzQi8UueJqFZX6eMU9UUl": {
+      "topics": [],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02nHiUgkgwE7APBtveTm5vuZQrqmyirBLQh3jreNrTMkoRCxXn1D7hrci4yuvy3zkLl": {
+      "topics": [],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid02oMXdMTsNgYeGkCHTL5eNmjGVpyNwsWmJp4asbnPeMhhgLcbLdLxryaETCvwZLPDYl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02pq9FwpzAvtwrUyMU7rxRSWykB1Nbb6jN8UGZ7A2ckSViqLVUaAmqJaDGAgWebgBHl": {
+      "topics": [
+        "volunteer"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02qCE8MUFBhdARZM7M5q1PLaAhRF9orw39kZeWvaEgfwKEpYQesa9itqgp2cAdcYS1l": {
+      "topics": [
+        "career",
+        "environment"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid02r8qFC3FbixnX1Ca711EpxPjUgH9dFHLUm2ubzGJMm5Q5sbsqpTFCSa5RVGcinrAQl": {
+      "topics": [
+        "research",
+        "career"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02sJS5iFnzYXizYKqEMWkYCyB8ZBnQixEnohVWxPPQRZSn6QC5d2aMYdo8YXZcu5Wdl": {
+      "topics": [],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02sg3uR6Gxc97MRGCYwTL3TgbV1gT9RV7wvMQjuhg1pEfmGy8vba6XKR5GjW25aJAXl": {
+      "topics": [
+        "technology"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid02siTEQKEuCF2qpDVh744eEdtSD3qdzfgyo86pwB9S8VxBv8YyaStV2Y2he6nqMYLil": {
+      "topics": [
+        "technology"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid02t92pVgHoWRYaV8FjZbebVvmJv9Yq4XaK6WNecBVT43Q56AKux7zZQMDj4VvuMvNsl": {
+      "topics": [
+        "volunteer"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid02ufAUyzips3EBXmQt4Nm2pLtbahyZZenaWtpUQJ4NS6fVYHbTUipk1hUe5kUxnKEel": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid02uqyZt4SWmoJme1y2HHWtaigR3vsESsgeeq4v97BJTJGvWhvPDcfuy9d79Z1qF81gl": {
+      "topics": [
+        "mathematics",
+        "career"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid02yMDVHE16UDK4zTjaearF8omPMY7LzTvCP8Fd9JCUUV43hnzrd7DdiXFr35gFvPFSl": {
+      "topics": [
+        "environment",
+        "career"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02yyN6zJpVkzoUEtVwR1yXjsYwmno8Zn6ErCUYFKNn5iMxq1MoyeaiQWiM1k7bGLgQl": {
+      "topics": [
+        "mathematics",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid02zyFDsiq3o68YGWrRuhvSitLHd5SK4segqABuRCRhSq8Y9orEo7sEjs6Tx6LbgVxLl": {
+      "topics": [
+        "technology",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid032KfAjEjEMxdFFsj7Cy9vSEGuUQKRa4f3gECk4dTN1gSTb8SMXtgjk2BnqDNQUw6Zl": {
+      "topics": [
+        "mathematics"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid032ty6V3vVWp3XP1qU2frLhFWnvZPbv2ZsBm6Rbach9QvdcdYGKT3ha2pznQxQvtGWl": {
+      "topics": [
+        "artificial_intelligence",
+        "soft_skills"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid032ty6V3vVWv86ySbmwwVuVoJdzRtp8ho9jWNGfn93PCVUiFw5yq4sA87MUuzc1pjel": {
+      "topics": [
+        "research",
+        "soft_skills"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl": {
+      "topics": [
+        "safety",
+        "soft_skills"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0348peH7andUqAfothwtJxbr5BQnQKPbTUZWjoGcuba4gMHMeBazFxpUseEBGd78xwl": {
+      "topics": [
+        "technology",
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid034B81QfPTsxeT9aqWhTRsKeghDQ1NZZRqZonp9HYUwjpjiEbQRegGZfdfddFRgz98l": {
+      "topics": [
+        "soft_skills"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid034HtkaTpbHATZQf2FNfLkY1u78X7ocS3Ym3et2BmXVhtAaFZq1W9ANr9Kbkf31zetl": {
+      "topics": [
+        "artificial_intelligence",
+        "technology",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid034P8mWxQfzzGLbMrSwyw9XdXKhsPoZm8GoYEYCzZZKvHmsVJKtVMj4xjbraKGrcCql": {
+      "topics": [
+        "environment",
+        "culture"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl": {
+      "topics": [
+        "research",
+        "artificial_intelligence"
+      ],
+      "campus_id": "NVC",
+      "time_tags": []
+    },
+    "pfbid036iL9LZpFZyFpzdho2MMSzP4zzcby8vdZRnyh2Wa7zkuC9aXX8wnPW7pDijHJX4Uxl": {
+      "topics": [
+        "technology",
+        "soft_skills"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid037Fu3dCFRn8bvGgLJ57t3fg38yhtWukNKTQeFgFvzL4vJ6AhysqnPbxhZVvxZ8WEyl": {
+      "topics": [
+        "culture"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": []
+    },
+    "pfbid037dQuUMa8WZycfPidHfFu2ZioZyQiQCNzffpts1NjzD7Nasx9orUaJM1iGuh4a415l": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid037nFyUmhshymd7mrmP2MEYjE9jEy2Dxt5h3nmuxccbnsW98pDuR738ASevRgTdx4el": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0381oQwuHvpmEh3ZK1TnzirV1vQyMe747ToR1nQ918JF6cYBVmJMS9Bwyphwekzi5Al": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid038DGUhwuATw2zV7BXaEZz4yaAZsxCeaqBmtHitPMphYTmkeVcso2V31FFNNCQv5grl": {
+      "topics": [
+        "environment",
+        "culture"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid038GmCPfh41jVGAaDGzmWJQSRVFtQ7hNVj1Qph1FSL1qtxzUw8azUnd3Ggpc4G6i97l": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid03JtQFt1ThCdY31bYF4xAct8ZAgQ4P6F7fzXiGAXNrG4vyrARwVXzvgSEApmDP1k4l": {
+      "topics": [
+        "technology",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid03UiW9MaH5rbtETZ5Yj6c1MqdRgDj1ZDzmpgitawKmbZNc5hqAeHRgAidcAqkK48Kl": {
+      "topics": [
+        "mathematics",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid03X1XBcRYamue2CtNT1nBHGsuPwqeHEfArVYBTKkEaZkPgVoRwf5XkTBDR4ba65uTl": {
+      "topics": [],
+      "campus_id": "NVC",
+      "time_tags": []
+    },
+    "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl": {
+      "topics": [
+        "research",
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid04TWHCk35qTYcTge6Y9MegsAB75pzxkkNt8eBcVvwNaAkAvAYkDHP1FK1B7kLeUjdl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid04cZzYL3H43W2be1KJdqcphQuDGBvesXXvWYR41L9zgSB5cpaVd4RoAXUqenh8CXjl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid04sy8x96bnq2Kns58R6Jgjdr1LfLrsgSexXbfG6so7kLJWCeUCZDLMrDqZ4czaUZbl": {
+      "topics": [
+        "mathematics",
+        "technology",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid05YjQKZS5mfiAGdG3uwRVghCnAHQaj3L7CAs7BFWBgcehwZUcWged7VogZbrzcgP8l": {
+      "topics": [
+        "culture"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid05g494RxPj45X3dAdedowc2ZtR7VmqyuXXtXvmEHYR65ptYHV8zUsPCMnArf5VDsol": {
+      "topics": [],
+      "campus_id": "ONLINE",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid06exFW2AyQW5HDpHfyMWnECX7HdaZMm7szug6R5JXkU3QE2EuDiCRzqspwxjqTnkpl": {
+      "topics": [
+        "research",
+        "culture"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid06qL2JWWfSVKvDaiZMJggoz2BK5GFA3KvchYDTBAFzNJck59vNqgM7TckBtcm8gZDl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid073tRtafeN7CM4HEhct79p942MFANdoLk3ebnXRZEpHUfa1sa3ux6z1BpdpBFntWgl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid07Tux7Ai4bxJcL5j8rckoGTQMbJHFRbTjBqdVmbCTqydgmM5gdvakjh8A7EK5eGejl": {
+      "topics": [
+        "career",
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid07U8FM3d6sDU19AFyzF8QXSKToyt21UwDAGcrWV34EzRHHD3k9YXszg128RGCX3Pfl": {
+      "topics": [
+        "safety",
+        "volunteer"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid08bsoKaZwLc6X473mUcYVujvuqqHTxTQYeofmvA2WGttwNVChgHFCcrGo2ker5fN2l": {
+      "topics": [
+        "artificial_intelligence",
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid08gtoQNh4T5peEggPdPJ5TxUTfcVqEKwXhyxVYFGaceSV3vJHaENVEXC6o3iezgfil": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid09Y9s952puDP3QcZQP7cT2Qu37195SBSwKXE7X4ARiy5b48nZ9VqpKAo7mF2b8ZbLl": {
+      "topics": [
+        "culture",
+        "sports",
+        "civic_education"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0AEzrJsJY7PUJjjBi4qxUx3L5XFRuTt9GuRKTvvaidxagcFN6xd3Ru6DsccNpuPNEl": {
+      "topics": [
+        "career"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid0B4HZ4d6x6R9DGgSC91Go4hzFEZM2XHAWitnpAatkvt1s9JVwpLBAx7Z8xgNxtt3tl": {
+      "topics": [
+        "technology",
+        "research"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0BpJELJG8E2fN28dp63xuopmJpK1Q8nLkNXAgSk9QzKAfM1XDt1yZDDtLhmFTSqxhl": {
+      "topics": [],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_evening"
+      ]
+    },
+    "pfbid0CwVmJXUgJUuV6TChmgGsFj9Lwm9A7ycitChowYdW92KaYdzVR5T4pAfFHbZUgCWtl": {
+      "topics": [
+        "technology",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0DMdcuKGsUUdshzF34zwD7RWtE8BUQKHuduXDBRSRoBJgdCqkstgFj5q2gT1re2R1l": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0DYE32yV1XMkeXbfucffpmGGDL6W77rjwaPd4NZXpnv4bZZegtDM7TFU6Yg3jFfpnl": {
+      "topics": [
+        "career"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl": {
+      "topics": [
+        "soft_skills"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl": {
+      "topics": [
+        "volunteer"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl": {
+      "topics": [
+        "civic_education"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0FyyqMGmaPaHsEV5fTrNZgCcgx38FpETvUCg1MuobJNHcgRhfRgRAiTyEupBH6Uiel": {
+      "topics": [],
+      "campus_id": "DONG_HOA",
+      "time_tags": []
+    },
+    "pfbid0HSj8yJoaxt3xytoxrhDDsnBXbzqoKXCNJooAbB9zusiNDkSWg1Cj1Mz2cJf676mml": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0HoFxwQhDVohGedE1sY1Q4dez3D4KFuCQtwd3kzoGXrAVwaVQXUH3h5RomZg8QzRml": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0JiSLqaex23GZMuiZA32GYeFC5nQdjqZNs353EmEd9ZVnMFDGfLDUEbCDeL82A8UCl": {
+      "topics": [
+        "volunteer"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0JwSUvE4e65FU1A1k2s9tGU7jjC2YosgNvawJb41X1uDxbxCE7yf6Rbj1uWG1f8k7l": {
+      "topics": [
+        "research",
+        "career"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0JzvoeBcvCnuaPzgSM5VmLLaEhiD8KXUviThgoTksoo12w9TV8kRfM6c96rAZXMEGl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl": {
+      "topics": [
+        "research",
+        "technology"
+      ],
+      "campus_id": null,
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0LR4V37mwvsshK8KUbKQGqk5C9rnmSZy9McGSyRvMHmKd6RuJGMmTimYv8iavL6KBl": {
+      "topics": [
+        "mathematics",
+        "technology",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0QD1ZSXT9WK1jcvGaRLBLpJbHauPL1ynXXM8M6uNwGBsKbfmR9YjrPwGP7kNHVywYl": {
+      "topics": [
+        "artificial_intelligence",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0X6wKqTejMciuYWvtPqdH28rcSBxvJnx8aqPyzCdZJ3s4vyS2aWuBCmqQA8JkvwaTl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": [
+        "weekday_evening"
+      ]
+    },
+    "pfbid0XsH1Fk5EGo78si8yhjCyy78BP6NiAJC7rJE7ttJ7F1xiWNqY5jj5bZQ4sPokUEXAl": {
+      "topics": [
+        "technology",
+        "soft_skills"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0XzA4NWd2m3eB1qz6Q7jmmoDrTDjipgRBeRq7rUBrN4DFGLAWRkJrbf1GiyUDaVdNl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0YHQrrXsRSecHxmPMzbBkgYTncQh2CYEAWuDAnkqHL1RSySZkeaZFwoa76U9jHxqol": {
+      "topics": [
+        "mathematics",
+        "technology",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0ZL8h8T9DTa1H5hT2yNKJhPGJrsqz5sB8hn81E47nuYTsZpvkQhJcKNgpJGBB9pn3l": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0ZrAbQBhEkyDX78nX31LitqTS2KKG7vLMaToGvpJUNa2JFE69bvybMDj2mrcxhqfWl": {
+      "topics": [
+        "research",
+        "career"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid0aUCrHq7mHLANjHkGTRUDVKZ6QXfzfDve9v3Y6hiqrUnSXTepxkh6sEKRB27x3aSHl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0aa6txmsbR2PKoZ8uVc4rCL7kbppAVgNrDgUWJnvWebPwEBTVoF97YTwC6Aj7V6cel": {
+      "topics": [
+        "research",
+        "soft_skills"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": []
+    },
+    "pfbid0arbMmNqZbdPeQvrpnmHyghSkbCNFoPcBhsjqUkACEZJq1FDzDYNbcjAiCBVBaHsjl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0axvNSc1yr7jRCiyy2vu9Uj1Df769i6QKu5jnA9eJBdYYCDDE65Yy2pHazDhGBPU8l": {
+      "topics": [
+        "technology",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0bLDucenYUZ6TKbA5d9iB4FvM77cgyYNv3DocuF94pZDT1Co85AE6oCEERhNqHF28l": {
+      "topics": [
+        "volunteer",
+        "civic_education"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0boR7w7iRdsuvBfCXvESjpRi81S7Js93u4QHY9jXCS7yUF1A2NYoYYewBPaMXdHRYl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": null,
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0ceLozgCMi4CTrTBFSrJGiD9ZypE6ZGvDW6YuYGwuCeqbrAazNyFR6whGtvYSWt3pl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": [
+        "weekend_afternoon"
+      ]
+    },
+    "pfbid0cppwcbvvWWjzU4XaYEWELKBSGsukoi7ZzoKQNWZrFoRtSK7aUGaMQk7p4gHp8V2Zl": {
+      "topics": [
+        "mathematics",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl": {
+      "topics": [
+        "volunteer"
+      ],
+      "campus_id": "NVC",
+      "time_tags": []
+    },
+    "pfbid0dYmFBC7HAaW1nMfZuinVHpoyK5vVprV9AK74wpmQWBBwyFcBNUe9sBiAZvSf5CMwl": {
+      "topics": [
+        "research",
+        "career"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0dpALiXtQDy2n5ZEpxGCaVwHBzazbqioR8HAjRAnBqEudZuPagknnpnMNSQo3u9o2l": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": []
+    },
+    "pfbid0f39ayW71WE5pLD1Ar1bmJANnEiAVju9aLr9tcVG3pJsqXGz5WbB48FoEPyefSji9l": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0fbNCLXPdDNXXDZ6jigFqByEZeXJVCCnavhpVcTZTrxPLM1GFgpSCjHBbqMqZ75arl": {
+      "topics": [
+        "mathematics",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0gTGXKP523cAQRMj54AFxPTJdfmx82i9Dnu2e4e3BERaJnKuwdwS3LxGHMQruE9Lwl": {
+      "topics": [
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0hHscC6XEmEUXDRjVPmVDaEjtFhkfgwZ5nDGuZjgrcdYicipTWrmazdv5jEoTv9ZDl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": []
+    },
+    "pfbid0iMo6F1TT9i8amU8tcpMynWZnzJWpdFmxFMGZxKonKXuEL3u6WTX5TeoNKiApooM6l": {
+      "topics": [
+        "mathematics",
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0jFLoVS3yVwDRFdr5yTdX92hNG76pP2gz8SjN5ZuYNYvL3gJzUPRN814PGYMNZcQyl": {
+      "topics": [
+        "health",
+        "volunteer"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0jePLhRwXE5Vs7K1EjpqXDCv9GNRCxtC1k2w8ssb3aWbp8jEzmrAEkR44sES4VNnLl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0mccsgBkgThN6At1thzoRVDwHAvpG5mcw7u1nf77agcNYU4AGTfafFqY82VTouN1ql": {
+      "topics": [
+        "volunteer",
+        "culture"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l": {
+      "topics": [
+        "culture"
+      ],
+      "campus_id": "NVC",
+      "time_tags": []
+    },
+    "pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l": {
+      "topics": [
+        "research",
+        "technology",
+        "soft_skills"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": []
+    },
+    "pfbid0pEXhirx5yvVsxQViVJwbTSm2rTF7ZxMXiHHg9qYhzVELkayfMKdkMH3f7LrHVS7ol": {
+      "topics": [
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0pwGRpAPKnSaoim8tfrJCmZXAs14Ne5wPzvqmoLLmXAgiebGwfPUvaohbWsZHbT6Ql": {
+      "topics": [
+        "research",
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0rWnRjXaG5b2ZYJfRm3KTFERyVrApzzSbY9kbxSn7cNvoXJLgR4sZpJyeHd29fRJcl": {
+      "topics": [
+        "research",
+        "artificial_intelligence"
+      ],
+      "campus_id": null,
+      "time_tags": []
+    },
+    "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml": {
+      "topics": [
+        "research",
+        "environment"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0uAt1jxnTgrtEAtvDhYotJgYFVNAMeSi2rnQrovSANvMj8vnmEGX2KQShGgckwTc9l": {
+      "topics": [
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0uLbjNmKJUSVtPsvVjmVxkUZ7XBz2gZyffobwGXUz14dNZpVBA9TYP6f7VzJdnuo1l": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0uZb9qbB5CMgWojhQ2uh8wRUt7F5sqQnRC316fffAvAkXDsbMHybjfncvzNJRraAfl": {
+      "topics": [
+        "culture"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": []
+    },
+    "pfbid0uvTL3bHSGPbLZMW34W7ahtnUE1ZvMhDAAwRM29Av9B3gCXki1KVY3pTxSnSe8KUol": {
+      "topics": [
+        "civic_education",
+        "soft_skills"
+      ],
+      "campus_id": "NVC",
+      "time_tags": []
+    },
+    "pfbid0v64mAfLhoWNgjX3PEqARcWj4S3bZW7zcDur89qqSxSrQ47SRgbgVkEGuN6vbPHnCl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0v6B57dTNtndVzWhM8mJfJ4jaCYzsBf9J5YkQvvNTb5CpDGHtTnuNSXmpSdYivD2zl": {
+      "topics": [
+        "environment"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    },
+    "pfbid0vbzL4C8xBDcahqarrDFJcc4hqVYDAbSAyBoSqQ8VuqznFMW52AcdPz2uH6nH66Kal": {
+      "topics": [
+        "technology",
+        "soft_skills"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": [
+        "weekday_morning"
+      ]
+    },
+    "pfbid0wqQryW6TVVatK9fMU2Yxg5HDjV6biQZbJ7sFBVcCWJTwKaRvNnYvfZLQXY8RBBGUl": {
+      "topics": [
+        "career"
+      ],
+      "campus_id": "ONLINE",
+      "time_tags": []
+    },
+    "pfbid0y3JjyD8DeZyf6wq46u2jvimz7puoyGc9ETfsduVRHC7buVNq19xSShGVqFu2tLZQl": {
+      "topics": [
+        "artificial_intelligence",
+        "technology"
+      ],
+      "campus_id": "NVC",
+      "time_tags": []
+    },
+    "pfbid0y6US561ga4uvo4oHgFg6NQhXhApDKWsAjxYsNJFWBFT2YLHdMbunahgCG81NnGaZl": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0yTDaiJTTCvE9PS5TsxfrWCVXLT6xyCsP5YMAJh5m1bzERrbn6xduhge2kr4pSZEWl": {
+      "topics": [
+        "career"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0yeafBSGKfrMPWtkdxjC43DqnzTBBGtx8x7bH9oAU8PAoqDCT9rJxuSiayvDauQdZl": {
+      "topics": [
+        "soft_skills"
+      ],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl": {
+      "topics": [
+        "volunteer"
+      ],
+      "campus_id": "DONG_HOA",
+      "time_tags": [
+        "weekend_morning"
+      ]
+    },
+    "pfbid0zsnbe3daebUmSH2MjuiTBqbPbN8Y4gT8FqCPHz4KwmUCWjKuzgyHL5mBabnD8SVil": {
+      "topics": [
+        "research"
+      ],
+      "campus_id": "NVC",
+      "time_tags": [
+        "weekday_afternoon"
+      ]
+    }
+  }
+}

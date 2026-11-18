@@ -1649,7 +1649,7 @@
         "baseline_ref": "synthetic-baseline-mf1",
         "facts": {
           "academic_exam_violations": 0,
-          "eligible_academic_seminars": 2,
+          "eligible_academic_seminars": 1,
           "school_rule_violations_excluding_academic_exam": 0,
           "social_evil_violations_or_coverups": 0,
           "school_faculty_mobilization_activities": 1,
@@ -1981,7 +1981,7 @@
     }
   },
   "derivation": [
-    "Baseline facts (same as synthetic_scoring_data.json): R11 -> C1 10, R19 2 seminars x5 -> C1 20; R21 -> C2 15; R37 10 + R33 1x5 -> C3 15; R41 -> C4 10; C5 0; total 60.",
+    "Baseline facts (same as synthetic_scoring_data.json): R11 -> C1 15, R19 1 seminar x5 -> C1 20; R21 -> C2 15; R37 10 + R33 1x5 -> C3 15; R41 -> C4 10; C5 0; total 60.",
     "Bindings: SEM-A/B/C and QUIZ-M add one R19 seminar (C1 +5 each, cap 30); QUIZ-L adds one R46 activity (C4 +10); MOB-W, REG-Z add one R33 activity (C3 +5 each, cap 25).",
     "Step 1 free time: Mon 08-12, Wed 07-13, Thu 13-17, Sat 08-12. SEM-A Mon 09-10 and SEM-B Mon 09:30-11 overlap -> conflict pair. NEWS-X is online without evidence -> NEEDS_REVIEW. DONE-Y is COMPLETED -> INFEASIBLE, not in the baseline -> pending_confirmation. REG-Z is REGISTERED, so its passed deadline is ignored.",
     "Targets C1 30, C4 20, total 80 need two seminars and QUIZ-L, so no plan of size 1 or 2 meets them. Size-3 plans that meet them: {SEM-x, QUIZ-M, QUIZ-L} for x in A, B, C. All have 2 online matches; minutes A 60+180+90 = 330, B 360, C 330; A beats C on the sorted ID list.",

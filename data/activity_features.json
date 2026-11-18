@@ -1,0 +1,131 @@
+{
+  "schema_version": "personalization-features/0.1",
+  "catalog": {
+    "topics": [
+      "mathematics",
+      "artificial_intelligence",
+      "technology",
+      "research",
+      "soft_skills",
+      "career",
+      "volunteer",
+      "environment",
+      "culture",
+      "sports",
+      "health",
+      "safety",
+      "civic_education"
+    ],
+    "campuses": ["NVC", "DONG_HOA", "ONLINE", "OTHER"],
+    "time_slots": [
+      "weekday_morning",
+      "weekday_afternoon",
+      "weekday_evening",
+      "weekend_morning",
+      "weekend_afternoon",
+      "weekend_evening"
+    ]
+  },
+  "activities": {
+    "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl": {
+      "topics": ["safety", "soft_skills"],
+      "campus_id": "NVC",
+      "time_tags": ["weekday_afternoon"]
+    },
+    "pfbid02EJmkk2oaZJuBw5VqRhEUeSUNqVW6dav9qSV4AZsK661vLikur7U4PPBqJcPDBYHzl": {
+      "topics": ["technology", "soft_skills"],
+      "campus_id": "DONG_HOA",
+      "time_tags": ["weekend_afternoon"]
+    },
+    "pfbid0ouxPwhrPNLVJkqySBkTXowuqDC2wkabJwYYuqsGe2qVP3o836nNvFAHHTMW7KJv5l": {
+      "topics": ["culture"],
+      "campus_id": "NVC",
+      "time_tags": ["weekend_evening"]
+    },
+    "pfbid0dmRU1XavPQ3rzXsGMSTaL69GEcdsmKnXeVaWA4LYybFFgsJDfg3qtMetBGfn7zKkl": {
+      "topics": ["technology", "career"],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid02o8CK5Ziex6z2ZjnEhnv49RyHkZwMxEcLkpF49QmVymQp3N2hghbSAcrvzFram89Pl": {
+      "topics": ["technology", "career", "soft_skills"],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl": {
+      "topics": ["health"],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid0p8jUJBWv9dCfTj4L9hr7QD8CycCVugW71gPzrRh4BgpB6WWCZWA5urLB783sTwc4l": {
+      "topics": ["technology", "career", "soft_skills"],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid02fsjfr4MEtTjN9TpVw3DvfWumQm7Wx2GGE56n7J51Y8sh4brg3p4k1uwhX41h26FFl": {
+      "topics": ["health"],
+      "campus_id": "DONG_HOA",
+      "time_tags": []
+    },
+    "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl": {
+      "topics": ["civic_education"],
+      "campus_id": "ONLINE",
+      "time_tags": []
+    },
+    "pfbid033dzDjjDUpdog6s9h3NWATwuoNp5UumRmNNYnZVyKMxFzyLktCc6xsxstaZP4fPjLl": {
+      "topics": ["safety", "soft_skills", "civic_education"],
+      "campus_id": "DONG_HOA",
+      "time_tags": ["weekday_morning"]
+    },
+    "pfbid0yi4qHyyzkSe4NWeBqXBMo5aifh7TaV4rEj4ZcYvhKM5DmdA8K6z9G1FUCt5TC7mzl": {
+      "topics": ["volunteer", "culture"],
+      "campus_id": "DONG_HOA",
+      "time_tags": []
+    },
+    "pfbid02gENqCMzeMBYaWH3zsqfExUZ5coUdTv7jS37xfTeJijUPRfYs6utzCZGZ3H6o9mYQl": {
+      "topics": ["volunteer", "environment"],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid0FhhUJfbqkRd3tXeqHd7paVvzojeGnfd4TVFn2NCZASxeUKAXKxK3hPgsoPCPxz5Hl": {
+      "topics": ["volunteer"],
+      "campus_id": "OTHER",
+      "time_tags": ["weekday_evening"]
+    },
+    "pfbid02YD2tW2i4Qf1NXyRniCfqRAThQH76uVHCGu8DQwNHupwCUyu4YVAniRHZdvRSngJ4l": {
+      "topics": ["sports"],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid026SJmz8cRXUkDwHvJrZyZv4bsikCC1t4pdDBt46gTuwxaTkBKtSHvCPvwJH1KJ47l": {
+      "topics": ["technology", "soft_skills"],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid034Pftro7LAxEMRbiQpWNcxtzw7B8ji6B9DWEvMq6nvmbqHR6RP3fLymeJrd5WJytTl": {
+      "topics": ["artificial_intelligence", "mathematics", "technology", "research"],
+      "campus_id": "NVC",
+      "time_tags": []
+    },
+    "pfbid0KfFuXSR1LyKtz1MQvsRR2civySNdRQuKrD8ouyX5gDcH5kGpZdYcwPpWNqVoqhQzl": {
+      "topics": ["mathematics", "technology", "research"],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid02buju6UWyad8k9Z4xH1tR5eNwpWsuaZtnwfesY2o8UQzdFh3p7cHemVx24dkaHSdFl": {
+      "topics": ["technology", "soft_skills"],
+      "campus_id": "OTHER",
+      "time_tags": []
+    },
+    "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl": {
+      "topics": ["civic_education", "culture"],
+      "campus_id": "ONLINE",
+      "time_tags": []
+    },
+    "pfbid02ATDhaQW22WUMoQuQ4Ef5tbLZS2RCUTLa7VxhpSxRwYiEcThL3pGfrsDf8refWW9Al": {
+      "topics": ["technology", "soft_skills"],
+      "campus_id": "OTHER",
+      "time_tags": []
+    }
+  }
+}
