@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="vi" class="min-h-screen lg:h-screen lg:overflow-hidden">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kho Hoạt Động Sinh Viên — UniLife</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Desktop: Lock page to 100vh viewport without outer vertical scrollbar */
+    @media (min-width: 1024px) {
+      html,
+      body {
+        height: 100vh;
+        max-height: 100vh;
+        overflow: hidden;
+      }
+    }
+
+    body {
+      background-color: #080c14;
+      color: #f8fafc;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Compact modern custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f293d;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Microsoft-style Teeter animation for urgent items (<24h deadline) */
+    @keyframes teeter-urgent {
+      0% {
+        transform: rotate(0deg) scale(1);
+      }
+      7% {
+        transform: rotate(-18deg) scale(1.15);
+      }
+      14% {
+        transform: rotate(16deg) scale(1.18);
+      }
+      21% {
+        transform: rotate(-14deg) scale(1.16);
+      }
+      28% {
+        transform: rotate(10deg) scale(1.12);
+      }
+      35% {
+        transform: rotate(-6deg) scale(1.06);
+      }
+      42% {
+        transform: rotate(3deg) scale(1.02);
+      }
+      48%, 100% {
+        transform: rotate(0deg) scale(1);
+      }
+    }
+
+    .pulse-urgent,
+    .teeter-urgent {
+      display: inline-block;
+      transform-origin: center center;
+      will-change: transform;
+      animation: teeter-urgent 1.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+      filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.5));
+    }
+
+    /* Activity Pills & Multi-Day Banners - Uniform 38px height */
+    .activity-pill {
+      height: 38px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .activity-pill:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.12);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+      z-index: 30;
+    }
+
+    /* Date carousel column cards */
+    .date-column-card {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .date-column-card:hover {
+      background-color: rgba(30, 41, 59, 0.6);
+    }
+
+    /* =========================================================================
+       LIGHT THEME OVERRIDES (Mirrors UniLife #workspaceApp.light-theme palette)
+       ========================================================================= */
+    body.light-theme {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    body.light-theme [class*="bg-[#0b101b]"],
+    body.light-theme [class*="bg-[#0e1524]"],
+    body.light-theme [class*="bg-[#080d18]"],
+    body.light-theme [class*="bg-[#0c1220]"],
+    body.light-theme [class*="bg-[#11192b]"] {
+      background-color: #ffffff !important;
+    }
+    body.light-theme [class*="border-[#1b2537]"],
+    body.light-theme [class*="border-[#223046]"] {
+      border-color: #cbd5e1 !important;
+    }
+    body.light-theme [class~="text-white"],
+    body.light-theme [class~="text-slate-100"] {
+      color: #0f172a !important;
+    }
+    body.light-theme [class~="text-slate-200"] {
+      color: #334155 !important;
+    }
+    body.light-theme [class~="text-slate-300"] {
+      color: #475569 !important;
+    }
+    body.light-theme [class~="text-slate-400"],
+    body.light-theme [class~="text-slate-500"] {
+      color: #64748b !important;
+    }
+    body.light-theme .activity-pill,
+    body.light-theme .activity-pill span {
+      color: #ffffff !important; /* Keep pill text high contrast on saturated domain badges */
+    }
+    body.light-theme .date-column-card:hover {
+      background-color: rgba(226, 232, 240, 0.7) !important;
+    }
+    body.light-theme .date-column-card.center-focus-card {
+      background-color: #e0e7ff !important;
+      color: #1e1b4b !important;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen lg:h-screen lg:max-h-screen flex flex-col font-sans select-none lg:overflow-hidden">
+
+  <!-- ==================== COMPACT HEADER & FILTERS ==================== -->
+  <header class="shrink-0 bg-[#0b101b] border-b border-[#1b2537] px-6 py-2.5 space-y-2 shadow-md">
+
+    <!-- Top row: Title & Quick Date Actions -->
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-8 h-8 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400 text-base shadow-sm">
+          📅
+        </div>
+        <h1 class="text-base font-black text-white tracking-wide uppercase flex items-center gap-2">
+          Kho Hoạt Động Sinh Viên
+          <span id="headerActCount"
+            class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-950/70 text-indigo-300 border border-indigo-500/30 font-mono font-medium lowercase">
+            Đang tải...
+          </span>
+        </h1>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Quick jump to simulated system today (25/10) -->
+        <button id="btnToday"
+          class="px-3 py-1.5 rounded-lg bg-[#11192b] hover:bg-[#18233a] border border-[#223046] text-xs font-bold text-slate-200 transition shadow-sm">
+          Hôm nay (<span id="todayLabel">25/10</span>)
+        </button>
+
+        <!-- Light / Dark Mode Toggle button (synced with UniLife localStorage theme) -->
+        <button id="themeToggleBtn" onclick="toggleLocalTheme()"
+          class="px-2.5 py-1.5 rounded-lg bg-[#11192b] hover:bg-[#18233a] border border-[#223046] text-xs font-semibold text-slate-300 hover:text-white transition shadow-sm"
+          title="Chuyển chế độ sáng/tối" aria-label="Chuyển chế độ sáng/tối">
+          🌓
+        </button>
+
+        <div class="h-4 w-px bg-slate-800 mx-1"></div>
+
+        <!-- Date picker ẩn -->
+        <input type="date" id="datePickerInput" class="hidden" />
+        <button id="btnOpenPicker"
+          class="px-3 py-1.5 rounded-lg bg-[#11192b] hover:bg-[#18233a] border border-[#223046] text-xs font-semibold text-slate-200 transition flex items-center gap-1.5 shadow-sm">
+          <span>📅 Chọn ngày</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Controls Row (Search, Domain, Mode, Active Only) -->
+    <div class="flex flex-wrap items-center gap-2.5 text-xs">
+      <!-- Search input field -->
+      <div class="relative min-w-[220px] flex-1 sm:flex-initial">
+        <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm hoạt động, ban tổ chức..."
+          class="w-full pl-3 pr-8 py-1.5 rounded-lg bg-[#080d18] border border-[#223046] text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition" />
+        <button id="clearSearchBtn"
+          class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">×</button>
+      </div>
+
+      <!-- Domain filter dropdown -->
+      <select id="domainSelect"
+        class="px-3 py-1.5 rounded-lg bg-[#080d18] border border-[#223046] text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer">
+        <option value="all">Tất cả lĩnh vực</option>
+        <option value="academic">Học thuật</option>
+        <option value="skills">Kỹ năng</option>
+        <option value="volunteer">Tình nguyện</option>
+        <option value="culture_sports">Văn hóa - Thể thao</option>
+        <option value="career">Nghề nghiệp</option>
+        <option value="other">Khác</option>
+      </select>
+
+      <!-- Attendance mode filter dropdown -->
+      <select id="modeSelect"
+        class="px-3 py-1.5 rounded-lg bg-[#080d18] border border-[#223046] text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer">
+        <option value="all">Tất cả hình thức</option>
+        <option value="offline">Trực tiếp (Offline)</option>
+        <option value="online">Trực tuyến (Online)</option>
+        <option value="hybrid">Kết hợp (Hybrid)</option>
+      </select>
+
+      <!-- Active registrations only toggle -->
+      <label
+        class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#080d18] border border-[#223046] text-xs text-slate-200 cursor-pointer hover:bg-[#11192b] transition select-none">
+        <input type="checkbox" id="activeOnlyCheckbox"
+          class="rounded bg-slate-900 border-slate-700 text-indigo-600 focus:ring-0 w-3.5 h-3.5 cursor-pointer">
+        <span>Chỉ hiện còn hạn đăng ký</span>
+      </label>
+
+      <!-- Reset all filters button -->
+      <button id="btnResetFilters"
+        class="ml-auto text-xs text-slate-400 hover:text-indigo-400 transition underline underline-offset-2">
+        Xóa bộ lọc
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSPACE (100% VIEWPORT HEIGHT FIT, ZERO OUTER SCROLL) ==================== -->
+  <main
+    class="flex-1 min-h-0 px-6 pt-3 pb-4 grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch overflow-y-auto lg:overflow-hidden">
+
+    <!-- AREA 2 (9/12 COLS): 5-DAY DATE CAROUSEL & ACTIVITY TIMELINE -->
+    <section id="timelineSection"
+      class="lg:col-span-9 h-full min-h-0 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-2xl flex flex-col overflow-hidden relative">
+
+      <!-- Top Title Bar & Deadline Status Legend -->
+      <div class="shrink-0 px-5 py-2.5 border-b border-[#1b2537] flex items-center justify-between bg-[#11192b]/40">
+        <h2 class="text-xs font-black text-white tracking-wider uppercase flex items-center gap-2">
+          Dòng thời gian hoạt động
+        </h2>
+
+        <!-- Registration Deadline Legend (Custom Vector Clock SVGs) -->
+        <div class="flex items-center gap-4 text-xs text-slate-300 font-medium select-none">
+          <div class="flex items-center gap-1.5">
+            <img src="image/activitie_storage/reg-available.svg" alt="Còn hạn"
+              class="w-4 h-4 shrink-0 object-contain drop-shadow-sm pointer-events-none select-none" />
+            <span>Còn hạn</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <img src="image/activitie_storage/reg-urgent.svg" alt="Còn <24h"
+              class="w-4 h-4 shrink-0 object-contain pulse-urgent drop-shadow-sm pointer-events-none select-none" />
+            <span>Còn &lt;24h</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <img src="image/activitie_storage/reg-expired.svg" alt="Hết hạn"
+              class="w-4 h-4 shrink-0 object-contain opacity-85 drop-shadow-sm pointer-events-none select-none" />
+            <span>Hết hạn</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Focused Day Visual Indicator (Downward Arrow Centered on Card #3) -->
+      <div class="shrink-0 w-full flex justify-center pt-1.5 pb-0.5 bg-[#0e1524]">
+        <div class="w-full grid grid-cols-5">
+          <div></div>
+          <div></div>
+          <!-- Center arrow marker at Column 3 -->
+          <div class="flex justify-center items-center">
+            <span class="text-indigo-400 text-xs font-black animate-bounce leading-none">▼</span>
+          </div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- 5-Day Cards Header Row -->
+      <div id="dateCardsContainer"
+        class="shrink-0 w-full grid grid-cols-5 border-b border-[#1b2537] bg-[#0e1524] select-none"
+        title="Lăn chuột tại đây hoặc bấm phím mũi tên để chuyển ngày">
+        <!-- Rendered by JS: 5 day cards -->
+      </div>
+
+      <!-- Activity Items Area (Timeline Lanes with Continuous Multi-Day Bars) -->
+      <div id="timelineScrollBody" class="flex-1 min-h-0 overflow-y-auto p-3 relative">
+        <div class="relative min-w-full">
+          <!-- Background Column Guides (5 columns aligned with activity grid) -->
+          <div id="columnBgGuides" class="absolute inset-0 grid grid-cols-5 gap-x-2.5 p-1 pointer-events-none z-0">
+            <div class="border-r border-[#1b2537]/40 h-full"></div>
+            <div class="border-r border-[#1b2537]/40 h-full"></div>
+            <div class="border-r border-[#1b2537]/40 h-full bg-indigo-950/20 rounded-lg"></div>
+            <div class="border-r border-[#1b2537]/40 h-full"></div>
+            <div class="h-full"></div>
+          </div>
+
+          <!-- Activity Grid: Continuous Multi-Day Bars & Single-Day Pills (Equal height 38px) -->
+          <div id="activityGrid" class="relative z-10 grid grid-cols-5 gap-y-2.5 gap-x-2.5 p-1 min-h-[300px]">
+            <!-- Rendered dynamically by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Hint at bottom -->
+      <div
+        class="shrink-0 px-4 py-1.5 border-t border-[#1b2537]/60 bg-[#080d18]/60 flex items-center justify-between text-[11px] text-slate-500">
+        <span>💡 <b>Mẹo:</b> Lăn chuột trên thanh ngày để trượt lịch; các thanh sự kiện có chiều cao chuẩn 38px đồng
+          đều; click để xem chi tiết 14 trường.</span>
+        <span id="activeFocusLabel" class="font-mono text-indigo-400">Đang xem: 25/10/2026</span>
+      </div>
+    </section>
+
+    <!-- KHU VỰC 3 (3/12 COLS): KHAY CHƯA CHỐT NGÀY (THU GỌN VỪA VẶN, CUỘN NỘI BỘ) -->
+    <aside class="lg:col-span-3 h-full min-h-0 flex flex-col overflow-hidden">
+      <div
+        class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-3.5 flex flex-col h-full min-h-0 overflow-hidden">
+
+        <!-- Header -->
+        <div class="shrink-0 flex items-center justify-between border-b border-[#1b2537] pb-2.5">
+          <div>
+            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+              <span>📌 Chưa chốt ngày</span>
+              <span id="unscheduledCountBadge"
+                class="px-2 py-0.5 rounded-full bg-amber-950/70 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold">
+                0
+              </span>
+            </h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">Mở đăng ký trước, ngày diễn ra thông báo sau</p>
+          </div>
+        </div>
+
+        <!-- Scrollable cards list (Tận dụng con lăn để cuộn lên xuống) -->
+        <div id="unscheduledList" class="flex-1 min-h-0 overflow-y-auto pr-1 pt-2.5 space-y-2">
+          <!-- Rendered by JS -->
+        </div>
+
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- ==================== MODAL CHI TIẾT 14 TRƯỜNG ==================== -->
+  <div id="detailModal"
+    class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div
+      class="bg-[#0e1524] border border-[#223046] rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[88vh] animate-in fade-in zoom-in-95 duration-150">
+
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-[#1b2537] flex items-start justify-between gap-4 bg-[#11192b]/70">
+        <div class="space-y-2">
+          <div id="modalBadges" class="flex flex-wrap items-center gap-2"></div>
+          <h2 id="modalTitle" class="text-base sm:text-lg font-bold text-white leading-snug"></h2>
+        </div>
+        <button id="modalCloseBtn"
+          class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition text-lg leading-none"
+          aria-label="Đóng">
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Body (14 Structured Contract Fields) -->
+      <div class="p-5 overflow-y-auto space-y-4 text-xs sm:text-sm">
+        <dl id="modalFieldsList" class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3.5"></dl>
+      </div>
+
+      <!-- Modal Footer (External Action Links) -->
+      <div class="p-4 border-t border-[#1b2537] bg-[#0b101b] flex flex-wrap items-center justify-between gap-3">
+        <div class="text-[11px] text-slate-400 font-mono" id="modalIdLabel"></div>
+        <div id="modalActions" class="flex items-center gap-2"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    // --- 1. CONFIGURATION & BENCHMARK SYSTEM DATE ---
+    const DEFAULT_SIMULATED_TODAY = '2026-10-25';
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+    function getSystemToday() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const demoDate = urlParams.get('demoDate');
+      if (demoDate && /^\d{4}-\d{2}-\d{2}$/.test(demoDate)) {
+        return new Date(demoDate + 'T00:00:00+07:00');
+      }
+      return new Date(DEFAULT_SIMULATED_TODAY + 'T00:00:00+07:00');
+    }
+
+    const SYSTEM_TODAY = getSystemToday();
+
+    // Domain styles & labels
+    const DOMAIN_CONFIG = {
+      academic: { label: 'Học thuật', bg: '#2563eb', border: '#1d4ed8' },
+      skills: { label: 'Kỹ năng', bg: '#16a34a', border: '#15803d' },
+      volunteer: { label: 'Tình nguyện', bg: '#ea580c', border: '#c2410c' },
+      culture_sports: { label: 'Văn hóa - Thể thao', bg: '#9333ea', border: '#7e22ce' },
+      career: { label: 'Nghề nghiệp', bg: '#0891b2', border: '#0e7490' },
+      other: { label: 'Khác', bg: '#64748b', border: '#475569' }
+    };
+
+    const MODE_LABELS = {
+      offline: 'Trực tiếp (Offline)',
+      online: 'Trực tuyến (Online)',
+      hybrid: 'Kết hợp (Hybrid)'
+    };
+
+    const DAY_OF_WEEK_NAMES = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+
+    // --- 2. REACTIVE APPLICATION STATE ---
+    const state = {
+      allActivities: [],
+      focusDate: new Date('2026-10-28T00:00:00+07:00'),
+      domainFilter: 'all',
+      modeFilter: 'all',
+      activeOnly: false,
+      searchQuery: '',
+      selectedActivity: null
+    };
+
+    // Format helpers
+    function formatDateIso(d) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function formatShortDate(d) {
+      return `${d.getDate()}/${d.getMonth() + 1}`;
+    }
+
+    function formatVietnameseDate(isoStr) {
+      if (!isoStr) return '—';
+      try {
+        const d = new Date(isoStr);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const mins = String(d.getMinutes()).padStart(2, '0');
+        if (isoStr.includes('T')) {
+          return `${hours}:${mins} ${day}/${month}/${year}`;
+        }
+        return `${day}/${month}/${year}`;
+      } catch (e) {
+        return isoStr;
+      }
+    }
+
+    function formatCurrency(fee) {
+      if (fee == null || fee === 0) return 'Miễn phí';
+      return new Intl.NumberFormat('vi-VN').format(fee) + ' đ';
+    }
+
+    // --- 3. REGISTRATION DEADLINE STATUS RESOLVER ---
+    function getRegistrationStatus(activity, now = SYSTEM_TODAY) {
+      if (!activity.registration_deadline) {
+        return { status: 'none', label: 'Không giới hạn hạn chót', colorClass: 'text-slate-400', isAvailable: true };
+      }
+      const deadline = new Date(activity.registration_deadline);
+      const diffMs = deadline.getTime() - now.getTime();
+
+      if (diffMs <= 0) {
+        return { status: 'expired', label: 'Đã hết hạn đăng ký', colorClass: 'text-slate-500', isAvailable: false };
+      }
+      if (diffMs <= ONE_DAY_MS) {
+        const hoursLeft = Math.max(1, Math.round(diffMs / (3600 * 1000)));
+        return { status: 'urgent', label: `Sắp hết hạn (~${hoursLeft}h)`, colorClass: 'text-rose-400', isAvailable: true };
+      }
+      const daysLeft = Math.ceil(diffMs / ONE_DAY_MS);
+      return { status: 'available', label: `Còn hạn (${daysLeft} ngày)`, colorClass: 'text-emerald-400', isAvailable: true };
+    }
+
+    // --- 3.1. RENDER CLOCK ICON FROM SVG ASSETS (web/image/activitie_storage/) ---
+    // Available: reg-available.svg | Urgent: reg-urgent.svg | Expired: reg-expired.svg
+    function renderClockSvg(status) {
+      if (status === 'urgent') {
+        // Urgent (<24h deadline): reg-urgent.svg with Teeter wobble animation
+        return `
+          <img src="image/activitie_storage/reg-urgent.svg" 
+               alt="Còn <24h" 
+               class="w-[18px] h-[18px] shrink-0 object-contain pulse-urgent drop-shadow-sm pointer-events-none select-none" />
+        `;
+      }
+      if (status === 'available') {
+        // Available registration: reg-available.svg
+        return `
+          <img src="image/activitie_storage/reg-available.svg" 
+               alt="Còn hạn" 
+               class="w-[18px] h-[18px] shrink-0 object-contain drop-shadow-sm pointer-events-none select-none" />
+        `;
+      }
+      // Expired or unstated registration: reg-expired.svg
+      return `
+        <img src="image/activitie_storage/reg-expired.svg" 
+             alt="Hết hạn" 
+             class="w-[18px] h-[18px] shrink-0 object-contain opacity-85 drop-shadow-sm pointer-events-none select-none" />
+      `;
+    }
+
+    // --- 4. DATA INGESTION & OFFLINE RESILIENCE (FALLBACK FOR file:///) ---
+    const STATIC_FALLBACK_ACTIVITIES = [
+      {
+        "activity_id": "demo-01",
+        "title": "LET IT SHINE 2026 - CUỘC THI TỎA SÁNG TÀI NĂNG SINH VIÊN",
+        "domain": "culture_sports",
+        "start": "2026-10-25T08:00:00+07:00",
+        "end": "2026-11-08T22:00:00+07:00",
+        "registration_deadline": "2026-10-24T23:59:00+07:00",
+        "mode": "offline",
+        "location": "Hội trường 1, 227 Nguyễn Văn Cừ",
+        "points": 5, "mandatory": false, "audience": ["Sinh viên toàn trường"], "fee": 0,
+        "completion_requirements": "Tham gia đêm chung kết",
+        "source": { "publisher": "Đoàn - Hội Trường ĐH KHTN", "platform": "facebook", "URL_post": "https://facebook.com", "URL_registration": "https://forms.gle" }
+      },
+      {
+        "activity_id": "demo-02",
+        "title": "Thực hiện nhiệm vụ thúc đẩy hệ sinh thái đổi mới sáng tạo",
+        "domain": "skills",
+        "start": "2026-10-27T08:00:00+07:00",
+        "end": "2026-11-05T17:00:00+07:00",
+        "registration_deadline": "2026-10-26T23:59:00+07:00",
+        "mode": "hybrid",
+        "location": "Giảng đường 2 & MS Teams",
+        "points": 4, "mandatory": false, "audience": ["Sinh viên"], "fee": 0,
+        "completion_requirements": "Tham gia 80% thời lượng",
+        "source": { "publisher": "Phòng KHCN", "platform": "facebook", "URL_post": "https://facebook.com", "URL_registration": "https://forms.gle" }
+      },
+      {
+        "activity_id": "demo-03",
+        "title": "CHUYÊN ĐỀ TẬP HUẤN PCCC VÀ KỸ NĂNG THOÁT HIỂM",
+        "domain": "skills",
+        "start": "2026-10-30T14:00:00+07:00",
+        "end": "2026-10-30T17:00:00+07:00",
+        "registration_deadline": "2026-10-28T23:59:00+07:00",
+        "mode": "offline",
+        "location": "Giảng đường 1",
+        "points": 3, "mandatory": false, "audience": ["Sinh viên"], "fee": 0,
+        "completion_requirements": "Điểm danh đầy đủ",
+        "source": { "publisher": "Phòng CTSV", "platform": "facebook", "URL_post": "https://facebook.com", "URL_registration": "https://forms.gle" }
+      },
+      {
+        "activity_id": "demo-04",
+        "title": "SEMINAR GIẢI TÍCH DỮ LIỆU VỚI PYTHON TRONG NGHIÊN CỨU",
+        "domain": "academic",
+        "start": "2026-10-28T09:00:00+07:00",
+        "end": "2026-10-28T11:30:00+07:00",
+        "registration_deadline": "2026-10-27T18:00:00+07:00",
+        "mode": "online",
+        "location": null,
+        "points": 3, "mandatory": false, "audience": ["Khoa CNTT, Toán"], "fee": 0,
+        "completion_requirements": "Hoàn thành bài mini-quiz",
+        "source": { "publisher": "CLB Tin học", "platform": "facebook", "URL_post": "https://facebook.com", "URL_registration": "https://forms.gle" }
+      },
+      {
+        "activity_id": "demo-05",
+        "title": "NGÀY HỘI HIẾN MÁU TÌNH NGUYỆN - MỘT GIỌT MÁU CHO ĐI",
+        "domain": "volunteer",
+        "start": "2026-10-27T07:30:00+07:00",
+        "end": "2026-10-28T11:30:00+07:00",
+        "registration_deadline": "2026-10-26T12:00:00+07:00",
+        "mode": "offline",
+        "location": "Sảnh nhà F, cơ sở 227 NVC",
+        "points": 5, "mandatory": false, "audience": ["Toàn thể sinh viên"], "fee": 0,
+        "completion_requirements": "Hiến máu thành công",
+        "source": { "publisher": "Đội CTXH", "platform": "facebook", "URL_post": "https://facebook.com", "URL_registration": "https://forms.gle" }
+      },
+      {
+        "activity_id": "demo-06",
+        "title": "[BẢN LĨNH IT 2026] - MỞ FORM ĐĂNG KÝ VÒNG SƠ LOẠI",
+        "domain": "skills",
+        "start": null,
+        "end": null,
+        "registration_deadline": "2026-09-25T23:59:00+07:00",
+        "mode": "offline",
+        "location": "Cơ sở Linh Trung",
+        "points": 4, "mandatory": false, "audience": ["Sinh viên"], "fee": 0,
+        "completion_requirements": "Tham gia thi",
+        "source": { "publisher": "Khoa CNTT", "platform": "facebook", "URL_post": "https://facebook.com", "URL_registration": "https://forms.gle" }
+      },
+      {
+        "activity_id": "demo-07",
+        "title": "CUỘC THI SÁNG TẠO CLIP NGẮN HIỂU LUẬT AN NINH MẠNG",
+        "domain": "other",
+        "start": null,
+        "end": null,
+        "registration_deadline": null,
+        "mode": "online",
+        "location": null,
+        "points": 2, "mandatory": false, "audience": ["Sinh viên"], "fee": 0,
+        "completion_requirements": "Nộp video hợp lệ",
+        "source": { "publisher": "Đoàn trường", "platform": "facebook", "URL_post": "https://facebook.com", "URL_registration": "https://forms.gle" }
+      }
+    ];
+
+    async function loadActivities() {
+      // 1. Try fetching from FastAPI backend endpoint
+      try {
+        const res = await fetch('/api/sp3/catalog?source=real');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.activities && json.activities.length > 0) {
+            return json.activities.map(r => r.activity || r);
+          }
+        }
+      } catch (e) { }
+
+      // 2. Try fetching static SP3 handover JSON dataset
+      try {
+        const res2 = await fetch('../data/handover/activities_sp3.json');
+        if (res2.ok) return await res2.json();
+      } catch (e) { }
+
+      // 3. Try fetching baseline activities JSON
+      try {
+        const res3 = await fetch('../data/activities.json');
+        if (res3.ok) return await res3.json();
+      } catch (e) { }
+
+      // 4. Static embedded fallback for direct file:/// viewing without a server
+      return STATIC_FALLBACK_ACTIVITIES;
+    }
+
+    // --- 5. COMPUTE 5 DATES RELATIVE TO FOCUS DATE ---
+    function get5VisibleDates() {
+      const dates = [];
+      for (let offset = -2; offset <= 2; offset++) {
+        const d = new Date(state.focusDate);
+        d.setDate(state.focusDate.getDate() + offset);
+        dates.push(d);
+      }
+      return dates;
+    }
+
+    // --- 6. FILTER SCHEDULED & UNSCHEDULED ACTIVITIES ---
+    function filterActivities() {
+      const unscheduled = [];
+      const scheduled = [];
+
+      for (const act of state.allActivities) {
+        // Domain filter
+        const dom = act.domain || 'other';
+        if (state.domainFilter !== 'all' && dom !== state.domainFilter) continue;
+
+        // Mode filter
+        if (state.modeFilter !== 'all' && act.mode !== state.modeFilter) continue;
+
+        // Active only filter
+        const reg = getRegistrationStatus(act);
+        if (state.activeOnly && reg.status === 'expired') continue;
+
+        // Search query
+        if (state.searchQuery) {
+          const q = state.searchQuery.toLowerCase();
+          const matchTitle = (act.title || '').toLowerCase().includes(q);
+          const matchPub = (act.source?.publisher || '').toLowerCase().includes(q);
+          if (!matchTitle && !matchPub) continue;
+        }
+
+        // Unscheduled (start === null)
+        if (!act.start) {
+          unscheduled.push(act);
+          continue;
+        }
+
+        act._startDateIso = act.start.split('T')[0];
+        act._endDateIso = act.end ? act.end.split('T')[0] : act._startDateIso;
+        scheduled.push(act);
+      }
+
+      return { scheduled, unscheduled };
+    }
+
+    // --- 7. GREEDY LANE PACKING ALGORITHM FOR MULTI-DAY CONTINUOUS BARS ---
+    function packTimelineLanes(visibleActs) {
+      // Prioritization:
+      // 1. Multi-day activities first (larger span gets higher lane priority)
+      // 2. Earlier start dates
+      const sorted = [...visibleActs].sort((a, b) => {
+        if (b._span !== a._span) return b._span - a._span;
+        return a._colStart - b._colStart;
+      });
+
+      const lanes = [];
+      for (const act of sorted) {
+        let placed = false;
+        for (let i = 0; i < lanes.length; i++) {
+          const lane = lanes[i];
+          const overlap = lane.some(other => !(act._colEnd <= other._colStart || act._colStart >= other._colEnd));
+          if (!overlap) {
+            lane.push(act);
+            act._laneIndex = i;
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) {
+          act._laneIndex = lanes.length;
+          lanes.push([act]);
+        }
+      }
+
+      return { lanes, laneCount: Math.max(1, lanes.length), sortedActivities: sorted };
+    }
+
+    // --- 8. RENDER 5-DAY DATE CAROUSEL & PACKED LANES ---
+    function renderView() {
+      const { scheduled, unscheduled } = filterActivities();
+
+      // Update badge counts
+      document.getElementById('headerActCount').innerText = `${state.allActivities.length} hoạt động`;
+      document.getElementById('unscheduledCountBadge').innerText = unscheduled.length;
+
+      // Render Unscheduled Tray
+      renderUnscheduledTray(unscheduled);
+
+      // Compute 5 days
+      const fiveDays = get5VisibleDates();
+      const systemTodayIso = formatDateIso(SYSTEM_TODAY);
+      const datesIsoList = fiveDays.map(d => formatDateIso(d));
+      const windowStart = datesIsoList[0];
+      const windowEnd = datesIsoList[4];
+
+      // Update footer indicator
+      document.getElementById('activeFocusLabel').innerText = `Đang xem: ${DAY_OF_WEEK_NAMES[state.focusDate.getDay()]}, ${formatShortDate(state.focusDate)}/2026`;
+
+      // 1. Render 5 Date Cards Header
+      const cardsContainer = document.getElementById('dateCardsContainer');
+      cardsContainer.innerHTML = fiveDays.map((d, idx) => {
+        const dIso = formatDateIso(d);
+        const isCenter = idx === 2; // Center focus
+        const isToday = dIso === systemTodayIso;
+        const dow = DAY_OF_WEEK_NAMES[d.getDay()];
+        const dm = formatShortDate(d);
+
+        let cardClass = 'date-column-card p-2.5 flex flex-col items-center justify-center border-r border-[#1b2537] relative transition-all ';
+        if (idx === 4) cardClass += 'border-r-0 ';
+
+        if (isCenter) {
+          cardClass += 'bg-[#162032] text-white shadow-inner ';
+        } else {
+          cardClass += 'text-slate-400 hover:text-slate-200 ';
+        }
+
+        return `
+          <div class="${cardClass}" onclick="setFocusDateByIso('${dIso}')" title="Bấm để đưa ngày này vào tâm điểm">
+            <span class="text-xs font-semibold ${isCenter ? 'text-indigo-300 font-bold' : 'text-slate-400'}">${dow}</span>
+            <span class="${isCenter ? 'text-xl font-black text-white my-0.5' : 'text-base font-bold text-slate-300'} font-mono">${dm}</span>
+            ${isToday ? '<span class="text-[9px] px-2 py-0.5 rounded-full bg-indigo-600 text-white font-bold mt-0.5 shadow-sm">Hôm nay</span>' : '<span class="h-[15px]"></span>'}
+          </div>
+        `;
+      }).join('');
+
+      // 2. Calculate Continuous Columns for visible activities
+      const visibleActs = [];
+      const datesMap = {};
+      datesIsoList.forEach((iso, idx) => { datesMap[iso] = idx; });
+
+      for (const act of scheduled) {
+        if (act._startDateIso <= windowEnd && act._endDateIso >= windowStart) {
+          let colStart = 1;
+          if (act._startDateIso in datesMap) {
+            colStart = datesMap[act._startDateIso] + 1; // 1 to 5
+          } else if (act._startDateIso > windowStart) {
+            colStart = 5;
+          } else {
+            colStart = 1; // bắt đầu trước dải này
+          }
+
+          let colEnd = 6;
+          if (act._endDateIso in datesMap) {
+            colEnd = datesMap[act._endDateIso] + 2; // line index 2 to 6
+          } else if (act._endDateIso < windowEnd) {
+            colEnd = 2;
+          } else {
+            colEnd = 6; // kết thúc sau dải này
+          }
+
+          colEnd = Math.max(colStart + 1, Math.min(6, colEnd));
+          const span = colEnd - colStart; // 1 to 5
+
+          act._colStart = colStart;
+          act._colEnd = colEnd;
+          act._span = span;
+          visibleActs.push(act);
+        }
+      }
+
+      // 3. Pack into non-overlapping horizontal lanes
+      const { laneCount, sortedActivities } = packTimelineLanes(visibleActs);
+
+      const gridEl = document.getElementById('activityGrid');
+
+      if (visibleActs.length === 0) {
+        gridEl.innerHTML = `
+          <div class="col-span-5 h-44 flex flex-col items-center justify-center text-center p-4 text-slate-500 italic text-xs space-y-1">
+            <span class="text-2xl">🔍</span>
+            <span class="font-semibold text-slate-400">Không có hoạt động nào trong 5 ngày này</span>
+            <span class="text-[11px] text-slate-600">Lăn chuột trên thanh ngày hoặc bấm Chọn ngày để xem các mốc khác</span>
+          </div>
+        `;
+        return;
+      }
+
+      // Render continuous multi-day banners & single-day pills - Uniform 38px height, title only
+      gridEl.innerHTML = sortedActivities.map(act => {
+        const domCfg = (act.domain && DOMAIN_CONFIG[act.domain]) ? DOMAIN_CONFIG[act.domain] : DOMAIN_CONFIG.other;
+        const reg = getRegistrationStatus(act);
+        const isMultiDay = act._span > 1;
+
+        const gridColStyle = `grid-column: ${act._colStart} / ${act._colEnd};`;
+        const gridRowStyle = `grid-row: ${act._laneIndex + 1};`;
+
+        if (isMultiDay) {
+          // Continuous multi-day banner spanning across columns
+          const continuesLeft = act._startDateIso < windowStart;
+          const continuesRight = act._endDateIso > windowEnd;
+
+          return `
+            <div class="activity-pill rounded-lg px-3 flex items-center justify-between gap-2 cursor-pointer text-white shadow-md overflow-hidden" 
+                 style="${gridColStyle} ${gridRowStyle} background-color: ${domCfg.bg}; border: 1px solid ${domCfg.border}"
+                 onclick="openModalById('${act.activity_id}')"
+                 title="${escapeHtml(act.title)}\nThời gian: ${formatVietnameseDate(act.start)} - ${formatVietnameseDate(act.end)}\nLĩnh vực: ${domCfg.label}\nĐơn vị: ${escapeHtml(act.source?.publisher || '')}">
+              
+              <div class="flex items-center gap-2 truncate min-w-0">
+                ${continuesLeft ? '<span class="text-white/60 font-mono text-[10px]">◀</span>' : ''}
+                ${renderClockSvg(reg.status)}
+                <span class="text-xs font-bold truncate leading-none">${escapeHtml(act.title)}</span>
+              </div>
+
+              ${continuesRight ? '<span class="text-white/60 font-mono text-[10px] shrink-0">▶</span>' : ''}
+            </div>
+          `;
+        } else {
+          // Single-day activity pill: Uniform 38px height with clock icon and title
+          return `
+            <div class="activity-pill rounded-lg px-2.5 flex items-center gap-2 cursor-pointer text-white shadow-md overflow-hidden" 
+                 style="${gridColStyle} ${gridRowStyle} background-color: ${domCfg.bg}; border: 1px solid ${domCfg.border}"
+                 onclick="openModalById('${act.activity_id}')"
+                 title="${escapeHtml(act.title)}\nLĩnh vực: ${domCfg.label}\nHạn: ${reg.label}\nĐơn vị: ${escapeHtml(act.source?.publisher || '')}">
+              ${renderClockSvg(reg.status)}
+              <span class="text-xs font-bold truncate leading-none">${escapeHtml(act.title)}</span>
+            </div>
+          `;
+        }
+      }).join('');
+    }
+
+    // --- 9. RENDER UNSCHEDULED ACTIVITIES TRAY ---
+    function renderUnscheduledTray(items) {
+      const container = document.getElementById('unscheduledList');
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center text-xs text-slate-500 italic">
+            Không có hoạt động nào chưa chốt ngày.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = items.map(act => {
+        const domCfg = (act.domain && DOMAIN_CONFIG[act.domain]) ? DOMAIN_CONFIG[act.domain] : DOMAIN_CONFIG.other;
+        const reg = getRegistrationStatus(act);
+        const modeLabel = (act.mode && MODE_LABELS[act.mode]) ? MODE_LABELS[act.mode] : 'Chưa rõ';
+
+        return `
+          <div class="p-2.5 rounded-xl bg-[#080d18] hover:bg-[#11192b] border border-[#223046] transition cursor-pointer space-y-1.5 shadow-sm shrink-0" onclick="openModalById('${act.activity_id}')">
+            <div class="flex items-center justify-between gap-1 text-[10px]">
+              <span class="px-1.5 py-0.5 rounded font-bold text-white shadow-xs" style="background-color: ${domCfg.bg}">
+                ${domCfg.label}
+              </span>
+              <span class="text-slate-400 font-mono">${modeLabel}</span>
+            </div>
+            <div class="text-xs font-semibold text-slate-200 line-clamp-2 hover:text-white" title="${escapeHtml(act.title)}">
+              ${escapeHtml(act.title)}
+            </div>
+            <div class="flex items-center gap-1.5 text-[11px] font-medium ${reg.colorClass}">
+              ${renderClockSvg(reg.status)}
+              <span class="truncate">${reg.label}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- 10. 14-FIELD ACTIVITY DETAIL MODAL ---
+    function openModalById(id) {
+      const act = state.allActivities.find(a => a.activity_id === id);
+      if (act) openModal(act);
+    }
+
+    function openModal(act) {
+      state.selectedActivity = act;
+      const domCfg = (act.domain && DOMAIN_CONFIG[act.domain]) ? DOMAIN_CONFIG[act.domain] : DOMAIN_CONFIG.other;
+      const reg = getRegistrationStatus(act);
+      const modeLabel = (act.mode && MODE_LABELS[act.mode]) ? MODE_LABELS[act.mode] : 'Chưa rõ';
+
+      // Title
+      document.getElementById('modalTitle').innerText = act.title;
+      document.getElementById('modalIdLabel').innerText = `ID: ${act.activity_id.substring(0, 18)}...`;
+
+      // Badges
+      const badgesContainer = document.getElementById('modalBadges');
+      badgesContainer.innerHTML = `
+        <span class="px-2.5 py-1 rounded-md text-xs font-bold text-white shadow-sm" style="background-color: ${domCfg.bg}">${domCfg.label}</span>
+        <span class="px-2 py-1 rounded-md text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">${modeLabel}</span>
+        <span class="px-2 py-1 rounded-md text-xs font-semibold ${act.mandatory ? 'bg-rose-950 text-rose-300 border border-rose-500/40' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
+          ${act.mandatory ? 'Bắt buộc' : 'Tự nguyện'}
+        </span>
+        <span class="px-2 py-1 rounded-md text-xs font-semibold bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+          ${formatCurrency(act.fee)}
+        </span>
+      `;
+
+      // 14 fields
+      const fields = [
+        ['Bắt đầu', act.start ? formatVietnameseDate(act.start) : 'Chưa có ngày cụ thể'],
+        ['Kết thúc', act.end ? formatVietnameseDate(act.end) : (act.start ? formatVietnameseDate(act.start) + ' (Ước tính trong ngày)' : 'Chưa xác định')],
+        ['Hạn đăng ký', act.registration_deadline ? `${formatVietnameseDate(act.registration_deadline)} (${reg.label})` : 'Không giới hạn'],
+        ['Địa điểm', act.location || (act.mode === 'online' ? 'Trực tuyến' : '—')],
+        ['Đơn vị tổ chức', act.source?.publisher || '—'],
+        ['Đối tượng tham gia', (act.audience && act.audience.length > 0) ? act.audience.join(', ') : 'Sinh viên toàn trường'],
+        ['Điểm ĐRL dự kiến', act.points != null ? `+${act.points} điểm` : 'Chưa công bố điểm'],
+        ['Điều kiện hoàn thành', act.completion_requirements || 'Tham gia đầy đủ hoạt động'],
+      ];
+
+      const listContainer = document.getElementById('modalFieldsList');
+      listContainer.innerHTML = fields.map(([label, val]) => `
+        <div class="space-y-0.5 bg-[#080d18] p-2.5 rounded-xl border border-[#1b2537]">
+          <dt class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">${label}</dt>
+          <dd class="text-xs font-bold text-slate-200">${escapeHtml(val)}</dd>
+        </div>
+      `).join('');
+
+      // Actions
+      const actionsContainer = document.getElementById('modalActions');
+      let actionsHtml = '';
+      if (act.source?.URL_registration) {
+        actionsHtml += `
+          <a href="${act.source.URL_registration}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-blue-600/30">
+            <span>Đăng ký ngay</span>
+            <span>↗</span>
+          </a>
+        `;
+      }
+      if (act.source?.URL_post) {
+        actionsHtml += `
+          <a href="${act.source.URL_post}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl bg-[#162032] hover:bg-[#1f2d46] text-slate-300 border border-[#223046] text-xs font-semibold transition flex items-center gap-1.5">
+            <span>Xem bài gốc</span>
+            <span>↗</span>
+          </a>
+        `;
+      }
+      actionsContainer.innerHTML = actionsHtml;
+
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+      state.selectedActivity = null;
+    }
+
+    // Helper HTML escaper
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // --- 11. FOCUS DATE CONTROLLER & MOUSE WHEEL SCROLLING ---
+    function setFocusDateByIso(isoStr) {
+      state.focusDate = new Date(isoStr + 'T00:00:00+07:00');
+      renderView();
+    }
+
+    function shiftFocusDate(days) {
+      const d = new Date(state.focusDate);
+      d.setDate(d.getDate() + days);
+      state.focusDate = d;
+      renderView();
+    }
+
+    // Setup mouse wheel interaction:
+    // 1. Wheel on date header cards -> shift days back and forth
+    // 2. Wheel inside activity grid body:
+    //    - Shift + Wheel OR horizontal swipe -> shift days
+    //    - Regular vertical wheel -> smooth internal vertical scrolling through event lanes
+    function setupWheelScroll() {
+      const cardsHeader = document.getElementById('dateCardsContainer');
+      const scrollBody = document.getElementById('timelineScrollBody');
+      let isThrottled = false;
+
+      function handleShift(delta) {
+        if (isThrottled) return;
+        isThrottled = true;
+        setTimeout(() => { isThrottled = false; }, 90);
+        shiftFocusDate(delta > 0 ? 1 : -1);
+      }
+
+      // Wheel on date header cards -> shift focus day
+      cardsHeader.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        handleShift(e.deltaY !== 0 ? e.deltaY : e.deltaX);
+      }, { passive: false });
+
+      // Wheel inside timeline body
+      scrollBody.addEventListener('wheel', (e) => {
+        if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+          e.preventDefault();
+          handleShift(e.deltaX !== 0 ? e.deltaX : e.deltaY);
+        }
+        // Standard vertical wheel: allow native internal vertical scrolling
+      }, { passive: false });
+    }
+
+    // --- 12. DOM EVENT LISTENERS & SHORTCUTS SETUP ---
+    function setupEventListeners() {
+      setupWheelScroll();
+
+      // Today button handler
+      document.getElementById('btnToday').onclick = () => {
+        state.focusDate = new Date(SYSTEM_TODAY);
+        renderView();
+      };
+
+      // Date picker
+      const picker = document.getElementById('datePickerInput');
+      document.getElementById('btnOpenPicker').onclick = () => {
+        picker.showPicker ? picker.showPicker() : picker.click();
+      };
+      picker.onchange = (e) => {
+        if (!e.target.value) return;
+        setFocusDateByIso(e.target.value);
+      };
+
+      // Filters
+      document.getElementById('domainSelect').onchange = (e) => {
+        state.domainFilter = e.target.value;
+        renderView();
+      };
+      document.getElementById('modeSelect').onchange = (e) => {
+        state.modeFilter = e.target.value;
+        renderView();
+      };
+      document.getElementById('activeOnlyCheckbox').onchange = (e) => {
+        state.activeOnly = e.target.checked;
+        renderView();
+      };
+
+      // Search input
+      const searchBox = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearSearchBtn');
+      searchBox.oninput = (e) => {
+        state.searchQuery = e.target.value.trim();
+        clearBtn.classList.toggle('hidden', !state.searchQuery);
+        renderView();
+      };
+      clearBtn.onclick = () => {
+        searchBox.value = '';
+        state.searchQuery = '';
+        clearBtn.classList.add('hidden');
+        renderView();
+      };
+
+      // Reset filters
+      document.getElementById('btnResetFilters').onclick = () => {
+        document.getElementById('domainSelect').value = 'all';
+        document.getElementById('modeSelect').value = 'all';
+        document.getElementById('activeOnlyCheckbox').checked = false;
+        searchBox.value = '';
+        clearBtn.classList.add('hidden');
+        state.domainFilter = 'all';
+        state.modeFilter = 'all';
+        state.activeOnly = false;
+        state.searchQuery = '';
+        state.focusDate = new Date('2026-10-28T00:00:00+07:00');
+        renderView();
+      };
+
+      // Modal close events
+      document.getElementById('modalCloseBtn').onclick = closeModal;
+      document.getElementById('detailModal').onclick = (e) => {
+        if (e.target === document.getElementById('detailModal')) closeModal();
+      };
+      window.onkeydown = (e) => {
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowLeft') shiftFocusDate(-1);
+        if (e.key === 'ArrowRight') shiftFocusDate(1);
+      };
+    }
+
+    // --- 13. BOOTSTRAP & THEME INITIALIZATION ---
+    
+    // --- THEME CONTROLLER (SYNCED WITH UniLife localStorage "unilife_theme") ---
+    function initTheme() {
+      try {
+        const savedTheme = localStorage.getItem('unilife_theme');
+        if (savedTheme === 'light') {
+          document.body.classList.add('light-theme');
+        } else {
+          document.body.classList.remove('light-theme');
+        }
+      } catch (e) {}
+    }
+
+    function toggleLocalTheme() {
+      const isLight = document.body.classList.toggle('light-theme');
+      try {
+        localStorage.setItem('unilife_theme', isLight ? 'light' : 'dark');
+      } catch (e) {}
+      renderView();
+    }
+
+    async function bootstrap() {
+      initTheme();
+      document.getElementById('todayLabel').innerText = `${SYSTEM_TODAY.getDate()}/${SYSTEM_TODAY.getMonth() + 1}`;
+
+      setupEventListeners();
+
+      // Load data
+      state.allActivities = await loadActivities();
+      renderView();
+    }
+
+    document.addEventListener('DOMContentLoaded', bootstrap);
+  </script>
+</body>
+
+</html>
