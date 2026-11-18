@@ -48,6 +48,7 @@ from personalization import (
     preference_provider_from_env,
 )
 from personalization.fast_interpreter import interpret_explicit_preference
+from personalization.action_assistant import interpret_message
 from sp1.deduplication import PostDeduplicator
 from sp1.extractor import extract
 from sp2.drl_engine import (
@@ -527,6 +528,12 @@ class EvaluationRequest(BaseModel):
     student_id: Optional[str] = Field(default=DEFAULT_STUDENT_ID)
     current_category_scores: Optional[dict[str, Any]] = Field(default=None)
     simulate_demo: bool = Field(default=False)
+
+
+class AssistantInterpretRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+    message: str = Field(min_length=1, max_length=2_000)
+    draft: Optional[dict[str, Any]] = None
 
 
 def get_grade_label(score: float) -> str:
@@ -1443,6 +1450,15 @@ def evaluate_verified_snapshot(req: VerifiedSnapshotRequest):
         "disclaimer": "Calculated from submitted example. Not an official DRL award or verified academic record.",
         "sp2": report,
     }
+
+
+@app.post("/api/assistant/interpret")
+def interpret_assistant_action(req: AssistantInterpretRequest):
+    """Return a validated preview; applying actions remains an explicit UI step."""
+    try:
+        return interpret_message(req.message, req.draft).model_dump(mode="json")
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 class AvailabilityResolveRequest(BaseModel):

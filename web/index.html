@@ -728,6 +728,37 @@
               </div>
             </div>
 
+            <section id="unilifeAssistant" aria-labelledby="assistantHeading" class="rounded-3xl border border-indigo-400/30 bg-gradient-to-br from-[#111a31] via-[#0e1524] to-[#11182b] p-5 sm:p-6 shadow-xl shadow-indigo-950/20">
+              <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+                <div class="xl:col-span-4 space-y-4">
+                  <span class="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[.18em] text-cyan-200"><span class="h-2 w-2 rounded-full bg-cyan-300"></span>Thực hiện thao tác trên website</span>
+                  <div>
+                    <h2 id="assistantHeading" class="text-xl sm:text-2xl font-black text-white">UniLife Assistant</h2>
+                    <p class="mt-2 text-sm leading-relaxed text-slate-300">Mô tả điều bạn muốn thiết lập, UniLife sẽ giúp điền vào website.</p>
+                    <p class="mt-2 text-xs text-slate-500">Trợ lý cấu hình mục tiêu, lịch và sở thích; không trả lời câu hỏi kiến thức chung.</p>
+                  </div>
+                  <div class="flex flex-wrap gap-2" aria-label="Ví dụ thao tác">
+                    <button type="button" onclick="useAssistantExample('Mình muốn đạt 95 điểm rèn luyện.')" class="min-h-9 rounded-xl border border-indigo-400/30 bg-indigo-500/10 px-3 text-xs font-bold text-indigo-200 hover:bg-indigo-500/20">Đặt mục tiêu ĐRL</button>
+                    <button type="button" onclick="useAssistantExample('Thứ 2 hàng tuần mình học từ 7h30 đến 17h30.')" class="min-h-9 rounded-xl border border-blue-400/30 bg-blue-500/10 px-3 text-xs font-bold text-blue-200 hover:bg-blue-500/20">Nhập lịch học</button>
+                    <button type="button" onclick="useAssistantExample('Mình thích hoạt động online và ưu tiên buổi tối.')" class="min-h-9 rounded-xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-3 text-xs font-bold text-fuchsia-200 hover:bg-fuchsia-500/20">Đặt sở thích</button>
+                    <button type="button" onclick="useAssistantExample('Tạo kế hoạch mục tiêu 90 điểm, ưu tiên hoạt động online.')" class="min-h-9 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-3 text-xs font-bold text-cyan-200 hover:bg-cyan-500/20">Tạo kế hoạch</button>
+                  </div>
+                </div>
+                <div class="xl:col-span-8 space-y-3">
+                  <div id="assistantMessages" role="log" aria-live="polite" class="min-h-24 max-h-64 overflow-y-auto rounded-2xl border border-[#223046] bg-[#080d18] p-4 space-y-2 text-sm">
+                    <div class="max-w-[88%] rounded-2xl rounded-bl-md bg-[#162032] px-4 py-3 text-slate-200">Bạn có thể mô tả mục tiêu, lịch bận, thời gian rảnh và sở thích hoạt động.</div>
+                  </div>
+                  <div id="assistantPreview" class="hidden rounded-2xl border border-indigo-400/30 bg-indigo-950/20 p-4 space-y-3"></div>
+                  <form id="assistantForm" onsubmit="submitAssistantMessage(event)" class="flex flex-col sm:flex-row gap-2">
+                    <label for="assistantInput" class="sr-only">Mô tả thiết lập cần thực hiện</label>
+                    <input id="assistantInput" maxlength="2000" autocomplete="off" placeholder="Ví dụ: Thứ 3 hàng tuần mình rảnh từ 16h30 đến 18h..." class="min-h-11 flex-1 rounded-xl border border-[#2b3a54] bg-[#080d18] px-4 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 outline-none" />
+                    <button id="assistantSendButton" type="submit" class="min-h-11 rounded-xl bg-indigo-600 px-5 text-sm font-extrabold text-white hover:bg-indigo-500 disabled:opacity-50">Gửi</button>
+                  </form>
+                  <div id="assistantStatus" aria-live="polite" class="min-h-5 text-xs text-slate-500"></div>
+                </div>
+              </div>
+            </section>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4">
               <article class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 shadow-lg shadow-black/10">
                 <div class="flex items-start justify-between gap-3">
@@ -1539,6 +1570,7 @@
                         <button type="button" onclick="addCustomBusyInterval()" class="min-h-10 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white">Thêm</button>
                       </div>
                       <div id="customBusySlotsList" class="flex flex-wrap gap-2"></div>
+                      <div id="assistantAvailableSummary" class="flex flex-wrap gap-2"></div>
                     </div>
                   </div>
                 </div>
@@ -3166,6 +3198,225 @@
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', syncSp3SourceUi);
     else syncSp3SourceUi();
+    // ---- UniLife Home Action Assistant: interpretation is separate from execution ----
+    let assistantDraft = null;
+    let assistantConversationText = [];
+    let assistantAvailableIntervals = [];
+
+    function appendAssistantMessage(text, role = 'system') {
+      const log = document.getElementById('assistantMessages');
+      if (!log) return;
+      const item = document.createElement('div');
+      item.className = role === 'user'
+        ? 'ml-auto max-w-[88%] rounded-2xl rounded-br-md bg-indigo-600 px-4 py-3 text-white'
+        : 'max-w-[88%] rounded-2xl rounded-bl-md bg-[#162032] px-4 py-3 text-slate-200';
+      item.textContent = text;
+      log.appendChild(item);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function useAssistantExample(text) {
+      const input = document.getElementById('assistantInput');
+      if (!input) return;
+      input.value = text;
+      input.focus();
+    }
+
+    async function submitAssistantMessage(event) {
+      event.preventDefault();
+      const input = document.getElementById('assistantInput');
+      const message = (input?.value || '').trim();
+      if (!message) return;
+      assistantConversationText.push(message);
+      appendAssistantMessage(message, 'user');
+      input.value = '';
+      const button = document.getElementById('assistantSendButton');
+      const status = document.getElementById('assistantStatus');
+      if (button) button.disabled = true;
+      if (status) status.textContent = 'Đang hiểu yêu cầu và kiểm tra dữ liệu…';
+      try {
+        const response = await fetch(`${API_BASE}/api/assistant/interpret`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, draft: assistantDraft })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.detail || `Máy chủ phản hồi mã ${response.status}`);
+        assistantDraft = data.draft;
+        document.getElementById('assistantPreview')?.classList.add('hidden');
+        if (data.status === 'clarification') {
+          appendAssistantMessage(data.questions[0]);
+          if (status) status.textContent = 'Cần thêm một thông tin trước khi tạo bản xem trước.';
+        } else if (data.status === 'error') {
+          appendAssistantMessage((data.errors || []).join(' '));
+          if (status) status.textContent = 'Yêu cầu chưa hợp lệ; website chưa thay đổi.';
+        } else {
+          appendAssistantMessage('Mình đã chuẩn bị bản xem trước. Hãy kiểm tra rồi xác nhận.');
+          renderAssistantPreview();
+          if (status) status.textContent = 'Chưa áp dụng vào website.';
+        }
+      } catch (error) {
+        appendAssistantMessage('Không thể kết nối trợ lý lúc này. Dữ liệu trên website chưa bị thay đổi.');
+        if (status) status.textContent = error.message || 'Lỗi kết nối.';
+      } finally {
+        if (button) button.disabled = false;
+        input?.focus();
+      }
+    }
+
+    function renderAssistantPreview() {
+      if (!assistantDraft) return;
+      const preview = document.getElementById('assistantPreview');
+      if (!preview) return;
+      const dayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
+      const intervalRows = (assistantDraft.intervals || []).map((item, index) => `
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 rounded-xl border border-[#2b3a54] bg-[#080d18] p-3">
+          <select aria-label="Loại khoảng giờ" onchange="editAssistantInterval(${index}, 'kind', this.value)" class="rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 py-1.5 text-xs text-white">
+            <option value="busy" ${item.kind === 'busy' ? 'selected' : ''}>Bận</option><option value="available" ${item.kind === 'available' ? 'selected' : ''}>Rảnh</option>
+          </select>
+          <select aria-label="Thứ trong tuần" onchange="editAssistantInterval(${index}, 'weekday', this.value)" class="rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 py-1.5 text-xs text-white">
+            ${dayNames.map((name, day) => `<option value="${day}" ${Number(item.weekday) === day ? 'selected' : ''}>${name}</option>`).join('')}
+          </select>
+          <input aria-label="Giờ bắt đầu" type="time" value="${escapeHTML(item.start)}" onchange="editAssistantInterval(${index}, 'start', this.value)" class="rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 py-1.5 text-xs text-white" />
+          <input aria-label="Giờ kết thúc" type="time" value="${escapeHTML(item.end)}" onchange="editAssistantInterval(${index}, 'end', this.value)" class="rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 py-1.5 text-xs text-white" />
+          <span class="px-2 py-1.5 text-xs text-slate-400">Hàng tuần</span>
+        </div>`).join('');
+      const modes = ['online', 'offline', 'hybrid'].map(mode => `<label class="inline-flex items-center gap-1.5 text-xs text-slate-300"><input type="checkbox" ${assistantDraft.preferred_modes.includes(mode) ? 'checked' : ''} onchange="editAssistantMode('${mode}', this.checked)" />${mode}</label>`).join('');
+      const softTimes = ['morning', 'afternoon', 'evening'].map(time => `<label class="inline-flex items-center gap-1.5 text-xs text-slate-300"><input type="checkbox" ${assistantDraft.soft_time_preferences.includes(time) ? 'checked' : ''} onchange="editAssistantSoftTime('${time}', this.checked)" />${{morning:'sáng', afternoon:'chiều', evening:'tối'}[time]}</label>`).join('');
+      preview.innerHTML = `
+        <div class="flex items-center justify-between gap-3"><h3 class="font-extrabold text-white">Xem trước thay đổi</h3><span class="text-[10px] font-bold text-amber-300">CHƯA ÁP DỤNG</span></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label class="rounded-xl border border-[#2b3a54] bg-[#080d18] p-3"><span class="block text-[11px] font-bold text-slate-400">Mục tiêu ĐRL</span><input type="number" min="0" max="100" value="${assistantDraft.drl_target ?? ''}" onchange="editAssistantTarget(this.value)" class="mt-1 w-full bg-transparent font-extrabold text-white outline-none" /></label>
+          <div class="rounded-xl border border-[#2b3a54] bg-[#080d18] p-3"><span class="block text-[11px] font-bold text-slate-400 mb-2">Sở thích suy luận · chờ xác nhận</span><div class="flex flex-wrap gap-3">${modes}</div><div class="mt-2 flex flex-wrap gap-3">${softTimes}</div></div>
+        </div>
+        <div class="space-y-2">${intervalRows || '<p class="text-xs text-slate-500">Không có khoảng thời gian.</p>'}</div>
+        <div class="flex flex-col sm:flex-row justify-end gap-2"><button type="button" onclick="resetAssistantDraft()" class="min-h-10 rounded-xl border border-[#2b3a54] px-4 text-sm font-bold text-slate-300">Nhập lại</button><button id="assistantConfirmButton" type="button" onclick="confirmAssistantActions()" class="min-h-10 rounded-xl bg-emerald-600 px-5 text-sm font-extrabold text-white hover:bg-emerald-500">Xác nhận và điền vào website</button></div>`;
+      preview.classList.remove('hidden');
+    }
+
+    function editAssistantTarget(value) {
+      if (assistantDraft) assistantDraft.drl_target = value === '' ? null : Number(value);
+    }
+
+    function editAssistantInterval(index, field, value) {
+      if (!assistantDraft?.intervals?.[index]) return;
+      assistantDraft.intervals[index][field] = field === 'weekday' ? Number(value) : value;
+    }
+
+    function editAssistantMode(mode, checked) {
+      if (!assistantDraft) return;
+      const values = new Set(assistantDraft.preferred_modes || []);
+      checked ? values.add(mode) : values.delete(mode);
+      assistantDraft.preferred_modes = [...values];
+    }
+
+    function editAssistantSoftTime(time, checked) {
+      if (!assistantDraft) return;
+      const values = new Set(assistantDraft.soft_time_preferences || []);
+      checked ? values.add(time) : values.delete(time);
+      assistantDraft.soft_time_preferences = [...values];
+    }
+
+    function resetAssistantDraft() {
+      assistantDraft = null;
+      assistantConversationText = [];
+      document.getElementById('assistantPreview')?.classList.add('hidden');
+      const status = document.getElementById('assistantStatus');
+      if (status) status.textContent = 'Bản xem trước đã xóa; planner chưa thay đổi.';
+    }
+
+    function expandAssistantInterval(interval) {
+      const date = addDaysToIsoDate(availabilityWeekStart, Number(interval.weekday));
+      return { start: `${date}T${interval.start}:00+07:00`, end: `${date}T${interval.end}:00+07:00`, source: 'assistant' };
+    }
+
+    function assistantPreferenceText(draft) {
+      const modeLabels = { online: 'online', offline: 'trực tiếp', hybrid: 'hybrid' };
+      const timeLabels = { morning: 'sáng ngày thường', afternoon: 'chiều ngày thường', evening: 'tối ngày thường' };
+      const parts = (draft.preferred_modes || []).map(mode => `thích hoạt động ${modeLabels[mode]}`);
+      parts.push(...(draft.soft_time_preferences || []).map(time => `ưu tiên ${timeLabels[time]}`));
+      return parts.length ? `Mình ${parts.join(', ')}.` : '';
+    }
+
+    async function applyAssistantPreference(draft) {
+      const text = assistantPreferenceText(draft);
+      if (!text) return;
+      const response = await fetch(`${API_BASE}/api/preferences/interpret`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.preference) throw new Error(data.detail?.message || 'Không thể xác nhận sở thích.');
+      preferenceDraft = JSON.parse(JSON.stringify(data.preference));
+      const box = document.getElementById('preferenceText');
+      if (box) box.value = text;
+      renderPreferenceEditor();
+      document.getElementById('preferenceReview')?.classList.remove('hidden');
+      const check = document.getElementById('confirmPreferenceCheck');
+      if (check) check.checked = true;
+      updatePreferenceConfirmButton();
+      await confirmPreference();
+    }
+
+    async function confirmAssistantActions() {
+      if (!assistantDraft) return;
+      const status = document.getElementById('assistantStatus');
+      const button = document.getElementById('assistantConfirmButton');
+      const target = Number(assistantDraft.drl_target);
+      if (assistantDraft.drl_target != null && (!Number.isFinite(target) || target < 0 || target > 100)) {
+        if (status) status.textContent = 'Mục tiêu ĐRL phải từ 0 đến 100.';
+        return;
+      }
+      if ((assistantDraft.intervals || []).some(item => !item.start || !item.end || item.start >= item.end)) {
+        if (status) status.textContent = 'Hãy kiểm tra lại giờ bắt đầu và kết thúc.';
+        return;
+      }
+      if (button) { button.disabled = true; button.textContent = 'Đang áp dụng…'; }
+      try {
+        await applyAssistantDraftToPlanner(assistantDraft);
+        assistantDraft.preferences_confirmed = true;
+        const preview = document.getElementById('assistantPreview');
+        if (preview) preview.innerHTML = `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><div class="font-extrabold text-emerald-300">Đã điền vào Lập lịch thông minh</div><div class="mt-1 text-xs text-slate-400">Bạn vẫn có thể chỉnh sửa trước khi tạo kế hoạch.</div></div><button type="button" onclick="switchTab('plan')" class="min-h-10 rounded-xl bg-emerald-600 px-5 text-sm font-extrabold text-white hover:bg-emerald-500">Xem tại Lập lịch thông minh</button></div>`;
+        if (status) status.textContent = 'Đã áp dụng sau xác nhận; chưa tự chuyển trang và chưa chạy planner.';
+      } catch (error) {
+        if (status) status.textContent = error.message || 'Không thể áp dụng thiết lập.';
+        if (button) { button.disabled = false; button.textContent = 'Xác nhận và điền vào website'; }
+      }
+    }
+
+    async function applyAssistantDraftToPlanner(draft) {
+      if (draft.drl_target != null) {
+        const input = document.getElementById('inputPlanTarget');
+        if (input) input.value = draft.drl_target;
+        onPlannerTargetInput(draft.drl_target);
+      }
+      customBusyIntervals = customBusyIntervals.filter(item => item.source !== 'assistant');
+      assistantAvailableIntervals = [];
+      (draft.intervals || []).forEach(interval => {
+        const expanded = expandAssistantInterval(interval);
+        if (interval.kind === 'busy') customBusyIntervals.push(expanded);
+        else assistantAvailableIntervals.push(expanded);
+      });
+      customBusyIntervals.sort((left, right) => left.start.localeCompare(right.start));
+      await applyAssistantPreference(draft);
+      renderAvailabilityPicker();
+      markPlanStale();
+      persistCurrentUserData();
+    }
+
+    function removeAssistantAvailableInterval(index) {
+      assistantAvailableIntervals.splice(index, 1);
+      renderAssistantAvailableIntervals();
+      markPlanStale();
+    }
+
+    function renderAssistantAvailableIntervals() {
+      const container = document.getElementById('assistantAvailableSummary');
+      if (!container) return;
+      container.innerHTML = assistantAvailableIntervals.length
+        ? `<span class="w-full text-[11px] font-bold text-emerald-300">Thời gian rảnh xác nhận (không chuyển thành lịch bận)</span>` + assistantAvailableIntervals.map((slot, index) => `<span class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-950/30 px-2.5 py-1.5 text-[11px] text-emerald-200 planner-number">${escapeHTML(formatPlanTimeRange(slot.start, slot.end))}<button type="button" onclick="removeAssistantAvailableInterval(${index})" aria-label="Xóa thời gian rảnh" class="h-5 w-5 rounded text-emerald-300 hover:bg-emerald-900/60">×</button></span>`).join('')
+        : '';
+    }
+
     const PLAN_CAT_LABELS = {
       C1: 'Mục 1', C2: 'Mục 2', C3: 'Mục 3', C4: 'Mục 4', C5: 'Mục 5'
     };
@@ -3215,6 +3466,7 @@
         <button type="button" onclick="changeAvailabilityWeek(1)" aria-label="Tuần sau" class="w-10 h-10 rounded-lg border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">›</button>
       </div><div class="grid grid-cols-[74px_repeat(7,minmax(74px,1fr))] gap-2"><div></div>${headers}${rows}</div>`;
       renderCustomBusySlots();
+      renderAssistantAvailableIntervals();
       updateBusySlotsBadge();
     }
 
@@ -3234,6 +3486,7 @@
       unavailableAvailabilitySlots.clear();
       availabilityWeekStart = AVAILABILITY_DEFAULT_WEEK_START;
       customBusyIntervals = [];
+      assistantAvailableIntervals = [];
       const start = document.getElementById('customBusyStart');
       const end = document.getElementById('customBusyEnd');
       if (start) start.value = '';
