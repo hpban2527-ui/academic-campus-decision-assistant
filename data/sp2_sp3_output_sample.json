@@ -1,0 +1,181 @@
+{
+  "schema_version": "sp2_sp3_v1",
+  "student": {
+    "student_id": "25127xxx",
+    "semester": "2026-1",
+    "student_type": "full_time"
+  },
+  "regulation": {
+    "regulation_id": "1028/QD-KHTN-CTSV",
+    "status": "verified",
+    "scope_status": "APPLICABLE",
+    "scope": "Sinh viên đại học hệ chính quy tại Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM",
+    "source": "https://hcmus.edu.vn/wp-content/uploads/2024/03/QD-1028-QC-DRL-2020_20231.pdf"
+  },
+  "summary": {
+    "confirmed_total": 40,
+    "max_total_score": 100,
+    "remaining_to_max": 60
+  },
+  "category_scores": [
+    {
+      "category_id": "C1",
+      "category_name": "Tham gia học tập và nghiên cứu khoa học",
+      "raw_confirmed_points": 30,
+      "confirmed_points": 30,
+      "cap": 30,
+      "remaining_to_cap": 0
+    },
+    {
+      "category_id": "C2",
+      "category_name": "Chấp hành nội quy, quy chế và các quy định được áp dụng trong Nhà trường",
+      "raw_confirmed_points": 0,
+      "confirmed_points": 0,
+      "cap": 20,
+      "remaining_to_cap": 20
+    },
+    {
+      "category_id": "C3",
+      "category_name": "Tham gia hoạt động chính trị - xã hội, văn hóa - văn nghệ, thể dục - thể thao",
+      "raw_confirmed_points": 0,
+      "confirmed_points": 0,
+      "cap": 25,
+      "remaining_to_cap": 25
+    },
+    {
+      "category_id": "C4",
+      "category_name": "Hành động hướng đến xây dựng và phát triển cộng đồng",
+      "raw_confirmed_points": 10,
+      "confirmed_points": 10,
+      "cap": 25,
+      "remaining_to_cap": 15
+    },
+    {
+      "category_id": "C5",
+      "category_name": "Các nội dung khuyến khích cộng thêm",
+      "raw_confirmed_points": 0,
+      "confirmed_points": 0,
+      "cap": 30,
+      "remaining_to_cap": 30
+    },
+    {
+      "category_id": "DEDUCTION",
+      "category_name": "Điểm trừ",
+      "raw_confirmed_points": 0,
+      "confirmed_points": 0,
+      "cap": null,
+      "remaining_to_cap": null
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_id": "1.1",
+      "category_id": "C1",
+      "confirmed_points": 15,
+      "matched_rule_ids": [
+        "R11"
+      ],
+      "record_ids": [
+        "REC001"
+      ],
+      "status": "CONFIRMED"
+    },
+    {
+      "criterion_id": "1.2",
+      "category_id": "C1",
+      "confirmed_points": 10,
+      "matched_rule_ids": [
+        "R1203"
+      ],
+      "record_ids": [
+        "REC002"
+      ],
+      "status": "CONFIRMED"
+    },
+    {
+      "criterion_id": "1.9",
+      "category_id": "C1",
+      "confirmed_points": 5,
+      "matched_rule_ids": [
+        "R19"
+      ],
+      "record_ids": [
+        "REC003"
+      ],
+      "status": "CONFIRMED"
+    },
+    {
+      "criterion_id": "4.1",
+      "category_id": "C4",
+      "confirmed_points": 10,
+      "matched_rule_ids": [
+        "R41"
+      ],
+      "record_ids": [
+        "REC004"
+      ],
+      "status": "CONFIRMED"
+    }
+  ],
+  "activity_assessments": [
+    {
+      "activity_id": "ACT001",
+      "title": "Hội thảo chuyên đề học thuật",
+      "announced_points": 5,
+      "expected_points": 5,
+      "criterion_id": "1.9",
+      "matched_rule_id": "R19",
+      "participation_status": "ATTENDED",
+      "verification_status": "CONFIRMED",
+      "confirmed_points": 5,
+      "counted_in_total": true,
+      "reason": "Đã tham gia và có minh chứng/xác nhận hợp lệ."
+    },
+    {
+      "activity_id": "ACT002",
+      "title": "Workshop kỹ năng học tập",
+      "announced_points": 5,
+      "expected_points": 5,
+      "criterion_id": "1.9",
+      "matched_rule_id": "R19",
+      "participation_status": "NOT_ATTENDED",
+      "verification_status": "VERIFIED",
+      "confirmed_points": 0,
+      "counted_in_total": false,
+      "reason": "Đã xác định được tiêu chí và điểm dự kiến, nhưng sinh viên chưa tham gia."
+    },
+    {
+      "activity_id": "ACT003",
+      "title": "Hoạt động tình nguyện chưa rõ tiêu chí",
+      "announced_points": null,
+      "expected_points": null,
+      "criterion_id": null,
+      "matched_rule_id": null,
+      "participation_status": "UNKNOWN",
+      "verification_status": "NEEDS_REVIEW",
+      "confirmed_points": 0,
+      "counted_in_total": false,
+      "reason": "Chưa đủ căn cứ xác định tiêu chí hoặc điểm DRL."
+    }
+  ],
+  "pending_records": [
+    {
+      "record_id": "REC005",
+      "activity_id": "ACT002",
+      "criterion_id": "1.9",
+      "points": 5,
+      "status": "PENDING",
+      "verification_status": "NEEDS_VERIFICATION",
+      "counted_in_total": false,
+      "reason": "Chưa có xác nhận tham gia hợp lệ."
+    }
+  ],
+  "review": {
+    "needs_review": true,
+    "flags": [
+      "Dữ liệu sinh viên và hoạt động trong file là dữ liệu minh họa.",
+      "ACT003 chưa đủ căn cứ để gán tiêu chí hoặc điểm DRL.",
+      "REC005 đang chờ xác minh nên chưa được cộng vào tổng điểm."
+    ]
+  }
+}

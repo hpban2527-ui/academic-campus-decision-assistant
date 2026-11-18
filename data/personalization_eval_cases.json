@@ -1,0 +1,117 @@
+{
+  "schema_version": "personalization-eval/0.1",
+  "reviewed_at": "2026-11-12",
+  "language": "vi",
+  "cases": [
+    {
+      "case_id": "PREF-01",
+      "text": "Em thích Toán và AI, ưu tiên mục 4 và online. Nếu đi trực tiếp thì thích cơ sở Nguyễn Văn Cừ. Tối đa 4 hoạt động.",
+      "expected": {
+        "preferences": [
+          {"dimension": "topic", "value": "mathematics", "min_weight": 4},
+          {"dimension": "topic", "value": "artificial_intelligence", "min_weight": 4},
+          {"dimension": "category", "value": "C4", "min_weight": 4},
+          {"dimension": "campus", "value": "NVC", "min_weight": 1},
+          {"dimension": "mode", "value": "online", "min_weight": 4}
+        ],
+        "limits": {"max_activities": 4},
+        "hard_exclusions": [],
+        "strategy": "BALANCED"
+      }
+    },
+    {
+      "case_id": "PREF-02",
+      "text": "Em chỉ có thể tham gia online, tuyệt đối không thể học offline. Tối đa 3 hoạt động.",
+      "expected": {
+        "preferences": [{"dimension": "mode", "value": "online", "min_weight": 5}],
+        "limits": {"max_activities": 3},
+        "hard_exclusions": [{"dimension": "mode", "value": "offline"}],
+        "strategy": "BALANCED"
+      }
+    },
+    {
+      "case_id": "PREF-03",
+      "text": "Mình thích hoạt động tình nguyện và môi trường ở cơ sở Đông Hòa, ưu tiên chiều cuối tuần và mục 3.",
+      "expected": {
+        "preferences": [
+          {"dimension": "topic", "value": "volunteer", "min_weight": 4},
+          {"dimension": "topic", "value": "environment", "min_weight": 4},
+          {"dimension": "category", "value": "C3", "min_weight": 4},
+          {"dimension": "campus", "value": "DONG_HOA", "min_weight": 4},
+          {"dimension": "time", "value": "weekend_afternoon", "min_weight": 4}
+        ],
+        "limits": {},
+        "hard_exclusions": [],
+        "strategy": "BALANCED"
+      }
+    },
+    {
+      "case_id": "PREF-04",
+      "text": "Em muốn đạt mục tiêu với ít hoạt động và ít thời gian nhất, tối đa 2 hoạt động và tổng cộng không quá 180 phút.",
+      "expected": {
+        "preferences": [],
+        "limits": {"max_activities": 2, "max_duration_minutes": 180},
+        "hard_exclusions": [],
+        "strategy": "MINIMUM_EFFORT"
+      }
+    },
+    {
+      "case_id": "PREF-05",
+      "text": "Sở thích quan trọng nhất với em. Hãy ưu tiên trước các hoạt động thể thao, văn hóa và mục 3.",
+      "expected": {
+        "preferences": [
+          {"dimension": "topic", "value": "sports", "min_weight": 4},
+          {"dimension": "topic", "value": "culture", "min_weight": 4},
+          {"dimension": "category", "value": "C3", "min_weight": 4}
+        ],
+        "limits": {},
+        "hard_exclusions": [],
+        "strategy": "PREFERENCE_FIRST"
+      }
+    },
+    {
+      "case_id": "PREF-06",
+      "text": "Em không thể đến Nguyễn Văn Cừ và không thể tham gia sáng ngày thường. Em ưu tiên Đông Hòa vào chiều ngày thường.",
+      "expected": {
+        "preferences": [
+          {"dimension": "campus", "value": "DONG_HOA", "min_weight": 4},
+          {"dimension": "time", "value": "weekday_afternoon", "min_weight": 4}
+        ],
+        "limits": {},
+        "hard_exclusions": [
+          {"dimension": "campus", "value": "NVC"},
+          {"dimension": "time", "value": "weekday_morning"}
+        ],
+        "strategy": "BALANCED"
+      }
+    },
+    {
+      "case_id": "PREF-07",
+      "text": "Em thích các hoạt động định hướng nghề nghiệp tổ chức online và chỉ tham gia hoạt động miễn phí.",
+      "expected": {
+        "preferences": [
+          {"dimension": "topic", "value": "career", "min_weight": 4},
+          {"dimension": "mode", "value": "online", "min_weight": 4}
+        ],
+        "limits": {"max_fee": 0},
+        "hard_exclusions": [],
+        "strategy": "BALANCED"
+      }
+    },
+    {
+      "case_id": "PREF-08",
+      "text": "Em ưu tiên nghiên cứu và công nghệ, thích hình thức kết hợp, tập trung mục 1.",
+      "expected": {
+        "preferences": [
+          {"dimension": "topic", "value": "research", "min_weight": 4},
+          {"dimension": "topic", "value": "technology", "min_weight": 4},
+          {"dimension": "category", "value": "C1", "min_weight": 4},
+          {"dimension": "mode", "value": "hybrid", "min_weight": 4}
+        ],
+        "limits": {},
+        "hard_exclusions": [],
+        "strategy": "BALANCED"
+      }
+    }
+  ]
+}

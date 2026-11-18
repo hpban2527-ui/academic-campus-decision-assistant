@@ -1,0 +1,146 @@
+{
+  "contract_version": "sp3-planner/0.2",
+  "availability_version": "sp3-availability/0.2",
+  "cases": [
+    {
+      "id": "F1",
+      "module": "availability",
+      "case": "Ad-hoc busy interval affects only the covered time",
+      "input": {
+        "free_interval": {
+          "start": "2026-11-02T08:00:00+07:00",
+          "end": "2026-11-02T11:30:00+07:00"
+        },
+        "busy_intervals": [
+          {
+            "start": "2026-11-02T09:00:00+07:00",
+            "end": "2026-11-02T10:00:00+07:00"
+          }
+        ]
+      },
+      "expected": {
+        "available_intervals": [
+          {
+            "start": "2026-11-02T08:00:00+07:00",
+            "end": "2026-11-02T09:00:00+07:00"
+          },
+          {
+            "start": "2026-11-02T10:00:00+07:00",
+            "end": "2026-11-02T11:30:00+07:00"
+          }
+        ],
+        "calendar_version_changes": true
+      }
+    },
+    {
+      "id": "F2",
+      "module": "feasibility",
+      "case": "Flexible 60 minutes cannot combine two separate 30-minute fragments",
+      "input": {
+        "schedule": {
+          "type": "FLEXIBLE_WINDOW",
+          "window_start": "2026-11-02T08:00:00+07:00",
+          "window_end": "2026-11-02T12:00:00+07:00",
+          "duration_minutes": 60
+        },
+        "available_intervals": [
+          {
+            "start": "2026-11-02T08:00:00+07:00",
+            "end": "2026-11-02T08:30:00+07:00"
+          },
+          {
+            "start": "2026-11-02T10:00:00+07:00",
+            "end": "2026-11-02T10:30:00+07:00"
+          }
+        ]
+      },
+      "expected": {
+        "status": "INFEASIBLE",
+        "reason_codes": ["OUTSIDE_AVAILABILITY"]
+      }
+    },
+    {
+      "id": "F3",
+      "module": "feasibility",
+      "case": "Registered activity skips the registration deadline check",
+      "input": {
+        "participation": {
+          "registration": "REGISTERED",
+          "progress": "NOT_STARTED"
+        },
+        "registration_deadline": "2026-11-01T07:00:00+07:00",
+        "as_of": "2026-11-01T08:00:00+07:00"
+      },
+      "expected": {
+        "deadline_reason_absent": "DEADLINE_PASSED"
+      }
+    },
+    {
+      "id": "F4",
+      "module": "feasibility",
+      "case": "Completed and cancelled activities cannot be selected again",
+      "input": {
+        "progress_values": ["COMPLETED", "CANCELLED"]
+      },
+      "expected": {
+        "COMPLETED": {
+          "status": "INFEASIBLE",
+          "reason_codes": ["ALREADY_COMPLETED"]
+        },
+        "CANCELLED": {
+          "status": "INFEASIBLE",
+          "reason_codes": ["CANCELLED"]
+        }
+      }
+    },
+    {
+      "id": "F5",
+      "module": "feasibility",
+      "case": "Unknown online and multi-day offline schedules need review",
+      "input": {
+        "variants": ["ONLINE_WITHOUT_EVIDENCE", "MULTI_DAY_OFFLINE_WITHOUT_EVIDENCE"]
+      },
+      "expected": {
+        "status": "NEEDS_REVIEW",
+        "reason_codes": ["MISSING_SCHEDULE_TYPE"],
+        "schedule": null
+      }
+    },
+    {
+      "id": "F6",
+      "module": "feasibility",
+      "case": "Every fixed session is checked and any overlapping session creates a pair",
+      "input": {
+        "activity_a_blocks": [
+          {
+            "start": "2026-11-02T09:00:00+07:00",
+            "end": "2026-11-02T10:00:00+07:00"
+          },
+          {
+            "start": "2026-11-03T09:00:00+07:00",
+            "end": "2026-11-03T10:00:00+07:00"
+          }
+        ],
+        "activity_b_blocks": [
+          {
+            "start": "2026-11-03T09:30:00+07:00",
+            "end": "2026-11-03T10:30:00+07:00"
+          }
+        ],
+        "available_intervals": [
+          {
+            "start": "2026-11-02T08:00:00+07:00",
+            "end": "2026-11-02T11:00:00+07:00"
+          }
+        ]
+      },
+      "expected": {
+        "activity_a": {
+          "status": "INFEASIBLE",
+          "reason_codes": ["OUTSIDE_AVAILABILITY"]
+        },
+        "conflict_pairs": [["A", "B"]]
+      }
+    }
+  ]
+}

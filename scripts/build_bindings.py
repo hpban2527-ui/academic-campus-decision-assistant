@@ -3,7 +3,8 @@
 Needs the SP2 rule matcher and the verified rule catalog. Until the branches are integrated, pass the
 files from the SP2/SP3 branch with --matcher and --rules.
 
-Outputs data/handover/bindings.json and reports/sp2_binding_readiness.md.
+Outputs data/handover/bindings.json and reports/sp2_binding_readiness.md under --out-dir (default: the repo
+root), reading the handover from the same directory.
 """
 
 import argparse
@@ -32,6 +33,8 @@ def main(argv=None):
     parser.add_argument("--matcher", type=Path, default=ROOT / "src/sp2/rule_matcher.py")
     parser.add_argument("--rules", type=Path, default=ROOT / "data/drl_rules.json")
     parser.add_argument("--reason", required=True, help="Logged: announcement text of all posts is read")
+    parser.add_argument("--out-dir", type=Path, default=ROOT)
+    parser.add_argument("--access-log", type=Path, help="Override the test-access log (dry runs only)")
     args = parser.parse_args(argv)
     if not args.matcher.exists():
         parser.error(f"{args.matcher} not found: pass --matcher from the SP2 branch")
@@ -39,23 +42,27 @@ def main(argv=None):
     binding = load_module("sp2_binding_loaded", ROOT / "src/sp2/binding.py")
     rules_config = json.loads(args.rules.read_text(encoding="utf-8"))
     rules = {r["rule_id"]: r for r in rules_config["rules"]}
-    activities = json.loads((ROOT / "data/handover/activities_sp3.json").read_text(encoding="utf-8"))
-    sidecar = json.loads((ROOT / "data/handover/sidecar.json").read_text(encoding="utf-8"))["activities"]
-    texts = {p["post_id"]: p["raw_content"] for p in final_run_posts(args.reason)}
+    out_dir = args.out_dir
+    activities = json.loads((out_dir / "data/handover/activities_sp3.json").read_text(encoding="utf-8"))
+    sidecar = json.loads((out_dir / "data/handover/sidecar.json").read_text(encoding="utf-8"))["activities"]
+    texts = {p["post_id"]: p["raw_content"] for p in final_run_posts(args.reason, log_path=args.access_log)}
     results = []
     for activity in activities:
         side = sidecar[activity["activity_id"]]
         match = matcher.match_activity_to_rule(activity, texts[side["post_id"]], rules_config).as_dict()
-        results.append(binding.propose_binding(activity["activity_id"], side.get("activity_type"), match, rules))
+        review = side.get("review") or {}
+        reviewed_rule = review.get("rule_id") if not review.get("stale") else None
+        results.append(binding.propose_binding(activity["activity_id"], side.get("activity_type"), match, rules,
+                                               reviewed_rule=reviewed_rule))
     bound = [r for r in results if r["binding"]]
     out = {"schema": "sp2-bindings/1.0", "label": binding.LABEL, "policy": binding.POLICY,
            "type_rules": {k: list(v) for k, v in binding.TYPE_RULES.items()},
            "ruleset_file": args.rules.name, "n_activities": len(results),
            "bindings": [r["binding"] for r in bound],
-           "explanations": {r["activity_id"]: {k: r[k] for k in ("activity_type", "matcher_rule", "matcher_method",
+           "explanations": {r["activity_id"]: {k: r[k] for k in ("activity_type", "matcher_rule", "matcher_method", "label",
                                                                  "reason", "category_id", "points_from_rules")
                                                if k in r} for r in results}}
-    path = ROOT / "data/handover/bindings.json"
+    path = out_dir / "data/handover/bindings.json"
     path.write_bytes((json.dumps(out, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
     by_rule = Counter(r["binding"]["rule_id"] for r in bound)
     reasons = Counter(r["reason"] for r in results if not r["binding"])
@@ -68,7 +75,8 @@ def main(argv=None):
     lines += [f"| {rid} | {rules[rid]['category_id']} | {rules[rid]['points']} | {n} |" for rid, n in sorted(by_rule.items())]
     lines += ["", "| Sent to review: reason | Activities |", "| --- | ---: |"]
     lines += [f"| {k} | {v} |" for k, v in sorted(reasons.items())]
-    (ROOT / "reports/sp2_binding_readiness.md").write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
+    (out_dir / "reports").mkdir(parents=True, exist_ok=True)
+    (out_dir / "reports/sp2_binding_readiness.md").write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
     print("\n".join(lines))
 
 

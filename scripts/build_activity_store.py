@@ -6,6 +6,10 @@ Outputs:
   --sample-out CSV                     optional: 20 seeded activities for a non-blind manual check
 
 Reading test posts goes through devdata.final_run_posts(), so a --reason is required and logged.
+
+--llm may be given several times (for example the original run plus a later batch that covers only the new
+posts). Records are merged by post_id; the same post with different content in two files is an error. Every
+post must have LLM output unless --allow-partial is given, which is a dry run and cannot write to the repo root.
 """
 
 import argparse
@@ -14,7 +18,7 @@ import json
 import random
 import sys
 from collections import Counter
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,28 +27,14 @@ sys.path.insert(0, str(ROOT / "src"))
 from sp1.dedup_v2 import apply_duplicates
 from sp1.devdata import final_run_posts, load_split
 from sp1.evaluate import wilson
-from sp1.extract_v2 import extract_v2
-from sp1.hybrid import merge
 from sp1.llm_v2 import PROMPT_VERSIONS, decide
-from sp1.normalize import load_config, normalize
-from sp1.preprocess import original_span, preprocess
+from sp1.normalize import load_config
+from sp1.activity_type import KEYWORDS
+from sp1.pipeline_v2 import MASKS, plannability, process_post, redact  # noqa: F401  (re-exported)
+from sp1.review import load_decisions
 
-MASKS = {"phone": "[phone removed]", "account": "[account removed]"}
 SAMPLE_SEED = 20261114
 GROUPS = {"dev": {"dev_gold", "dev_extra"}, "pool": {"pool"}, "test": {"test"}}
-
-
-def redact(value):
-    if isinstance(value, dict):
-        return {key: redact(item) for key, item in value.items()}
-    if isinstance(value, list):
-        return [redact(item) for item in value]
-    if isinstance(value, str):
-        pre = preprocess(value)
-        for start, end, kind in reversed(pre.masked):
-            left, right = original_span(pre, start, end)
-            value = value[:left] + MASKS[kind] + value[right:]
-    return value
 
 
 def load_llm(path, model_id, allowed):
@@ -68,16 +58,27 @@ def load_llm(path, model_id, allowed):
     return rows
 
 
-def plannability(activity, config):
-    start = activity["window"]["open"]
-    day = date.fromisoformat(start[:10]) if start else None
-    semester = next((key for left, right, key in config.semesters["standard"] if day and left <= day <= right),
-                    "out_of_scope_semester" if day else "insufficient_data")
-    fails = [key for key, fail in (("post_type", activity["post_type"] != "activity"), ("window_open", not start),
-             ("mode", activity["mode"] is None),
-             ("semester", semester in {"out_of_scope_semester", "insufficient_data"}),
-             ("failed_status", activity["meta"]["status"] == "failed")) if fail]
-    return fails, semester
+# Run measurements that differ between two runs of the same model on the same input; not output content.
+RUN_STATS = ("seconds", "peak_vram_gb")
+DEFAULT_LLM = ROOT / "data/llm_outputs/final/Qwen__Qwen3.5-4B.jsonl"
+
+
+def load_llm_files(paths, model_id, allowed):
+    """load_llm() for one or more files, merged by post_id. The same post in two files must have the same
+    content (run measurements aside); otherwise ValueError, so a later file never silently wins."""
+    merged, origin = {}, {}
+    for path in paths:
+        for pid, row in load_llm(path, model_id, allowed).items():
+            if pid in merged:
+                old = {k: v for k, v in merged[pid].items() if k not in RUN_STATS}
+                new = {k: v for k, v in row.items() if k not in RUN_STATS}
+                if old != new:
+                    fields = sorted(k for k in set(old) | set(new) if old.get(k) != new.get(k))
+                    raise ValueError(f"Post {pid} has different LLM output in {Path(origin[pid]).name} and "
+                                     f"{Path(path).name} (fields: {', '.join(fields)}); keep one of them")
+                continue
+            merged[pid], origin[pid] = row, path
+    return merged
 
 
 def ci(k, n):
@@ -87,47 +88,54 @@ def ci(k, n):
     return f"{k}/{n} = {k / n:.1%} [{low:.1%}, {high:.1%}]"
 
 
-def build(llm_path, policy_path, reason, out_dir, allow_partial=False, access_log=None):
+def build(llm_path, policy_path, reason, out_dir, allow_partial=False, access_log=None, decisions_path=None):
     policy = json.loads(Path(policy_path).read_text(encoding="utf-8"))
     model_id = policy.get("_model_id")
     if not model_id:
         raise ValueError("Policy has no _model_id")
+    llm_paths = [llm_path] if isinstance(llm_path, (str, Path)) else list(llm_path)
+    if allow_partial and Path(out_dir).resolve() == ROOT.resolve():
+        raise ValueError("--allow-partial is a dry run: pass an --out-dir outside the repository root")
     split = {row["post_id"]: row for row in load_split()["posts"]}
     posts = final_run_posts(reason, log_path=access_log)
-    llm = load_llm(llm_path, model_id, split.keys())
+    llm = load_llm_files(llm_paths, model_id, split.keys())
     missing = [p["post_id"] for p in posts if p["post_id"] not in llm]
     if missing and not allow_partial:
-        raise ValueError(f"{len(missing)} posts have no LLM output; rerun or pass --allow-partial")
+        listed = ", ".join(f"position {split[pid]['position']} ({pid})" for pid in missing)
+        raise ValueError(f"{len(missing)} posts have no LLM output: {listed}. Export them with "
+                         "scripts/export_llm_inputs.py --only-missing, run the notebook and pass the new file "
+                         "with another --llm")
     config = load_config()
+    rules_path = ROOT / "data/drl_rules.json"
+    rule_ids = ({r["rule_id"] for r in json.loads(rules_path.read_text(encoding="utf-8"))["rules"]
+                 if r.get("status") == "verified"} if rules_path.exists() else set())
+    activity_types = {(k[0] if isinstance(k, tuple) else k) for k in KEYWORDS} | {"other"}
+    decisions, decision_problems = load_decisions(decisions_path or ROOT / "data/review/decisions.csv",
+                                                  activity_types, rule_ids)
+    unknown = sorted(set(decisions) - set(split))
+    decision_problems += [{"line": None, "post_id": pid, "problem": "unknown post_id"} for pid in unknown]
     store, rows = [], []
     for post in posts:
         pid = post["post_id"]
-        source = {key: post.get(key) for key in ("post_id", "publisher", "platform", "date_posted")}
-        source["URL_post"] = post["url"]
-        rules = extract_v2(post)
         decision = decide(post, llm[pid]["replies"]) if pid in llm else None
-        hybrid = merge(rules, decision, policy)
-        per_method = {}
-        for method, output in (("rules", rules), ("hybrid", hybrid)):
-            activity = normalize(output["layer_a"], source, config)
-            per_method[method] = (activity, *plannability(activity, config))
-        activity, fails, semester = per_method["hybrid"]
-        store.append({"position": split[pid]["position"], "split": split[pid]["split"], "activity": activity,
-                      "activity_type": hybrid["classification"]["activity_type"],
-                      "semester": semester, "plannable": not fails, "not_plannable_reasons": fails,
-                      "field_methods": hybrid.get("field_methods", {}),
-                      "llm_warnings": (decision or {}).get("warnings", []),
-                      "llm_available": decision is not None})
-        rows.append((split[pid]["split"], per_method))
+        result = process_post(post, decision, policy, config, decisions.get(pid))
+        store.append({"position": split[pid]["position"], "split": split[pid]["split"], **result["record"]})
+        rows.append((split[pid]["split"], result["per_method"]))
     dedup = apply_duplicates(store, {p["post_id"]: p["raw_content"] for p in posts})
     out_dir = Path(out_dir)
     (out_dir / "data").mkdir(parents=True, exist_ok=True)
     (out_dir / "reports").mkdir(parents=True, exist_ok=True)
     meta = {"schema": "sp1-activity-store/2.0", "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "model_id": model_id, "prompt_versions": PROMPT_VERSIONS, "merge_policy": policy,
-            "llm_file": Path(llm_path).name, "n_posts": len(store), "n_without_llm": len(missing),
+            "llm_file": ", ".join(Path(p).name for p in llm_paths), "n_posts": len(store), "n_without_llm": len(missing),
             "n_duplicate_groups": len(dedup["groups"]), "n_possible_duplicate_pairs": len(dedup["possible"]),
-            "n_canonical": sum(r["duplicate_of"] is None for r in store)}
+            "n_canonical": sum(r["duplicate_of"] is None for r in store),
+            "n_human_reviewed": sum(bool(r["review"]) and not r["review"]["stale"] for r in store),
+            "n_stale_decisions": sum(bool(r["review"]) and r["review"]["stale"] for r in store),
+            "n_plannable_after_review": sum(r["plannable"] for r in store),
+            "reviewers": sorted({r["review"]["reviewer"] for r in store
+                                 if r["review"] and not r["review"]["stale"]}),
+            "decision_problems": decision_problems}
     (out_dir / "data/activity_store_v2.json").write_bytes(
         (json.dumps(redact({**meta, "records": store}), ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
     (out_dir / "reports/sp1_final_readiness.md").write_bytes(report(rows, meta).encode("utf-8"))
@@ -166,6 +174,13 @@ def report(rows, meta):
               f"Merged groups: {meta['n_duplicate_groups']}. Canonical records: {meta['n_canonical']}/{meta['n_posts']}. "
               f"Possible-duplicate pairs flagged for review: {meta['n_possible_duplicate_pairs']}.",
               "Consumers (SP2/SP3) must use records with duplicate_of = null."]
+    lines += ["", "## Human review", "",
+              f"Records with an applied review decision: {meta['n_human_reviewed']}. Stale decisions (text changed): "
+              f"{meta['n_stale_decisions']}. Rejected decision rows: {len(meta['decision_problems'])}.",
+              f"Reviewers: {', '.join(meta['reviewers']) or 'none'}. A review decision is not verified by this",
+              "project unless its reviewer is a person; the rules/hybrid table above excludes review decisions,",
+              f"so the plannable figures there measure extraction only. Plannable after review: "
+              f"{meta['n_plannable_after_review']}/{meta['n_posts']}."]
     lines += ["", "| Hybrid value | Posts |", "| --- | ---: |"]
     lines += [f"| {k} | {n} |" for k, n in sorted(fields.items())]
     return "\n".join(lines) + "\n"
@@ -192,17 +207,20 @@ def write_sample(store, path, seed=SAMPLE_SEED, exclude=(), n=20):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--llm", type=Path, default=ROOT / "data/llm_outputs/final/Qwen__Qwen3.5-4B.jsonl")
+    parser.add_argument("--llm", type=Path, action="append",
+                        help=f"LLM output .jsonl; repeat for several files (default {DEFAULT_LLM.relative_to(ROOT)})")
     parser.add_argument("--policy", type=Path, default=ROOT / "data/config/merge_policy.json")
     parser.add_argument("--reason", required=True)
     parser.add_argument("--out-dir", type=Path, default=ROOT)
     parser.add_argument("--sample-out", type=Path, help="Also write a seeded manual-check sample to this CSV")
     parser.add_argument("--sample-seed", type=int, default=SAMPLE_SEED)
     parser.add_argument("--sample-exclude", type=Path, help="CSV of an earlier sample whose positions are excluded")
+    parser.add_argument("--decisions", type=Path, help="Review decisions CSV (default data/review/decisions.csv)")
     parser.add_argument("--access-log", type=Path, help="Override the test-access log (dry runs only)")
     parser.add_argument("--allow-partial", action="store_true", help="Dry run only: posts without LLM output use rules")
     args = parser.parse_args(argv)
-    store, meta = build(args.llm, args.policy, args.reason, args.out_dir, args.allow_partial, args.access_log)
+    store, meta = build(args.llm or [DEFAULT_LLM], args.policy, args.reason, args.out_dir, args.allow_partial, args.access_log,
+                        args.decisions)
     if args.sample_out:
         exclude = []
         if args.sample_exclude:

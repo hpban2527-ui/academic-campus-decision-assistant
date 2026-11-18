@@ -1,6 +1,6 @@
-# PROJECT E — SP1 + SP2 (Điểm rèn luyện)
+# PROJECT E — SP1 + SP2 + SP3 (Điểm rèn luyện)
 
-Lead & Integration: Bình An. SP1: Trí (data), Duyên (extractor). SP2: Tuyền (rules), Ngọc (engine). UI: Tiến. SP3 chưa triển khai.
+Lead & Integration: Bình An. SP1: Trí (data), Duyên (extractor). SP2: Tuyền (rules), Ngọc (engine). SP3: Ngọc (availability/feasibility), Duyên (planner). UI: Tiến.
 
 ## Chạy thử
 
@@ -51,6 +51,10 @@ python scripts/check_team_source_integrity.py
 ~~~
 
 Trên PowerShell, đặt $env:PYTHONPATH = "src" trước khi chạy lệnh pytest. CI: .github/workflows/integration.yml.
+
+## Updating activity data (admin)
+
+Students never submit announcements, and the running app never calls a model: it only reads the committed files in `data/`. New announcements are added by the admin as an offline batch (add posts, run the LLM notebook on Kaggle, `python scripts/admin_rebuild.py --reason "..."`, human review in `data/review/decisions.csv`, rebuild, tests, PR on a `data/` branch). Step-by-step commands: [docs/admin_data_update.md](docs/admin_data_update.md).
 
 ## Bàn giao H4–H5 – bản tích hợp cuối chờ duyệt
 
@@ -105,3 +109,26 @@ curl -X POST http://localhost:8000/api/pipeline/demo -H "Content-Type: applicati
 Nguồn và danh sách các hạn chế: `docs/REGULATION_SOURCE_AUDIT_20261027.md`, `docs/LEAD_INTEGRATION_HANDOFF.md`.
 
 Chưa merge `main` khi chưa được approval theo ruleset và xác minh điều kiện nghiệm thu.
+
+
+## SP3 integration preview (Week 5)
+
+Start the existing API with `python run_server.py`. The SP3 endpoints are:
+
+- `GET /api/sp3/catalog`: SP1's 20 structured activities with Trí's QA status. An additional 18 collected posts are **raw source**, not approved 14-field activities.
+- `POST /api/sp3/demo/plan`: JSON body `{"scenario":"first_plan"}`, `{"scenario":"replan"}`, or `{"scenario":"what_if_skip"}`. For the first plan, `total_target` (0–100) and `busy_intervals` are optional UI inputs. Output has `availability`, `feasibility`, and `plan` for Tiến's UI. The catalog also provides unapproved extraction drafts from the extra source posts; these are not score-eligible.
+- The demo recomputes availability and feasibility from Ngọc's code, plans with Duyên's code and invokes the real SP2 engine. The student, dates and activity bindings are synthetic fixture data; output is **DEMO_ONLY**, not a university-confirmed DRL award.
+
+Run `PYTHONPATH=src python -m pytest -q tests/sp3 tests/integration/test_sp3_flow.py` for the complete SP3 checks. The live HK3 planner remains review-gated until source activity records and point bindings are verified; do not turn unknown points into zero or claim official credit.
+
+## Phase 2 — MVP acceptance
+
+Start `python run_server.py`. Tiến's SP3 frontend calls the real `GET /api/sp3/catalog` and `POST /api/sp3/demo/plan`. From **Kế hoạch rèn luyện**, set a 0–100 target, optionally mark busy slots and generate a plan. The replan/what-if steps demonstrate fixed sample scenarios, not personalized continuations of arbitrary calendars.
+
+SP1's source catalog and SP3's November 2026 synthetic fixture are separate datasets.
+
+**Real store switch.** Both SP3 screens have a data-source selector. "Dữ liệu giả lập (MVP)" is the default and keeps the fixture above. "Kho bài thật · HK1 2026-2027" adds `?source=real` to `/api/sp3/catalog`, `/api/sp3/demo/plan` and `/api/sp3/personalized/plan` and plans over `data/handover/` (activities from real announcements, rule-based or hand-reviewed bindings; built by `scripts/build_handover.py` and `scripts/build_bindings.py`). The student, baseline and free time (07:00–21:00 daily from 2026-10-01, minus ticked busy slots) are synthetic. "Replan" simulates the slot of the first planned activity becoming busy; "what-if" skips the last activity of the replanned schedule. Restart the server after rebuilding `data/handover/`. Tests: `tests/integration/test_sp3_real_source.py`. Planner results are `DEMO_ONLY` (`official_award_verified=false`); source activities are not officially recognized DRL points.
+
+Acceptance: `PYTHONPATH=src python -m pytest -q tests/sp1 tests/sp2 tests/sp3 tests/integration tests/test_e2e_pipeline.py tests/test_session_flow.py`, `python scripts/check_team_source_integrity.py`, `python scripts/check_sp2_cases.py`, and `python scripts/verify_browser_e2e.py` (requires Playwright Chromium). Browser evidence covers SP1/SP2, SP3 first-plan/replan/what-if, target/busy input changes, catalog labels, and mobile view.
+
+Existing teammate rules, source, and SP3 modules remain unchanged. Do not merge until exact-head CI passes and a valid reviewer approves.

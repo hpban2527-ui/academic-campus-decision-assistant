@@ -1,4 +1,4 @@
-"""FastAPI Server for Academic Campus Decision Assistant (SP1 -> SP2).
+"""FastAPI Server for Academic Campus Decision Assistant (SP1 -> SP2 -> SP3).
 
 Integrates:
 - SP1 Extractor (15-field draft) + Lead Publication Gate (14-field activity.schema.json)
@@ -8,15 +8,19 @@ Integrates:
   1. Strict Fail-Closed Intake Mode (default POST /api/evaluate: REVIEW_REQUIRED, 0 auto-awarded points)
   2. Demo Simulation Mode (simulate_demo=True & POST /api/pipeline/demo: runs real SP2 engine with DEMO_ONLY label)
 - Academic Snapshot DRL Evaluation (POST /api/sp2/evaluate) & Dataset/Regulation Audit (GET /api/lead/audit)
+- SP3 weekly availability resolution (POST /api/sp3/availability/resolve)
 """
 
 from __future__ import annotations
 
 import json
+import hashlib
 import sys
 import uuid
+from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
+from time import perf_counter
 from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException
@@ -34,6 +38,16 @@ if str(ROOT_DIR / "src") not in sys.path:
 from api.dedup_review import possible_duplicates
 from api.lead_contract import ACTIVITY_FIELDS, audit_dataset, canonical_url, prepare_publication
 from api.reviewed_pipeline import evaluate_reviewed_activity, fingerprint
+from personalization import (
+    ConfirmedPreferenceSaveRequest,
+    InterpretPreferenceRequest,
+    PersonalizedPlanRequest,
+    PreferenceProviderInvalidResponse,
+    PreferenceProviderUnavailable,
+    StudentPreference,
+    preference_provider_from_env,
+)
+from personalization.fast_interpreter import interpret_explicit_preference
 from sp1.deduplication import PostDeduplicator
 from sp1.extractor import extract
 from sp2.drl_engine import (
@@ -43,6 +57,8 @@ from sp2.drl_engine import (
     evaluate_rule_conditions,
     evaluate_rules_progress,
 )
+from sp3 import AvailabilityContractError, resolve_availability
+from sp2.rule_matcher import match_activity_to_rule
 
 DATA_DIR = ROOT_DIR / "data"
 WEB_DIR = ROOT_DIR / "web"
@@ -50,8 +66,8 @@ SCHEMAS_DIR = ROOT_DIR / "schemas"
 
 app = FastAPI(
     title="HCMUS Academic Campus Decision Assistant API",
-    description="Backend API integrating SP1 (Information Extraction) -> SP2 (DRL Evaluation)",
-    version="1.1.0",
+    description="Backend API integrating SP1, SP2 and SP3 availability/feasibility contracts",
+    version="1.2.0",
 )
 
 app.add_middleware(
@@ -121,14 +137,37 @@ for item in SOURCE_POSTS:
         BASELINE_POST_IDS.add(str(pid))
         deduplicator.index_post(str(pid), txt)
 
-# Default Student Demo Baseline State (Lưu Minh Tiến) using authentic category caps from drl_rules.json
+# Default Student Demo Baseline State (Lưu Minh Tiến) using authentic category caps
+# and the rules marked default_awarded in drl_rules.json.
 DEFAULT_STUDENT_ID = "25127242"
-# Kept in sync with the web UI baseline (20 + 15 + 22 + 10 + 2 = 69 points).
-DEFAULT_CATEGORY_CURRENTS = {"C1": 20, "C2": 15, "C3": 22, "C4": 10, "C5": 2}
+
+
+def _build_default_category_currents() -> tuple[dict[str, int | float], list[str]]:
+    """Calculate a new student's opening score from default-awarded DRL rules.
+
+    The score values live in drl_rules.json.  Keeping this calculation here avoids
+    a second, hard-coded baseline drifting away from the SP2 rule engine.
+    """
+
+    result = evaluate_rule_conditions(
+        DRL_RULES_CONFIG,
+        {},
+        apply_default_awards=True,
+    )
+    currents: dict[str, int | float] = {cid: 0 for cid in CATEGORY_META}
+    for category in result["category_scores"]:
+        cid = str(category["category_id"])
+        if cid in currents:
+            currents[cid] = category["score"]
+    return currents, list(result["default_applied_rules"])
+
+
+DEFAULT_CATEGORY_CURRENTS, DEFAULT_APPLIED_RULES = _build_default_category_currents()
+DEFAULT_BASELINE_TOTAL = min(100, sum(DEFAULT_CATEGORY_CURRENTS.values()))
 
 
 def build_student_baseline_scores(custom_currents: Optional[dict[str, float]] = None) -> dict[str, dict[str, Any]]:
-    currents = custom_currents or DEFAULT_CATEGORY_CURRENTS
+    currents = custom_currents if custom_currents is not None else DEFAULT_CATEGORY_CURRENTS
     scores: dict[str, dict[str, Any]] = {}
     for cid, meta in CATEGORY_META.items():
         scores[cid] = {
@@ -160,12 +199,23 @@ STUDENT_BASELINE = {
 SESSION_DIR = ROOT_DIR / "data" / "sessions"
 SESSION_DIR.mkdir(parents=True, exist_ok=True)
 SESSION_FILE = SESSION_DIR / "current_session.json"
-SESSION_SCHEMA_VERSION = 2
+# Version 3 replaces the old synthetic 69-point baseline with the opening score
+# calculated from default_awarded rules.  Older demo sessions are intentionally not
+# restored because their absolute category scores include the obsolete baseline.
+SESSION_SCHEMA_VERSION = 3
 
 # Committed (saved) activities across students, newest first.
 session_committed: list[dict[str, Any]] = []
 # Per-student saved scores: {student_id: {"current": {Cx: n}, "projected": {Cx: n}}}
 session_scores: dict[str, dict[str, dict[str, float]]] = {}
+# Per-student preference snapshots confirmed in the UI.  The AI's unconfirmed
+# draft is intentionally never persisted.
+session_preferences: dict[str, dict[str, Any]] = {}
+# Successful interpretations are safe to reuse because temperature is zero and
+# deterministic normalization runs before this boundary. Keep the cache small
+# and process-local; confirmed preferences remain stored separately per student.
+preference_interpret_cache: OrderedDict[tuple[str, str, str], dict[str, Any]] = OrderedDict()
+PREFERENCE_INTERPRET_CACHE_SIZE = 128
 # Posts explicitly submitted for human review.
 review_queue: list[dict[str, Any]] = []
 # Per-student MinHash index of *committed* posts (prevents counting the same post twice).
@@ -227,6 +277,9 @@ def _scores_payload(student_id: str) -> dict[str, Any]:
         "is_baseline": not any(
             c.get("kind") == "score" and c.get("student_id") == student_id for c in session_committed
         ),
+        "baseline_source": "DRL_DEFAULT_AWARDS",
+        "default_applied_rules": DEFAULT_APPLIED_RULES,
+        "default_baseline_total": _clean_num(DEFAULT_BASELINE_TOTAL),
     }
 
 
@@ -239,6 +292,7 @@ def _save_session_to_disk() -> None:
             "storage_mode": "local_filesystem_folder",
             "folder": str(SESSION_DIR),
             "session_scores": session_scores,
+            "confirmed_preferences": session_preferences,
             "committed": session_committed,
             "review_queue": review_queue,
             # Read-only convenience view for humans opening the file.
@@ -253,6 +307,7 @@ def _save_session_to_disk() -> None:
 def _clear_session_state() -> None:
     session_committed.clear()
     session_scores.clear()
+    session_preferences.clear()
     review_queue.clear()
     student_dedupers.clear()
 
@@ -264,6 +319,7 @@ def _load_session_from_disk() -> None:
         return
     try:
         session_scores.update(data.get("session_scores") or {})
+        session_preferences.update(data.get("confirmed_preferences") or {})
         session_committed.extend(data.get("committed") or [])
         review_queue.extend(data.get("review_queue") or [])
         for c in session_committed:
@@ -285,7 +341,7 @@ E2E_SCENARIOS: dict[int, dict[str, Any]] = {
         "badge": "Điểm dự kiến (+5đ)",
         "badge_class": "bg-blue-100 text-blue-800",
         "rule_label": "R19 (Mục 1.9, C1)",
-        "description": "Bài đăng offline đầy đủ 14 trường. Chưa có minh chứng điểm danh nên ghi nhận Điểm dự kiến (+5đ, điểm chính thức C1 giữ nguyên 20/30đ).",
+        "description": "Bài đăng offline đầy đủ 14 trường. Chưa có minh chứng điểm danh nên ghi nhận Điểm dự kiến (+5đ, điểm mặc định C1 giữ nguyên 15/30đ).",
         "post_id": "pfbid01_pccc_new_2026",
         "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
         "platform": "facebook",
@@ -300,9 +356,9 @@ E2E_SCENARIOS: dict[int, dict[str, Any]] = {
             "category_id": "C1",
             "projected_added": 5,
             "confirmed_added": 0,
-            "category_before": 20,
-            "category_after": 20,
-            "hypothetical_category_after": 25,
+            "category_before": 15,
+            "category_after": 15,
+            "hypothetical_category_after": 20,
             "category_cap": 30,
         },
         "raw_content": """CHUYÊN ĐỀ TẬP HUẤN KIẾN THỨC, KỸ NĂNG VÀ THỰC TẬP PHƯƠNG ÁN PHÒNG CHÁY CHỮA CHÁY NĂM 2026
@@ -371,9 +427,9 @@ Quyền lợi: Cộng 10 điểm rèn luyện theo quy chế khi hoàn thành hi
             "category_id": "C1",
             "projected_added": 0,
             "confirmed_added": 0,
-            "category_before": 20,
-            "category_after": 20,
-            "hypothetical_category_after": 20,
+            "category_before": 15,
+            "category_after": 15,
+            "hypothetical_category_after": 15,
             "category_cap": 30,
         },
         "raw_content": """WEBINAR HƯỚNG NGHIỆP: KỸ NĂNG VIẾT CV VÀ PHỎNG VẤN NGÀNH CNTT
@@ -399,6 +455,7 @@ Lệ phí: Miễn phí. Không bắt buộc.""",
         "url": "https://www.facebook.com/doantruong.hcmus/posts/olympicmaclenin",
         "evidence": True,
         "rule_override": "R3101",
+        "current_category_scores": {"C1": 15, "C2": 15, "C3": 22, "C4": 10, "C5": 0},
         "expected": {
             "strict_decision": "PENDING_REVIEW",
             "demo_decision": "DEMO_CONFIRMED",
@@ -442,9 +499,9 @@ Link đăng ký: https://forms.gle/olympic2026""",
             "category_id": "C1",
             "projected_added": 0,
             "confirmed_added": 0,
-            "category_before": 20,
-            "category_after": 20,
-            "hypothetical_category_after": 20,
+            "category_before": 15,
+            "category_after": 15,
+            "hypothetical_category_after": 15,
             "category_cap": 30,
         },
         "raw_content": """CHUYÊN ĐỀ TẬP HUẤN KIẾN THỨC, KỸ NĂNG VÀ THỰC TẬP PHƯƠNG ÁN PHÒNG CHÁY CHỮA CHÁY NĂM 2026
@@ -484,34 +541,6 @@ def get_grade_label(score: float) -> str:
     return "Yếu / Kém (<50)"
 
 
-def _match_demo_rule(rec: dict[str, Any], raw_content: str, rule_override: str) -> Optional[dict[str, Any]]:
-    """Select candidate rule from DRL_RULES_CONFIG for demo simulation."""
-    rules_list = DRL_RULES_CONFIG.get("rules", [])
-    rule_map = {r["rule_id"]: r for r in rules_list if "rule_id" in r}
-
-    if rule_override and rule_override != "auto":
-        return rule_map.get(rule_override)
-
-    title_lower = (rec.get("title") or "").lower()
-    content_lower = raw_content.lower()
-
-    if "hiến máu" in title_lower or "hiến máu" in content_lower:
-        return rule_map.get("R42")
-    if any(k in title_lower or k in content_lower for k in ["olympic", "mác - lênin", "mác-lênin"]):
-        return rule_map.get("R3101")
-    if any(k in title_lower or k in content_lower for k in ["chạy bộ", "thể thao", "thanh niên khỏe"]):
-        return rule_map.get("R32")
-    if any(k in title_lower or k in content_lower for k in ["tuyển sinh", "ngày hội việc làm", "hội chợ việc làm"]):
-        return rule_map.get("R38")
-    if rec.get("domain") == "volunteer" or "tình nguyện" in content_lower:
-        return rule_map.get("R4301")
-    if any(k in content_lower for k in ["khảo sát", "điều tra xã hội"]):
-        return rule_map.get("R23")
-    if any(k in title_lower or k in content_lower for k in ["pccc", "phòng cháy", "kỹ năng", "tập huấn", "chuyên đề"]):
-        return rule_map.get("R19")
-    return rule_map.get("R19")
-
-
 def _clean_num(val: Optional[float | int]) -> Optional[float | int]:
     if val is None:
         return None
@@ -539,6 +568,88 @@ def _extract_flat_baseline_scores(
         clamped = max(0.0, min(float(meta["max"]), cur))
         flat[cid] = _clean_num(clamped)
     return flat
+
+
+def _estimate_rule_against_baseline(
+    rule: dict[str, Any],
+    flat_baseline: dict[str, int | float],
+    *,
+    student_id: str,
+    activity_id: str,
+) -> dict[str, Any]:
+    """Run a read-only SP2 what-if for an incomplete/unreviewed activity.
+
+    This deliberately skips the reviewed-activity adapter because the SP1
+    record may contain nullable fields that cannot pass the publication
+    schema.  It does not fill those fields or create trusted participation;
+    only the selected rule's category contribution is projected.
+    """
+    regulation = DRL_RULES_CONFIG.get("regulation", {})
+    caps = {
+        item["category_id"]: item["max_score"]
+        for item in DRL_RULES_CONFIG.get("scoring_model", {}).get("category_caps", [])
+    }
+    rule_set = {
+        "rule_set_id": regulation.get("regulation_id"),
+        "version": regulation.get("effective_from"),
+        "verified": True,
+        "scope": {"universities": ["HCMUS"]},
+        "criteria": [
+            {"code": cid, "max_score": cap}
+            for cid, cap in caps.items()
+        ],
+        "topic_requirements": [],
+        "min_total_score": DRL_RULES_CONFIG.get("scoring_model", {}).get("semester_score_min", 0),
+        "max_total_score": DRL_RULES_CONFIG.get("scoring_model", {}).get("max_total_score", 100),
+    }
+    profile = {"student_id": student_id, "university": "HCMUS"}
+    base_records = [
+        {
+            "record_id": f"baseline-{cid}",
+            "status": "CONFIRMED",
+            "evidence_status": "VERIFIED",
+            "criterion_code": cid,
+            "points": points,
+        }
+        for cid, points in flat_baseline.items()
+    ]
+    event_record = {
+        "record_id": f"estimate-{activity_id}",
+        "activity_id": activity_id,
+        "status": "CONFIRMED",
+        "evidence_status": "VERIFIED",
+        "criterion_code": rule["category_id"],
+        "points": rule["points"],
+    }
+    before = evaluate_progress(rule_set, profile, base_records, require_verified_rules=True)
+    hypothetical = evaluate_progress(rule_set, profile, base_records + [event_record], require_verified_rules=True)
+    before_map = {item["code"]: item["score"] for item in before["confirmed_by_criterion"]}
+    after_map = {item["code"]: item["score"] for item in hypothetical["confirmed_by_criterion"]}
+    category_id = rule["category_id"]
+    category_before = before_map.get(category_id, 0)
+    category_after = after_map.get(category_id, category_before)
+    projected_added = category_after - category_before
+    return {
+        "mode": "DEMO_ONLY",
+        "official_award_verified": False,
+        "status": "PROJECTED",
+        "activity_id": activity_id,
+        "student_id": student_id,
+        "rule_id": rule["rule_id"],
+        "criterion_id": rule["criterion_id"],
+        "category_id": category_id,
+        "category_cap": caps[category_id],
+        "rule_points": rule["points"],
+        "category_before": category_before,
+        "category_after": category_before,
+        "hypothetical_category_after": category_after,
+        "remaining_after_hypothetical": max(0, caps[category_id] - category_after),
+        "projected_added": projected_added,
+        "confirmed_added": 0,
+        "confirmed_total_before": before["confirmed_total"],
+        "confirmed_total_after": before["confirmed_total"],
+        "notes": "Unreviewed activity estimate from a candidate rule; not an official or confirmed award.",
+    }
 
 
 @app.get("/api/health")
@@ -603,12 +714,13 @@ def get_student_profile(student_id: Optional[str] = None):
         "gpa": gpa,
         "term": "HK1/2026-2027",
         "category_scores": cat_scores,
-        "verified_activities_count": 8,
+        "verified_activities_count": 0,
         "total_confirmed_score": total_confirmed,
         "total_projected_score": scores["total_projected"],
         "demo_only": True,
         "official_score_verified": False,
-        "score_source": "SYNTHETIC_DEMO_BASELINE",
+        "score_source": "DRL_DEFAULT_AWARDS",
+        "default_applied_rules": DEFAULT_APPLIED_RULES,
         "grade_label": "DEMO - " + get_grade_label(total_confirmed),
     }
 
@@ -664,7 +776,7 @@ def _check_post_duplicate(
     req_url: str,
     raw_content: str,
     student_id: str,
-) -> tuple[bool, Optional[str], float]:
+) -> tuple[bool, Optional[str], float, Optional[str], Optional[str]]:
     """Duplicate check against (1) baseline collected posts and (2) posts this student already SAVED.
 
     Previewed-but-unsaved posts are never indexed, so re-checking the same text is not a duplicate.
@@ -683,19 +795,28 @@ def _check_post_duplicate(
             dup_match_id, dup_sim = post.get("post_id"), 1.0
             break
 
-    # 2. Baseline collected posts: MinHash-LSH content similarity.
-    if dup_match_id is None and raw_content:
-        match = deduplicator.find_duplicate(raw_content)
-        if match and match[1] >= 0.75:
-            dup_match_id, dup_sim = match[0], float(match[1])
+    if dup_match_id is not None:
+        return True, dup_match_id, round(float(dup_sim), 4), "baseline", "exact_identity"
 
-    # 3. Activities this student has already saved to the score board.
+    # 2. Activities this student has already saved to the score board.  This
+    # must run before catalog similarity so a saved catalog activity cannot be
+    # disguised as a harmless source reference.
     if dup_match_id is None and raw_content:
         match = _get_student_deduper(student_id).find_duplicate(raw_content)
         if match and match[1] >= 0.75:
             dup_match_id, dup_sim = match[0], float(match[1])
+            return True, dup_match_id, round(float(dup_sim), 4), "saved", "student_saved_content"
 
-    return (dup_match_id is not None), dup_match_id, round(float(dup_sim), 4)
+    # 3. Baseline collected posts: content similarity means the announcement
+    # is already known to the catalog.  Demo estimation may use this match;
+    # strict ingestion still treats it as a duplicate source post.
+    if raw_content:
+        match = deduplicator.find_duplicate(raw_content)
+        if match and match[1] >= 0.75:
+            dup_match_id, dup_sim = match[0], float(match[1])
+            return True, dup_match_id, round(float(dup_sim), 4), "baseline", "catalog_content"
+
+    return False, None, 0.0, None, None
 
 
 @app.post("/api/evaluate")
@@ -723,9 +844,18 @@ def evaluate_announcement(req: EvaluationRequest):
     rec, meta = draft["record"], draft["meta"]
     current_activity_id = rec["activity_id"]
     student_id = req.student_id or DEFAULT_STUDENT_ID
-    is_duplicate, dup_match_id, dup_sim = _check_post_duplicate(
+    detected_duplicate, dup_match_id, dup_sim, dup_source, dup_match_kind = _check_post_duplicate(
         req.post_id, req.url, req.raw_content, student_id
     )
+    catalog_match = bool(
+        detected_duplicate
+        and dup_source == "baseline"
+        and dup_match_kind == "catalog_content"
+        and req.simulate_demo
+    )
+    # A catalog content match is useful evidence about the source activity,
+    # not proof that this student has already received credit for it.
+    is_duplicate = detected_duplicate and not catalog_match
     # A post the student saved earlier as "dự kiến" may be re-submitted WITH evidence to upgrade it
     # to "đã xác nhận". That is not a duplicate award: the projected points are replaced, not added.
     upgrade_of: Optional[dict[str, Any]] = None
@@ -741,12 +871,7 @@ def evaluate_announcement(req: EvaluationRequest):
             None,
         )
         if upgrade_of is not None:
-            is_duplicate, dup_match_id, dup_sim = False, None, 0.0
-    dup_source = (
-        None if not is_duplicate
-        else "saved" if str(dup_match_id).startswith("commit_")
-        else "baseline"
-    )
+            is_duplicate, dup_match_id, dup_sim, dup_source, dup_match_kind = False, None, 0.0, None, None
     meta["is_duplicate"] = is_duplicate
     review_fp = _review_fingerprint(req.raw_content)
     already_in_review = any(x.get("fingerprint") == review_fp for x in review_queue)
@@ -778,12 +903,11 @@ def evaluate_announcement(req: EvaluationRequest):
         if req.has_evidence:
             explanation += " Ô chọn 'có minh chứng' chỉ là khai báo của người dùng, chưa phải chứng thực."
 
-        suggestion = None
+        rule_match = match_activity_to_rule(
+            rec, req.raw_content, DRL_RULES_CONFIG, rule_override=req.rule_override
+        )
+        suggestion = rule_match.rule
         if req.rule_override and req.rule_override != "auto":
-            suggestion = next(
-                (r for r in DRL_RULES_CONFIG.get("rules", []) if r.get("rule_id") == req.rule_override),
-                None,
-            )
             if suggestion is not None:
                 explanation += f" Quy tắc {req.rule_override} do người dùng chọn, chưa được xác nhận áp dụng."
 
@@ -830,7 +954,10 @@ def evaluate_announcement(req: EvaluationRequest):
                 "match_id": dup_match_id,
                 "similarity": dup_sim,
                 "source": dup_source,
+                "match_kind": dup_match_kind,
+                "catalog_match": catalog_match,
             },
+            "rule_match": rule_match.as_dict(),
             "commit": {
                 "kind": None if is_duplicate or already_in_review else "review",
                 "already_in_review": already_in_review,
@@ -840,7 +967,10 @@ def evaluate_announcement(req: EvaluationRequest):
     # =========================================================================
     # MODE 2: DEMO SIMULATION MODE (simulate_demo=True -> Real SP2 Engine)
     # =========================================================================
-    matched_rule = _match_demo_rule(rec, req.raw_content, req.rule_override)
+    rule_match = match_activity_to_rule(
+        rec, req.raw_content, DRL_RULES_CONFIG, rule_override=req.rule_override
+    )
+    matched_rule = rule_match.rule
     # Baseline = explicit scores from the caller (dev batch runner / tests) or, by default,
     # the student's SAVED score board in this session (single source of truth).
     uses_session_scores = req.current_category_scores is None
@@ -865,6 +995,19 @@ def evaluate_announcement(req: EvaluationRequest):
     announced_points = rec.get("points")
     rule_points = matched_rule.get("points") if matched_rule else None
 
+    extraction_flags = list(meta.get("flags") or [])
+    extraction_has_warnings = meta.get("status") != "valid" or bool(extraction_flags)
+    online_missing_completion = (
+        rec.get("mode") == "online"
+        and "needs_review:completion_requirements" in extraction_flags
+    )
+    estimate_requires_review = bool(
+        (extraction_has_warnings or rule_match.ambiguous)
+        and matched_rule is not None
+        and rule_match.confidence >= 0.65
+        and not online_missing_completion
+    )
+
     if is_duplicate:
         meta["routed_to"] = "discarded_duplicate"
         decision = "REJECTED_DUPLICATE"
@@ -882,10 +1025,11 @@ def evaluate_announcement(req: EvaluationRequest):
             "Hệ thống chặn cộng điểm lần 2 theo đúng quy chế."
         )
     elif (
-        meta.get("status") != "valid"
-        or meta.get("flags")
-        or matched_rule is None
+        matched_rule is None
         or matched_rule.get("status") != "verified"
+        or rule_match.confidence < 0.65
+        or online_missing_completion
+        or (extraction_has_warnings and not estimate_requires_review)
         or (
             rec.get("points") is not None
             and rec["points"] != matched_rule.get("points")
@@ -903,7 +1047,10 @@ def evaluate_announcement(req: EvaluationRequest):
         total_confirmed_after = total_confirmed_before
 
         if matched_rule is None:
-            reason_detail = f"Mã quy tắc '{req.rule_override}' không tồn tại trong bộ quy chế."
+            if rule_match.method == "invalid_override":
+                reason_detail = f"Mã quy tắc '{req.rule_override}' không tồn tại trong bộ quy chế."
+            else:
+                reason_detail = " ".join(rule_match.reasons) or "Chưa đủ căn cứ để ghép hoạt động với quy tắc ĐRL."
         elif matched_rule.get("status") != "verified":
             reason_detail = (
                 f"Quy tắc {matched_rule.get('rule_id')} đang ở trạng thái '{matched_rule.get('status')}' "
@@ -913,6 +1060,11 @@ def evaluate_announcement(req: EvaluationRequest):
             reason_detail = (
                 f"Bài đăng công bố +{rec['points']} điểm nhưng quy tắc {matched_rule['rule_id']} "
                 f"quy định +{matched_rule['points']} điểm. Cần đối chiếu lại; không được tự đổi điểm công bố."
+            )
+        elif online_missing_completion:
+            reason_detail = (
+                "Hoạt động trực tuyến chưa nêu cách xác nhận hoàn thành/điểm danh. "
+                "Không thể ước lượng an toàn theo D16 và CALC_05."
             )
         else:
             reason_detail = (
@@ -946,7 +1098,7 @@ def evaluate_announcement(req: EvaluationRequest):
             "included_activity_ids": [],
         }
         participation = None
-        if req.has_evidence:
+        if req.has_evidence and not estimate_requires_review:
             participation = {
                 "student_id": student_id_str,
                 "activity_id": eval_record["activity_id"],
@@ -957,16 +1109,24 @@ def evaluate_announcement(req: EvaluationRequest):
                 "evidence_ref": "synthetic://demo/evidence-01",
             }
 
-        sp2_res = evaluate_reviewed_activity(
-            record=eval_record,
-            metadata={"status": "valid", "flags": [], "is_duplicate": False},
-            approval=simulated_approval,
-            participation=participation,
-            baseline=baseline,
-            student_profile=student_profile,
-            rules_config=DRL_RULES_CONFIG,
-            schema=ACTIVITY_SCHEMA,
-        )
+        if estimate_requires_review:
+            sp2_res = _estimate_rule_against_baseline(
+                matched_rule,
+                flat_baseline,
+                student_id=student_id_str,
+                activity_id=eval_record["activity_id"],
+            )
+        else:
+            sp2_res = evaluate_reviewed_activity(
+                record=eval_record,
+                metadata={"status": "valid", "flags": [], "is_duplicate": False},
+                approval=simulated_approval,
+                participation=participation,
+                baseline=baseline,
+                student_profile=student_profile,
+                rules_config=DRL_RULES_CONFIG,
+                schema=ACTIVITY_SCHEMA,
+            )
 
         projected_added = sp2_res.get("projected_added", 0)
         confirmed_added = sp2_res.get("confirmed_added", 0)
@@ -989,10 +1149,11 @@ def evaluate_announcement(req: EvaluationRequest):
             hypothetical_after = _clean_num(min(cat_cap, (cat_before or 0) + existing_projected + projected_added))
             cat_missing = max(0, cat_cap - hypothetical_after)
 
-        effective_delta = confirmed_added if req.has_evidence else projected_added
+        can_demo_confirm = req.has_evidence and not estimate_requires_review
+        effective_delta = confirmed_added if can_demo_confirm else projected_added
         is_capped = (rule_points is not None) and (effective_delta < rule_points)
 
-        if req.has_evidence:
+        if can_demo_confirm:
             decision = "DEMO_CONFIRMED"
             badge_text = (
                 f"DEMO: ĐÃ XÁC NHẬN - ÁP TRẦN {category_id} (+{confirmed_added}đ)"
@@ -1027,7 +1188,17 @@ def evaluate_announcement(req: EvaluationRequest):
                 f"({matched_rule.get('rule_id')}: {matched_rule.get('name')})."
             )
 
-        explanation = exp_core + exp_cap + projected_room_note
+        estimate_note = ""
+        if estimate_requires_review:
+            estimate_note = (
+                f" Đây là ước lượng từ {matched_rule.get('rule_id')} trong drl_rules.json "
+                f"(độ tin cậy {round(rule_match.confidence * 100)}%). "
+                f"Bài còn thiếu dữ liệu ({', '.join(extraction_flags) or meta.get('status')}); "
+                "chỉ được lưu vào hàng đợi duyệt, không phải điểm xác nhận."
+            )
+        elif catalog_match:
+            estimate_note = " Bài đã có trong kho nguồn; điều này không có nghĩa sinh viên đã được cộng điểm."
+        explanation = exp_core + exp_cap + projected_room_note + estimate_note
         meta["routed_to"] = "preview (awaiting user save via /api/commit)"
         # NOTE: preview only — nothing is recorded or indexed here. See POST /api/commit.
 
@@ -1068,17 +1239,25 @@ def evaluate_announcement(req: EvaluationRequest):
             "explanation": explanation,
             "citation": citation,
             "existing_projected": existing_projected,
+            "estimate_confidence": round(rule_match.confidence, 2),
+            "estimate_requires_review": estimate_requires_review,
+            "point_source": "drl_rules.json" if matched_rule else None,
         },
         "dedup": {
             "is_duplicate": is_duplicate,
             "match_id": dup_match_id,
             "similarity": dup_sim,
             "source": dup_source,
+            "match_kind": dup_match_kind,
+            "catalog_match": catalog_match,
         },
+        "rule_match": rule_match.as_dict(),
         "commit": {
             "upgrade_of": upgrade_of.get("commit_id") if upgrade_of else None,
             "kind": (
-                "score"
+                "review"
+                if estimate_requires_review and not already_in_review
+                else "score"
                 if decision in ("PROJECTED", "DEMO_CONFIRMED") and (confirmed_added or projected_added)
                 else "review"
                 if decision == "NEEDS_REVIEW" and not already_in_review
@@ -1266,6 +1445,31 @@ def evaluate_verified_snapshot(req: VerifiedSnapshotRequest):
     }
 
 
+class AvailabilityResolveRequest(BaseModel):
+    availability: dict[str, Any]
+    window_start: str
+    window_end: str
+
+
+@app.post("/api/sp3/availability/resolve")
+def resolve_sp3_availability(req: AvailabilityResolveRequest):
+    """Expand a UI week template without persisting or inferring free time."""
+
+    try:
+        resolved = resolve_availability(
+            req.availability,
+            window_start=req.window_start,
+            window_end=req.window_end,
+        )
+    except (AvailabilityContractError, ValueError, TypeError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return {
+        "mode": "DEMO_ONLY",
+        "persistent": False,
+        **resolved,
+    }
+
+
 class DemoPipelineRequest(BaseModel):
     case_id: int = 1
     with_demo_confirmation: Optional[bool] = None
@@ -1288,7 +1492,7 @@ def evaluate_end_to_end_demo(req: DemoPipelineRequest):
     activity = candidate["record"]
     meta = candidate["meta"]
 
-    is_dup, dup_id, dup_sim = _check_post_duplicate(
+    is_dup, dup_id, dup_sim, _dup_source, _dup_kind = _check_post_duplicate(
         case["post_id"], case["url"], case["raw_content"], activity["activity_id"]
     )
     meta["is_duplicate"] = is_dup
@@ -1310,12 +1514,13 @@ def evaluate_end_to_end_demo(req: DemoPipelineRequest):
         "rule_id": rule_id,
     }
     student_profile = {"student_id": "demo-student-001", "university": "HCMUS"}
-    # Keep C1=20, C2..C5=0 for case 1 compatibility with test_reviewed_pipeline.py;
-    # use full category baseline for cases 2..5
+    # Keep C1=20, C2..C5=0 for case 1 compatibility with test_reviewed_pipeline.py.
+    # A fixture may explicitly override the rule-derived default baseline when it is
+    # testing a specific edge case such as category-cap enforcement.
     if req.case_id == 1:
         base_scores = {"C1": 20, "C2": 0, "C3": 0, "C4": 0, "C5": 0}
     else:
-        base_scores = dict(DEFAULT_CATEGORY_CURRENTS)
+        base_scores = dict(case.get("current_category_scores") or DEFAULT_CATEGORY_CURRENTS)
 
     baseline = {
         "student_id": student_profile["student_id"],
@@ -1371,8 +1576,8 @@ def evaluate_end_to_end_demo(req: DemoPipelineRequest):
 
 @app.get("/api/lead/audit")
 def lead_data_audit():
-    """Quick read-only audit of regulation rules, 20-activity catalog, and cross-post duplicates."""
-    raw_source = load_json(ROOT_DIR / "Collecting_Data/source.json", None) or SOURCE_POSTS
+    """Audit rules, the reviewed catalog, and Minh Tri's current raw-source feed."""
+    raw_source = load_json(DATA_DIR / "raw" / "source.json", None) or SOURCE_POSTS
     return {
         "mode": "DEMO_ONLY",
         "regulation_id": DRL_RULES_CONFIG.get("regulation", {}).get("regulation_id"),
@@ -1387,6 +1592,240 @@ def lead_data_audit():
 
 
 # Serve Frontend static files if web directory exists
+from api.sp3_service import (
+    demo_plan as _sp3_demo_plan,
+    personalized_demo_plan as _sp3_personalized_plan,
+    sp1_catalog as _sp3_catalog,
+)
+from api.sp3_real import real_catalog as _sp3_real_catalog, real_plan as _sp3_real_plan
+
+# ?source=real switches the SP3 screens to the SP1 v2 store (HK1 2026-2027, synthetic student).
+# The default stays the synthetic MVP fixture so existing demos and tests are unchanged.
+# The app only reads committed data files; new announcements arrive through the admin batch
+# (scripts/admin_rebuild.py, docs/admin_data_update.md), never through a model call at runtime.
+SP3_SOURCES = ("synthetic", "real")
+
+
+def _sp3_source(source: str) -> str:
+    if source not in SP3_SOURCES:
+        raise HTTPException(status_code=422, detail="source must be 'synthetic' or 'real'")
+    return source
+
+
+class SP3DemoPlanRequest(BaseModel):
+    scenario: str = "first_plan"
+    total_target: Optional[int] = Field(default=None, ge=0, le=100)
+    busy_intervals: list[dict[str, str]] = Field(default_factory=list)
+
+
+@app.get("/api/sp3/catalog")
+def get_sp3_catalog(source: str = "synthetic"):
+    """Read SP1 activity records and QA without awarding points."""
+    if _sp3_source(source) == "real":
+        return _sp3_real_catalog()
+    return _sp3_catalog()
+
+
+@app.post("/api/sp3/demo/plan")
+def run_sp3_demo_plan(req: SP3DemoPlanRequest, source: str = "synthetic"):
+    """Read-only complete SP1-format -> feasibility -> planner -> SP2 demo."""
+    try:
+        if _sp3_source(source) == "real":
+            return _sp3_real_plan(req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals)
+        return _sp3_demo_plan(req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/sp3/personalized/plan")
+def run_sp3_personalized_plan(req: PersonalizedPlanRequest, source: str = "synthetic"):
+    """Rank the demo SP3 schedule using a student-confirmed preference only."""
+
+    try:
+        if _sp3_source(source) == "real":
+            return _sp3_real_plan(
+                req.scenario,
+                target_total=req.total_target,
+                busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
+                preference=req.preference,
+            )
+        return _sp3_personalized_plan(
+            req.preference,
+            scenario=req.scenario,
+            target_total=req.total_target,
+            busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+def _get_preference_provider():
+    """Late provider construction keeps env configuration testable and reloadable."""
+
+    return preference_provider_from_env()
+
+
+def _preference_error_detail(exc) -> dict[str, str]:
+    return {"code": exc.code, "message": exc.public_message}
+
+
+def _validated_student_id(value: str) -> str:
+    normalized = value.strip()
+    if not normalized or len(normalized) > 64:
+        raise HTTPException(status_code=422, detail="student_id must contain 1 to 64 characters")
+    return normalized
+
+
+def _preference_version(preference: dict[str, Any]) -> str:
+    canonical = json.dumps(preference, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return "pref-" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
+@app.get("/api/preferences/confirmed")
+def get_confirmed_preference(student_id: str):
+    """Return only the last preference explicitly confirmed by this student."""
+
+    normalized_id = _validated_student_id(student_id)
+    stored = session_preferences.get(normalized_id)
+    if not isinstance(stored, dict):
+        return {"status": "EMPTY", "student_id": normalized_id, "confirmed_preference": None}
+    try:
+        preference = StudentPreference.model_validate(stored.get("preference"))
+    except (ValueError, TypeError):
+        return {"status": "EMPTY", "student_id": normalized_id, "confirmed_preference": None}
+    return {
+        "status": "OK",
+        "student_id": normalized_id,
+        "confirmed_preference": {
+            "preference": preference.model_dump(mode="json"),
+            "source_text": stored.get("source_text"),
+            "preference_version": stored.get("preference_version"),
+            "confirmed_at": stored.get("confirmed_at"),
+        },
+    }
+
+
+@app.put("/api/preferences/confirmed")
+def save_confirmed_preference(req: ConfirmedPreferenceSaveRequest):
+    """Persist a validated preference after the student's explicit confirmation."""
+
+    preference = req.preference.model_dump(mode="json")
+    record = {
+        "preference": preference,
+        "source_text": req.source_text,
+        "preference_version": _preference_version(preference),
+        "confirmed_at": _now_iso(),
+    }
+    session_preferences[req.student_id] = record
+    _save_session_to_disk()
+    return {
+        "status": "SAVED",
+        "student_id": req.student_id,
+        "confirmed_preference": record,
+    }
+
+
+@app.delete("/api/preferences/confirmed")
+def delete_confirmed_preference(student_id: str):
+    """Delete one student's confirmed preference without touching scores."""
+
+    normalized_id = _validated_student_id(student_id)
+    existed = session_preferences.pop(normalized_id, None) is not None
+    _save_session_to_disk()
+    return {"status": "DELETED" if existed else "EMPTY", "student_id": normalized_id}
+
+
+@app.get("/api/preferences/ai-health")
+def get_preference_ai_health():
+    """Report Ollama/model readiness without making a generation request."""
+
+    try:
+        provider = _get_preference_provider()
+        health = provider.health()
+    except PreferenceProviderUnavailable as exc:
+        return {
+            "available": False,
+            "provider": None,
+            "model": None,
+            **_preference_error_detail(exc),
+        }
+    return {
+        "available": health.available,
+        "provider": health.provider,
+        "model": health.model,
+        "code": health.code,
+        "message": health.message,
+    }
+
+
+@app.post("/api/preferences/interpret")
+def interpret_student_preference(req: InterpretPreferenceRequest):
+    """Translate Vietnamese preference text into a validated, non-scheduling contract."""
+
+    started = perf_counter()
+    if not req.force_ai:
+        fast_preference = interpret_explicit_preference(req.text)
+        if fast_preference is not None:
+            return {
+                "status": "OK",
+                "provider": "deterministic",
+                "model": None,
+                "method": "FAST_RULES",
+                "cached": False,
+                "processing_ms": round((perf_counter() - started) * 1_000),
+                "preference": fast_preference.model_dump(mode="json"),
+            }
+    try:
+        provider = _get_preference_provider()
+    except PreferenceProviderUnavailable as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=_preference_error_detail(exc),
+        ) from exc
+
+    normalized_text = " ".join(req.text.casefold().split())
+    cache_key = (provider.provider_name, provider.model, normalized_text)
+    cached_payload = preference_interpret_cache.get(cache_key)
+    if cached_payload is not None:
+        preference_interpret_cache.move_to_end(cache_key)
+        return {
+            "status": "OK",
+            "provider": provider.provider_name,
+            "model": provider.model,
+            "method": "AI_CACHE",
+            "cached": True,
+            "processing_ms": round((perf_counter() - started) * 1_000),
+            "preference": cached_payload,
+        }
+
+    try:
+        preference = provider.interpret(req.text)
+    except PreferenceProviderUnavailable as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=_preference_error_detail(exc),
+        ) from exc
+    except PreferenceProviderInvalidResponse as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=_preference_error_detail(exc),
+        ) from exc
+    preference_payload = preference.model_dump(mode="json")
+    preference_interpret_cache[cache_key] = preference_payload
+    preference_interpret_cache.move_to_end(cache_key)
+    while len(preference_interpret_cache) > PREFERENCE_INTERPRET_CACHE_SIZE:
+        preference_interpret_cache.popitem(last=False)
+    return {
+        "status": "OK",
+        "provider": provider.provider_name,
+        "model": provider.model,
+        "method": "AI",
+        "cached": False,
+        "processing_ms": round((perf_counter() - started) * 1_000),
+        "preference": preference_payload,
+    }
+
+
 @app.get("/favicon.ico", include_in_schema=False)
 def serve_favicon():
     svg = (
@@ -1405,5 +1844,8 @@ if WEB_DIR.exists():
     def serve_index():
         index_file = WEB_DIR / "index.html"
         if index_file.exists():
-            return FileResponse(index_file)
+            return FileResponse(
+                index_file,
+                headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+            )
         return JSONResponse({"message": "Web UI index.html not found"}, status_code=404)

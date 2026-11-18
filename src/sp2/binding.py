@@ -16,16 +16,22 @@ TYPE_RULES = {
     "seminar_workshop": ("R19",),
     "academic_competition": ("R16",),
     "culture_sports_competition": ("R3102", "R3101"),
-    "legal_health_campaign": ("R46",),
+    # Content decides (D21): legal or social-evil wording -> R46; a safety talk (fire, traffic, scams) -> R19.
+    "legal_health_campaign": ("R46", "R19"),
+    # A career fair is R38; a CV or career-skills workshop is R19 ("tu van huong nghiep" is in R19's name).
+    "career_admissions_event": ("R38", "R19"),
     "volunteer": ("R4301", "R4302", "R4303"),
     "fundraising": ("R45",),
     "blood_donation": ("R42",),
+    "survey": ("R2301",),
 }
+REVIEWED_LABEL = "reviewed"
 _COUNT_OPERATORS = {"count_greater_than"}
 _SET_OPERATORS = {"equals"}
 
 
-def propose_binding(activity_id: str, activity_type: str | None, match: dict, rules: dict) -> dict:
+def propose_binding(activity_id: str, activity_type: str | None, match: dict, rules: dict,
+                    reviewed_rule: str | None = None) -> dict:
     """Return {"binding": {...} or None, "reason": str, ...} for one activity.
 
     match is RuleMatch.as_dict() from the SP2 rule matcher; rules maps rule_id to the rule object.
@@ -33,10 +39,12 @@ def propose_binding(activity_id: str, activity_type: str | None, match: dict, ru
     matched = match.get("rule_id")
     allowed = TYPE_RULES.get(activity_type or "")
     info = {"activity_id": activity_id, "activity_type": activity_type, "matcher_rule": matched,
-            "matcher_method": match.get("method"), "binding": None}
-    if not allowed:
+            "matcher_method": match.get("method"), "binding": None, "label": LABEL}
+    if reviewed_rule:                     # a reviewer chose the rule: no agreement needed
+        matched, info = reviewed_rule, {**info, "label": REVIEWED_LABEL}
+    elif not allowed:
         return {**info, "reason": "activity_type_not_auto_bound"}
-    if matched not in allowed:
+    elif matched not in allowed:
         return {**info, "reason": "sources_disagree"}
     rule = rules.get(matched)
     if rule is None or rule.get("status") != "verified":
@@ -51,7 +59,9 @@ def propose_binding(activity_id: str, activity_type: str | None, match: dict, ru
         operation, value = "SET", condition["value"]
     else:
         return {**info, "reason": f"operator_unsupported_by_sp3:{operator}"}
-    binding = {"activity_id": activity_id, "binding_ref": f"auto-{matched}-{activity_id}", "rule_id": matched,
+    prefix = "reviewed" if reviewed_rule else "auto"
+    binding = {"activity_id": activity_id, "binding_ref": f"{prefix}-{matched}-{activity_id}", "rule_id": matched,
                "field": field, "operation": operation, "value": value}
-    return {**info, "binding": binding, "reason": "sources_agree", "category_id": rule.get("category_id"),
+    return {**info, "binding": binding, "reason": "reviewer_decision" if reviewed_rule else "sources_agree",
+            "category_id": rule.get("category_id"),
             "points_from_rules": rule.get("points")}

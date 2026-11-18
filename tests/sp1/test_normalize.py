@@ -160,7 +160,7 @@ def test_place(run, mode, location, campus, flag):
     assert result["meta"]["flags"] == ([flag] if flag else [])
     assert result["meta"]["status"] == ("partial" if mode is None else "valid")
     if location is not None and mode != "online":
-        assert result["meta"]["derived"]["campus"] == "dict:campus_v1.0.0"
+        assert result["meta"]["derived"]["campus"].startswith("dict:campus_v1.3.0")
 
 
 @pytest.mark.parametrize("value", [None, True, False])

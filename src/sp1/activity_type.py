@@ -4,7 +4,7 @@ import re
 
 from .preprocess import original_span
 
-ACTIVITY_TYPE_VERSION = "1.0.0"
+ACTIVITY_TYPE_VERSION = "1.1.0"
 KEYWORDS = (
     ("blood_donation", ("hiến máu",)),
     ("survey", ("khảo sát", "lấy ý kiến", "đánh giá chất lượng đào tạo")),
@@ -18,7 +18,8 @@ KEYWORDS = (
                                    "hội thao", "văn nghệ", "giải đấu", "cuộc thi ảnh", "tiktok", "clip", "nhảy", "hát")),
     ("academic_competition", ("cuộc thi", "olympic", "hackathon", "kỳ thi", "contest", "challenge")),
     ("seminar_workshop", ("hội thảo", "chuyên đề", "workshop", "seminar", "tọa đàm", "toạ đàm", "talkshow",
-                         "webinar", "tập huấn", "hội nghị", "khóa học", "khoá học")),
+                         "webinar", "tập huấn", "hội nghị", "khóa học", "khoá học", "mini-course", "mini course",
+                         "lecture")),
     ("mobilization", ("huy động", "lực lượng")),
     ("university_history", ("lịch sử trường", "truyền thống", "tìm hiểu về trường")),
 )
