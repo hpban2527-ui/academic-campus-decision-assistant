@@ -127,6 +127,8 @@ def _is_weekly(text: str) -> bool:
 
 
 def _interval_kind(text: str) -> Literal["busy", "available"] | None:
+    if re.search(r"\b(?:khong ranh|khong the tham gia)\b", text):
+        return "busy"
     if re.search(r"\b(?:ranh|trong lich|co the tham gia)\b", text):
         return "available"
     if re.search(r"\b(?:hoc|ban|khong ranh|co lich)\b", text):

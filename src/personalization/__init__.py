@@ -23,6 +23,12 @@ from personalization.planner_adapter import (
     PreparedPersonalization,
     prepare_personalized_planner_input,
 )
+from personalization.profile_assistant import (
+    ProfileAssistantDraft,
+    ProfileExtraction,
+    ProfilePatchAction,
+    merge_profile_extraction,
+)
 
 __all__ = [
     "CampusId",
@@ -42,4 +48,8 @@ __all__ = [
     "TopicId",
     "preference_provider_from_env",
     "prepare_personalized_planner_input",
+    "ProfileAssistantDraft",
+    "ProfileExtraction",
+    "ProfilePatchAction",
+    "merge_profile_extraction",
 ]

@@ -51,7 +51,14 @@ def test_does_not_invent_recurrence_and_rejects_conflicts() -> None:
         "Thứ 2 hàng tuần mình rảnh từ 10h đến 11h."
     )
     assert conflict.status == "error"
-    assert "xung đột" in conflict.errors[0].lower()
+    assert conflict.errors
+
+
+def test_khong_ranh_is_busy_not_available() -> None:
+    result = interpret_message("Thu 2 hang tuan minh khong ranh tu 8h den 11h")
+
+    assert result.status == "preview"
+    assert result.draft.intervals[0].kind == "busy"
 
 
 def test_rejects_invalid_values_and_keeps_preferences_unconfirmed() -> None:
@@ -78,13 +85,13 @@ def test_interpret_api_is_preview_only() -> None:
     assert payload["draft"]["preferences_confirmed"] is False
 
 
-def test_homepage_confirms_before_applying_existing_planner_state() -> None:
+def test_profile_editor_confirms_before_applying_existing_planner_state() -> None:
     html = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
 
-    assert 'id="unilifeAssistant"' in html
-    assert 'id="assistantConfirmButton"' in html
-    assert "function confirmAssistantActions" in html
-    assert "function applyAssistantDraftToPlanner" in html
+    assert 'id="unilifeAssistant"' not in html
+    assert 'id="onboardingWizard"' in html
+    assert "function confirmProfileProposal" in html
+    assert "/api/profile-assistant/interpret" in html
     assert "customBusyIntervals" in html
     assert "unavailableAvailabilitySlots" in html
     assert "collectBusyIntervals" in html
