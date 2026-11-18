@@ -27,6 +27,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from sp1.dedup_v2 import apply_duplicates
 from sp1.devdata import final_run_posts, load_split
 from sp1.evaluate import wilson
+from sp1.llm_cache import input_digest, prompts_for
 from sp1.llm_v2 import PROMPT_VERSIONS, decide
 from sp1.normalize import load_config
 from sp1.activity_type import KEYWORDS
@@ -114,11 +115,22 @@ def build(llm_path, policy_path, reason, out_dir, allow_partial=False, access_lo
                                                   activity_types, rule_ids)
     unknown = sorted(set(decisions) - set(split))
     decision_problems += [{"line": None, "post_id": pid, "problem": "unknown post_id"} for pid in unknown]
-    store, rows = [], []
+    store, rows, stale = [], [], []
     for post in posts:
         pid = post["post_id"]
-        decision = decide(post, llm[pid]["replies"]) if pid in llm else None
+        # A recorded reply names candidate IDs of the prompt it answered. Replay it only if the prompts are
+        # still byte-identical (same digest as the notebook's input_sha256); otherwise the IDs may point at
+        # different spans, so the post is built without the model and marked stale.
+        usable = pid in llm and llm[pid].get("input_sha256") == input_digest(prompts_for(post))
+        if pid in llm and not usable:
+            stale.append(pid)
+        decision = decide(post, llm[pid]["replies"]) if usable else None
         result = process_post(post, decision, policy, config, decisions.get(pid))
+        if pid in stale:
+            result["record"]["llm_warnings"] = [{"code": "llm_output_stale"}]
+            result["record"]["plannable"] = False
+            result["record"]["not_plannable_reasons"] = sorted(set(result["record"]["not_plannable_reasons"]) |
+                                                               {"llm_output_stale"})
         store.append({"position": split[pid]["position"], "split": split[pid]["split"], **result["record"]})
         rows.append((split[pid]["split"], result["per_method"]))
     dedup = apply_duplicates(store, {p["post_id"]: p["raw_content"] for p in posts})
@@ -127,7 +139,8 @@ def build(llm_path, policy_path, reason, out_dir, allow_partial=False, access_lo
     (out_dir / "reports").mkdir(parents=True, exist_ok=True)
     meta = {"schema": "sp1-activity-store/2.0", "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "model_id": model_id, "prompt_versions": PROMPT_VERSIONS, "merge_policy": policy,
-            "llm_file": ", ".join(Path(p).name for p in llm_paths), "n_posts": len(store), "n_without_llm": len(missing),
+            "llm_file": ", ".join(Path(p).name for p in llm_paths), "n_posts": len(store), "n_without_llm": len(missing) + len(stale),
+            "n_llm_output_stale": len(stale), "llm_output_stale": stale,
             "n_duplicate_groups": len(dedup["groups"]), "n_possible_duplicate_pairs": len(dedup["possible"]),
             "n_canonical": sum(r["duplicate_of"] is None for r in store),
             "n_human_reviewed": sum(bool(r["review"]) and not r["review"]["stale"] for r in store),

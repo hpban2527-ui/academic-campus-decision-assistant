@@ -13,7 +13,7 @@ from .candidates import Candidate, build_candidates
 from dataclasses import replace
 
 from .dates import DateParseError, day_range_spans, parse_point
-from .extract_v2 import BANNERS, precision
+from .extract_v2 import clean_title_candidate, precision
 from .preprocess import original_span, preprocess
 from .segment import segment
 
@@ -247,13 +247,7 @@ def evidence_span(pre, start, end):
 
 
 def _clean_title(text):
-    text = re.sub(r"(?:\s*#\w+)+\s*$", "", text).strip()
-    text = re.sub(r"^[^\w\[]+|[^\w\]]+$", "", text)
-    if re.fullmatch(r"\[[^\[\]\n]+\]", text):
-        text = text[1:-1].strip()
-    if len(text) < 4 or text.split("\n")[0].strip("[] ").casefold() in BANNERS:
-        return None
-    return text
+    return clean_title_candidate(text)
 
 
 def values_from_roles(roles, cands, pre, posted):

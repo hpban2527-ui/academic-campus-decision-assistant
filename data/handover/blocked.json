@@ -30,6 +30,20 @@
     ]
   },
   {
+    "position": 41,
+    "post_id": "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml",
+    "reasons": [
+      "llm_output_stale"
+    ]
+  },
+  {
+    "position": 45,
+    "post_id": "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl",
+    "reasons": [
+      "llm_output_stale"
+    ]
+  },
+  {
     "position": 61,
     "post_id": "pfbid02yCG328qNfLc5QHP3fZtx3HtdPKijcrpjiGGdLHSSY8BbAAJyAPkfrWYzQrUtr4kBl",
     "reasons": [
@@ -41,6 +55,13 @@
     "post_id": "pfbid0dREAKyPjGZpJ4B7vYsjwWF2QweiZPuUroCATCPohAkeSLr2fYUzQNudBaDwgZ8thl",
     "reasons": [
       "not_an_activity"
+    ]
+  },
+  {
+    "position": 66,
+    "post_id": "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
+    "reasons": [
+      "llm_output_stale"
     ]
   },
   {
@@ -103,10 +124,24 @@
     ]
   },
   {
+    "position": 135,
+    "post_id": "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl",
+    "reasons": [
+      "llm_output_stale"
+    ]
+  },
+  {
     "position": 155,
     "post_id": "pfbid0gA27o84EoBnEWsir7FptnjJswVcKANTEW2smJSkgw9V3HmWpfJGiNEGAXaFxhgGUl",
     "reasons": [
       "missing_mode"
+    ]
+  },
+  {
+    "position": 164,
+    "post_id": "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl",
+    "reasons": [
+      "llm_output_stale"
     ]
   }
 ]

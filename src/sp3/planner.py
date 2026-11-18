@@ -556,7 +556,11 @@ def _parse_candidate(entry: Any, path: str, window: tuple[datetime, ...], availa
         )
         if participation.registration is RegistrationStatus.NOT_REGISTERED:
             as_of = window[2]
-            require(deadline is not None and as_of < deadline, path + ".activity.registration_deadline", "FEASIBLE requires an open registration deadline")
+            # sp3-activity/0.3: a stated deadline must still be open. An unstated deadline reaches FEASIBLE only
+            # when the feasibility step was told the organizer stated none (deadline_unstated_by_activity);
+            # otherwise it already returned MISSING_DEADLINE. Registration openness then stays a data warning.
+            require(deadline is None or as_of < deadline, path + ".activity.registration_deadline",
+                    "FEASIBLE requires an open registration deadline")
     else:
         require(bool(codes), path + ".feasibility.reason_codes", "non-FEASIBLE requires a reason code")
     fixed_json: tuple[Mapping[str, str], ...] = ()

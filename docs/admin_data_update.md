@@ -1,5 +1,12 @@
 # Updating activity data (admin runbook)
 
+> **Superseded for the running application (2026-11-18).** The app now reads
+> `data/operational/activity_dataset.json`, built by one command:
+> `python scripts/update_activity_data.py --reason "..."`. New and edited announcements go to
+> `data/raw/operational_updates.json` (the frozen corpus and split are not edited). See
+> `docs/OPERATIONAL_DATA_PIPELINE.md`. The steps below rebuild the legacy SP1 v2 store and handover
+> (`data/activity_store_v2.json`, `data/handover/`), which are kept and tested but no longer read at runtime.
+
 Students never submit announcements. The admin (a developer on the team) adds new announcements in an
 offline batch, and the change reaches the app through a reviewed pull request:
 

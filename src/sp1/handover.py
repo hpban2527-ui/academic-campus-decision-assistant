@@ -66,6 +66,8 @@ def project(record: dict) -> dict:
     blocked, warnings, derived = [], [], {}
     if record.get("duplicate_of"):
         blocked.append("duplicate")
+    if any(w.get("code") == "llm_output_stale" for w in record.get("llm_warnings") or [] if isinstance(w, dict)):
+        blocked.append("llm_output_stale")
     if a["post_type"] != "activity":
         blocked.append("not_an_activity")
     if a["meta"]["status"] == "failed":

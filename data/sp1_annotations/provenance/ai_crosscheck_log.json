@@ -1,0 +1,238 @@
+[
+  {
+    "post_id": "pfbid02kVX7vEbj6FuQSGiHs7NqQMz9CszBXfbmt9RjRcpJfU17z7CnhkjUVEee7vVirgnWl",
+    "field": "audience_text",
+    "proposed_value": "Trường ĐH KHTN, ĐHQG-HCM thông báo đến sinh viên về đăng ký khám sức khỏe định kỳ cho sinh viên đợt 2 năm 2026",
+    "reason": "Nguồn có câu thông báo đối tượng đăng ký là sinh viên; audience_text hiện null làm mất thông tin đối tượng được nêu. Giữ câu gốc, không tự thêm hạn chế khóa/chương trình.",
+    "evidence": [
+      "Trường ĐH KHTN, ĐHQG-HCM thông báo đến sinh viên về đăng ký khám sức khỏe định kỳ cho sinh viên đợt 2 năm 2026"
+    ],
+    "old_value": null,
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid0DeYsfZBiuFn3oyYi6JE2vjfzPWHirxKMfBAzUk284M4guunLjVQxPTs8oodLfWiJl",
+    "field": "audience_text",
+    "proposed_value": "toàn thể sinh viên\nThành viên đội thi đồng đội không thuộc đối tượng tham gia phần thi trực tuyến này.",
+    "reason": "audience_text hiện chỉ có toàn thể sinh viên trong khi bài loại trừ thành viên đội thi đồng đội. Không chỉ để ngoại lệ trong field_notes vì người dùng đọc trường chính có thể hiểu mọi sinh viên đều được tham gia. Hai đoạn ghép bằng xuống dòng, bằng chứng giữ riêng từng đoạn nguyên văn.",
+    "evidence": [
+      "toàn thể sinh viên",
+      "Thành viên đội thi đồng đội không thuộc đối tượng tham gia phần thi trực tuyến này."
+    ],
+    "old_value": "toàn thể sinh viên",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid0XY9yh6vTLib4ADSzim4hNzw5xh5FK2XMUmhezcWy99AaXxjTBau8qFhxihzANbrUl",
+    "field": "unsure",
+    "proposed_value": [
+      "activity_type"
+    ],
+    "reason": "Đề xuất thêm cờ duyệt activity_type: cuộc thi tìm hiểu lịch sử/công dân có domain other và taxonomy chưa có nhãn riêng; academic_competition có thể khiến binding tự động nghiêng sang thi học thuật. Không khẳng định đổi nhãn khi nhóm chưa chốt.",
+    "evidence": [
+      "CUỘC THI TRẮC NGHIỆM TRỰC TUYẾN “THEO DẤU CHÂN NGƯỜI”",
+      "Hưởng ứng chuỗi sự kiện kỷ niệm 136 năm Ngày sinh Chủ tịch Hồ Chí Minh (19/5/1890 – 19/5/2026), 115 năm Ngày Chủ tịch Hồ Chí Minh ra đi tìm đường cứu nước (05/6/1911 – 05/6/2026) và hướng đến kỷ niệm 50 năm Ngày Thành phố Sài Gòn - Gia Định chính thức mang tên Thành phố Hồ Chí Minh (02/7/1976 – 02/7/2026)."
+    ],
+    "old_value": [],
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid0jFLoVS3yVwDRFdr5yTdX92hNG76pP2gz8SjN5ZuYNYvL3gJzUPRN814PGYMNZcQyl",
+    "field": "audience_text",
+    "proposed_value": "Mọi người dân từ 18 tuổi trở lên đều có thể tham gia chương trình khi đủ điều kiện sức khoẻ.\nSinh viên dưới 18 tuổi hoặc có cân nặng dưới 45kg không được tham gia hiến máu.",
+    "reason": "Bản nháp giữ câu đối tượng đầu tiên nhưng thiếu ngay trong audience_text điều kiện loại trừ cân nặng <45kg. Điều kiện đã nằm trong ghi chú, nên đề xuất đưa cả hai câu nguồn vào trường đối tượng để người duyệt và module tiếp theo không bỏ sót. Không đổi thành cohort/program và không suy thêm điều kiện y tế.",
+    "evidence": [
+      "Mọi người dân từ 18 tuổi trở lên đều có thể tham gia chương trình khi đủ điều kiện sức khoẻ.",
+      "Sinh viên dưới 18 tuổi hoặc có cân nặng dưới 45kg không được tham gia hiến máu."
+    ],
+    "old_value": "Mọi người dân từ 18 tuổi trở lên đều có thể tham gia chương trình khi đủ điều kiện sức khoẻ.",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid025erNwk7cF1tMs1kos2bfv64bXQ5ucFuZXFjWTJrkq61bCFrmx2sN56pFmuCodtyyl",
+    "field": "multi_session",
+    "proposed_value": null,
+    "reason": "Nguồn chỉ công bố lịch một vòng sơ tuyển dự kiến. Sàng lọc hồ sơ/lựa chọn đội tuyển là mốc tuyển chọn hành chính, không tự tính thành buổi hoạt động thứ hai. Theo guide, chưa đủ lịch để xác định nhiều buổi thì giữ null; bản nháp đã đánh dấu unsure nên đây là đề xuất bảo thủ để người duyệt chốt.",
+    "evidence": [
+      "Sau khi kết thúc thời gian đăng ký, Ban Tổ chức sẽ tiến hành sàng lọc và lựa chọn cá nhân/nhóm phù hợp để thành lập đội tuyển tham dự vòng sơ tuyển.",
+      "VÒNG SƠ TUYỂN – “LỘ DIỆN”",
+      "Dự kiến: 22/9/2026"
+    ],
+    "old_value": true,
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid0333yBjDEvD9S7dYuwtp5G7xwGsSutgKcuVFDGNuuQN13TtD3pehF1B8CE8PfDE2Kl",
+    "field": "window_close",
+    "proposed_value": null,
+    "reason": "Nguồn chỉ nêu hai ngày cho toàn hội thảo, không nêu kết thúc buổi đầu. Theo quy ước chỉ lấy buổi/vòng đầu, không coi 13/11 là kết thúc buổi đầu; giữ ngày kết thúc toàn hội thảo trong field_notes và yêu cầu duyệt.",
+    "evidence": [
+      "Thời gian: 12 – 13/11/2026",
+      "12–13/11/2026: Thời gian hội thảo"
+    ],
+    "old_value": "2026-11-13",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid0333yBjDEvD9S7dYuwtp5G7xwGsSutgKcuVFDGNuuQN13TtD3pehF1B8CE8PfDE2Kl",
+    "field": "completion_requirements",
+    "proposed_value": [],
+    "reason": "30/6 là hạn gửi tóm tắt cho tác giả, không phải điều kiện hoàn thành hoặc nhận ghi nhận của mọi người tham dự. Tránh đưa điều kiện theo vai trò vào danh sách điều kiện chung; giữ hạn tóm tắt và full paper tùy chọn ở ghi chú riêng.",
+    "evidence": [
+      "30/6/2026: Hạn nộp Tóm tắt",
+      "01/10/2026: Hạn nộp full paper (không bắt buộc)",
+      "Nhà khoa học, giảng viên, nghiên cứu sinh, học viên cao học, sinh viên, nhà quản lý và doanh nghiệp quan tâm đến lĩnh vực môi trường và phát triển bền vững."
+    ],
+    "old_value": [
+      {
+        "type": "other",
+        "threshold": null,
+        "unit": null,
+        "deadline": "2026-06-30"
+      }
+    ],
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid02hJkDnVfGkv83TzXoq8XKNPRkKmdxcKaM3QyUwa2X1tgtdxonqyoWkjYCsfHCQNAVl",
+    "field": "audience_text",
+    "proposed_value": null,
+    "reason": "Đối tượng Master/PhD chỉ được nêu cho phần phỏng vấn, trong khi sự kiện còn có phần giới thiệu sau đại học và trao đổi thực tập. Chưa có câu giới hạn đối tượng cho toàn sự kiện; để null và giữ đối tượng phỏng vấn trong field_notes thay vì có nguy cơ áp thành điều kiện loại trừ chung.",
+    "evidence": [
+      "- Giới thiệu chương trình đào tạo Sau đại học tại College of Life Science and Medicines, NTHU",
+      "- Phổ biến chương trình trao đổi thực tập ngắn hạn mùa hè tại College of Life Science and Medicines, NTHU",
+      "- Phỏng vấn ứng viên có nguyện vọng học Master và PhD. tại College of Life Science and Medicines, NTHU cho Học kỳ tháng 1/2027 và Học kỳ tháng 9/2027"
+    ],
+    "old_value": "ứng viên có nguyện vọng học Master và PhD. tại College of Life Science and Medicines, NTHU cho Học kỳ tháng 1/2027 và Học kỳ tháng 9/2027",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid0ZrAbQBhEkyDX78nX31LitqTS2KKG7vLMaToGvpJUNa2JFE69bvybMDj2mrcxhqfWl",
+    "field": "window_close",
+    "proposed_value": null,
+    "reason": "31/07 là kết thúc cả khóa SCHOOL 05 tuần, không phải kết thúc buổi/phiên đầu. Bản nhãn đã tự nhận chưa có lịch từng buổi; giữ ngày kết thúc toàn khóa trong ghi chú thay vì gán vào window_close của buổi đầu.",
+    "evidence": [
+      "Thời gian học dự kiến: 01/07/2026 – 31/07/2026",
+      "Chương trình nghiên cứu chuyên sâu kéo dài 05 tuần dành cho học sinh THPT và sinh viên có mong muốn trải nghiệm môi trường nghiên cứu khoa học thực thụ."
+    ],
+    "old_value": "2026-07-31",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid0ZrAbQBhEkyDX78nX31LitqTS2KKG7vLMaToGvpJUNa2JFE69bvybMDj2mrcxhqfWl",
+    "field": "completion_requirements",
+    "proposed_value": [],
+    "reason": "Mini Project nằm trong danh sách nội dung học, chưa có câu quy định đó là điều kiện hoàn thành hay ghi nhận. Không tự sinh điều kiện other; có thể giữ nguyên chi tiết và nghi vấn trong ghi chú cho người duyệt.",
+    "evidence": [
+      "Nội dung chính",
+      "• Báo cáo tổng kết theo hình thức Mini Project."
+    ],
+    "old_value": [
+      {
+        "type": "other",
+        "threshold": null,
+        "unit": null,
+        "deadline": null
+      }
+    ],
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid03X1XBcRYamue2CtNT1nBHGsuPwqeHEfArVYBTKkEaZkPgVoRwf5XkTBDR4ba65uTl",
+    "field": "window_open",
+    "proposed_value": null,
+    "reason": "Đơn vị hoạt động đang đặt title là keynote cụ thể. Nguồn chỉ cho lịch toàn hội nghị 13–14/11, không chứng minh keynote ngày 13. Quy ước lấy buổi đầu không cho phép tự gán một bài keynote vào ngày đầu của hội nghị; để null và yêu cầu đối chiếu chương trình.",
+    "evidence": [
+      "\"Learning Beyond the Screen: Brain–Computer Interfaces and Multisensory Interaction for Human-Centred Educational Technology\"",
+      "TS. Vi Chí Thành sẽ mở màn tiểu ban bằng các nghiên cứu về:",
+      "Thứ Sáu – Thứ Bảy, 13 – 14/11/2026"
+    ],
+    "old_value": "2026-11-13",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid02QMkDAHHrWA2uPJjG4s9PHzoRfhmJHDk19RxQ7bfQ76RTPdgZjhXcffG8zX3t3i2jl",
+    "field": "title",
+    "proposed_value": "CHƯƠNG TRÌNH TẬP HUẤN GIỚI THIỆU SẢN PHẨM CỐC GIẤY KHÔNG VI NHỰA",
+    "reason": "Tiêu đề chính trải trên hai dòng: “CHƯƠNG TRÌNH TẬP HUẤN” là tiền tố định danh của chương trình, không phải banner hỗ trợ truyền thông. Đề xuất giữ cả tiền tố và dòng tên sản phẩm để người duyệt thấy đúng loại chương trình.",
+    "evidence": [
+      "CHƯƠNG TRÌNH TẬP HUẤN",
+      "GIỚI THIỆU SẢN PHẨM CỐC GIẤY KHÔNG VI NHỰA"
+    ],
+    "old_value": "GIỚI THIỆU SẢN PHẨM CỐC GIẤY KHÔNG VI NHỰA",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid032ty6V3vVWv86ySbmwwVuVoJdzRtp8ho9jWNGfn93PCVUiFw5yq4sA87MUuzc1pjel",
+    "field": "title",
+    "proposed_value": "[THÔNG BÁO] WORKSHOP KỸ NĂNG GIAO TIẾP VÀ XỬ LÝ TÌNH HUỐNG TRONG HỌC THUẬT",
+    "reason": "Giữ nguyên thẻ tiền tố cân bằng vì dấu ngoặc chỉ bao quanh tiền tố, không bao toàn bộ tiêu đề; tránh chuẩn hóa mất cấu trúc nguồn.",
+    "evidence": [
+      "[THÔNG BÁO] WORKSHOP KỸ NĂNG GIAO TIẾP VÀ XỬ LÝ TÌNH HUỐNG TRONG HỌC THUẬT"
+    ],
+    "old_value": "THÔNG BÁO WORKSHOP KỸ NĂNG GIAO TIẾP VÀ XỬ LÝ TÌNH HUỐNG TRONG HỌC THUẬT",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid06qL2JWWfSVKvDaiZMJggoz2BK5GFA3KvchYDTBAFzNJck59vNqgM7TckBtcm8gZDl",
+    "field": "title",
+    "proposed_value": "[SEMINAR] Image Analysis Hub: Trung tâm phân tích hình ảnh trong nghiên cứu sinh học",
+    "reason": "Giữ nguyên thẻ tiền tố cân bằng vì dấu ngoặc chỉ bao quanh tiền tố, không bao toàn bộ tiêu đề; tránh chuẩn hóa mất cấu trúc nguồn.",
+    "evidence": [
+      "[SEMINAR] Image Analysis Hub: Trung tâm phân tích hình ảnh trong nghiên cứu sinh học"
+    ],
+    "old_value": "SEMINAR Image Analysis Hub: Trung tâm phân tích hình ảnh trong nghiên cứu sinh học",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid0dYmFBC7HAaW1nMfZuinVHpoyK5vVprV9AK74wpmQWBBwyFcBNUe9sBiAZvSf5CMwl",
+    "field": "title",
+    "proposed_value": "[SEMINAR] GRADUATE STUDIES AND RESEARCH OPPORTUNITIES AT CONCORDIA UNIVERSITY AND IN CANADA",
+    "reason": "Giữ nguyên thẻ tiền tố cân bằng vì dấu ngoặc chỉ bao quanh tiền tố, không bao toàn bộ tiêu đề; tránh chuẩn hóa mất cấu trúc nguồn.",
+    "evidence": [
+      "[SEMINAR] GRADUATE STUDIES AND RESEARCH OPPORTUNITIES AT CONCORDIA UNIVERSITY AND IN CANADA"
+    ],
+    "old_value": "SEMINAR GRADUATE STUDIES AND RESEARCH OPPORTUNITIES AT CONCORDIA UNIVERSITY AND IN CANADA",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid02DCZpfGjQzAAYMT1iGMTLMT1ZhupsrtjzP976EHHMxXjyftf9o1hCdXFGxLKKg89wl",
+    "field": "location",
+    "proposed_value": "Phòng F207, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM cơ sở 1 (227 Nguyễn Văn Cừ, Phường Chợ Quán, Thành phố Hồ Chí Minh)",
+    "reason": "Buổi đầu ngày 29/7 ở F207; bản đề xuất chỉ giữ số phòng, làm mất địa chỉ/cơ sở đã được nguồn công bố. Ghép phòng của buổi đầu với địa chỉ chung, không lấy phòng B43 thuộc ngày 30/7.",
+    "evidence": [
+      "Phòng F207 (ngày 29/7 và 31/7) và B43 (ngày 30/7), Trường Đại học Khoa học tự nhiên, ĐHQG-HCM cơ sở 1 (227 Nguyễn Văn Cừ, Phường Chợ Quán, Thành phố Hồ Chí Minh)"
+    ],
+    "old_value": "Phòng F207",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  },
+  {
+    "post_id": "pfbid0dYmFBC7HAaW1nMfZuinVHpoyK5vVprV9AK74wpmQWBBwyFcBNUe9sBiAZvSf5CMwl",
+    "field": "audience_text",
+    "proposed_value": "Bạn đang tìm kiếm cơ hội học Thạc sĩ, Tiến sĩ hay thực tập nghiên cứu trong môi trường quốc tế nhưng chưa biết bắt đầu từ đâu?",
+    "reason": "Cụm \"quý thầy/cô và các bạn\" đang lấy từ hướng dẫn điền biểu mẫu cho cả người không tham dự. Câu mở đầu trực tiếp mô tả người được buổi seminar hướng tới, không đặt giới hạn khóa/chương trình.",
+    "evidence": [
+      "Bạn đang tìm kiếm cơ hội học Thạc sĩ, Tiến sĩ hay thực tập nghiên cứu trong môi trường quốc tế nhưng chưa biết bắt đầu từ đâu?",
+      "Trường hợp không thể sắp xếp tham dự nhưng vẫn muốn nhận thông tin về chương trình, quý thầy/cô và các bạn vẫn có thể điền biểu mẫu đăng ký."
+    ],
+    "old_value": "quý thầy/cô và các bạn",
+    "action": "applied_ai_draft_correction",
+    "human_approved": false
+  }
+]

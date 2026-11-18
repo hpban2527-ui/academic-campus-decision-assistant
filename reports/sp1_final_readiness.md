@@ -1,6 +1,6 @@
 # SP1 final readiness (all posts)
 
-Model: Qwen/Qwen3.5-4B. Posts: 189. Posts without LLM output: 0.
+Model: Qwen/Qwen3.5-4B. Posts: 189. Posts without LLM output: 5.
 Structural readiness, not gold accuracy: a post is plannable when it is an activity with an opening
 date in a configured semester, a known mode and a non-failed status. Intervals are Wilson 95%.
 Dev posts were used to choose the model and merge policy; pool and test posts were not.
@@ -36,6 +36,13 @@ Dev posts were used to choose the model and merge policy; pool and test posts we
 Merged groups: 0. Canonical records: 189/189. Possible-duplicate pairs flagged for review: 1.
 Consumers (SP2/SP3) must use records with duplicate_of = null.
 
+## Human review
+
+Records with an applied review decision: 63. Stale decisions (text changed): 0. Rejected decision rows: 0.
+Reviewers: Thao Duyen (reviewed by hand; CSV written with AI assistance). A review decision is not verified by this
+project unless its reviewer is a person; the rules/hybrid table above excludes review decisions,
+so the plannable figures there measure extraction only. Plannable after review: 155/189.
+
 | Hybrid value | Posts |
 | --- | ---: |
 | mode:None | 28 |
@@ -45,5 +52,5 @@ Consumers (SP2/SP3) must use records with duplicate_of = null.
 | post_type:info_only | 1 |
 | post_type:insufficient | 13 |
 | status:failed | 9 |
-| status:partial | 52 |
-| status:valid | 128 |
+| status:partial | 51 |
+| status:valid | 129 |

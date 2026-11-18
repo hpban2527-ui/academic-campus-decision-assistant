@@ -3145,11 +3145,11 @@
         if (el) el.value = SP3_SOURCE;
       });
       const badge = document.getElementById('planDataSourceBadge');
-      if (badge) badge.innerText = real ? 'SP1-STORE-V2' : 'SYNTHETIC-DEMO';
+      if (badge) badge.innerText = real ? 'OPERATIONAL-DATASET' : 'SYNTHETIC-DEMO';
       const term = document.getElementById('planTermLabel');
       if (term) term.innerText = real ? 'Kho thật · từ 01/10/2026' : 'Fixture Tháng 11/2026';
       const disclosure = document.getElementById('planDisclosureSource');
-      if (disclosure) disclosure.innerText = 'DEMO_ONLY · official_award_verified: false · ' + (real ? 'SP1-STORE-V2' : 'SYNTHETIC-DEMO');
+      if (disclosure) disclosure.innerText = 'DEMO_ONLY · official_award_verified: false · ' + (real ? 'OPERATIONAL-DATASET' : 'SYNTHETIC-DEMO');
       const note = document.getElementById('planRealSourceNote');
       if (note) note.classList.toggle('hidden', !real);
     }
@@ -4369,7 +4369,8 @@
                       ${regDeadline ? `<div><b class="text-slate-400">Hạn đăng ký:</b> <span class="text-amber-300 font-medium">${escapeHTML(regDeadline)}</span></div>` : ''}
                       <div><b class="text-slate-400">Quyền lợi ĐRL:</b> <span class="text-emerald-400 font-bold">${gains.map(r => `+${r.projected_added}đ ${PLAN_CAT_LABELS[r.category_id] || r.category_id}`).join(', ') || 'Cộng điểm theo quy chế'}</span></div>
                     </div>
-                    ${candAct.completion_requirements ? `<div class="p-2.5 rounded-lg bg-[#080d18] border border-[#223046] text-slate-300"><b>Minh chứng hoàn thành:</b> ${escapeHTML(candAct.completion_requirements)}</div>` : ''}
+                    ${candAct.completion_requirements ? `<div class="p-2.5 rounded-lg bg-[#080d18] border border-[#223046] text-slate-300"><b>Minh chứng hoàn thành:</b> ${escapeHTML(candAct.completion_requirements === 'NOT_STATED' ? 'Bài không nêu' : candAct.completion_requirements)}</div>` : ''}
+                    ${(data.activity_warnings && data.activity_warnings[item.activity_id] || []).length ? `<ul class="p-2.5 rounded-lg bg-amber-950/30 border border-amber-500/30 text-amber-200 list-disc pl-6 space-y-0.5">${data.activity_warnings[item.activity_id].map(w => `<li>${escapeHTML(w.message)}</li>`).join('')}</ul>` : ''}
                   </div>
                 </div>`;
             }).join(''));
@@ -5010,7 +5011,19 @@
               const dt = a["4_datetimes"] || {};
               const timeDisplay = a.start ? formatIsoToVietnamese(a.start) : (dt.start_datetime || 'Chưa rõ');
               const locDisplay = a.location || (a.mode === 'online' ? 'Trực tuyến' : 'Cơ sở trường');
-              const ptsDisplay = a.points != null ? `Thông báo: +${a.points}đ` : 'Chưa rõ điểm';
+              const binding = row.score_binding || null;
+              const ptsDisplay = binding
+                ? `Quy tắc ${binding.rule_id}: +${binding.points_from_rules ?? '?'}đ (ước tính)`
+                : (a.points != null ? `Thông báo: +${a.points}đ` : (row.warnings ? 'Không tính vào mục tiêu điểm' : 'Chưa rõ điểm'));
+              // Operational dataset rows: unknown facts are shown as unknown, never as free or matched.
+              const unknownHtml = row.warnings ? `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-400">
+                  <div><b>Chi phí:</b> <span class="text-slate-200">${row.fee_known ? (a.fee === 0 ? 'Miễn phí (BTC công bố)' : escapeHTML(String(a.fee)) + 'đ/người') : 'Chưa rõ'}</span></div>
+                  <div><b>Lĩnh vực:</b> <span class="text-slate-200">${row.domain_known ? escapeHTML(a.domain) : 'Chưa rõ'}</span></div>
+                  <div><b>Hạn đăng ký:</b> <span class="text-slate-200">${a.registration_deadline ? escapeHTML(formatIsoToVietnamese(a.registration_deadline)) : 'Không nêu'}</span></div>
+                  <div><b>Lịch:</b> <span class="text-slate-200">${row.schedule?.type === 'FLEXIBLE_WINDOW' ? 'Làm trong cửa sổ (' + escapeHTML(String(row.schedule.duration_minutes)) + ' phút)' : 'Giờ cố định'}</span></div>
+                </div>
+                ${row.warnings.length ? `<ul class="text-[11px] text-amber-200/90 list-disc pl-4 space-y-0.5">${row.warnings.map(w => `<li>${escapeHTML(w.message)}</li>`).join('')}</ul>` : ''}` : '';
               const qaHtml = qa
                 ? `<div class="dev-only text-[11px] font-mono text-indigo-300 bg-indigo-950/40 border border-indigo-500/30 rounded-lg px-2.5 py-1.5">
                      <b>Data QA (${escapeHTML(qa.status || 'checked')} • ${escapeHTML(qa.semester || '')}):</b> ${escapeHTML(qa.notes || '')}
@@ -5037,6 +5050,7 @@
                     <div><b>Thời gian:</b> <span class="text-slate-200 font-mono">${escapeHTML(timeDisplay)}</span></div>
                     <div class="sm:col-span-2"><b>Địa điểm:</b> <span class="text-slate-200">${escapeHTML(locDisplay)}</span></div>
                   </div>
+                  ${unknownHtml}
                   ${qaHtml}
                 </div>
               `;
@@ -5051,6 +5065,7 @@
                 const rec = d.activity || {};
                 const flags = d.review_flags || [];
                 const pubSt = d.publication_status || "REVIEW_REQUIRED";
+                const automatic = Array.isArray(d.reason_messages);
                 return `
                   <div class="p-3.5 rounded-xl bg-[#080d18] border border-amber-500/40 space-y-2">
                     <div class="flex items-start justify-between gap-2">
@@ -5059,7 +5074,7 @@
                         ${escapeHTML(rec.title || rec.activity_id || 'Bản nháp bài đăng mới')}
                       </div>
                       <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40 shrink-0">
-                        <span>Chờ rà soát</span>
+                        <span>${automatic ? 'Không tự xếp lịch' : 'Chờ rà soát'}</span>
                         <span class="dev-only font-mono text-[9px] ml-1">(${escapeHTML(pubSt)})</span>
                       </span>
                     </div>
@@ -5071,7 +5086,9 @@
                       <b>Cờ kỹ thuật:</b> ${escapeHTML(flags.join(", ") || 'Chờ duyệt nội dung')}
                     </div>
                     <div class="text-xs text-slate-400">
-                      Hoạt động mới đang chờ ban tổ chức và CTSV duyệt minh chứng &amp; điểm ĐRL.
+                      ${automatic
+                        ? (d.reason_messages.length ? d.reason_messages.map(m => escapeHTML(m)).join(' ') : 'Giữ nguồn để tra cứu.')
+                        : 'Hoạt động mới đang chờ ban tổ chức và CTSV duyệt minh chứng &amp; điểm ĐRL.'}
                     </div>
                   </div>
                 `;

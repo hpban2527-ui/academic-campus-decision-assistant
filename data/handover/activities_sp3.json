@@ -753,7 +753,7 @@
       "URL_post": "https://www.facebook.com/doanhoikhoamoitruong/posts/pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl?rdid=1ZmZihH1VIdAmVnY",
       "URL_registration": "https://forms.gle/xjPkru7AZdQ8A73V6"
     },
-    "title": "HTTT",
+    "title": "WORKSHOP GÂY QUỸ TRUNG THU- ĐIỂM TRĂNG CHO EM",
     "domain": null,
     "start": null,
     "end": null,
@@ -788,27 +788,6 @@
     "audience": null,
     "fee": 0,
     "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"check_in\", \"unit\": null}]"
-  },
-  {
-    "activity_id": "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml",
-    "source": {
-      "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
-      "platform": "Facebook",
-      "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml?rdid=Y4EQFpgGfS6ABe1g",
-      "URL_registration": "https://song-xanh-hcmus.vercel.app/"
-    },
-    "title": "CHƯƠNG TRÌNH SỐNG XANH CÙNG HCMUS - Hiểu bằng Khoa học - Sống bằng hành động",
-    "domain": null,
-    "start": "2026-11-08T08:00:00+07:00",
-    "end": "2026-11-08T11:00:00+07:00",
-    "registration_deadline": "2026-11-08T08:00:00+07:00",
-    "mode": "offline",
-    "location": "Sân Trường Đại học Khoa học tự nhiên, ĐHQG-HCM – Cơ sở 2",
-    "points": null,
-    "mandatory": false,
-    "audience": null,
-    "fee": 0,
-    "completion_requirements": "NOT_STATED"
   },
   {
     "activity_id": "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl",
@@ -867,27 +846,6 @@
     "registration_deadline": "2026-10-25T15:00:00+07:00",
     "mode": "online",
     "location": null,
-    "points": null,
-    "mandatory": false,
-    "audience": null,
-    "fee": 0,
-    "completion_requirements": "NOT_STATED"
-  },
-  {
-    "activity_id": "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl",
-    "source": {
-      "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
-      "platform": "Facebook",
-      "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl?rdid=gS9YhulwZKgXQrP9",
-      "URL_registration": "https://bit.ly/Hienmauthang10"
-    },
-    "title": "MỘT GIỌT MÁU CHO ĐI, MỘT CUỘC ĐỜI Ở LẠI",
-    "domain": "volunteer",
-    "start": "2026-10-28T07:30:00+07:00",
-    "end": "2026-10-28T11:00:00+07:00",
-    "registration_deadline": "2026-10-28T07:30:00+07:00",
-    "mode": "offline",
-    "location": "Hội quán Khoa học, trường Đại học Khoa học tự nhiên, ĐHQG-HCM (Tầng Hầm nhà Điều hành cơ sở 2)",
     "points": null,
     "mandatory": false,
     "audience": null,
@@ -1032,7 +990,7 @@
       "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid0DYE32yV1XMkeXbfucffpmGGDL6W77rjwaPd4NZXpnv4bZZegtDM7TFU6Yg3jFfpnl?rdid=KKsOiiv4iouJiZTE",
       "URL_registration": "https://forms.gle/AtuZX2gLvTLPFVvo9"
     },
-    "title": "HTTT",
+    "title": "WORKSHOP: VIẾT VÀ CHẤM ĐIỂM CV - BỨC PHÁ HỒ SƠ, CHINH PHỤC NHÀ TUYỂN DỤNG",
     "domain": "career",
     "start": "2026-09-22T14:00:00+07:00",
     "end": "2026-09-22T16:00:00+07:00",
@@ -1285,29 +1243,6 @@
     "completion_requirements": "[{\"deadline\": null, \"threshold\": null, \"type\": \"check_in\", \"unit\": null}]"
   },
   {
-    "activity_id": "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
-    "source": {
-      "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
-      "platform": "Facebook",
-      "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl?rdid=G7ncz4lfscv0kBOP",
-      "URL_registration": "https://forms.gle/BLHSmPcnSRVdtcA56"
-    },
-    "title": "[SKETCH YOUR IDEAS] – KHI Ý TƯỞNG ĐƯỢC KỂ BẰNG NÉT VẼ",
-    "domain": null,
-    "start": "2026-06-21T08:00:00+07:00",
-    "end": "2026-06-21T11:30:00+07:00",
-    "registration_deadline": "2026-06-20T23:59:00+07:00",
-    "mode": "offline",
-    "location": "Hội trường Tế bào gốc, Tòa nhà B2-3, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM",
-    "points": null,
-    "mandatory": false,
-    "audience": [
-      "Sinh viên"
-    ],
-    "fee": 0,
-    "completion_requirements": "NOT_STATED"
-  },
-  {
     "activity_id": "pfbid02kR3wMs65f7GQ89ojixmKDysEPt77nEd6hv4UgBar99NoQghQZoDbK5PiyqKUsJP3l",
     "source": {
       "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
@@ -1336,7 +1271,7 @@
       "URL_post": "https://www.facebook.com/osa.hcmus/posts/pfbid02KYphUfhTSv343V1AHeqLJtuRvoWKF6ue7ChUFkPAoMs9zvfgosyY4xuGj9o4JDeDl?rdid=K8CsxRuiO1xkq2tV",
       "URL_registration": null
     },
-    "title": "HƯỞNG ỨNG NGÀY PHÁP LUẬT VIỆT NAM NĂM 2026",
+    "title": "CUỘC THI TRỰC TUYẾN “SINH VIÊN TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN TÌM HIỂU PHÁP LUẬT NĂM 2026",
     "domain": "skills",
     "start": "2026-11-09T09:00:00+07:00",
     "end": "2026-11-13T23:59:00+07:00",
@@ -2606,29 +2541,6 @@
     "completion_requirements": "NOT_STATED"
   },
   {
-    "activity_id": "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl",
-    "source": {
-      "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
-      "platform": "Facebook",
-      "URL_post": "https://www.facebook.com/chemusvnu/posts/pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl?rdid=6delWb7IazUkqmAo",
-      "URL_registration": "https://tinyurl.com/CSVTTK2026"
-    },
-    "title": "TỌA ĐÀM “AI TRONG HÓA HỌC: TỪ Ý TƯỞNG NGHIÊN CỨU ĐẾN SẢN PHẨM” - NGÀY HỘI TRUYỀN THỐNG KHOA HÓA HỌC NĂM 2026",
-    "domain": "career",
-    "start": "2026-11-07T15:00:00+07:00",
-    "end": "2026-11-07T17:00:00+07:00",
-    "registration_deadline": "2026-11-07T15:00:00+07:00",
-    "mode": "offline",
-    "location": "Giảng đường 1, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (227 Nguyễn Văn Cừ, Phường Chợ Quán, TP. Hồ Chí Minh)",
-    "points": null,
-    "mandatory": false,
-    "audience": [
-      "Sinh viên, Cựu sinh viên khoa Hóa học và các cá nhân quan tâm đến ứng dụng AI trong nghiên cứu, sản xuất và đổi mới sáng tạo."
-    ],
-    "fee": 0,
-    "completion_requirements": "NOT_STATED"
-  },
-  {
     "activity_id": "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel",
     "source": {
       "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
@@ -2720,7 +2632,7 @@
       "URL_post": "https://www.facebook.com/chemusvnu/posts/pfbid0XzA4NWd2m3eB1qz6Q7jmmoDrTDjipgRBeRq7rUBrN4DFGLAWRkJrbf1GiyUDaVdNl?rdid=oEEco4tZ481AFrRe",
       "URL_registration": "https://qrco.de/bh0teX"
     },
-    "title": "HTTT",
+    "title": "HỘI THẢO KHOA HỌC VÀ CƠ HỘI NGHIÊN CỨU TẠI NANYANG TECHNOLOGICAL UNIVERSITY",
     "domain": "academic",
     "start": "2026-09-28T13:00:00+07:00",
     "end": "2026-09-28T15:00:00+07:00",
@@ -2961,7 +2873,7 @@
       "URL_post": "https://www.facebook.com/DK.LCH.ToanTinHoc.HCMUS/posts/pfbid026Sq6YJVpvZ94HBx364fXmJs2i5jTLFKHE6Yt2XziXy6jcsuuuzM38EPfGBsYUn2gl?rdid=VtOfRRwSm4j0aMLw",
       "URL_registration": null
     },
-    "title": "HTTT",
+    "title": "CUỘC THI “HIỂU ĐÚNG - NẮM CHUẨN LUẬT CƯ TRÚ",
     "domain": null,
     "start": "2026-11-05T00:00:00+07:00",
     "end": "2026-11-10T23:59:00+07:00",
@@ -2984,7 +2896,7 @@
       "URL_post": "https://www.facebook.com/DK.LCH.ToanTinHoc.HCMUS/posts/pfbid0y6US561ga4uvo4oHgFg6NQhXhApDKWsAjxYsNJFWBFT2YLHdMbunahgCG81NnGaZl?rdid=O3gspOnI5iWz66Pp",
       "URL_registration": "https://forms.gle/iLYdGWPNxnf47pocA"
     },
-    "title": "HTTT",
+    "title": "MATHSPACE #1 - WORKSHOP CHẠM NGÕ NGHIÊN CỨU KHOA HỌC",
     "domain": "academic",
     "start": "2026-10-25T08:00:00+07:00",
     "end": "2026-10-25T11:00:00+07:00",
@@ -3007,7 +2919,7 @@
       "URL_post": "https://www.facebook.com/DK.LCH.ToanTinHoc.HCMUS/posts/pfbid02R2QY7G7Az76zRtJtgpUZEh9US3tLSKRKCZ8K7oUbKvNojfbjYxioJQC5fCdxkJCDl?rdid=C7arbL2SKsRGHxvF",
       "URL_registration": "https://forms.gle/U3U1SCQT7B79Y2zU8"
     },
-    "title": "[HTTT] - [HƯỞNG ỨNG TUẦN LỄ “SINH VIÊN THÀNH PHỐ VƯƠN MÌNH THỜI ĐẠI SỐ”]",
+    "title": "[HOẠT ĐỘNG WORKSHOP] - KỸ NĂNG SỐ TRONG QUẢN LÝ THỜI GIAN",
     "domain": "skills",
     "start": "2026-10-18T08:00:00+07:00",
     "end": "2026-10-18T11:00:00+07:00",
@@ -3215,27 +3127,6 @@
     "registration_deadline": "2026-10-11T08:00:00+07:00",
     "mode": "offline",
     "location": "Phòng I34, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM (227 Nguyễn Văn Cừ, Phường Chợ Quán, TP. Hồ Chí Minh)",
-    "points": null,
-    "mandatory": false,
-    "audience": null,
-    "fee": 0,
-    "completion_requirements": "NOT_STATED"
-  },
-  {
-    "activity_id": "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl",
-    "source": {
-      "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
-      "platform": "Facebook",
-      "URL_post": "https://www.facebook.com/khoatoantinhoc/posts/pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl?rdid=98D8dOAkE8Wb9KIf",
-      "URL_registration": "https://1.org.vn/seminar15-10"
-    },
-    "title": "SEMINAR NEW TECHNOLOGIES IN R",
-    "domain": "skills",
-    "start": "2026-10-15T07:30:00+07:00",
-    "end": "2026-10-15T09:30:00+07:00",
-    "registration_deadline": "2026-10-15T07:30:00+07:00",
-    "mode": "offline",
-    "location": "Phòng F207, Trường Đại học Khoa học tự nhiên (227 Nguyễn Văn Cừ, P. Chợ Quán, TP. Hồ Chí Minh)",
     "points": null,
     "mandatory": false,
     "audience": null,

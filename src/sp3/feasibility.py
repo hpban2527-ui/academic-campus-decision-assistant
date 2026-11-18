@@ -153,6 +153,11 @@ class FeasibilityEvidence:
     )
     source_review_by_activity: Mapping[str, bool | None] = field(default_factory=dict)
     schedule_by_activity: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
+    # True for an activity whose announcement states no registration deadline (checked by SP1 against
+    # the source). Registration openness then stays unknown: it is reported by the data layer as a
+    # warning, and MISSING_DEADLINE is not raised, so an organizer's omission does not become a
+    # review gate. A missing entry keeps the v0.2 behaviour (MISSING_DEADLINE).
+    deadline_unstated_by_activity: Mapping[str, bool] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -270,9 +275,8 @@ def _validate_activity(value: Any, path: str) -> tuple[str, datetime | None, dat
     if audience is not None:
         if not isinstance(audience, list) or any(not isinstance(item, str) for item in audience):
             _fail(f"{path}.audience", "must be an array of strings or null")
+    # sp3-activity/0.3: an unstated or non-per-person cost stays null ("unknown"); it is never zero.
     _number_or_null(activity["fee"], f"{path}.fee")
-    if activity["fee"] is None:
-        _fail(f"{path}.fee", "must be a non-negative number")
     _non_empty_string(
         activity["completion_requirements"], f"{path}.completion_requirements"
     )
@@ -616,7 +620,8 @@ def _assess_one(
 
     if parsed.registration is RegistrationStatus.NOT_REGISTERED:
         if parsed.deadline is None:
-            reasons.add("MISSING_DEADLINE")
+            if evidence.deadline_unstated_by_activity.get(parsed.activity_id) is not True:
+                reasons.add("MISSING_DEADLINE")
         elif as_of >= parsed.deadline:
             reasons.add("DEADLINE_PASSED")
 

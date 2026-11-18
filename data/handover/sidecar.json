@@ -1,6 +1,6 @@
 {
   "schema": "sp1-handover-sidecar/1.0",
-  "store_generated_at": "2026-11-14T17:12:34+00:00",
+  "store_generated_at": "2026-11-18T10:34:56+00:00",
   "evidence_label": "auto_checked_not_human_reviewed",
   "demo_profile": {
     "cohort": "K24",
@@ -47,11 +47,9 @@
       "pfbid02bVcZdd9u3YkPwKABb5ofe5SjtcdV7kB2DjyoGEzhbmuLwobMuKwF1QPxrP2xaoaKl": "ELIGIBLE",
       "pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl": "ELIGIBLE",
       "pfbid038DGUhwuATw2zV7BXaEZz4yaAZsxCeaqBmtHitPMphYTmkeVcso2V31FFNNCQv5grl": "ELIGIBLE",
-      "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml": "ELIGIBLE",
       "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl": "ELIGIBLE",
       "pfbid037Fu3dCFRn8bvGgLJ57t3fg38yhtWukNKTQeFgFvzL4vJ6AhysqnPbxhZVvxZ8WEyl": "ELIGIBLE",
       "pfbid0ceLozgCMi4CTrTBFSrJGiD9ZypE6ZGvDW6YuYGwuCeqbrAazNyFR6whGtvYSWt3pl": "ELIGIBLE",
-      "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl": "ELIGIBLE",
       "pfbid0jFLoVS3yVwDRFdr5yTdX92hNG76pP2gz8SjN5ZuYNYvL3gJzUPRN814PGYMNZcQyl": "ELIGIBLE",
       "pfbid02eQzrvj7F749ehTidCzne4rUP9NnrBi8stCoaSRwYFjg5ErhuqmzQ4w2ckN3ATT1Fl": "ELIGIBLE",
       "pfbid02k1a64HpY4MFwMBRqhHbsczAVbKwmV3xUa3pPAX6V8zeUXKiFADFuyKnAoCXmv1TCl": "ELIGIBLE",
@@ -70,7 +68,6 @@
       "pfbid0bLDucenYUZ6TKbA5d9iB4FvM77cgyYNv3DocuF94pZDT1Co85AE6oCEERhNqHF28l": "ELIGIBLE",
       "pfbid0yeafBSGKfrMPWtkdxjC43DqnzTBBGtx8x7bH9oAU8PAoqDCT9rJxuSiayvDauQdZl": "ELIGIBLE",
       "pfbid0dpALiXtQDy2n5ZEpxGCaVwHBzazbqioR8HAjRAnBqEudZuPagknnpnMNSQo3u9o2l": "ELIGIBLE",
-      "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl": "ELIGIBLE",
       "pfbid02kR3wMs65f7GQ89ojixmKDysEPt77nEd6hv4UgBar99NoQghQZoDbK5PiyqKUsJP3l": "ELIGIBLE",
       "pfbid02KYphUfhTSv343V1AHeqLJtuRvoWKF6ue7ChUFkPAoMs9zvfgosyY4xuGj9o4JDeDl": "ELIGIBLE",
       "pfbid02eMqDhKVyrocNhXZ8AR5ugCNRj1MHZCdGjXJ6GYFo8ZVGNqAQcixVqeCMPDP2PtUPl": "ELIGIBLE",
@@ -131,7 +128,6 @@
       "pfbid02SXEDSP813Nakurd3SoxwZcyrGeDd6zEmckJB3HMJmNUWYBqmNPQCW4NvxwCEk8oTl": "ELIGIBLE",
       "pfbid02t92pVgHoWRYaV8FjZbebVvmJv9Yq4XaK6WNecBVT43Q56AKux7zZQMDj4VvuMvNsl": "ELIGIBLE",
       "pfbid037nFyUmhshymd7mrmP2MEYjE9jEy2Dxt5h3nmuxccbnsW98pDuR738ASevRgTdx4el": "ELIGIBLE",
-      "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl": "ELIGIBLE",
       "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel": "ELIGIBLE",
       "pfbid0219WhKzg2VY5EfQp6HMhoMuEF6Lgh7zsvdovR38vwdVLxtCA2gE2EDfVPteg8SyAwl": "ELIGIBLE",
       "pfbid0hHscC6XEmEUXDRjVPmVDaEjtFhkfgwZ5nDGuZjgrcdYicipTWrmazdv5jEoTv9ZDl": "ELIGIBLE",
@@ -159,7 +155,6 @@
       "pfbid02gQSArenKumt6jbHtfrhHs3gcuCj7WtPX9K19MqtngN6kxLyoRAeNDcPLvDsEsT9Sl": "ELIGIBLE",
       "pfbid032ty6V3vVWv86ySbmwwVuVoJdzRtp8ho9jWNGfn93PCVUiFw5yq4sA87MUuzc1pjel": "ELIGIBLE",
       "pfbid02uqyZt4SWmoJme1y2HHWtaigR3vsESsgeeq4v97BJTJGvWhvPDcfuy9d79Z1qF81gl": "ELIGIBLE",
-      "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl": "ELIGIBLE",
       "pfbid02FRDX3FT2Sgwx1Bc76q6kskVkegZczF4CLqz8nrwHhrqMVUzsMVEWKuYDqQ1ZN2Yhl": "ELIGIBLE",
       "pfbid032KfAjEjEMxdFFsj7Cy9vSEGuUQKRa4f3gECk4dTN1gSTb8SMXtgjk2BnqDNQUw6Zl": "ELIGIBLE",
       "pfbid034HtkaTpbHATZQf2FNfLkY1u78X7ocS3Ym3et2BmXVhtAaFZq1W9ANr9Kbkf31zetl": "ELIGIBLE",
@@ -223,11 +218,9 @@
       "pfbid02bVcZdd9u3YkPwKABb5ofe5SjtcdV7kB2DjyoGEzhbmuLwobMuKwF1QPxrP2xaoaKl": "IN_SCOPE",
       "pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl": "NEEDS_REVIEW",
       "pfbid038DGUhwuATw2zV7BXaEZz4yaAZsxCeaqBmtHitPMphYTmkeVcso2V31FFNNCQv5grl": "OUT_OF_SCOPE",
-      "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml": "IN_SCOPE",
       "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl": "IN_SCOPE",
       "pfbid037Fu3dCFRn8bvGgLJ57t3fg38yhtWukNKTQeFgFvzL4vJ6AhysqnPbxhZVvxZ8WEyl": "NEEDS_REVIEW",
       "pfbid0ceLozgCMi4CTrTBFSrJGiD9ZypE6ZGvDW6YuYGwuCeqbrAazNyFR6whGtvYSWt3pl": "IN_SCOPE",
-      "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl": "IN_SCOPE",
       "pfbid0jFLoVS3yVwDRFdr5yTdX92hNG76pP2gz8SjN5ZuYNYvL3gJzUPRN814PGYMNZcQyl": "IN_SCOPE",
       "pfbid02eQzrvj7F749ehTidCzne4rUP9NnrBi8stCoaSRwYFjg5ErhuqmzQ4w2ckN3ATT1Fl": "IN_SCOPE",
       "pfbid02k1a64HpY4MFwMBRqhHbsczAVbKwmV3xUa3pPAX6V8zeUXKiFADFuyKnAoCXmv1TCl": "IN_SCOPE",
@@ -246,7 +239,6 @@
       "pfbid0bLDucenYUZ6TKbA5d9iB4FvM77cgyYNv3DocuF94pZDT1Co85AE6oCEERhNqHF28l": "OUT_OF_SCOPE",
       "pfbid0yeafBSGKfrMPWtkdxjC43DqnzTBBGtx8x7bH9oAU8PAoqDCT9rJxuSiayvDauQdZl": "OUT_OF_SCOPE",
       "pfbid0dpALiXtQDy2n5ZEpxGCaVwHBzazbqioR8HAjRAnBqEudZuPagknnpnMNSQo3u9o2l": "OUT_OF_SCOPE",
-      "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl": "OUT_OF_SCOPE",
       "pfbid02kR3wMs65f7GQ89ojixmKDysEPt77nEd6hv4UgBar99NoQghQZoDbK5PiyqKUsJP3l": "OUT_OF_SCOPE",
       "pfbid02KYphUfhTSv343V1AHeqLJtuRvoWKF6ue7ChUFkPAoMs9zvfgosyY4xuGj9o4JDeDl": "IN_SCOPE",
       "pfbid02eMqDhKVyrocNhXZ8AR5ugCNRj1MHZCdGjXJ6GYFo8ZVGNqAQcixVqeCMPDP2PtUPl": "IN_SCOPE",
@@ -307,7 +299,6 @@
       "pfbid02SXEDSP813Nakurd3SoxwZcyrGeDd6zEmckJB3HMJmNUWYBqmNPQCW4NvxwCEk8oTl": "IN_SCOPE",
       "pfbid02t92pVgHoWRYaV8FjZbebVvmJv9Yq4XaK6WNecBVT43Q56AKux7zZQMDj4VvuMvNsl": "OUT_OF_SCOPE",
       "pfbid037nFyUmhshymd7mrmP2MEYjE9jEy2Dxt5h3nmuxccbnsW98pDuR738ASevRgTdx4el": "OUT_OF_SCOPE",
-      "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl": "IN_SCOPE",
       "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel": "IN_SCOPE",
       "pfbid0219WhKzg2VY5EfQp6HMhoMuEF6Lgh7zsvdovR38vwdVLxtCA2gE2EDfVPteg8SyAwl": "IN_SCOPE",
       "pfbid0hHscC6XEmEUXDRjVPmVDaEjtFhkfgwZ5nDGuZjgrcdYicipTWrmazdv5jEoTv9ZDl": "IN_SCOPE",
@@ -335,7 +326,6 @@
       "pfbid02gQSArenKumt6jbHtfrhHs3gcuCj7WtPX9K19MqtngN6kxLyoRAeNDcPLvDsEsT9Sl": "IN_SCOPE",
       "pfbid032ty6V3vVWv86ySbmwwVuVoJdzRtp8ho9jWNGfn93PCVUiFw5yq4sA87MUuzc1pjel": "IN_SCOPE",
       "pfbid02uqyZt4SWmoJme1y2HHWtaigR3vsESsgeeq4v97BJTJGvWhvPDcfuy9d79Z1qF81gl": "IN_SCOPE",
-      "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl": "IN_SCOPE",
       "pfbid02FRDX3FT2Sgwx1Bc76q6kskVkegZczF4CLqz8nrwHhrqMVUzsMVEWKuYDqQ1ZN2Yhl": "OUT_OF_SCOPE",
       "pfbid032KfAjEjEMxdFFsj7Cy9vSEGuUQKRa4f3gECk4dTN1gSTb8SMXtgjk2BnqDNQUw6Zl": "OUT_OF_SCOPE",
       "pfbid034HtkaTpbHATZQf2FNfLkY1u78X7ocS3Ym3et2BmXVhtAaFZq1W9ANr9Kbkf31zetl": "OUT_OF_SCOPE",
@@ -399,11 +389,9 @@
       "pfbid02bVcZdd9u3YkPwKABb5ofe5SjtcdV7kB2DjyoGEzhbmuLwobMuKwF1QPxrP2xaoaKl": true,
       "pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl": true,
       "pfbid038DGUhwuATw2zV7BXaEZz4yaAZsxCeaqBmtHitPMphYTmkeVcso2V31FFNNCQv5grl": true,
-      "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml": true,
       "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl": true,
       "pfbid037Fu3dCFRn8bvGgLJ57t3fg38yhtWukNKTQeFgFvzL4vJ6AhysqnPbxhZVvxZ8WEyl": true,
       "pfbid0ceLozgCMi4CTrTBFSrJGiD9ZypE6ZGvDW6YuYGwuCeqbrAazNyFR6whGtvYSWt3pl": true,
-      "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl": true,
       "pfbid0jFLoVS3yVwDRFdr5yTdX92hNG76pP2gz8SjN5ZuYNYvL3gJzUPRN814PGYMNZcQyl": true,
       "pfbid02eQzrvj7F749ehTidCzne4rUP9NnrBi8stCoaSRwYFjg5ErhuqmzQ4w2ckN3ATT1Fl": true,
       "pfbid02k1a64HpY4MFwMBRqhHbsczAVbKwmV3xUa3pPAX6V8zeUXKiFADFuyKnAoCXmv1TCl": true,
@@ -422,7 +410,6 @@
       "pfbid0bLDucenYUZ6TKbA5d9iB4FvM77cgyYNv3DocuF94pZDT1Co85AE6oCEERhNqHF28l": true,
       "pfbid0yeafBSGKfrMPWtkdxjC43DqnzTBBGtx8x7bH9oAU8PAoqDCT9rJxuSiayvDauQdZl": true,
       "pfbid0dpALiXtQDy2n5ZEpxGCaVwHBzazbqioR8HAjRAnBqEudZuPagknnpnMNSQo3u9o2l": true,
-      "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl": true,
       "pfbid02kR3wMs65f7GQ89ojixmKDysEPt77nEd6hv4UgBar99NoQghQZoDbK5PiyqKUsJP3l": true,
       "pfbid02KYphUfhTSv343V1AHeqLJtuRvoWKF6ue7ChUFkPAoMs9zvfgosyY4xuGj9o4JDeDl": true,
       "pfbid02eMqDhKVyrocNhXZ8AR5ugCNRj1MHZCdGjXJ6GYFo8ZVGNqAQcixVqeCMPDP2PtUPl": true,
@@ -483,7 +470,6 @@
       "pfbid02SXEDSP813Nakurd3SoxwZcyrGeDd6zEmckJB3HMJmNUWYBqmNPQCW4NvxwCEk8oTl": true,
       "pfbid02t92pVgHoWRYaV8FjZbebVvmJv9Yq4XaK6WNecBVT43Q56AKux7zZQMDj4VvuMvNsl": true,
       "pfbid037nFyUmhshymd7mrmP2MEYjE9jEy2Dxt5h3nmuxccbnsW98pDuR738ASevRgTdx4el": true,
-      "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl": true,
       "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel": true,
       "pfbid0219WhKzg2VY5EfQp6HMhoMuEF6Lgh7zsvdovR38vwdVLxtCA2gE2EDfVPteg8SyAwl": true,
       "pfbid0hHscC6XEmEUXDRjVPmVDaEjtFhkfgwZ5nDGuZjgrcdYicipTWrmazdv5jEoTv9ZDl": true,
@@ -511,7 +497,6 @@
       "pfbid02gQSArenKumt6jbHtfrhHs3gcuCj7WtPX9K19MqtngN6kxLyoRAeNDcPLvDsEsT9Sl": null,
       "pfbid032ty6V3vVWv86ySbmwwVuVoJdzRtp8ho9jWNGfn93PCVUiFw5yq4sA87MUuzc1pjel": true,
       "pfbid02uqyZt4SWmoJme1y2HHWtaigR3vsESsgeeq4v97BJTJGvWhvPDcfuy9d79Z1qF81gl": true,
-      "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl": null,
       "pfbid02FRDX3FT2Sgwx1Bc76q6kskVkegZczF4CLqz8nrwHhrqMVUzsMVEWKuYDqQ1ZN2Yhl": true,
       "pfbid032KfAjEjEMxdFFsj7Cy9vSEGuUQKRa4f3gECk4dTN1gSTb8SMXtgjk2BnqDNQUw6Zl": true,
       "pfbid034HtkaTpbHATZQf2FNfLkY1u78X7ocS3Ym3et2BmXVhtAaFZq1W9ANr9Kbkf31zetl": true,
@@ -2632,65 +2617,6 @@
       },
       "warnings": []
     },
-    "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml": {
-      "post_id": "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml",
-      "sp1_activity_id": "TMP-02bc7bb1-01",
-      "activity_type": "other",
-      "review": {
-        "label": "reviewed",
-        "stale": false,
-        "reviewer": "Thao Duyen (reviewed by hand; CSV written with AI assistance)",
-        "reviewed_at": "2026-11-15",
-        "fields_set": [],
-        "activity_type": null,
-        "rule_id": "R19",
-        "approved": false,
-        "note": "Rule/campus review 2026-11-15: rule R19"
-      },
-      "date_posted": "2026-11-06T22:40:38",
-      "sources": [
-        {
-          "post_id": "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml",
-          "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
-          "platform": "Facebook",
-          "date_posted": "2026-11-06T22:40:38",
-          "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml?rdid=Y4EQFpgGfS6ABe1g"
-        }
-      ],
-      "status": "valid",
-      "flags": [],
-      "campus": [
-        "CS2"
-      ],
-      "audience": {
-        "text": null,
-        "cohorts": [],
-        "programs": [],
-        "all_students": true
-      },
-      "fee": 0,
-      "join_url": null,
-      "completion_requirements": [],
-      "multi_session": false,
-      "semester_by_program": {
-        "standard": "HK1_2026_2027",
-        "high_quality": "HK1_2026_2027"
-      },
-      "duration_minutes": 180,
-      "duration_source": "window_span",
-      "time_defaults": {},
-      "recognition_stated": null,
-      "drl_recognized": true,
-      "possible_duplicates": [],
-      "derived": {
-        "registration_deadline": "team_convention:deadline_at_start",
-        "audience": "team_default:audience_all",
-        "mandatory": "team_default:mandatory_false",
-        "fee": "team_default:fee_not_stated_free",
-        "completion_requirements": "team_convention:not_stated"
-      },
-      "warnings": []
-    },
     "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl": {
       "post_id": "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl",
       "sp1_activity_id": "TMP-32c74a49-01",
@@ -2851,55 +2777,6 @@
       "possible_duplicates": [],
       "derived": {
         "end": "start_plus_duration:default_online_30m",
-        "registration_deadline": "team_convention:deadline_at_start",
-        "audience": "team_default:audience_all",
-        "mandatory": "team_default:mandatory_false",
-        "fee": "team_default:fee_not_stated_free",
-        "completion_requirements": "team_convention:not_stated"
-      },
-      "warnings": []
-    },
-    "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl": {
-      "post_id": "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl",
-      "sp1_activity_id": "TMP-4031ba32-01",
-      "activity_type": "blood_donation",
-      "review": null,
-      "date_posted": "2026-10-27T18:26:00",
-      "sources": [
-        {
-          "post_id": "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl",
-          "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
-          "platform": "Facebook",
-          "date_posted": "2026-10-27T18:26:00",
-          "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl?rdid=gS9YhulwZKgXQrP9"
-        }
-      ],
-      "status": "valid",
-      "flags": [],
-      "campus": [
-        "CS2"
-      ],
-      "audience": {
-        "text": null,
-        "cohorts": [],
-        "programs": [],
-        "all_students": true
-      },
-      "fee": 0,
-      "join_url": null,
-      "completion_requirements": [],
-      "multi_session": false,
-      "semester_by_program": {
-        "standard": "HK1_2026_2027",
-        "high_quality": "HK1_2026_2027"
-      },
-      "duration_minutes": 210,
-      "duration_source": "window_span",
-      "time_defaults": {},
-      "recognition_stated": null,
-      "drl_recognized": true,
-      "possible_duplicates": [],
-      "derived": {
         "registration_deadline": "team_convention:deadline_at_start",
         "audience": "team_default:audience_all",
         "mandatory": "team_default:mandatory_false",
@@ -3459,7 +3336,7 @@
       "possible_duplicates": [
         {
           "post_id": "pfbid0285J7o94gHZcTDZ3T7g9t2rUyZaopXD2xCpCQevjusKo49EXM7mmycf3beX6tkqWxl",
-          "reason": "same_opening_title_0.88_text_0.44"
+          "reason": "same_opening_title_0.88_text_0.40"
         }
       ],
       "derived": {
@@ -3515,7 +3392,7 @@
       "possible_duplicates": [
         {
           "post_id": "pfbid09Y9s952puDP3QcZQP7cT2Qu37195SBSwKXE7X4ARiy5b48nZ9VqpKAo7mF2b8ZbLl",
-          "reason": "same_opening_title_0.88_text_0.44"
+          "reason": "same_opening_title_0.88_text_0.40"
         }
       ],
       "derived": {
@@ -3926,65 +3803,6 @@
         "audience": "team_default:audience_all",
         "mandatory": "team_default:mandatory_false",
         "fee": "team_default:fee_not_stated_free"
-      },
-      "warnings": []
-    },
-    "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl": {
-      "post_id": "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
-      "sp1_activity_id": "TMP-6ca87326-01",
-      "activity_type": "other",
-      "review": {
-        "label": "reviewed",
-        "stale": false,
-        "reviewer": "Thao Duyen (reviewed by hand; CSV written with AI assistance)",
-        "reviewed_at": "2026-11-15",
-        "fields_set": [],
-        "activity_type": null,
-        "rule_id": "R19",
-        "approved": false,
-        "note": "Rule/campus review 2026-11-15: rule R19"
-      },
-      "date_posted": "2026-06-16T00:00:00",
-      "sources": [
-        {
-          "post_id": "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
-          "publisher": "Tuổi trẻ Trường Đại học Khoa học tự nhiên",
-          "platform": "Facebook",
-          "date_posted": "2026-06-16T00:00:00",
-          "URL_post": "https://www.facebook.com/DoanHoiHCMUS/posts/pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl?rdid=G7ncz4lfscv0kBOP"
-        }
-      ],
-      "status": "valid",
-      "flags": [],
-      "campus": [
-        "Other"
-      ],
-      "audience": {
-        "text": "Sinh viên\n Lệ phí tham gia:\nMiễn phí cho 20 bạn đăng ký sớm nhất\nTừ bạn thứ 21: 20.000đ/người",
-        "cohorts": [],
-        "programs": [],
-        "all_students": true
-      },
-      "fee": 0,
-      "join_url": null,
-      "completion_requirements": [],
-      "multi_session": false,
-      "semester_by_program": {
-        "standard": "HK3_2025_2026",
-        "high_quality": "HK3_2025_2026"
-      },
-      "duration_minutes": 210,
-      "duration_source": "window_span",
-      "time_defaults": {
-        "registration_deadline": "date_only_2359"
-      },
-      "recognition_stated": true,
-      "drl_recognized": true,
-      "possible_duplicates": [],
-      "derived": {
-        "audience": "team_default:audience_all",
-        "mandatory": "team_default:mandatory_false",
-        "completion_requirements": "team_convention:not_stated"
       },
       "warnings": []
     },
@@ -7357,55 +7175,6 @@
       },
       "warnings": []
     },
-    "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl": {
-      "post_id": "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl",
-      "sp1_activity_id": "TMP-795334b7-01",
-      "activity_type": "seminar_workshop",
-      "review": null,
-      "date_posted": "2026-11-05T22:57:40",
-      "sources": [
-        {
-          "post_id": "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl",
-          "publisher": "Khoa Hóa học, Trường Đại học Khoa học tự nhiên",
-          "platform": "Facebook",
-          "date_posted": "2026-11-05T22:57:40",
-          "URL_post": "https://www.facebook.com/chemusvnu/posts/pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl?rdid=6delWb7IazUkqmAo"
-        }
-      ],
-      "status": "valid",
-      "flags": [],
-      "campus": [
-        "CS1"
-      ],
-      "audience": {
-        "text": "Sinh viên, Cựu sinh viên khoa Hóa học và các cá nhân quan tâm đến ứng dụng AI trong nghiên cứu, sản xuất và đổi mới sáng tạo.\n Đừng bỏ lỡ cơ hội gặp gỡ các diễn giả, kết nối tri thức và khám phá những khả năng mới khi AI đồng hành cùng Hóa học!\n—————————\n Link đăng ký tham dự Ngày hội và mua sản phẩm kỷ niệm: https://tinyurl.com/CSVTTK2026\n Mọi sự đóng góp cho Ngày hội Truyền thống Khoa, liên hệ chị Lê Thị Phượng (SĐT [phone removed]) và gửi về:",
-        "cohorts": [],
-        "programs": [],
-        "all_students": true
-      },
-      "fee": 0,
-      "join_url": null,
-      "completion_requirements": [],
-      "multi_session": false,
-      "semester_by_program": {
-        "standard": "HK1_2026_2027",
-        "high_quality": "HK1_2026_2027"
-      },
-      "duration_minutes": 120,
-      "duration_source": "window_span",
-      "time_defaults": {},
-      "recognition_stated": null,
-      "drl_recognized": true,
-      "possible_duplicates": [],
-      "derived": {
-        "registration_deadline": "team_convention:deadline_at_start",
-        "audience": "team_default:audience_all",
-        "mandatory": "team_default:mandatory_false",
-        "fee": "team_default:fee_not_stated_free",
-        "completion_requirements": "team_convention:not_stated"
-      },
-      "warnings": []
-    },
     "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel": {
       "post_id": "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel",
       "sp1_activity_id": "TMP-7ade63d1-01",
@@ -8766,58 +8535,6 @@
       ],
       "status": "valid",
       "flags": [],
-      "campus": [
-        "CS1"
-      ],
-      "audience": {
-        "text": null,
-        "cohorts": [],
-        "programs": [],
-        "all_students": true
-      },
-      "fee": 0,
-      "join_url": null,
-      "completion_requirements": [],
-      "multi_session": false,
-      "semester_by_program": {
-        "standard": "HK1_2026_2027",
-        "high_quality": "HK1_2026_2027"
-      },
-      "duration_minutes": 120,
-      "duration_source": "default_offline_2h",
-      "time_defaults": {},
-      "recognition_stated": null,
-      "drl_recognized": true,
-      "possible_duplicates": [],
-      "derived": {
-        "end": "start_plus_duration:default_offline_2h",
-        "registration_deadline": "team_convention:deadline_at_start",
-        "audience": "team_default:audience_all",
-        "mandatory": "team_default:mandatory_false",
-        "fee": "team_default:fee_not_stated_free",
-        "completion_requirements": "team_convention:not_stated"
-      },
-      "warnings": []
-    },
-    "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl": {
-      "post_id": "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl",
-      "sp1_activity_id": "TMP-fc65ac80-01",
-      "activity_type": "seminar_workshop",
-      "review": null,
-      "date_posted": "2026-10-05T00:00:00",
-      "sources": [
-        {
-          "post_id": "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl",
-          "publisher": "Khoa Toán - Tin học, Trường ĐH Khoa học tự nhiên, ĐHQG - HCM",
-          "platform": "Facebook",
-          "date_posted": "2026-10-05T00:00:00",
-          "URL_post": "https://www.facebook.com/khoatoantinhoc/posts/pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl?rdid=98D8dOAkE8Wb9KIf"
-        }
-      ],
-      "status": "partial",
-      "flags": [
-        "needs_review:mode"
-      ],
       "campus": [
         "CS1"
       ],

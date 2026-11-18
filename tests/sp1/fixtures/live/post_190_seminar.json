@@ -1,0 +1,12 @@
+{
+  "label": "SYNTHETIC-DEMO",
+  "note": "Synthetic announcement for the incremental SP1 ingestion workflow (post 190). Not a real post; example.invalid URLs.",
+  "post": {
+    "url": "https://example.invalid/unilife/posts/190",
+    "publisher": "Synthetic fixture - Khoa Công nghệ Thông tin",
+    "platform": "facebook",
+    "date_posted": "2026-09-28T09:00:00",
+    "raw_content": "[HỘI THẢO] ỨNG DỤNG TRÍ TUỆ NHÂN TẠO TRONG NGHIÊN CỨU KHOA HỌC\n\nKhoa Công nghệ Thông tin trân trọng mời các bạn sinh viên tham dự hội thảo chuyên đề \"Ứng dụng trí tuệ nhân tạo trong nghiên cứu khoa học\".\n\n⏰ Thời gian: 14h00 - 16h00, thứ Năm ngày 05/11/2026\n📍 Địa điểm: Hội trường I, cơ sở Nguyễn Văn Cừ\n👥 Đối tượng: tất cả sinh viên của Trường\n📝 Đăng ký tham gia tại: https://forms.example.invalid/hoithao-ai-2026\n⏳ Hạn đăng ký: 23h59 ngày 03/11/2026\n\nSinh viên tham dự đầy đủ sẽ được ghi nhận điểm rèn luyện theo quy định."
+  },
+  "edited_raw_content": "[HỘI THẢO] ỨNG DỤNG TRÍ TUỆ NHÂN TẠO TRONG NGHIÊN CỨU KHOA HỌC\n\nKhoa Công nghệ Thông tin trân trọng mời các bạn sinh viên tham dự hội thảo chuyên đề \"Ứng dụng trí tuệ nhân tạo trong nghiên cứu khoa học\".\n\n⏰ Thời gian: 08h00 - 10h00, thứ Sáu ngày 06/11/2026 (đổi lịch)\n📍 Địa điểm: Hội trường I, cơ sở Nguyễn Văn Cừ\n👥 Đối tượng: tất cả sinh viên của Trường\n📝 Đăng ký tham gia tại: https://forms.example.invalid/hoithao-ai-2026\n⏳ Hạn đăng ký: 23h59 ngày 04/11/2026\n\nSinh viên tham dự đầy đủ sẽ được ghi nhận điểm rèn luyện theo quy định."
+}

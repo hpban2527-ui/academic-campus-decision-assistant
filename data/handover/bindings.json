@@ -37,7 +37,7 @@
     ]
   },
   "ruleset_file": "drl_rules.json",
-  "n_activities": 174,
+  "n_activities": 169,
   "bindings": [
     {
       "activity_id": "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl",
@@ -280,22 +280,6 @@
       "value": 1
     },
     {
-      "activity_id": "pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl",
-      "binding_ref": "auto-R45-pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl",
-      "rule_id": "R45",
-      "field": "school_fundraising_activities",
-      "operation": "INCREMENT",
-      "value": 1
-    },
-    {
-      "activity_id": "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml",
-      "binding_ref": "reviewed-R19-pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml",
-      "rule_id": "R19",
-      "field": "eligible_academic_seminars",
-      "operation": "INCREMENT",
-      "value": 1
-    },
-    {
       "activity_id": "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl",
       "binding_ref": "auto-R46-pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl",
       "rule_id": "R46",
@@ -318,14 +302,6 @@
       "field": "eligible_civic_cultural_sports_competition_level",
       "operation": "SET",
       "value": "faculty"
-    },
-    {
-      "activity_id": "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl",
-      "binding_ref": "auto-R42-pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl",
-      "rule_id": "R42",
-      "field": "blood_donation_certificates",
-      "operation": "INCREMENT",
-      "value": 1
     },
     {
       "activity_id": "pfbid0jFLoVS3yVwDRFdr5yTdX92hNG76pP2gz8SjN5ZuYNYvL3gJzUPRN814PGYMNZcQyl",
@@ -452,14 +428,6 @@
       "binding_ref": "auto-R16-pfbid0dpALiXtQDy2n5ZEpxGCaVwHBzazbqioR8HAjRAnBqEudZuPagknnpnMNSQo3u9o2l",
       "rule_id": "R16",
       "field": "academic_competitions_completed_first_round",
-      "operation": "INCREMENT",
-      "value": 1
-    },
-    {
-      "activity_id": "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
-      "binding_ref": "reviewed-R19-pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
-      "rule_id": "R19",
-      "field": "eligible_academic_seminars",
       "operation": "INCREMENT",
       "value": 1
     },
@@ -912,14 +880,6 @@
       "value": 1
     },
     {
-      "activity_id": "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl",
-      "binding_ref": "auto-R19-pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl",
-      "rule_id": "R19",
-      "field": "eligible_academic_seminars",
-      "operation": "INCREMENT",
-      "value": 1
-    },
-    {
       "activity_id": "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel",
       "binding_ref": "auto-R19-pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel",
       "rule_id": "R19",
@@ -1122,14 +1082,6 @@
     {
       "activity_id": "pfbid02uqyZt4SWmoJme1y2HHWtaigR3vsESsgeeq4v97BJTJGvWhvPDcfuy9d79Z1qF81gl",
       "binding_ref": "auto-R19-pfbid02uqyZt4SWmoJme1y2HHWtaigR3vsESsgeeq4v97BJTJGvWhvPDcfuy9d79Z1qF81gl",
-      "rule_id": "R19",
-      "field": "eligible_academic_seminars",
-      "operation": "INCREMENT",
-      "value": 1
-    },
-    {
-      "activity_id": "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl",
-      "binding_ref": "auto-R19-pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl",
       "rule_id": "R19",
       "field": "eligible_academic_seminars",
       "operation": "INCREMENT",
@@ -1637,12 +1589,10 @@
     },
     "pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl": {
       "activity_type": "fundraising",
-      "matcher_rule": "R45",
+      "matcher_rule": "R19",
       "matcher_method": "catalog_signal_match",
       "label": "auto_proposed_not_human_reviewed",
-      "reason": "sources_agree",
-      "category_id": "C4",
-      "points_from_rules": 3
+      "reason": "sources_disagree"
     },
     "pfbid038DGUhwuATw2zV7BXaEZz4yaAZsxCeaqBmtHitPMphYTmkeVcso2V31FFNNCQv5grl": {
       "activity_type": "other",
@@ -1650,15 +1600,6 @@
       "matcher_method": "catalog_signal_match",
       "label": "auto_proposed_not_human_reviewed",
       "reason": "activity_type_not_auto_bound"
-    },
-    "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml": {
-      "activity_type": "other",
-      "matcher_rule": "R35",
-      "matcher_method": "rule_name_token_overlap",
-      "label": "reviewed",
-      "reason": "reviewer_decision",
-      "category_id": "C1",
-      "points_from_rules": 5
     },
     "pfbid0FuB5dtHHrr3CzuSoVgsGgMLCj4ayYWBdm55tbTqbd6hAyXH5NSozEvPoY8nz3b1Hl": {
       "activity_type": "legal_health_campaign",
@@ -1686,15 +1627,6 @@
       "reason": "reviewer_decision",
       "category_id": "C3",
       "points_from_rules": 5
-    },
-    "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl": {
-      "activity_type": "blood_donation",
-      "matcher_rule": "R42",
-      "matcher_method": "catalog_signal_match",
-      "label": "auto_proposed_not_human_reviewed",
-      "reason": "sources_agree",
-      "category_id": "C4",
-      "points_from_rules": 10
     },
     "pfbid0jFLoVS3yVwDRFdr5yTdX92hNG76pP2gz8SjN5ZuYNYvL3gJzUPRN814PGYMNZcQyl": {
       "activity_type": "blood_donation",
@@ -1851,15 +1783,6 @@
       "matcher_method": "catalog_signal_match",
       "label": "auto_proposed_not_human_reviewed",
       "reason": "sources_agree",
-      "category_id": "C1",
-      "points_from_rules": 5
-    },
-    "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl": {
-      "activity_type": "other",
-      "matcher_rule": "R35",
-      "matcher_method": "rule_name_token_overlap",
-      "label": "reviewed",
-      "reason": "reviewer_decision",
       "category_id": "C1",
       "points_from_rules": 5
     },
@@ -2395,15 +2318,6 @@
       "category_id": "C1",
       "points_from_rules": 5
     },
-    "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl": {
-      "activity_type": "seminar_workshop",
-      "matcher_rule": "R19",
-      "matcher_method": "catalog_signal_match",
-      "label": "auto_proposed_not_human_reviewed",
-      "reason": "sources_agree",
-      "category_id": "C1",
-      "points_from_rules": 5
-    },
     "pfbid0vWJviRFa4ej5GyGZVPcCtTwtn6sZkKzgvFNNAdiNJbN8HDPqrv8a7a52LnBQDLZel": {
       "activity_type": "seminar_workshop",
       "matcher_rule": "R19",
@@ -2637,15 +2551,6 @@
       "points_from_rules": 5
     },
     "pfbid02uqyZt4SWmoJme1y2HHWtaigR3vsESsgeeq4v97BJTJGvWhvPDcfuy9d79Z1qF81gl": {
-      "activity_type": "seminar_workshop",
-      "matcher_rule": "R19",
-      "matcher_method": "catalog_signal_match",
-      "label": "auto_proposed_not_human_reviewed",
-      "reason": "sources_agree",
-      "category_id": "C1",
-      "points_from_rules": 5
-    },
-    "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl": {
       "activity_type": "seminar_workshop",
       "matcher_rule": "R19",
       "matcher_method": "catalog_signal_match",

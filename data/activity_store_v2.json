@@ -1,6 +1,6 @@
 {
   "schema": "sp1-activity-store/2.0",
-  "generated_at": "2026-11-14T17:12:34+00:00",
+  "generated_at": "2026-11-18T10:34:56+00:00",
   "model_id": "Qwen/Qwen3.5-4B",
   "prompt_versions": {
     "classify": "sp1_classify_v2 1.0.0",
@@ -189,13 +189,21 @@
   },
   "llm_file": "Qwen__Qwen3.5-4B.jsonl",
   "n_posts": 189,
-  "n_without_llm": 0,
+  "n_without_llm": 5,
+  "n_llm_output_stale": 5,
+  "llm_output_stale": [
+    "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml",
+    "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl",
+    "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl",
+    "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl",
+    "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl"
+  ],
   "n_duplicate_groups": 0,
   "n_possible_duplicate_pairs": 1,
   "n_canonical": 189,
   "n_human_reviewed": 63,
   "n_stale_decisions": 0,
-  "n_plannable_after_review": 160,
+  "n_plannable_after_review": 155,
   "reviewers": [
     "Thao Duyen (reviewed by hand; CSV written with AI assistance)"
   ],
@@ -5088,7 +5096,7 @@
         },
         "post_type": "activity",
         "drl_recognized": true,
-        "title": "HTTT",
+        "title": "WORKSHOP GÂY QUỸ TRUNG THU- ĐIỂM TRĂNG CHO EM",
         "domain": null,
         "multi_session": false,
         "mode": "offline",
@@ -5552,19 +5560,21 @@
       },
       "text_sha256": "39990269049c172d73c2f462214a7dbfac9e8abd530af0a45d6d733cfd7d14bd",
       "semester": "HK1_2026_2027",
-      "plannable": true,
-      "not_plannable_reasons": [],
+      "plannable": false,
+      "not_plannable_reasons": [
+        "llm_output_stale"
+      ],
       "plannable_before_review": true,
       "field_methods": {
-        "post_type": "agree",
+        "post_type": "rules_fallback",
         "title": "rules",
         "domain": "rules",
-        "multi_session": "rules",
-        "window_open": "llm",
-        "window_close": "rules",
+        "multi_session": "rules_fallback",
+        "window_open": "rules_fallback",
+        "window_close": "rules_fallback",
         "duration_minutes_stated": "rules",
         "registration_deadline": "rules",
-        "mode": "agree",
+        "mode": "rules_fallback",
         "location": "rules",
         "audience_text": "rules",
         "audience_scope": "rules",
@@ -5579,27 +5589,10 @@
       },
       "llm_warnings": [
         {
-          "call": "classify",
-          "attempt": 1,
-          "code": "extra_key:activity_type_evidence"
-        },
-        {
-          "call": "roles",
-          "attempt": 1,
-          "code": "unknown_id_dropped:D2"
-        },
-        {
-          "call": "roles",
-          "attempt": 1,
-          "code": "missing_id_as_other:T2"
-        },
-        {
-          "call": "roles",
-          "attempt": 1,
-          "code": "unknown_id_dropped:H1"
+          "code": "llm_output_stale"
         }
       ],
-      "llm_available": true,
+      "llm_available": false,
       "duplicate_of": null,
       "sources": [
         {
@@ -6074,11 +6067,13 @@
       "review": null,
       "text_sha256": "08d921d9d90d2b046098cc8ad195bf99648228b666b0042e1dbb69ddbda0eab9",
       "semester": "HK1_2026_2027",
-      "plannable": true,
-      "not_plannable_reasons": [],
+      "plannable": false,
+      "not_plannable_reasons": [
+        "llm_output_stale"
+      ],
       "plannable_before_review": true,
       "field_methods": {
-        "post_type": "agree",
+        "post_type": "rules_fallback",
         "title": "rules",
         "domain": "rules",
         "multi_session": "rules_fallback",
@@ -6086,7 +6081,7 @@
         "window_close": "rules_fallback",
         "duration_minutes_stated": "rules",
         "registration_deadline": "rules",
-        "mode": "agree",
+        "mode": "rules_fallback",
         "location": "rules",
         "audience_text": "rules",
         "audience_scope": "rules",
@@ -6101,12 +6096,10 @@
       },
       "llm_warnings": [
         {
-          "call": "classify",
-          "attempt": 1,
-          "code": "extra_key:domain_evidence"
+          "code": "llm_output_stale"
         }
       ],
-      "llm_available": true,
+      "llm_available": false,
       "duplicate_of": null,
       "sources": [
         {
@@ -6894,7 +6887,7 @@
         },
         "post_type": "activity",
         "drl_recognized": true,
-        "title": "HTTT",
+        "title": "WORKSHOP: VIẾT VÀ CHẤM ĐIỂM CV - BỨC PHÁ HỒ SƠ, CHINH PHỤC NHÀ TUYỂN DỤNG",
         "domain": "career",
         "multi_session": false,
         "mode": "offline",
@@ -7405,7 +7398,7 @@
       "possible_duplicates": [
         {
           "post_id": "pfbid0285J7o94gHZcTDZ3T7g9t2rUyZaopXD2xCpCQevjusKo49EXM7mmycf3beX6tkqWxl",
-          "reason": "same_opening_title_0.88_text_0.44"
+          "reason": "same_opening_title_0.88_text_0.40"
         }
       ]
     },
@@ -7525,7 +7518,7 @@
       "possible_duplicates": [
         {
           "post_id": "pfbid09Y9s952puDP3QcZQP7cT2Qu37195SBSwKXE7X4ARiy5b48nZ9VqpKAo7mF2b8ZbLl",
-          "reason": "same_opening_title_0.88_text_0.44"
+          "reason": "same_opening_title_0.88_text_0.40"
         }
       ]
     },
@@ -8743,7 +8736,7 @@
         "drl_recognized": true,
         "title": "[SKETCH YOUR IDEAS] – KHI Ý TƯỞNG ĐƯỢC KỂ BẰNG NÉT VẼ",
         "domain": null,
-        "multi_session": false,
+        "multi_session": null,
         "mode": "offline",
         "window": {
           "open": "2026-06-21T08:00:00+07:00",
@@ -8812,19 +8805,21 @@
       },
       "text_sha256": "bec9f5cea14db4bd2bd4ea1fa6cf50ea47980ff646e85499af143c4ed9ff78e5",
       "semester": "HK3_2025_2026",
-      "plannable": true,
-      "not_plannable_reasons": [],
+      "plannable": false,
+      "not_plannable_reasons": [
+        "llm_output_stale"
+      ],
       "plannable_before_review": true,
       "field_methods": {
-        "post_type": "agree",
+        "post_type": "rules_fallback",
         "title": "rules",
         "domain": "rules",
-        "multi_session": "llm",
-        "window_open": "llm",
-        "window_close": "rules",
+        "multi_session": "rules_fallback",
+        "window_open": "rules_fallback",
+        "window_close": "rules_fallback",
         "duration_minutes_stated": "rules",
         "registration_deadline": "rules",
-        "mode": "agree",
+        "mode": "rules_fallback",
         "location": "rules",
         "audience_text": "rules",
         "audience_scope": "rules",
@@ -8839,27 +8834,10 @@
       },
       "llm_warnings": [
         {
-          "call": "classify",
-          "attempt": 1,
-          "code": "extra_key:domain_evidence"
-        },
-        {
-          "call": "roles",
-          "attempt": 1,
-          "code": "unknown_id_dropped:D5"
-        },
-        {
-          "call": "roles",
-          "attempt": 1,
-          "code": "missing_id_as_other:D3"
-        },
-        {
-          "call": "roles",
-          "attempt": 1,
-          "code": "missing_id_as_other:T3"
+          "code": "llm_output_stale"
         }
       ],
-      "llm_available": true,
+      "llm_available": false,
       "duplicate_of": null,
       "sources": [
         {
@@ -9006,7 +8984,7 @@
         },
         "post_type": "activity",
         "drl_recognized": true,
-        "title": "HƯỞNG ỨNG NGÀY PHÁP LUẬT VIỆT NAM NĂM 2026",
+        "title": "CUỘC THI TRỰC TUYẾN “SINH VIÊN TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN TÌM HIỂU PHÁP LUẬT NĂM 2026",
         "domain": "skills",
         "multi_session": false,
         "mode": "online",
@@ -18097,11 +18075,13 @@
       "review": null,
       "text_sha256": "2f4fe8872396a7b3a1618fb765499bb6bc449be0ea12e8b16a48ab70636bfc29",
       "semester": "HK1_2026_2027",
-      "plannable": true,
-      "not_plannable_reasons": [],
+      "plannable": false,
+      "not_plannable_reasons": [
+        "llm_output_stale"
+      ],
       "plannable_before_review": true,
       "field_methods": {
-        "post_type": "agree",
+        "post_type": "rules_fallback",
         "title": "rules",
         "domain": "rules",
         "multi_session": "rules_fallback",
@@ -18109,7 +18089,7 @@
         "window_close": "rules_fallback",
         "duration_minutes_stated": "rules",
         "registration_deadline": "rules",
-        "mode": "agree",
+        "mode": "rules_fallback",
         "location": "rules",
         "audience_text": "rules",
         "audience_scope": "rules",
@@ -18124,12 +18104,10 @@
       },
       "llm_warnings": [
         {
-          "call": "classify",
-          "attempt": 1,
-          "code": "extra_key:domain_evidence"
+          "code": "llm_output_stale"
         }
       ],
-      "llm_available": true,
+      "llm_available": false,
       "duplicate_of": null,
       "sources": [
         {
@@ -18666,7 +18644,7 @@
         },
         "post_type": "activity",
         "drl_recognized": true,
-        "title": "HTTT",
+        "title": "HỘI THẢO KHOA HỌC VÀ CƠ HỘI NGHIÊN CỨU TẠI NANYANG TECHNOLOGICAL UNIVERSITY",
         "domain": "academic",
         "multi_session": false,
         "mode": "offline",
@@ -20038,7 +20016,7 @@
         },
         "post_type": "activity",
         "drl_recognized": true,
-        "title": "HTTT",
+        "title": "CUỘC THI “HIỂU ĐÚNG - NẮM CHUẨN LUẬT CƯ TRÚ",
         "domain": null,
         "multi_session": null,
         "mode": "online",
@@ -20167,7 +20145,7 @@
         },
         "post_type": "activity",
         "drl_recognized": true,
-        "title": "HTTT",
+        "title": "MATHSPACE #1 - WORKSHOP CHẠM NGÕ NGHIÊN CỨU KHOA HỌC",
         "domain": "academic",
         "multi_session": false,
         "mode": "offline",
@@ -20307,7 +20285,7 @@
         },
         "post_type": "activity",
         "drl_recognized": true,
-        "title": "[HTTT] - [HƯỞNG ỨNG TUẦN LỄ “SINH VIÊN THÀNH PHỐ VƯƠN MÌNH THỜI ĐẠI SỐ”]",
+        "title": "[HOẠT ĐỘNG WORKSHOP] - KỸ NĂNG SỐ TRONG QUẢN LÝ THỜI GIAN",
         "domain": "skills",
         "multi_session": false,
         "mode": "offline",
@@ -21707,14 +21685,14 @@
         "drl_recognized": true,
         "title": "SEMINAR NEW TECHNOLOGIES IN R",
         "domain": "skills",
-        "multi_session": false,
+        "multi_session": null,
         "mode": "offline",
         "window": {
-          "open": "2026-10-15T07:30:00+07:00",
+          "open": "2026-10-15T00:00:00+07:00",
           "close": null
         },
-        "duration_minutes": 120,
-        "duration_source": "default_offline_2h",
+        "duration_minutes": null,
+        "duration_source": "unsupported",
         "registration_deadline": null,
         "location": "Phòng F207, Trường Đại học Khoa học tự nhiên (227 Nguyễn Văn Cừ, P. Chợ Quán, TP. Hồ Chí Minh)",
         "campus": [
@@ -21738,14 +21716,12 @@
           "high_quality": "HK1_2026_2027"
         },
         "meta": {
-          "status": "partial",
-          "flags": [
-            "needs_review:mode"
-          ],
+          "status": "valid",
+          "flags": [],
           "derived": {
             "activity_id": "rule:temp_id_url_sha1",
             "drl_recognized": "rule:post_type_activity",
-            "duration_minutes": "team_default:default_offline_2h",
+            "window_open": "rule:date_only_0000",
             "campus": "dict:campus_v1.3.0",
             "audience": "team_default:audience_all",
             "mandatory": "team_default:mandatory_false",
@@ -21753,9 +21729,12 @@
             "semester_by_program": "rule:semester_from_window_open"
           },
           "unsupported": [
+            "duration_minutes",
             "registration_deadline"
           ],
-          "time_defaults": {},
+          "time_defaults": {
+            "window_open": "date_only_0000"
+          },
           "year_inferred": [],
           "normalizer_version": "1.0.0",
           "config_versions": {
@@ -21768,19 +21747,21 @@
       "review": null,
       "text_sha256": "2464721976f7bcfcc55eb95456c0a90631b4fe1cd53b4eaf1af8ccc7eb66a4b9",
       "semester": "HK1_2026_2027",
-      "plannable": true,
-      "not_plannable_reasons": [],
+      "plannable": false,
+      "not_plannable_reasons": [
+        "llm_output_stale"
+      ],
       "plannable_before_review": true,
       "field_methods": {
-        "post_type": "agree",
+        "post_type": "rules_fallback",
         "title": "rules",
         "domain": "rules",
-        "multi_session": "llm",
-        "window_open": "llm",
-        "window_close": "llm",
+        "multi_session": "rules_fallback",
+        "window_open": "rules_fallback",
+        "window_close": "rules_fallback",
         "duration_minutes_stated": "rules",
         "registration_deadline": "rules",
-        "mode": "rules",
+        "mode": "rules_fallback",
         "location": "rules",
         "audience_text": "rules",
         "audience_scope": "rules",
@@ -21795,27 +21776,10 @@
       },
       "llm_warnings": [
         {
-          "call": "classify",
-          "attempt": 1,
-          "code": "extra_key:domain_evidence"
-        },
-        {
-          "call": "roles",
-          "attempt": 1,
-          "code": "bad_role_as_other:T2"
-        },
-        {
-          "call": "roles",
-          "attempt": 1,
-          "code": "missing_id_as_other:T3"
-        },
-        {
-          "call": "roles",
-          "attempt": 1,
-          "code": "missing_id_as_other:T4"
+          "code": "llm_output_stale"
         }
       ],
-      "llm_available": true,
+      "llm_available": false,
       "duplicate_of": null,
       "sources": [
         {

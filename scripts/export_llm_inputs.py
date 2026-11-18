@@ -1,10 +1,11 @@
 """Export model-ready inputs without giving the notebook any corpus access.
 
---only-missing drops every post that already has a record in the given LLM output files (--llm, repeatable;
+--only-missing drops every post that already has a record for its current prompts (same input_sha256) in the given LLM output files (--llm, repeatable;
 default data/llm_outputs/final/Qwen__Qwen3.5-4B.jsonl), so the notebook only runs on new posts.
 """
 
 import argparse
+import hashlib
 import json
 import sys
 from dataclasses import asdict
@@ -65,13 +66,20 @@ def synthetic_rows(paths):
 
 
 def llm_output_ids(paths):
-    """post_ids that already have a record in any of the LLM output files (.jsonl)."""
+    """(post_id, input_sha256) of every record in the LLM output files (.jsonl). A post counts as done only
+    if a record answers its current prompts: an edited post or a changed candidate builder needs a new run."""
     ids = set()
     for path in paths:
         for line in Path(path).read_text(encoding="utf-8").splitlines():
             if line.strip():
-                ids.add(json.loads(line)["post_id"])
+                row = json.loads(line)
+                ids.add((row["post_id"], row.get("input_sha256")))
     return ids
+
+
+def _digest(row):
+    prompts = {"classify": row["classify_prompt"], "roles": row["roles_prompt"]}
+    return hashlib.sha256(json.dumps(prompts, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 
 def export(split, out, final_run_include_test=False, reason=None, log_path=None, posts=None, skip_ids=None):
@@ -80,7 +88,7 @@ def export(split, out, final_run_include_test=False, reason=None, log_path=None,
     # Materialise first: refused exports must not create an empty file or directory.
     rows = synthetic_rows(posts) if posts else list(export_rows(split, final_run_include_test, reason, log_path))
     if skip_ids is not None:
-        rows = [row for row in rows if row["post_id"] not in skip_ids]
+        rows = [row for row in rows if (row["post_id"], _digest(row)) not in skip_ids]
         if not rows:
             return rows
     payload = "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows).encode("utf-8")

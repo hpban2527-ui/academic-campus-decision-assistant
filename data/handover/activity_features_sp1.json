@@ -110,13 +110,6 @@
       "campus_id": "ONLINE",
       "time_tags": []
     },
-    "pfbid026eQX7nVwL7FJXUYw5Ao9PkazyfhSY6jg4FawaSm34csqA9HfB13biKoSgFWwtUbSl": {
-      "topics": [],
-      "campus_id": "OTHER",
-      "time_tags": [
-        "weekend_morning"
-      ]
-    },
     "pfbid026qSFM265Ft8XG2VwUNw6YoooAKBLtBzDAAMDdv9HdL78aqBx91MALHnWrENVh6QMl": {
       "topics": [
         "environment"
@@ -264,8 +257,9 @@
     },
     "pfbid02KYphUfhTSv343V1AHeqLJtuRvoWKF6ue7ChUFkPAoMs9zvfgosyY4xuGj9o4JDeDl": {
       "topics": [
-        "civic_education",
-        "soft_skills"
+        "chemistry",
+        "research",
+        "civic_education"
       ],
       "campus_id": "ONLINE",
       "time_tags": [
@@ -302,7 +296,7 @@
     },
     "pfbid02R2QY7G7Az76zRtJtgpUZEh9US3tLSKRKCZ8K7oUbKvNojfbjYxioJQC5fCdxkJCDl": {
       "topics": [
-        "mathematics",
+        "technology",
         "soft_skills"
       ],
       "campus_id": "DONG_HOA",
@@ -413,16 +407,6 @@
         "weekend_evening"
       ]
     },
-    "pfbid02Z96q8HjcaZY6eDM6KgtqMkRASbQiumbimnQcYzifUCxhGz5FTwRc8wD2dWJZo5nCl": {
-      "topics": [
-        "health",
-        "volunteer"
-      ],
-      "campus_id": "DONG_HOA",
-      "time_tags": [
-        "weekday_morning"
-      ]
-    },
     "pfbid02bVcZdd9u3YkPwKABb5ofe5SjtcdV7kB2DjyoGEzhbmuLwobMuKwF1QPxrP2xaoaKl": {
       "topics": [
         "mathematics",
@@ -490,17 +474,6 @@
       "campus_id": "NVC",
       "time_tags": [
         "weekday_afternoon"
-      ]
-    },
-    "pfbid02euwUEuPioQ5q9dHsr9Nrkd9i5q46FG3E4fPY9orEucVaSjhGai5GS9sU4qDhenFWl": {
-      "topics": [
-        "chemistry",
-        "artificial_intelligence",
-        "research"
-      ],
-      "campus_id": "NVC",
-      "time_tags": [
-        "weekend_afternoon"
       ]
     },
     "pfbid02fGUGmmeFVfurrKSD5o4vZHViiLRkCqJEEQbyMCiS41JAm5uStkEB1gaGRA7pBAZGl": {
@@ -921,16 +894,6 @@
       "campus_id": "NVC",
       "time_tags": []
     },
-    "pfbid041x4C5nim3SkGAV7aAJQRdeGDfMiLzFytn3jbV3rTXnw5SQZWuZkUKKzLfLkpobEl": {
-      "topics": [
-        "research",
-        "soft_skills"
-      ],
-      "campus_id": "NVC",
-      "time_tags": [
-        "weekday_morning"
-      ]
-    },
     "pfbid04TWHCk35qTYcTge6Y9MegsAB75pzxkkNt8eBcVvwNaAkAvAYkDHP1FK1B7kLeUjdl": {
       "topics": [
         "research"
@@ -1252,6 +1215,7 @@
     },
     "pfbid0XzA4NWd2m3eB1qz6Q7jmmoDrTDjipgRBeRq7rUBrN4DFGLAWRkJrbf1GiyUDaVdNl": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "DONG_HOA",
@@ -1363,7 +1327,8 @@
     },
     "pfbid0dJnSk1s2Vgn1eiFSYgKRbjoCTbKtKXv4qbzRex8Lvim74YKNMbdvwWyYrYeGXRabl": {
       "topics": [
-        "volunteer"
+        "volunteer",
+        "culture"
       ],
       "campus_id": "NVC",
       "time_tags": []
@@ -1504,17 +1469,6 @@
       "campus_id": null,
       "time_tags": []
     },
-    "pfbid0rbG8RqX29HLSeoVFVc5KmpMH5UBGeQTtyNMBrxUZUQ9KphNnfivVrfeNuDiQzL9Ml": {
-      "topics": [
-        "chemistry",
-        "research",
-        "environment"
-      ],
-      "campus_id": "DONG_HOA",
-      "time_tags": [
-        "weekend_morning"
-      ]
-    },
     "pfbid0uAt1jxnTgrtEAtvDhYotJgYFVNAMeSi2rnQrovSANvMj8vnmEGX2KQShGgckwTc9l": {
       "topics": [
         "soft_skills"
@@ -1601,6 +1555,7 @@
     },
     "pfbid0y6US561ga4uvo4oHgFg6NQhXhApDKWsAjxYsNJFWBFT2YLHdMbunahgCG81NnGaZl": {
       "topics": [
+        "chemistry",
         "research"
       ],
       "campus_id": "DONG_HOA",

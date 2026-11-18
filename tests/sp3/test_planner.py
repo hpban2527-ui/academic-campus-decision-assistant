@@ -610,7 +610,6 @@ INVALID_INPUTS = {
     "feasible_starts_before_as_of": lambda d: _block(d, "A").update(start=at(1, 7)),
     "feasible_outside_window": lambda d: _block(d, "A").update(end=at(9, 10)),
     "feasible_with_passed_deadline": lambda d: _candidate(d, "A")["activity"].update(registration_deadline=at(1, 8)),
-    "feasible_without_deadline": lambda d: _candidate(d, "A")["activity"].update(registration_deadline=None),
     "feasible_end_before_start": lambda d: _block(d, "A").update(end=at(2, 8)),
     "timestamp_without_offset": lambda d: _candidate(d, "A")["activity"].update(start="2026-11-02T09:00:00"),
     "block_timestamp_without_offset": lambda d: _block(d, "A").update(start="2026-11-02T09:00:00"),
@@ -740,3 +739,19 @@ def test_shuffled_candidates_and_conflicts_give_identical_output():
         rng.shuffle(shuffled["conflict_pairs"])
         rng.shuffle(shuffled["preferences"]["preferred_domains"])
         assert plan(shuffled, scorer) == reference
+
+
+def test_feasible_candidate_with_unstated_deadline_is_accepted():
+    """sp3-activity/0.3: feasibility decides about an unstated deadline (deadline_unstated_by_activity);
+    the planner accepts a FEASIBLE candidate whose organizer stated no deadline instead of erroring."""
+    data = _valid_input()
+    _candidate(data, "A")["activity"].update(registration_deadline=None)
+    output = build_plan(data, StaticTableScorer([]))
+    assert not any(e["code"] == "INVALID_INPUT" for e in output["errors"])
+
+
+def test_feasible_candidate_with_passed_stated_deadline_is_still_rejected():
+    data = _valid_input()
+    _candidate(data, "A")["activity"].update(registration_deadline=at(1, 8))
+    output = build_plan(data, StaticTableScorer([]))
+    assert output["status"] == "ERROR" and output["errors"][0]["code"] == "INVALID_INPUT"
