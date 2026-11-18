@@ -28,10 +28,9 @@ longer reads them**.
 | Frozen corpus (189 posts) | `data/raw/source.json` + `data/gold/split_v2.json` | evaluation corpus; never edited for operations; read through the logged final-run reader |
 | Operational updates | `data/raw/operational_updates.json` (optional) | new posts (190, 191, ...) and edited texts of existing posts |
 | AI-assisted annotations | `data/sp1_annotations/ai_annotations_20261118.json` | 129 non-test posts, 19 stated-fact fields + activity type, evidence spans, uncertainty; label `AI_EXTRACTED_POLICY_CHECKED_NOT_GOLD`; provenance in `data/sp1_annotations/provenance/` |
-| Human-reviewed exports (optional) | `data/sp1_annotations/human_reviewed/*.json` | exports of `scripts/review_ai_drafts.html`, validated by `scripts/validate_ai_review_export.py` |
 | Human decisions | `data/review/decisions.csv` | genuine corrections (63 applied), bound to the text fingerprint |
 | Recorded model replies | `data/llm_outputs/final/*.jsonl`, `data/llm_outputs/operational/*.jsonl` | Qwen/Qwen3.5-4B replies, replayed only when the prompt digest matches |
-| Acceptance policy | `data/config/activity_acceptance_v1.json` + `src/sp1/acceptance.py` | data readiness and schedule (JavaScript mirror `scripts/activity_acceptance.js`, parity-tested) |
+| Acceptance policy | `data/config/activity_acceptance_v1.json` + `src/sp1/acceptance.py` | data readiness and schedule (`activity-acceptance/1.1`) |
 | Rules | `data/drl_rules.json` | SP2 rule catalog (points come only from here) |
 
 `artifacts/` is a delivery folder and is not read by any build. `scripts/import_ai_annotations.py` copied the
@@ -40,7 +39,7 @@ annotation packet from `artifacts/ai_review_20261118/` into `data/sp1_annotation
 ## 3. Per-post processing (src/sp1/operational.py)
 
 1. **Extraction source** (first match, each bound to the current text fingerprint):
-   human-reviewed export → AI annotation (non-test only) → recorded model reply whose `input_sha256`
+   AI annotation (non-test only) → recorded model reply whose `input_sha256`
    (SHA-256 of both rendered prompts), model ID and prompt versions match → otherwise
    `EXTRACTION_PENDING` (`model_output_missing` or `model_output_stale`). Test posts use only frozen model
    outputs. A changed text or a changed candidate builder can never replay an old D1/T1 role mapping.
@@ -145,10 +144,8 @@ never edited (updates go to `data/raw/operational_updates.json`).
 5. Commit `data/raw/operational_updates.json`, `data/llm_outputs/operational/`, `data/operational/`,
    `reports/operational_dataset_report.md` on a `data/` branch and open a PR.
 
-Optional correction of a genuine extraction error: correct it in `scripts/review_ai_drafts.html`, export
-the human-reviewed records, validate them with `scripts/validate_ai_review_export.py`, put the export in
-`data/sp1_annotations/human_reviewed/`, and run the update command. Or add a row to
-`data/review/decisions.csv`. Neither is required to publish a dataset.
+Optional correction of a genuine extraction error: add a row to `data/review/decisions.csv` (the only
+correction mechanism) and run the update command. It is not required to publish a dataset.
 
 The build is deterministic: rebuilding the same inputs gives the same `dataset_version`. A failed build or
 validation leaves the previous `activity_dataset.json` in place (staged write + validation + atomic replace).

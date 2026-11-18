@@ -1,8 +1,8 @@
 {
-  "version": "activity-acceptance/1.0",
+  "version": "activity-acceptance/1.1",
   "agreed_by": "user",
   "agreed_on": "2026-11-18",
-  "soft_fields": ["domain", "fee", "activity_type", "location", "registration_url", "join_url", "registration_deadline", "multi_session", "duration_minutes_stated"],
+  "soft_fields": ["domain", "fee", "activity_type", "location", "registration_url", "join_url", "registration_deadline", "multi_session", "duration_minutes_stated", "completion_requirements"],
   "default_fixed_duration_minutes": {"offline": 120, "online": 30, "hybrid": 30},
   "default_quiz_duration_minutes": 30,
   "quiz_pattern": "quiz|trắc nghiệm|trac nghiem|đường dẫn dự thi|duong dan du thi",
@@ -16,6 +16,7 @@
     "location_unknown": "Chưa rõ địa điểm; chưa bảo đảm phù hợp cơ sở hoặc di chuyển.",
     "fixed_duration_default": "Thời lượng xếp lịch dùng mặc định của nhóm, không phải dữ kiện BTC công bố.",
     "quiz_duration_default": "Quiz dùng thời lượng mặc định 30 phút của nhóm.",
+    "uncertain_end_time_default_used": "Giờ kết thúc chưa chắc nên bị bỏ qua; dùng thời lượng đã nêu hoặc mặc định của nhóm, không phải dữ kiện BTC công bố.",
     "multiple_sessions": "Bản ghi chỉ xét buổi/vòng đầu; nguồn nhiều buổi được giữ trong ghi chú.",
     "mandatory_unscheduled": "Nguồn có nghĩa vụ bắt buộc nhưng chưa xếp được lịch; vẫn phải hiển thị cảnh báo.",
     "scoring_not_verified": "Đủ dữ kiện lịch không đồng nghĩa đã xác minh quy tắc hoặc số điểm.",

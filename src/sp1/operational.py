@@ -7,12 +7,11 @@ data/operational/activity_dataset.json. The API and the planner read only that f
 Per post:
 
 1. Extraction source, first match wins, each bound to the current text fingerprint:
-   a. a genuinely human-reviewed export of the AI-assisted review (data/sp1_annotations/human_reviewed/),
-   b. the AI-assisted annotation of 2026-11-18 (non-test posts only, data/sp1_annotations/),
-   c. a recorded SP1 v2 model reply (Qwen/Qwen3.5-4B) whose prompt digest matches the current prompts,
+   a. the AI-assisted annotation of 2026-11-18 (non-test posts only, data/sp1_annotations/),
+   b. a recorded SP1 v2 model reply (Qwen/Qwen3.5-4B) whose prompt digest matches the current prompts,
       replayed through the rules + hybrid merge,
-   d. otherwise EXTRACTION_PENDING: no record is invented; the post is listed with the reason.
-   Held-out test posts never use (a)/(b); they use only frozen model outputs (c) under the access log.
+   c. otherwise EXTRACTION_PENDING: no record is invented; the post is listed with the reason.
+   Held-out test posts never use (a); they use only frozen model outputs (b) under the access log.
 2. Genuine human decisions from data/review/decisions.csv are applied last (same fingerprint rule).
 3. The user-agreed acceptance policy (sp1.acceptance, activity-acceptance/1.x) decides data readiness
    and the schedule. Missing organizer facts stay null; nothing is defaulted into a time, deadline,
@@ -55,7 +54,6 @@ DATASET_SCHEMA = "unilife-operational-dataset/1.0"
 ACTIVITY_CONTRACT = "sp3-activity/0.3"
 DATASET_PATH = ROOT / "data/operational/activity_dataset.json"
 ANNOTATIONS_PATH = ROOT / "data/sp1_annotations/ai_annotations_20261118.json"
-HUMAN_REVIEWED_DIR = ROOT / "data/sp1_annotations/human_reviewed"
 DECISIONS_PATH = ROOT / "data/review/decisions.csv"
 MERGE_POLICY_PATH = ROOT / "data/config/merge_policy.json"
 RULES_PATH = ROOT / "data/drl_rules.json"
@@ -63,13 +61,13 @@ LLM_DIRS = (ROOT / "data/llm_outputs/final", ROOT / "data/llm_outputs/operationa
 
 AI_LABEL = "AI_EXTRACTED_POLICY_CHECKED_NOT_GOLD"
 MODEL_LABEL = "MODEL_EXTRACTED_POLICY_CHECKED_NOT_GOLD"
-HUMAN_EXPORT_LABEL = "HUMAN_REVIEWED_AI_ASSISTED_NOT_BLIND_GOLD"
 READY_STATUSES = {"READY", "READY_WITH_WARNINGS"}
 STATUSES = ("READY", "READY_WITH_WARNINGS", "NOT_SCHEDULABLE", "NOT_AN_ACTIVITY", "DUPLICATE", "EXTRACTION_PENDING")
 SP3_FIELDS = ("activity_id", "source", "title", "domain", "start", "end", "registration_deadline", "mode",
               "location", "points", "mandatory", "audience", "fee", "completion_requirements")
 DOMAINS = {"academic", "volunteer", "culture_sports", "skills", "career", "other"}
 NOT_STATED = "NOT_STATED"
+UNKNOWN = "UNKNOWN"
 # Layer-A flags that make a field uncertain (the model or the rules could not settle it).
 _UNSURE_FLAG = re.compile(r"^(?:needs_review|invalid_value):(\w+)")
 _BLOCKING_FLAG = re.compile(r"^(?:injection_suspected|candidates_truncated)")
@@ -118,26 +116,6 @@ def load_annotations(path: Path | None = None) -> dict:
     return {"packet_id": data.get("packet_id"), "items": items, "sha256": sha256_file(path)}
 
 
-def load_human_reviewed(directory: Path | None = None) -> dict:
-    """Validated human-approved exports of the AI-assisted review viewer, keyed by post_id."""
-    directory = HUMAN_REVIEWED_DIR if directory is None else Path(directory)
-    rows = {}
-    if not directory.exists():
-        return rows
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("validate_ai_review_export", ROOT / "scripts/validate_ai_review_export.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    for path in sorted(directory.glob("*.json")):
-        module.validate_export(path)          # raises on anything that is not a complete human approval
-        data = json.loads(path.read_text(encoding="utf-8-sig"))
-        for row in data["items"]:
-            if row["post_id"] in rows:
-                raise ValueError(f"{path.name}: post {row['post_id']} is approved in two export files")
-            rows[row["post_id"]] = {**row, "_file": path.name}
-    return rows
-
-
 def default_llm_files() -> list[Path]:
     files = []
     for directory in LLM_DIRS:
@@ -172,15 +150,6 @@ def _extract(post: dict, ctx: dict) -> dict:
     """Choose the extraction source. Returns layer_a (or None), activity_type, unsure, method and notes."""
     pid, fingerprint = post["post_id"], text_fingerprint(post["raw_content"])
     notes, is_test = [], post["split"] == "test"
-    human = ctx["human_reviewed"].get(pid)
-    if human is not None and not is_test:
-        if human["source_sha256"] == fingerprint:
-            layer_a, activity_type, _ = _layer_a_from_annotation(human)
-            return {"layer_a": layer_a, "activity_type": activity_type, "unsure": [], "state": "EXTRACTED",
-                    "method": "human_reviewed_ai_assisted", "label": HUMAN_EXPORT_LABEL,
-                    "provenance": {"file": human["_file"], "reviewer": human["review"]["reviewer"],
-                                   "reviewed_at": human["review"]["reviewed_at"]}, "notes": notes}
-        notes.append("human_reviewed_export_stale")
     item = ctx["annotations"]["items"].get(pid)
     if item is not None and not is_test:
         if item["source_sha256"] == fingerprint:
@@ -228,8 +197,13 @@ def _fee(fee) -> tuple[int | float | None, str]:
     return None, "invalid"
 
 
-def project_sp3(post: dict, accepted: dict, schedule: dict, normalized: dict, audience: dict) -> tuple[dict, dict]:
-    """The 14-field SP3 activity (sp3-activity/0.3) and the labelled conventions used to build it."""
+def project_sp3(post: dict, accepted: dict, schedule: dict, normalized: dict, audience: dict,
+                completion_unknown: bool = False) -> tuple[dict, dict]:
+    """The 14-field SP3 activity (sp3-activity/0.3) and the labelled conventions used to build it.
+
+    completion_unknown: the post's completion requirements were uncertain (soft field, policy 1.1). The marker
+    is then UNKNOWN, never NOT_STATED ("the post says nothing") and never a completed/none-required claim.
+    """
     derived = {}
     if schedule["type"] == "FIXED":
         start, end = schedule["start"], schedule["end"]
@@ -248,8 +222,10 @@ def project_sp3(post: dict, accepted: dict, schedule: dict, normalized: dict, au
     if accepted.get("mandatory_stated") is None:
         derived["mandatory"] = "team_default:mandatory_false_when_unstated"
     registration_url = accepted.get("registration_url")
-    completion = accepted.get("completion_requirements") or []
-    if not completion:
+    completion = [] if completion_unknown else accepted.get("completion_requirements") or []
+    if completion_unknown:
+        derived["completion_requirements"] = "marker:unknown"
+    elif not completion:
         derived["completion_requirements"] = "marker:not_stated"
     domain = accepted.get("domain")
     activity = {
@@ -265,7 +241,9 @@ def project_sp3(post: dict, accepted: dict, schedule: dict, normalized: dict, au
         "mandatory": mandatory,
         "audience": audience["lines"] or None,
         "fee": fee,
-        "completion_requirements": json.dumps(completion, ensure_ascii=False, sort_keys=True) if completion else NOT_STATED,
+        "completion_requirements": (UNKNOWN if completion_unknown else
+                                    json.dumps(completion, ensure_ascii=False, sort_keys=True) if completion
+                                    else NOT_STATED),
     }
     return activity, derived
 
@@ -350,7 +328,7 @@ def process_post(post: dict, ctx: dict) -> dict:
     blocking = {flag.split(":")[0] for flag in layer_a["flags"] if _BLOCKING_FLAG.match(flag)}
     if any(flag.startswith("injection_suspected") for flag in pre.flags):
         blocking.add("injection_suspected")
-    if extraction["method"] in ("ai_annotation", "human_reviewed_ai_assisted"):
+    if extraction["method"] == "ai_annotation":
         for field in _grounding_problems(layer_a, pre.text):
             unsure.add(field)
             extraction["notes"].append(f"evidence_not_grounded:{field}")
@@ -371,7 +349,9 @@ def process_post(post: dict, ctx: dict) -> dict:
     accepted = assessed["accepted_record"]
     activity_type = accepted.get("activity_type")
     base["activity_type"] = activity_type
-    accepted_layer = {"record": {k: v for k, v in accepted.items() if k != "activity_type"},
+    # An uncertain completion list is unknown in the accepted record; the normaliser only needs a list.
+    accepted_layer = {"record": {**{k: v for k, v in accepted.items() if k != "activity_type"},
+                                 "completion_requirements": accepted.get("completion_requirements") or []},
                       "year_inferred": layer_a["year_inferred"], "flags": [], "evidence": layer_a["evidence"]}
     normalized = normalize(accepted_layer, post_source(post), ctx["config"])
     aud = audience_rules.classify(accepted.get("audience_text"), accepted.get("audience_scope"))
@@ -403,7 +383,8 @@ def process_post(post: dict, ctx: dict) -> dict:
     )
     base["_normalized_activity"] = normalized
     if status in READY_STATUSES:
-        activity, derived = project_sp3(post, accepted, schedule, normalized, base["audience"])
+        activity, derived = project_sp3(post, accepted, schedule, normalized, base["audience"],
+                                        completion_unknown="completion_requirements" in assessed["uncertain_fields"])
         problems = sp3_contract_problems(activity)
         if problems:
             base.update(status="NOT_SCHEDULABLE", ready_for_scheduling=False,
@@ -422,8 +403,7 @@ def _dimensions(record: dict) -> dict:
         "data_ready_for_scheduling": record["ready_for_scheduling"] and record["duplicate_of"] is None,
         "score_binding_supported": record.get("binding") is not None,
         "student_eligibility_basis": (record.get("audience") or {}).get("basis"),
-        "human_reviewed": bool(review and not review.get("stale")) or
-                          record["extraction"]["method"] == "human_reviewed_ai_assisted",
+        "human_reviewed": bool(review and not review.get("stale")),
         "official_award_verified": False,
     }
 
@@ -514,7 +494,7 @@ def summarize(records: list[dict]) -> dict:
     }
 
 
-def build_dataset(posts: list[dict], *, annotations_path=None, human_dir=None, decisions_path=None,
+def build_dataset(posts: list[dict], *, annotations_path=None, decisions_path=None,
                   llm_files=None, rules_path=None, merge_policy_path=None, overlay_sha256=None) -> dict:
     """Pure build: returns the dataset dict for the given posts (nothing is written)."""
     from .review import load_decisions
@@ -525,8 +505,7 @@ def build_dataset(posts: list[dict], *, annotations_path=None, human_dir=None, d
     verified = {r["rule_id"] for r in rules_config["rules"] if r.get("status") == "verified"}
     decisions, decision_problems = load_decisions(Path(decisions_path or DECISIONS_PATH), ACTIVITY_TYPES, verified)
     llm_files = [Path(p) for p in (llm_files if llm_files is not None else default_llm_files())]
-    ctx = {"annotations": load_annotations(annotations_path), "human_reviewed": load_human_reviewed(human_dir),
-           "decisions": decisions, "replies": load_replies(llm_files, model_id), "model_id": model_id,
+    ctx = {"annotations": load_annotations(annotations_path), "decisions": decisions, "replies": load_replies(llm_files, model_id), "model_id": model_id,
            "merge_policy": merge_policy, "policy": load_policy(), "config": load_config(),
            "rules_config": rules_config}
     ids = [p["post_id"] for p in posts]
@@ -551,10 +530,9 @@ def build_dataset(posts: list[dict], *, annotations_path=None, human_dir=None, d
         "split_sha256": sha256_file(ROOT / "data/gold/split_v2.json"),
         "ai_annotations": {"path": "data/sp1_annotations/ai_annotations_20261118.json",
                            "sha256": ctx["annotations"].get("sha256"), "packet_id": ctx["annotations"]["packet_id"]},
-        "human_reviewed_exports": sorted({r["_file"] for r in ctx["human_reviewed"].values()}),
         "decisions_sha256": sha256_file(Path(decisions_path or DECISIONS_PATH)),
         "model_id": model_id, "prompt_versions": dict(PROMPT_VERSIONS),
-        "llm_files": [{"path": str(p.relative_to(ROOT)) if p.is_absolute() and ROOT in p.parents else str(p),
+        "llm_files": [{"path": p.relative_to(ROOT).as_posix() if p.is_absolute() and ROOT in p.parents else p.as_posix(),
                        "sha256": sha256_file(p)} for p in llm_files],
         "rules_sha256": sha256_file(rules_path), "merge_policy_sha256": sha256_file(Path(merge_policy_path or MERGE_POLICY_PATH)),
         "acceptance_policy": ctx["policy"]["version"],

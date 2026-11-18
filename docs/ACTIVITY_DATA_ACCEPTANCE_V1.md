@@ -1,6 +1,6 @@
 # Hợp đồng sử dụng dữ liệu hoạt động v1
 
-Thống nhất với người dùng ngày 18/11/2026. Phiên bản: `activity-acceptance/1.0`.
+Thống nhất với người dùng ngày 18/11/2026. Phiên bản hiện hành: `activity-acceptance/1.1` (xem mục "1.1 changes"; bản 1.0 là nội dung còn lại).
 Triển khai: `src/sp1/acceptance.py`, cấu hình `data/config/activity_acceptance_v1.json`.
 
 ## Nguyên tắc
@@ -42,8 +42,20 @@ Các trạng thái nói về độ sẵn sàng dữ liệu, không bảo đảm 
 
 ## Duyệt và tương thích
 
-- Giao diện không chặn xác nhận trích xuất chỉ vì nguồn còn thiếu thông tin. Kết quả được phân loại lịch độc lập; một bài đã được người đọc vẫn có thể `NOT_SCHEDULABLE`.
-- Tiến độ cũ được nạp theo cùng `packet_id`, ID bài và fingerprint nguồn. Giữ các sửa đổi và quyết định thật của người dùng.
+- Sửa lỗi trích xuất chỉ qua `data/review/decisions.csv` (gắn với fingerprint của văn bản); kết quả vẫn được phân loại lịch độc lập.
 - Danh mục v1 dùng `unilife-policy-catalog/1.0`, gồm `accepted_record`, `schedule`, `warnings`, `budget_known`, `scoring_verified=false`, `student_eligibility_verified=false`.
 - Hợp đồng SP3 14 trường cũ đang yêu cầu `fee` là số; không ép `null` thành 0 để tương thích. Bộ danh mục mới là đầu vào cho adapter cập nhật sau, không tự thay thế dữ liệu runtime của branch khác.
 - Không công bố tỉ lệ đúng NLP từ số bản ghi đạt policy. Đây là kiểm tra cấu trúc và điều kiện dùng dữ liệu, không phải thước đo tính đúng ngữ nghĩa.
+
+## 1.1 changes
+
+- **Uncertain end of a fixed event.** If `window_open` has a certain date and time and `window_close` is the only
+  uncertain schedule field (`window_open`, `window_close`, `duration_minutes_stated`), `window_close` is ignored.
+  The end is the stated duration, otherwise the team default (120 minutes offline, 30 online/hybrid), with the
+  warning `uncertain_end_time_default_used`. A flexible online quiz with an uncertain end still blocks
+  (`uncertain:window_close`), as does an uncertain `window_open` or a date-only start.
+- **Uncertain `completion_requirements` is soft.** The accepted value is unknown, the warning is
+  `uncertain_soft:completion_requirements`, and the SP3 activity carries the marker `UNKNOWN` (not `NOT_STATED`,
+  which means the post says nothing). It is never treated as completed or as "none required".
+- **Review path.** The offline viewer and human-export import were removed; `data/review/decisions.csv` is the
+  only correction mechanism.

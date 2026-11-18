@@ -47,3 +47,4 @@
 {"at": "2026-11-18T10:34:56+00:00", "reason": "Rebuild legacy SP1 store after stale-reply count fix (2026-11-18)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
 {"at": "2026-11-18T10:44:03+00:00", "reason": "Final operational dataset build for delivery (2026-11-18)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
 {"at": "2026-11-18T10:49:55+00:00", "reason": "Rebuild after making duplicate notes machine-independent (2026-11-18)", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}
+{"at": "2026-11-18T13:11:57+00:00", "reason": "policy 1.1", "splits": ["dev_extra", "dev_gold", "pool", "test"], "n_posts": 189}

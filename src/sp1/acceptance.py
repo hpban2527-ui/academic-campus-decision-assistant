@@ -26,10 +26,26 @@ def _moment(value, *, closing=False):
     return datetime.fromisoformat(value)
 
 
+# Schedule inputs: when window_close is the only one of these that is uncertain, a fixed event can still
+# be scheduled from its certain start (policy 1.1).
+TIMING_FIELDS = {"window_open", "window_close", "duration_minutes_stated"}
+
+
 def assess_activity(row: dict, policy: dict | None = None) -> dict:
     policy = policy or load_policy()
     record = deepcopy(row["record"])
     unsure = set(row.get("unsure", []))
+    source = row.get("source_text", "")
+    mode = record.get("mode")
+    quiz = (mode == "online" and bool(re.search(policy["quiz_pattern"], source, re.I))
+            and not re.search(policy["live_pattern"], source, re.I))
+    # Policy 1.1: a certain start date+time with an uncertain end only (fixed events, not quizzes): the end is
+    # ignored and replaced by the stated duration or the team default. A flexible quiz still needs its end.
+    start_value = record.get("window_open")
+    ignore_close = (not quiz and unsure & TIMING_FIELDS == {"window_close"}
+                    and isinstance(start_value, str) and "T" in start_value)
+    if ignore_close:
+        record["window_close"] = None
     warning_fields = sorted(unsure & set(policy["soft_fields"]))
     # Keep the AI proposal untouched; operational values abstain on uncertain soft facts.
     for field in warning_fields:
@@ -37,16 +53,14 @@ def assess_activity(row: dict, policy: dict | None = None) -> dict:
             record[field] = None
     reasons, warnings = [], []
     schedule = None
-    source = row.get("source_text", "")
     kind = record.get("post_type")
     if kind != "activity":
         reasons.append("not_an_activity" if kind == "info_only" else "insufficient_activity_information")
     if not record.get("title"):
         reasons.append("missing_title")
-    mode = record.get("mode")
     if mode not in {"online", "offline", "hybrid"}:
         reasons.append("missing_mode")
-    critical = sorted(unsure - set(policy["soft_fields"]))
+    critical = sorted(unsure - set(policy["soft_fields"]) - ({"window_close"} if ignore_close else set()))
     reasons.extend("uncertain:" + field for field in critical)
     if record.get("domain") is None:
         warnings.append("domain_unknown")
@@ -75,8 +89,8 @@ def assess_activity(row: dict, policy: dict | None = None) -> dict:
         if "duration_minutes_stated" in unsure:
             minutes = None
         valid_minutes = isinstance(minutes, int) and not isinstance(minutes, bool) and minutes > 0
-        quiz = (mode == "online" and bool(re.search(policy["quiz_pattern"], source, re.I))
-                and not re.search(policy["live_pattern"], source, re.I))
+        if ignore_close:
+            warnings.append("uncertain_end_time_default_used")
         if opening is None:
             reasons.append("missing_activity_date")
         elif quiz:
