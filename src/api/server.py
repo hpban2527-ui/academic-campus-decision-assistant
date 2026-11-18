@@ -1598,19 +1598,17 @@ from api.sp3_service import (
     sp1_catalog as _sp3_catalog,
 )
 from api.sp3_real import real_catalog as _sp3_real_catalog, real_plan as _sp3_real_plan
-from api.live_posts import router as _live_posts_router
-
-app.include_router(_live_posts_router)
 
 # ?source=real switches the SP3 screens to the SP1 v2 store (HK1 2026-2027, synthetic student).
 # The default stays the synthetic MVP fixture so existing demos and tests are unchanged.
-# "real_live" = the real store plus posts published through /api/sp1/posts (data_source SP1-STORE-V2+LIVE).
-SP3_SOURCES = ("synthetic", "real", "real_live")
+# The app only reads committed data files; new announcements arrive through the admin batch
+# (scripts/admin_rebuild.py, docs/admin_data_update.md), never through a model call at runtime.
+SP3_SOURCES = ("synthetic", "real")
 
 
 def _sp3_source(source: str) -> str:
     if source not in SP3_SOURCES:
-        raise HTTPException(status_code=422, detail="source must be 'synthetic', 'real' or 'real_live'")
+        raise HTTPException(status_code=422, detail="source must be 'synthetic' or 'real'")
     return source
 
 
@@ -1623,8 +1621,8 @@ class SP3DemoPlanRequest(BaseModel):
 @app.get("/api/sp3/catalog")
 def get_sp3_catalog(source: str = "synthetic"):
     """Read SP1 activity records and QA without awarding points."""
-    if _sp3_source(source) in ("real", "real_live"):
-        return _sp3_real_catalog(live=source == "real_live")
+    if _sp3_source(source) == "real":
+        return _sp3_real_catalog()
     return _sp3_catalog()
 
 
@@ -1632,9 +1630,8 @@ def get_sp3_catalog(source: str = "synthetic"):
 def run_sp3_demo_plan(req: SP3DemoPlanRequest, source: str = "synthetic"):
     """Read-only complete SP1-format -> feasibility -> planner -> SP2 demo."""
     try:
-        if _sp3_source(source) in ("real", "real_live"):
-            return _sp3_real_plan(req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals,
-                                  live=source == "real_live")
+        if _sp3_source(source) == "real":
+            return _sp3_real_plan(req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals)
         return _sp3_demo_plan(req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -1645,13 +1642,12 @@ def run_sp3_personalized_plan(req: PersonalizedPlanRequest, source: str = "synth
     """Rank the demo SP3 schedule using a student-confirmed preference only."""
 
     try:
-        if _sp3_source(source) in ("real", "real_live"):
+        if _sp3_source(source) == "real":
             return _sp3_real_plan(
                 req.scenario,
                 target_total=req.total_target,
                 busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
                 preference=req.preference,
-                live=source == "real_live",
             )
         return _sp3_personalized_plan(
             req.preference,

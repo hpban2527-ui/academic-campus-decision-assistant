@@ -19,10 +19,9 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 
-from api import live_state
 from personalization.models import StudentPreference
 from personalization.planner_adapter import prepare_personalized_planner_input
-from personalization.scoring import ActivityFeatures, load_activity_features
+from personalization.scoring import load_activity_features
 from sp3.feasibility import FeasibilityEvidence, assess_feasibility
 from sp3.plan_checker import check_plan
 from sp3.planner import build_plan, what_if_skip
@@ -35,8 +34,6 @@ HANDOVER = DATA / "handover"
 FIXTURE = ROOT / "tests" / "sp3" / "fixtures" / "main_flow_integration.json"
 
 DATA_SOURCE = "SP1-STORE-V2"
-# Original handover dataset plus posts published through the live ingestion workflow (sp1.live_ingest).
-LIVE_DATA_SOURCE = "SP1-STORE-V2+LIVE"
 TERM = {"id": "HK1_2026_2027", "start": "2026-08-29", "end": "2026-11-15"}
 # Demo clock: the planner looks at the rest of HK1 from this date.
 AS_OF = "2026-10-01T08:00:00+07:00"
@@ -83,42 +80,8 @@ def _load_base() -> dict:
     }
 
 
-def _load(live: bool = False) -> dict:
-    """The handover dataset; with live=True also the live posts published right now (read per call)."""
-    base = _load_base()
-    if not live:
-        return base
-    published = [r for r in live_state.published_records()
-                 if r["post_id"] not in {a["activity_id"] for a in base["activities"]}]
-    if not published:
-        return {**base, "live": {}}
-    data = {**base, "activities": list(base["activities"]), "binding_by_id": dict(base["binding_by_id"]),
-            "evidence": deepcopy(base["evidence"]), "scoring": deepcopy(base["scoring"]),
-            "sidecar": deepcopy(base["sidecar"]), "live": {}}
-    for record in published:
-        post_id = record["post_id"]
-        data["activities"].append(record["activity"])
-        data["sidecar"]["activities"][post_id] = record["sidecar"]
-        for key, value in record["evidence"].items():
-            if value is not None:
-                data["evidence"][key][post_id] = value
-        binding = record["binding"]
-        if binding:
-            data["binding_by_id"][post_id] = binding
-            data["scoring"]["bindings"].append(binding)
-            if binding["operation"] == "INCREMENT":
-                data["scoring"]["baselines"][0]["facts"].setdefault(binding["field"], 0)
-        data["live"][post_id] = record
-    data["scoring"]["activities"] = data["activities"]
-    return data
-
-
-def _features(data: dict):
-    features = load_activity_features(HANDOVER / "activity_features_sp1.json")
-    for post_id, record in data.get("live", {}).items():
-        value = record["features"]
-        features[post_id] = ActivityFeatures(frozenset(value["topics"]), value["campus_id"], frozenset(value["time_tags"]))
-    return features
+def _features():
+    return load_activity_features(HANDOVER / "activity_features_sp1.json")
 
 
 def _queue_reasons() -> dict[str, list[str]]:
@@ -134,12 +97,9 @@ def _score_callback(data: dict):
     return ScorerAdapter(ProjectedScorer(InMemoryScoringData(deepcopy(data["scoring"])))).score_plan
 
 
-def real_catalog(live: bool = False) -> dict:
-    """Handed-over activities with their binding and review state; blocked posts as drafts.
-
-    live=True adds the posts published through sp1.live_ingest (marked with live_revision).
-    """
-    data = _load(live)
+def real_catalog() -> dict:
+    """Handed-over activities with their binding and review state; blocked posts as drafts."""
+    data = _load_base()
     queue = _queue_reasons()
     side = data["sidecar"]["activities"]
     rows = []
@@ -162,7 +122,7 @@ def real_catalog(live: bool = False) -> dict:
                               if binding else None),
             "activity_type": meta.get("activity_type"),
             "review_reasons": reasons,
-            "live_revision": (data.get("live", {}).get(aid) or {}).get("revision"),
+            "live_revision": None,      # kept for response compatibility; live ingestion was removed
         })
     store = {r["activity"]["source"]["post_id"]: r for r in _json(DATA / "activity_store_v2.json")["records"]}
     drafts = []
@@ -177,8 +137,8 @@ def real_catalog(live: bool = False) -> dict:
     return {
         "mode": "DEMO_ONLY",
         "official_award_verified": False,
-        "data_source": LIVE_DATA_SOURCE if live else DATA_SOURCE,
-        "live_published": {pid: r["revision"] for pid, r in data.get("live", {}).items()} if live else {},
+        "data_source": DATA_SOURCE,
+        "live_published": {},       # kept for response compatibility; live ingestion was removed
         "term": TERM,
         "source_dataset": {"path": "data/raw/source.json", "total_posts": len(store),
                            "status": "SP1_V2_STORE", "handed_over": len(rows),
@@ -223,8 +183,8 @@ def _previous(plan: dict | None) -> dict | None:
 
 
 def _step(name: str, target_total: int, busy: list[dict[str, str]], previous: dict | None,
-          preference: StudentPreference | None, live: bool = False) -> dict:
-    data = _load(live)
+          preference: StudentPreference | None) -> dict:
+    data = _load_base()
     free = _free_time(busy)
     context = {
         "student_id": STUDENT_ID, "term_id": TERM["id"], "window_start": WINDOW_START, "window_end": WINDOW_END,
@@ -252,7 +212,7 @@ def _step(name: str, target_total: int, busy: list[dict[str, str]], previous: di
     }
     extra, engine, hard_excluded = {}, None, []
     if preference is not None:
-        features = _features(data)
+        features = _features()
         personalized = prepare_personalized_planner_input(planner_input, preference, features)
         planner_input, extra = personalized.planner_input, personalized.build_plan_options
         engine, hard_excluded = personalized.engine, list(personalized.hard_excluded)
@@ -275,7 +235,7 @@ def _block_of(plan: dict) -> list[dict[str, str]]:
 
 
 def real_plan(scenario: str, *, target_total: int | None = None, busy_intervals: list[dict[str, str]] | None = None,
-              preference: StudentPreference | None = None, live: bool = False) -> dict:
+              preference: StudentPreference | None = None) -> dict:
     """first_plan / replan (first planned slot becomes busy) / what_if_skip (skip a replanned activity)."""
     if scenario not in {"first_plan", "replan", "what_if_skip"}:
         raise ValueError("scenario must be first_plan, replan, or what_if_skip")
@@ -283,12 +243,12 @@ def real_plan(scenario: str, *, target_total: int | None = None, busy_intervals:
         raise ValueError("target_total must be an integer from 0 to 100")
     target = 80 if target_total is None else target_total
     busy = list(busy_intervals or [])
-    first = _step("first_plan", target, busy, None, preference, live)
+    first = _step("first_plan", target, busy, None, preference)
     skip_id = None
     if scenario == "first_plan":
         output = first
     else:
-        second = _step("replan", target, busy + _block_of(first["plan"]), first["plan"], preference, live)
+        second = _step("replan", target, busy + _block_of(first["plan"]), first["plan"], preference)
         if scenario == "replan":
             output = second
         else:
@@ -315,8 +275,8 @@ def real_plan(scenario: str, *, target_total: int | None = None, busy_intervals:
     result = {
         "mode": "DEMO_ONLY",
         "official_award_verified": False,
-        "data_source": LIVE_DATA_SOURCE if live else DATA_SOURCE,
-        "live_published": {pid: r["revision"] for pid, r in output["data"].get("live", {}).items()} if live else {},
+        "data_source": DATA_SOURCE,
+        "live_published": {},       # kept for response compatibility; live ingestion was removed
         "scenario": ("personalized_" if preference is not None else "") + scenario,
         "term": TERM["id"],
         "as_of": AS_OF,
