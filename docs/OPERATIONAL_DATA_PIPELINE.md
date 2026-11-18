@@ -1,8 +1,8 @@
 # Operational activity data pipeline (contract, migration notes, runbook)
 
 Status: implemented on branch `feat/operational-data-pipeline-20261118` (2026-11-18). Business rules:
-`docs/ACTIVITY_DATA_ACCEPTANCE_V1.md` (agreed with the user on 2026-11-18) and the handoff
-`docs/CLAUDE_DATA_COMPLETION_HANDOFF.md`. Decision record: `docs/adr/0003-operational-activity-dataset.md`.
+`docs/ACTIVITY_DATA_ACCEPTANCE_V1.md` (agreed with the user on 2026-11-18).
+Decision record: `docs/adr/0003-operational-activity-dataset.md`.
 
 ## 1. What the application reads
 

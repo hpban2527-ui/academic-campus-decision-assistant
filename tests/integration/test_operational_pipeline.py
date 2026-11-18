@@ -1,6 +1,6 @@
 """End-to-end checks of the operational data pipeline (SP1 -> SP2 -> SP3 -> API).
 
-The acceptance behaviours of docs/CLAUDE_DATA_COMPLETION_HANDOFF.md section 7, checked on the real
+The acceptance behaviours of docs/ACTIVITY_DATA_ACCEPTANCE_V1.md, checked on the real
 corpus and dataset, plus the update path for a new post (190) and an edited post. Nothing here writes
 to the repository: builds go to tmp_path and the test-access log is redirected.
 """
