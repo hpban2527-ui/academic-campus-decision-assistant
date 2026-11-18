@@ -729,6 +729,40 @@
               </div>
             </div>
 
+            <!-- REVIEW-DASH START -->
+            <section id="confirmedPlanDashboard" aria-labelledby="cpdTitle" class="space-y-4">
+              <div class="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-[.22em] text-emerald-300">KẾ HOẠCH ĐÃ CHỐT</p>
+                  <h2 id="cpdTitle" class="mt-1 text-lg sm:text-xl font-extrabold text-white">Lịch hoạt động của bạn</h2>
+                  <p id="cpdToday" class="mt-1 text-xs text-slate-400"></p>
+                </div>
+                <div id="cpdViewToggle" class="hidden inline-flex rounded-xl border border-[#2b3a54] bg-[#080d18] p-1" role="group" aria-label="Chế độ xem lịch">
+                  <button type="button" data-cpd-view="today" onclick="setConfirmedPlanView('today')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white">Hôm nay</button>
+                  <button type="button" data-cpd-view="week" onclick="setConfirmedPlanView('week')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300">Tuần</button>
+                  <button type="button" data-cpd-view="month" onclick="setConfirmedPlanView('month')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300">Tháng</button>
+                </div>
+              </div>
+              <div id="cpdBannerPending" class="hidden flex flex-col gap-2 rounded-xl border border-sky-500/40 bg-sky-950/30 p-3.5 text-sm text-sky-100 sm:flex-row sm:items-center sm:justify-between">
+                <span><b>Có kế hoạch mới chưa chốt.</b> Bạn vừa lập lại kế hoạch; lịch bên dưới vẫn là kế hoạch bạn đã chốt trước đó.</span>
+                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-500">Đến Lập lịch</button>
+              </div>
+              <div id="cpdBannerInvalid" class="hidden flex flex-col gap-2 rounded-xl border border-amber-500/40 bg-amber-950/30 p-3.5 text-sm text-amber-100 sm:flex-row sm:items-center sm:justify-between">
+                <span><b>Kế hoạch bị ảnh hưởng.</b> <span id="cpdInvalidReason"></span> Hãy lập và chốt lại kế hoạch.</span>
+                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-500">Đến Lập lịch</button>
+              </div>
+              <div id="cpdEmpty" class="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-[#2b3a54] bg-[#0e1524] p-5 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-sm text-slate-300">Bạn chưa chốt kế hoạch nào; hãy lập lịch và bấm “Xác nhận kế hoạch” để xem lịch tại đây.</p>
+                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-indigo-500">Đến Lập lịch</button>
+              </div>
+              <div id="cpdContent" class="hidden space-y-4">
+                <div id="cpdProgress"></div>
+                <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 sm:p-5"><div id="cpdCalendar"></div></div>
+                <div id="cpdDetail" class="hidden"></div>
+              </div>
+            </section>
+            <!-- REVIEW-DASH END -->
+
             <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4">
               <article class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 shadow-lg shadow-black/10">
                 <div class="flex items-start justify-between gap-3">
@@ -1593,6 +1627,13 @@
             <div id="plannerActiveResult" class="hidden space-y-5">
               <section id="smartPlanSection" class="rounded-2xl border border-emerald-500/30 bg-emerald-950/10 p-4"><div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div><h3 class="font-extrabold text-white">Kế hoạch thông minh</h3><p id="planOptionsMessage" class="text-xs text-slate-400">Chuyển phương án tức thì, không tính lại.</p></div><button id="undoCustomPlanButton" type="button" onclick="undoCustomPlan()" class="hidden rounded-lg border border-amber-500/40 px-3 py-2 text-xs font-bold text-amber-300">Hoàn tác lịch tùy chỉnh</button></div><div id="planOptionsSelector" class="mt-3 grid gap-2 sm:grid-cols-3"></div></section>
 
+              <!-- REVIEW-DASH START -->
+              <div id="confirmPlanBar" class="hidden flex flex-col gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-950/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <p id="confirmPlanHint" class="text-xs text-slate-300">Chốt kế hoạch để xem lịch trên trang chủ. Bạn vẫn có thể lập lại kế hoạch mà không mất kế hoạch đã chốt.</p>
+                <button id="btnConfirmPlan" type="button" onclick="confirmCurrentPlanFromUi()" class="shrink-0 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-500">Xác nhận kế hoạch</button>
+              </div>
+              <!-- REVIEW-DASH END -->
+
               <!-- Stale Notice -->
               <div id="planStaleNotice" class="hidden p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-sm text-amber-200">
                 Bạn vừa đổi mục tiêu hoặc buổi bận. Bấm <b>Cập nhật kế hoạch</b> ở trên để tính toán lại lộ trình mới.
@@ -1794,6 +1835,560 @@
   <!-- ======================================================================== -->
   <!-- JAVASCRIPT CONTROLLER                                                    -->
   <!-- ======================================================================== -->
+  <!-- REVIEW-DASH START -->
+  <script>
+    // REVIEW-DASH START
+    // Confirmed plan + calendar dashboard. Everything here reads engine (SP2/SP3) output that was stored
+    // by confirmConfirmedPlan(); the dashboard never computes a score. State is `var` so hooks that run
+    // before this block is evaluated see `undefined` instead of a temporal-dead-zone error.
+    var cpdView = 'today';          // 'today' | 'week' | 'month'
+    var cpdAnchor = null;           // ISO date used by the week and month views
+    var cpdSelectedActivityId = null;
+    var CPD_WEEKDAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+    var CPD_ACTIVE_STATUSES = ['TARGET_MET', 'PARTIAL', 'ALREADY_MET'];
+    var CPD_AGENDA_DAYS = 7;
+    var CPD_HOUR_PX = 48;
+    var CPD_FIRST_HOUR = 7;
+    var CPD_LAST_HOUR = 21;
+    var CPD_VN_OFFSET_MS = 7 * 3600 * 1000;
+
+    // ---- small date helpers: wall-clock time of Asia/Ho_Chi_Minh, independent of the browser zone ----
+    function cpdVn(iso) {
+      const text = String(iso || '');
+      let local = text;
+      if (!/\+07:00$/.test(text)) {
+        const parsed = Date.parse(text);
+        if (!Number.isFinite(parsed)) return null;
+        local = new Date(parsed + CPD_VN_OFFSET_MS).toISOString();
+      }
+      const date = local.slice(0, 10);
+      const time = local.slice(11, 16);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) return null;
+      return { date, time, minutes: Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5)) };
+    }
+
+    function cpdWeekday(isoDate) {
+      const [year, month, day] = isoDate.split('-').map(Number);
+      return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+    }
+
+    function cpdShort(isoDate) {
+      return `${isoDate.slice(8, 10)}/${isoDate.slice(5, 7)}`;
+    }
+
+    function cpdLong(isoDate) {
+      return `${CPD_WEEKDAYS[cpdWeekday(isoDate)]}, ${cpdShort(isoDate)}/${isoDate.slice(0, 4)}`;
+    }
+
+    function cpdDeadlineText(iso) {
+      const parts = cpdVn(iso);
+      return parts ? `${parts.time} ngày ${cpdShort(parts.date)}` : '';
+    }
+
+    function cpdAddMonths(isoDate, months) {
+      const [year, month] = isoDate.split('-').map(Number);
+      return new Date(Date.UTC(year, month - 1 + months, 1)).toISOString().slice(0, 10);
+    }
+
+    // ---- stored state: confirmed_plan, pending_plan_notice, invalidated, confirmed_plan_basis ----
+    function cpdValidPlan(plan) {
+      return Boolean(plan) && typeof plan === 'object' && Array.isArray(plan.activities)
+        && Boolean(plan.score_summary) && typeof plan.as_of === 'string' && Boolean(cpdVn(plan.as_of));
+    }
+
+    function reviewDashReadState() {
+      const mssv = currentStudent?.student_id;
+      if (!mssv) return null;
+      let data;
+      try { data = readLocalUserData(mssv); } catch (error) { return null; }
+      const plan = cpdValidPlan(data.confirmed_plan) ? data.confirmed_plan : null;
+      return {
+        mssv,
+        data,
+        plan,
+        pending: Boolean(plan) && Boolean(data.pending_plan_notice),
+        invalidated: plan && data.invalidated && data.invalidated.value ? data.invalidated : null
+      };
+    }
+
+    function cpdStableStringify(value) {
+      if (Array.isArray(value)) return '[' + value.map(cpdStableStringify).join(',') + ']';
+      if (value && typeof value === 'object') {
+        return '{' + Object.keys(value).sort().map(key => JSON.stringify(key) + ':' + cpdStableStringify(value[key])).join(',') + '}';
+      }
+      return JSON.stringify(value === undefined ? null : value);
+    }
+
+    function cpdFingerprint(value) {
+      const text = cpdStableStringify(JSON.parse(JSON.stringify(value)));
+      let hash = 2166136261;
+      for (let index = 0; index < text.length; index += 1) {
+        hash ^= text.charCodeAt(index);
+        hash = Math.imul(hash, 16777619) >>> 0;
+      }
+      return `${hash.toString(16)}:${text.length}`;
+    }
+
+    // Fingerprints of the two inputs a confirmed plan depends on. The planner never receives
+    // weekly_participation_hours inside the availability, so it is left out.
+    function cpdInputsBasis(availability, preference) {
+      const copy = JSON.parse(JSON.stringify(availability || {}));
+      delete copy.weekly_participation_hours;
+      return { availability: cpdFingerprint(copy), preference: preference ? cpdFingerprint(preference) : null };
+    }
+
+    // Called by persistCurrentUserData with the record about to be saved.
+    function reviewDashSyncInvalidation(saved) {
+      try {
+        if (!saved || !cpdValidPlan(saved.confirmed_plan) || !saved.confirmed_plan_basis) return;
+        const now = cpdInputsBasis(saved.canonical_availability, saved.confirmed_preference);
+        const was = saved.confirmed_plan_basis;
+        let reason = null;
+        if (now.availability !== was.availability) {
+          reason = 'Lịch rảnh/bận của bạn đã thay đổi sau khi bạn chốt kế hoạch.';
+        } else if (now.preference !== null && now.preference !== was.preference) {
+          // A missing preference is ignored: it is also what the page holds while a profile is loading.
+          reason = 'Nguyện vọng của bạn đã thay đổi sau khi bạn chốt kế hoạch.';
+        }
+        saved.invalidated = reason ? { value: true, reason } : { value: false, reason: null };
+      } catch (error) {
+        console.warn('Could not check whether the confirmed plan is still valid:', error);
+      }
+    }
+
+    // Called after the planner produced a new result: the confirmed plan itself is never touched.
+    function reviewDashNotePlannerResult() {
+      try {
+        const state = reviewDashReadState();
+        if (!state || !state.plan) return;
+        state.data.pending_plan_notice = true;
+        localStorage.setItem(localUserDataKey(state.mssv), JSON.stringify(state.data));
+        renderConfirmedPlanDashboard();
+      } catch (error) {
+        console.warn('Could not record the pending plan notice:', error);
+      }
+    }
+
+    // Writes confirmed_plan from an engine result (the object the planner endpoints return) and nothing else.
+    function confirmConfirmedPlan(result, optionLabel) {
+      const mssv = currentStudent?.student_id;
+      if (!mssv) throw new Error('Hãy đăng nhập trước khi xác nhận kế hoạch.');
+      const plan = result && result.plan;
+      const fromEngine = plan && typeof plan === 'object'
+        && Array.isArray(plan.selected_activities)
+        && Boolean(plan.score_summary)
+        && /^sp3plan-[0-9a-f]{16}$/.test(String(plan.plan_version || ''))
+        && Boolean(plan.context && cpdVn(plan.context.as_of))
+        && CPD_ACTIVE_STATUSES.includes(plan.status);
+      if (!fromEngine) throw new Error('Chỉ có thể xác nhận một kế hoạch do hệ thống lập kế hoạch tạo ra.');
+      const target = Number(result.requested_total_target);
+      if (!Number.isFinite(target) || target < 0 || target > 100) throw new Error('Kế hoạch này thiếu mục tiêu điểm hợp lệ.');
+
+      const catalog = new Map((result.feasibility?.candidates || []).map(entry => [entry.activity?.activity_id, entry.activity || {}]));
+      const breakdown = new Map((result.personalization?.selected_breakdown || []).map(row => [row.activity_id, row]));
+      const activities = plan.selected_activities.map(item => {
+        const activity = catalog.get(item.activity_id) || {};
+        const goal = (item.reasons || []).find(reason => reason.code === 'GOAL_CONTRIBUTION' && reason.category_id);
+        const campus = (breakdown.get(item.activity_id)?.matches || []).find(match => match.dimension === 'campus');
+        const gain = goal ? Number(goal.projected_added) : NaN;
+        return {
+          activity_id: item.activity_id,
+          title: item.title || activity.title || item.activity_id,
+          criterion: goal ? goal.category_id : null,
+          effective_gain: Number.isFinite(gain) ? gain : null,
+          mode: activity.mode || null,
+          campus: campus ? campus.value : null,
+          location: activity.location || null,
+          registration_deadline: activity.registration_deadline || null,
+          completion_requirements: activity.completion_requirements || null,
+          scheduled_blocks: (item.scheduled_blocks || []).map(block => ({ start: block.start, end: block.end })),
+          source_url: activity.source?.URL_post || null
+        };
+      });
+      const confirmed = {
+        plan_version: plan.plan_version,
+        based_on: JSON.parse(JSON.stringify(plan.based_on || {})),
+        confirmed_at: new Date().toISOString(),
+        source: result.data_source || (SP3_SOURCE === 'real' ? 'SP1-STORE-V2' : 'SYNTHETIC-DEMO'),
+        option_label: optionLabel || 'Kế hoạch đề xuất',
+        target_total: target,
+        // The planner's demo clock; the dashboard uses it as "today" instead of the system date.
+        as_of: plan.context.as_of,
+        score_summary: JSON.parse(JSON.stringify(plan.score_summary)),
+        activities
+      };
+      const data = readLocalUserData(mssv);
+      data.confirmed_plan = confirmed;
+      data.pending_plan_notice = false;
+      data.invalidated = { value: false, reason: null };
+      data.confirmed_plan_basis = cpdInputsBasis(buildCanonicalAvailability(), confirmedPreference);
+      data.updated_at = new Date().toISOString();
+      localStorage.setItem(localUserDataKey(mssv), JSON.stringify(data));
+      cpdAnchor = null;
+      cpdSelectedActivityId = null;
+      renderConfirmedPlanDashboard();
+      return confirmed;
+    }
+
+    // ---- review hook on the planner screen ----
+    function cpdOptionLabel(data) {
+      if (data && data.custom_plan_name) return data.custom_plan_name;
+      const labels = { MINIMUM_EFFORT: 'Ít thời gian', BALANCED: 'Cân bằng', PREFERENCE_FIRST: 'Theo sở thích' };
+      if (currentPlanStage === 'first' && Array.isArray(cachedPlanOptions) && cachedPlanOptions[selectedPlanOptionIndex]) {
+        return labels[cachedPlanOptions[selectedPlanOptionIndex].strategy] || 'Kế hoạch đề xuất';
+      }
+      return 'Kế hoạch đề xuất';
+    }
+
+    function reviewDashRenderConfirmBar() {
+      const bar = document.getElementById('confirmPlanBar');
+      if (!bar) return;
+      // Steps 2 and 3 are demo scenarios; only the plan of step 1 (or a swapped version of it) can be confirmed.
+      bar.classList.toggle('hidden', currentPlanStage !== 'first' || !planStages.first);
+      const state = reviewDashReadState();
+      const hint = document.getElementById('confirmPlanHint');
+      if (hint && state) {
+        hint.textContent = state.plan && state.plan.plan_version === planStages.first?.plan?.plan_version
+          ? 'Kế hoạch này đã được chốt và đang hiển thị trên trang chủ.'
+          : 'Chốt kế hoạch để xem lịch trên trang chủ. Bạn vẫn có thể lập lại kế hoạch mà không mất kế hoạch đã chốt.';
+      }
+    }
+
+    function confirmCurrentPlanFromUi() {
+      const hint = document.getElementById('confirmPlanHint');
+      try {
+        const data = planStages[currentPlanStage];
+        confirmConfirmedPlan(data, cpdOptionLabel(data));
+        switchTab('dashboard');
+      } catch (error) {
+        if (hint) hint.textContent = error.message || 'Không thể xác nhận kế hoạch.';
+      }
+    }
+
+    // ---- dashboard rendering ----
+    function setConfirmedPlanView(view) {
+      cpdView = ['today', 'week', 'month'].includes(view) ? view : 'today';
+      renderConfirmedPlanDashboard();
+    }
+
+    function shiftConfirmedPlanPeriod(direction) {
+      const state = reviewDashReadState();
+      if (!state || !state.plan) return;
+      const today = cpdVn(state.plan.as_of).date;
+      const anchor = cpdEffectiveAnchor(state.plan, today);
+      cpdAnchor = cpdView === 'month' ? cpdAddMonths(anchor, direction) : addDaysToIsoDate(anchor, 7 * direction);
+      renderConfirmedPlanDashboard();
+    }
+
+    // Without a chosen period the week view opens on the current week, or on the first week that has
+    // activities when the current week has none (the planner's "today" often falls just before the plan).
+    function cpdEffectiveAnchor(plan, today) {
+      if (cpdAnchor) return cpdAnchor;
+      if (cpdView === 'week') {
+        const weekStart = planWeekStart(today);
+        const weekEnd = addDaysToIsoDate(weekStart, 6);
+        const events = cpdEvents(plan);
+        if (!events.some(event => event.date >= weekStart && event.date <= weekEnd)) {
+          const next = events.find(event => event.date > weekEnd);
+          if (next) return next.date;
+        }
+      }
+      return today;
+    }
+
+    function resetConfirmedPlanAnchor() {
+      cpdAnchor = null;
+      renderConfirmedPlanDashboard();
+    }
+
+    function renderConfirmedPlanDashboard() {
+      try {
+        cpdRender();
+      } catch (error) {
+        console.warn('Could not draw the confirmed plan dashboard:', error);
+      }
+    }
+
+    function cpdEvents(plan) {
+      const events = [];
+      (plan.activities || []).forEach((activity, activityIndex) => {
+        (activity.scheduled_blocks || []).forEach(block => {
+          const start = cpdVn(block.start);
+          const end = cpdVn(block.end);
+          if (!start || !end) return;
+          events.push({ activity, activityIndex, date: start.date, start, end });
+        });
+      });
+      return events.sort((left, right) => (left.date + left.start.time).localeCompare(right.date + right.start.time)
+        || left.activity.activity_id.localeCompare(right.activity.activity_id));
+    }
+
+    function cpdPlaceText(activity) {
+      if (activity.mode === 'online') return 'Trực tuyến';
+      return activity.location || (activity.campus ? (PREF_LABELS[activity.campus] || activity.campus) : 'Tại cơ sở trường');
+    }
+
+    function cpdPointsText(activity) {
+      if (activity.effective_gain == null) return '';
+      return `+${activity.effective_gain}đ${activity.criterion ? ` · ${PLAN_CAT_LABELS[activity.criterion] || activity.criterion}` : ''}`;
+    }
+
+    function cpdTimeText(event) {
+      return event.end.date === event.date
+        ? `${event.start.time}–${event.end.time}`
+        : `${event.start.time}–${event.end.time} (${cpdShort(event.end.date)})`;
+    }
+
+    function cpdColor(activityIndex) {
+      return PLAN_EVENT_COLORS[activityIndex % PLAN_EVENT_COLORS.length];
+    }
+
+    // Registration deadlines that still lie ahead of the demo clock, as calendar markers.
+    function cpdDeadlines(plan) {
+      const asOf = Date.parse(plan.as_of);
+      return (plan.activities || []).map((activity, activityIndex) => {
+        const parts = cpdVn(activity.registration_deadline);
+        if (!parts || Date.parse(activity.registration_deadline) < asOf) return null;
+        return { activity, activityIndex, date: parts.date, time: parts.time };
+      }).filter(Boolean);
+    }
+
+    function cpdEventButton(event, compact) {
+      const activity = event.activity;
+      const token = activityToken(activity.activity_id);
+      const color = cpdColor(event.activityIndex);
+      if (compact) {
+        return `<button type="button" onclick="cpdOpenActivity('${token}')" title="${escapeHTML(activity.title)}" class="block w-full truncate rounded px-1.5 py-0.5 text-left text-[10px] font-bold text-white" style="background:${color.border}">${escapeHTML(event.start.time)} ${escapeHTML(activity.title)}</button>`;
+      }
+      const deadline = activity.registration_deadline ? `<span class="text-amber-300">⚑ Hạn đăng ký: ${escapeHTML(cpdDeadlineText(activity.registration_deadline))}</span>` : '';
+      const points = cpdPointsText(activity);
+      return `<button type="button" onclick="cpdOpenActivity('${token}')" class="flex w-full items-start gap-3 rounded-xl border border-[#223046] bg-[#080d18] p-3 text-left transition hover:border-indigo-500/60" style="border-left:3px solid ${color.border}">
+        <span class="w-24 shrink-0 text-xs font-extrabold text-indigo-300 planner-number">${escapeHTML(cpdTimeText(event))}</span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm font-extrabold text-white">${escapeHTML(activity.title)}</span>
+          <span class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400"><span>${escapeHTML(cpdPlaceText(activity))}</span>${points ? `<span class="font-bold text-emerald-300">${escapeHTML(points)}</span>` : ''}${deadline}</span>
+        </span>
+      </button>`;
+    }
+
+    function cpdRenderToday(plan, today) {
+      const events = cpdEvents(plan);
+      const deadlines = cpdDeadlines(plan);
+      const days = Array.from({ length: CPD_AGENDA_DAYS }, (_, index) => addDaysToIsoDate(today, index));
+      const body = days.map((date, index) => {
+        const dayEvents = events.filter(event => event.date === date);
+        const dayDeadlines = deadlines.filter(item => item.date === date);
+        if (!dayEvents.length && !dayDeadlines.length && index > 0) return '';
+        const heading = index === 0 ? `Hôm nay · ${cpdLong(date)}` : cpdLong(date);
+        const rows = dayEvents.map(event => cpdEventButton(event, false)).join('')
+          + dayDeadlines.map(item => `<div class="rounded-xl border border-dashed border-amber-500/40 bg-amber-950/20 px-3 py-2 text-[11px] text-amber-200">⚑ Hạn đăng ký lúc ${escapeHTML(item.time)}: <b>${escapeHTML(item.activity.title)}</b></div>`).join('');
+        return `<section class="space-y-2"><h3 class="text-xs font-extrabold uppercase tracking-wide ${index === 0 ? 'text-emerald-300' : 'text-slate-400'}">${escapeHTML(heading)}</h3>${rows || '<p class="rounded-xl border border-dashed border-[#2b3a54] p-3 text-xs text-slate-500">Hôm nay bạn không có hoạt động nào trong kế hoạch.</p>'}</section>`;
+      }).join('');
+      let note = '';
+      const inRange = events.some(event => event.date >= today && event.date <= days[days.length - 1]);
+      const next = events.find(event => event.date > days[days.length - 1]);
+      if (!inRange && next) {
+        note = `<p class="rounded-xl border border-dashed border-[#2b3a54] p-3 text-xs text-slate-400">Hoạt động gần nhất diễn ra vào ${escapeHTML(cpdLong(next.date))}. <button type="button" onclick="cpdAnchor='${next.date}';setConfirmedPlanView('week')" class="font-bold text-cyan-300">Xem tuần đó</button></p>`;
+      } else if (!events.length) {
+        note = '<p class="rounded-xl border border-dashed border-[#2b3a54] p-3 text-xs text-slate-400">Kế hoạch đã chốt không có hoạt động nào cần tham gia.</p>';
+      }
+      return `<div class="space-y-4">${body}${note}</div>`;
+    }
+
+    function cpdBusyBlocks(busy, date) {
+      const first = CPD_FIRST_HOUR * 60;
+      const last = CPD_LAST_HOUR * 60;
+      return busy.map(item => {
+        const start = cpdVn(item.start);
+        const end = cpdVn(item.end);
+        if (!start || !end || start.date > date || end.date < date) return '';
+        const from = Math.max(first, start.date < date ? 0 : start.minutes);
+        const to = Math.min(last, end.date > date ? 1440 : end.minutes);
+        if (to <= from) return '';
+        const top = ((from - first) / 60) * CPD_HOUR_PX;
+        const height = ((to - from) / 60) * CPD_HOUR_PX;
+        return `<div class="absolute left-0 right-0 pointer-events-none" title="Lịch bận của bạn" style="top:${top}px;height:${height}px;background:repeating-linear-gradient(135deg,rgba(100,116,139,.22) 0 6px,rgba(100,116,139,.07) 6px 12px)"></div>`;
+      }).join('');
+    }
+
+    function cpdRenderWeek(plan, today, availability) {
+      const weekStart = planWeekStart(cpdEffectiveAnchor(plan, today));
+      const weekEnd = addDaysToIsoDate(weekStart, 6);
+      const events = cpdEvents(plan);
+      const deadlines = cpdDeadlines(plan);
+      const busy = (availability && Array.isArray(availability.busy_intervals)) ? availability.busy_intervals : [];
+      const hours = CPD_LAST_HOUR - CPD_FIRST_HOUR;
+      const hourLabels = Array.from({ length: hours + 1 }, (_, index) => `<span class="absolute right-2 -translate-y-1/2 text-[10px] text-slate-500 planner-number" style="top:${index * CPD_HOUR_PX}px">${String(CPD_FIRST_HOUR + index).padStart(2, '0')}:00</span>`).join('');
+      const headers = AVAILABILITY_DAYS.map((name, index) => {
+        const date = addDaysToIsoDate(weekStart, index);
+        const markers = deadlines.filter(item => item.date === date);
+        return `<div class="border-l border-[#1b2537] py-2.5 text-center ${date === today ? 'bg-emerald-950/30' : ''}"><span class="block text-xs font-extrabold ${date === today ? 'text-emerald-300' : 'text-slate-200'}">${name}</span><span class="text-[10px] text-slate-500 planner-number">${cpdShort(date)}</span>${markers.length ? `<span class="block text-[10px] font-bold text-amber-300" title="${escapeHTML(markers.map(item => 'Hạn đăng ký: ' + item.activity.title).join('; '))}">⚑ Hạn ĐK</span>` : ''}</div>`;
+      }).join('');
+      const columns = AVAILABILITY_DAYS.map((_, index) => {
+        const date = addDaysToIsoDate(weekStart, index);
+        const items = events.filter(event => event.date === date).map(event => {
+          const top = Math.max(0, ((event.start.minutes - CPD_FIRST_HOUR * 60) / 60) * CPD_HOUR_PX);
+          const endMinutes = event.end.date === date ? event.end.minutes : CPD_LAST_HOUR * 60;
+          const height = Math.max(30, ((Math.min(endMinutes, CPD_LAST_HOUR * 60) - Math.max(event.start.minutes, CPD_FIRST_HOUR * 60)) / 60) * CPD_HOUR_PX);
+          const color = cpdColor(event.activityIndex);
+          return `<button type="button" onclick="cpdOpenActivity('${activityToken(event.activity.activity_id)}')" title="${escapeHTML(event.activity.title)} · ${escapeHTML(cpdTimeText(event))}" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white" style="top:${top}px;height:${height}px;background:${color.bg};border-left:3px solid ${color.border}">
+            <span class="block text-[10px] font-extrabold leading-tight line-clamp-2">${escapeHTML(event.activity.title)}</span>
+            <span class="block mt-1 text-[9px] text-white/75 planner-number">${escapeHTML(cpdTimeText(event))}</span>
+            <span class="block text-[9px] text-white/75">${escapeHTML(cpdPlaceText(event.activity))}${cpdPointsText(event.activity) ? ' · ' + escapeHTML(cpdPointsText(event.activity)) : ''}</span>
+          </button>`;
+        }).join('');
+        return `<div class="plan-calendar-day relative border-l border-[#1b2537]">${cpdBusyBlocks(busy, date)}${items}</div>`;
+      }).join('');
+      return `<div class="space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2"><button type="button" onclick="shiftConfirmedPlanPeriod(-1)" aria-label="Tuần trước" class="h-9 w-9 rounded-lg border border-[#2b3a54] text-slate-200 hover:bg-[#162032]">‹</button><strong class="text-sm text-white planner-number">Tuần ${cpdShort(weekStart)} – ${cpdShort(weekEnd)}</strong><button type="button" onclick="shiftConfirmedPlanPeriod(1)" aria-label="Tuần sau" class="h-9 w-9 rounded-lg border border-[#2b3a54] text-slate-200 hover:bg-[#162032]">›</button></div>
+          <button type="button" onclick="resetConfirmedPlanAnchor()" class="text-xs font-bold text-cyan-300 hover:text-cyan-200">Về hôm nay</button>
+        </div>
+        <div class="overflow-x-auto rounded-xl border border-[#1b2537]"><div class="plan-calendar-board">
+          <div class="grid bg-[#0b101b] border-b border-[#1b2537]" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div></div>${headers}</div>
+          <div class="grid" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div class="relative bg-[#080d18]" style="height:${hours * CPD_HOUR_PX}px">${hourLabels}</div>${columns}</div>
+        </div></div>
+        <p class="text-[11px] text-slate-500"><span class="inline-block h-2.5 w-4 align-middle rounded-sm" style="background:repeating-linear-gradient(135deg,rgba(100,116,139,.5) 0 3px,rgba(100,116,139,.15) 3px 6px)"></span> Nền mờ là lịch bận bạn đã khai (chỉ để xem).</p>
+      </div>`;
+    }
+
+    function cpdRenderMonth(plan, today) {
+      const anchor = cpdEffectiveAnchor(plan, today);
+      const monthStart = `${anchor.slice(0, 7)}-01`;
+      const gridStart = planWeekStart(monthStart);
+      const events = cpdEvents(plan);
+      const deadlines = cpdDeadlines(plan);
+      const cells = Array.from({ length: 42 }, (_, index) => {
+        const date = addDaysToIsoDate(gridStart, index);
+        const inMonth = date.slice(0, 7) === monthStart.slice(0, 7);
+        const dayEvents = events.filter(event => event.date === date);
+        const dayDeadlines = deadlines.filter(item => item.date === date);
+        const shown = dayEvents.slice(0, 2).map(event => cpdEventButton(event, true)).join('');
+        const more = dayEvents.length > 2 ? `<span class="block text-[10px] text-slate-400">+${dayEvents.length - 2} nữa</span>` : '';
+        const flag = dayDeadlines.length ? `<span class="text-[10px] font-bold text-amber-300" title="${escapeHTML(dayDeadlines.map(item => 'Hạn đăng ký: ' + item.activity.title).join('; '))}">⚑</span>` : '';
+        return `<div class="min-h-[92px] space-y-1 border-l border-t border-[#1b2537] p-1.5 ${inMonth ? '' : 'opacity-40'} ${date === today ? 'bg-emerald-950/30 ring-1 ring-inset ring-emerald-500/50' : ''}"><div class="flex items-center justify-between"><span class="text-[11px] font-bold ${date === today ? 'text-emerald-300' : 'text-slate-300'} planner-number">${Number(date.slice(8, 10))}</span>${flag}</div>${shown}${more}</div>`;
+      }).join('');
+      const heads = AVAILABILITY_DAYS.map(name => `<div class="py-2 text-center text-[11px] font-extrabold text-slate-300">${name}</div>`).join('');
+      return `<div class="space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2"><button type="button" onclick="shiftConfirmedPlanPeriod(-1)" aria-label="Tháng trước" class="h-9 w-9 rounded-lg border border-[#2b3a54] text-slate-200 hover:bg-[#162032]">‹</button><strong class="text-sm text-white planner-number">Tháng ${monthStart.slice(5, 7)}/${monthStart.slice(0, 4)}</strong><button type="button" onclick="shiftConfirmedPlanPeriod(1)" aria-label="Tháng sau" class="h-9 w-9 rounded-lg border border-[#2b3a54] text-slate-200 hover:bg-[#162032]">›</button></div>
+          <button type="button" onclick="resetConfirmedPlanAnchor()" class="text-xs font-bold text-cyan-300 hover:text-cyan-200">Về hôm nay</button>
+        </div>
+        <div class="overflow-x-auto rounded-xl border-b border-r border-[#1b2537]"><div class="min-w-[640px]"><div class="grid grid-cols-7 bg-[#0b101b]">${heads}</div><div class="grid grid-cols-7">${cells}</div></div></div>
+      </div>`;
+    }
+
+    function cpdRenderProgress(plan) {
+      const summary = plan.score_summary || {};
+      const baseline = summary.baseline_total;
+      const gain = summary.gain_total;
+      const projected = summary.projected_total;
+      const remaining = summary.remaining_total;
+      const numeric = value => typeof value === 'number' && Number.isFinite(value);
+      if (!numeric(baseline) || !numeric(projected)) return '';
+      const width = value => `${Math.max(0, Math.min(100, value))}%`;
+      const gainWidth = numeric(gain) ? Math.max(0, Math.min(100 - Math.max(0, baseline), gain)) : 0;
+      const verdict = remaining === 0
+        ? '<span class="font-bold text-emerald-300">Kế hoạch này đạt mục tiêu điểm.</span>'
+        : (numeric(remaining) ? `<span class="font-bold text-amber-300">Còn thiếu ${remaining}đ so với mục tiêu.</span>` : '');
+      return `<section aria-label="Tiến độ theo kế hoạch" class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 sm:p-5">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div><p class="text-[11px] font-bold uppercase tracking-[.2em] text-cyan-300">TIẾN ĐỘ THEO KẾ HOẠCH</p>
+          <p class="mt-1 text-2xl font-black text-white planner-number">${baseline}đ → ${projected}đ <span class="text-sm font-bold text-slate-500">/ 100đ</span></p></div>
+          <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2"><span class="block text-slate-400">Điểm nền</span><b class="text-white planner-number">${baseline}đ</b></div>
+            <div class="rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2"><span class="block text-slate-400">Dự kiến cộng</span><b class="text-emerald-300 planner-number">${numeric(gain) ? '+' + gain : '—'}đ</b></div>
+            <div class="rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2"><span class="block text-slate-400">Mục tiêu</span><b class="text-indigo-300 planner-number">${numeric(plan.target_total) ? plan.target_total : '—'}đ</b></div>
+          </div>
+        </div>
+        <div class="mt-4 flex h-2.5 overflow-hidden rounded-full bg-[#080d18]"><div class="h-full bg-slate-400" style="width:${width(baseline)}"></div><div class="h-full bg-emerald-400" style="width:${width(gainWidth)}"></div></div>
+        <p class="mt-2 text-xs text-slate-400">${verdict} Điểm dự kiến do hệ thống lập kế hoạch tính, chưa phải điểm được nhà trường xác nhận.</p>
+      </section>`;
+    }
+
+    function cpdOpenActivity(token) {
+      cpdSelectedActivityId = activityFromToken(token);
+      renderConfirmedPlanDashboard();
+      document.getElementById('cpdDetail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function closeConfirmedPlanDetail() {
+      cpdSelectedActivityId = null;
+      renderConfirmedPlanDashboard();
+    }
+
+    function cpdRenderDetail(plan) {
+      const box = document.getElementById('cpdDetail');
+      if (!box) return;
+      const activity = (plan.activities || []).find(item => item.activity_id === cpdSelectedActivityId);
+      if (!activity) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+        return;
+      }
+      const times = (activity.scheduled_blocks || []).map(block => formatPlanTimeRange(block.start, block.end)).join(' | ');
+      const points = cpdPointsText(activity);
+      const link = /^https?:\/\//i.test(String(activity.source_url || ''))
+        ? `<a href="${escapeHTML(activity.source_url)}" target="_blank" rel="noopener noreferrer" class="font-bold text-cyan-300 hover:text-cyan-200">Xem bài đăng gốc ↗</a>` : '';
+      box.classList.remove('hidden');
+      box.innerHTML = `<div class="rounded-2xl border border-indigo-500/40 bg-[#0c1220] p-4 text-xs space-y-2.5">
+        <div class="flex items-start justify-between gap-3"><h3 class="text-sm font-extrabold text-white">${escapeHTML(activity.title)}</h3><button type="button" onclick="closeConfirmedPlanDetail()" aria-label="Đóng chi tiết" class="text-slate-400 hover:text-white">✕</button></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300">
+          <div><b class="text-slate-400">Thời gian tổ chức:</b> <span class="text-white font-medium">${escapeHTML(times || 'Thời gian linh hoạt')}</span></div>
+          <div><b class="text-slate-400">Địa điểm / Hình thức:</b> <span class="text-white font-medium">${escapeHTML(cpdPlaceText(activity))}</span></div>
+          ${activity.registration_deadline ? `<div><b class="text-slate-400">Hạn đăng ký:</b> <span class="text-amber-300 font-medium">${escapeHTML(cpdDeadlineText(activity.registration_deadline))}</span></div>` : ''}
+          <div><b class="text-slate-400">Quyền lợi ĐRL:</b> <span class="text-emerald-400 font-bold">${escapeHTML(points || 'Cộng điểm theo quy chế')}</span></div>
+        </div>
+        ${activity.completion_requirements ? `<div class="rounded-lg border border-[#223046] bg-[#080d18] p-2.5 text-slate-300"><b>Minh chứng hoàn thành:</b> ${escapeHTML(activity.completion_requirements)}</div>` : ''}
+        ${link}
+      </div>`;
+    }
+
+    function cpdRender() {
+      const root = document.getElementById('confirmedPlanDashboard');
+      if (!root) return;
+      // The older overview cards show calculator numbers (for example 0 and "còn 80đ") that can disagree
+      // with the planner, so the dashboard keeps them hidden and reads only the confirmed plan.
+      document.getElementById('overviewDrlScore')?.closest('.grid')?.classList.add('hidden');
+      document.getElementById('overviewSemesterBar')?.closest('section')?.classList.add('hidden');
+
+      const state = reviewDashReadState();
+      const plan = state ? state.plan : null;
+      const show = (id, visible) => document.getElementById(id)?.classList.toggle('hidden', !visible);
+      show('cpdBannerPending', Boolean(state && state.pending));
+      show('cpdBannerInvalid', Boolean(state && state.invalidated));
+      const reason = document.getElementById('cpdInvalidReason');
+      if (reason) reason.textContent = state && state.invalidated ? (state.invalidated.reason || '') : '';
+      show('cpdEmpty', !plan);
+      show('cpdContent', Boolean(plan));
+      show('cpdViewToggle', Boolean(plan));
+      const todayLabel = document.getElementById('cpdToday');
+      if (!plan) {
+        if (todayLabel) todayLabel.textContent = '';
+        return;
+      }
+      const today = cpdVn(plan.as_of).date;
+      if (todayLabel) {
+        todayLabel.innerHTML = `Hôm nay: <b class="text-white">${escapeHTML(cpdLong(today))}</b> · ngày mốc của hệ thống lập kế hoạch · ${escapeHTML(plan.option_label || 'Kế hoạch đã chốt')} <span class="dev-only font-mono">${escapeHTML(plan.plan_version)}</span>`;
+      }
+      document.querySelectorAll('[data-cpd-view]').forEach(button => {
+        const active = button.getAttribute('data-cpd-view') === cpdView;
+        button.className = `px-3.5 py-1.5 rounded-lg text-xs font-bold ${active ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/30' : 'text-slate-300 hover:bg-[#162032]'}`;
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      const progress = document.getElementById('cpdProgress');
+      if (progress) progress.innerHTML = cpdRenderProgress(plan);
+      const calendar = document.getElementById('cpdCalendar');
+      if (calendar) {
+        calendar.innerHTML = cpdView === 'week'
+          ? cpdRenderWeek(plan, today, state.data.canonical_availability)
+          : (cpdView === 'month' ? cpdRenderMonth(plan, today) : cpdRenderToday(plan, today));
+      }
+      cpdRenderDetail(plan);
+    }
+    // REVIEW-DASH END
+  </script>
+  <!-- REVIEW-DASH END -->
   <script>
     const authModal = document.getElementById("loginModal");
     if (!authModal) throw new Error("The local account dialog is missing from the page.");
@@ -2404,6 +2999,9 @@
 
       const progressBar = document.getElementById("overviewSemesterBar");
       if (progressBar) progressBar.style.width = `${progress}%`;
+      // REVIEW-DASH START
+      renderConfirmedPlanDashboard();
+      // REVIEW-DASH END
     }
 
     function renderRecommendedActivities(rows) {
@@ -2492,6 +3090,12 @@
         category_scores: cloneDefaultScores(),
         default_baseline_total: 0,
         saved_activities: [],
+        // REVIEW-DASH START
+        confirmed_plan: null,
+        pending_plan_notice: false,
+        invalidated: { value: false, reason: null },
+        confirmed_plan_basis: null,
+        // REVIEW-DASH END
         planner: {
           target_total: 80,
           plan_stages: { first: null, replan: null, whatif: null },
@@ -2839,6 +3443,9 @@
       saved.profile_assistant_history = JSON.parse(JSON.stringify(profileAssistantConversation.slice(-20)));
       saved.confirmed_preference = confirmedPreference ? JSON.parse(JSON.stringify(confirmedPreference)) : null;
       saved.canonical_availability = buildCanonicalAvailability();
+      // REVIEW-DASH START
+      reviewDashSyncInvalidation(saved);
+      // REVIEW-DASH END
       saved.manual_busy_intervals = JSON.parse(JSON.stringify(customBusyIntervals));
       saved.unavailable_slots = [...unavailableAvailabilitySlots];
       saved.planner = {
@@ -3508,6 +4115,9 @@
         // Auto-run first plan with default 80 on first view for seamless experience
         runSp3Planner();
       }
+      // REVIEW-DASH START
+      if (tab === 'dashboard') renderConfirmedPlanDashboard();
+      // REVIEW-DASH END
       if (tab === 'calculator') {
         const target = action === 'tracker'
           ? document.getElementById('drlScorePanel')
@@ -4594,6 +5204,9 @@
         renderSp3PlanResult();
         renderPlanOptionsSelector();
         persistCurrentUserData();
+        // REVIEW-DASH START
+        reviewDashNotePlannerResult();
+        // REVIEW-DASH END
       } catch (err) {
         if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
         console.error('SP3 Planner error:', err);
@@ -5111,6 +5724,9 @@
 
       renderPlanStepper();
       renderPlanPersonalizationCard(data, titles);
+      // REVIEW-DASH START
+      reviewDashRenderConfirmBar();
+      // REVIEW-DASH END
 
       // Summary header
       const met = plan.status === 'TARGET_MET';

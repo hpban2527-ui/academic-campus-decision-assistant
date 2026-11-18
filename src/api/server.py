@@ -1660,6 +1660,10 @@ from api.sp3_service import (
     personalized_demo_plan as _sp3_personalized_plan,
     preview_personalized_swap as _sp3_preview_swap,
     sp1_catalog as _sp3_catalog,
+    # REVIEW-DASH START
+    list_swap_alternatives as _sp3_list_alternatives,
+    what_if_skip_planned_activity as _sp3_what_if_skip,
+    # REVIEW-DASH END
 )
 from api.sp3_real import real_catalog as _sp3_real_catalog, real_plan as _sp3_real_plan
 
@@ -1751,7 +1755,10 @@ class SmartSwapRequest(BaseModel):
     preference: StudentPreference
     base_result: dict[str, Any]
     remove_activity_id: str = Field(min_length=1, max_length=100)
-    add_activity_id: str = Field(min_length=1, max_length=100)
+    # REVIEW-DASH START
+    # Required but nullable: an explicit null removes the activity without a replacement.
+    add_activity_id: Optional[str] = Field(min_length=1, max_length=100)
+    # REVIEW-DASH END
 
 
 @app.post("/api/sp3/personalized/swap-preview")
@@ -1769,6 +1776,50 @@ def preview_sp3_smart_swap(req: SmartSwapRequest, source: str = "synthetic"):
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+# REVIEW-DASH START
+class PlanReviewRequest(BaseModel):
+    """SmartSwapRequest without add_activity_id; the base of the review endpoints."""
+
+    model_config = {"extra": "forbid"}
+    confirmed_profile: Literal[True]
+    preference: StudentPreference
+    base_result: dict[str, Any]
+    remove_activity_id: str = Field(min_length=1, max_length=100)
+
+
+class SwapAlternativesRequest(PlanReviewRequest):
+    limit: int = Field(default=3, ge=1, le=10)
+
+
+def _sp3_review_backend(source: str) -> None:
+    """Review endpoints share the swap-preview source rule; real joins when swap supports it."""
+    if _sp3_source(source) != "synthetic":
+        raise HTTPException(status_code=422, detail="plan review is not yet available for source=real")
+
+
+@app.post("/api/sp3/personalized/alternatives")
+def list_sp3_swap_alternatives(req: SwapAlternativesRequest, source: str = "synthetic"):
+    """Valid replacements for one planned activity, best first; never persists anything."""
+
+    _sp3_review_backend(source)
+    try:
+        return _sp3_list_alternatives(req.preference, req.base_result, req.remove_activity_id, req.limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/sp3/personalized/what-if-skip")
+def preview_sp3_what_if_skip(req: PlanReviewRequest, source: str = "synthetic"):
+    """Plan if one activity is skipped; the others keep their times. Never persists anything."""
+
+    _sp3_review_backend(source)
+    try:
+        return _sp3_what_if_skip(req.preference, req.base_result, req.remove_activity_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+# REVIEW-DASH END
 
 
 def _get_preference_provider():

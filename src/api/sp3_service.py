@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import dataclass
 from datetime import datetime
 import hashlib
 import json
@@ -488,14 +489,21 @@ def preview_personalized_swap(
     preference: StudentPreference,
     base_result: dict,
     remove_activity_id: str,
-    add_activity_id: str,
+    add_activity_id: str | None,
 ) -> dict:
     """Preview a safe replacement through SP3 whole-plan scoring.
 
-    SP3's current public contract supports excluding A but not forcing B. The
-    preview succeeds only when the validated replan naturally selects B; it
-    otherwise fails closed and asks for a future force-include contract.
+    A FIXED replacement is seeded into the previous plan and kept with
+    KEEP_TIME. A flexible replacement is requested with FORCE_INCLUDE (contract
+    revision 0.2.1) so the planner places it around the kept blocks; when it
+    cannot, the keep conflict fails the preview closed. ``add_activity_id=None``
+    removes the activity only (see ``remove_planned_activity``).
     """
+
+    # REVIEW-DASH START
+    if add_activity_id is None:
+        return remove_planned_activity(preference, base_result, remove_activity_id)
+    # REVIEW-DASH END
 
     if not isinstance(base_result, dict):
         raise ValueError("base_result must be an object")
@@ -557,15 +565,21 @@ def preview_personalized_swap(
     if replacement is None:
         raise ValueError("replacement activity is outside the eligible catalog")
     schedule = replacement.get("schedule") or {}
-    if schedule.get("type") != "FIXED" or not schedule.get("fixed_blocks"):
-        raise ValueError("SP3 v0.2 needs a force-include contract for flexible replacements")
+    # REVIEW-DASH START
+    force_include = schedule.get("type") == "FLEXIBLE_WINDOW"
+    if not force_include and (schedule.get("type") != "FIXED" or not schedule.get("fixed_blocks")):
+        raise ValueError("replacement activity has no usable schedule")
+    # REVIEW-DASH END
 
     seeded = [
         {"activity_id": item["activity_id"], "scheduled_blocks": deepcopy(item.get("scheduled_blocks", []))}
         for item in base_result["plan"].get("selected_activities", [])
         if item["activity_id"] != remove_activity_id
     ]
-    seeded.append({"activity_id": add_activity_id, "scheduled_blocks": deepcopy(schedule["fixed_blocks"])})
+    # REVIEW-DASH START
+    if not force_include:
+        seeded.append({"activity_id": add_activity_id, "scheduled_blocks": deepcopy(schedule["fixed_blocks"])})
+    # REVIEW-DASH END
     seeded.sort(key=lambda item: item["activity_id"])
     # build_based_on fields come from the fresh plan output and are safer than
     # reconstructing the upstream version tuple here.
@@ -579,6 +593,10 @@ def preview_personalized_swap(
         {"activity_id": item["activity_id"], "mode": "KEEP_TIME"}
         for item in seeded
     ]
+    # REVIEW-DASH START
+    if force_include:
+        planner_input["keep_requests"].append({"activity_id": add_activity_id, "mode": "FORCE_INCLUDE"})
+    # REVIEW-DASH END
     for candidate_row in planner_input["candidates"]:
         activity_id = candidate_row["activity"]["activity_id"]
         original_candidate = candidates.get(activity_id)
@@ -624,3 +642,376 @@ def preview_personalized_swap(
         "added_activity_ids": sorted(after_ids - before_ids),
         "result": preview,
     }
+
+
+# REVIEW-DASH START
+# --- Plan review: alternatives, remove-only and what-if ------------------------------
+#
+# These functions sit on top of ``preview_personalized_swap``; they never score or
+# check a plan themselves. Every number they return comes from SP2/SP3 output.
+
+REVIEW_DEFAULT_LIMIT = 3
+REVIEW_MAX_LIMIT = 10
+_TARGET_TOLERANCE = 1e-9
+
+
+@dataclass(frozen=True)
+class _ReviewContext:
+    selected_rows: list
+    selected_ids: frozenset
+    target_total: int
+    base_summary: dict
+    planner_input: dict
+    engine: object
+    score_callback: object
+    internal: dict
+
+
+def _review_context(preference: StudentPreference, base_result: dict, remove_activity_id: str) -> _ReviewContext:
+    """Validate a client-held base result and rebuild trusted planner state for it."""
+    if not isinstance(base_result, dict):
+        raise ValueError("base_result must be an object")
+    base_plan = base_result.get("plan")
+    feasibility_payload = base_result.get("feasibility")
+    if not isinstance(base_plan, dict) or not isinstance(feasibility_payload, dict):
+        raise ValueError("base_result must contain plan and feasibility objects")
+    rows = base_plan.get("selected_activities")
+    candidates = feasibility_payload.get("candidates")
+    if (
+        not isinstance(rows, list)
+        or len(rows) > 20
+        or not all(isinstance(item, dict) and isinstance(item.get("activity_id"), str) for item in rows)
+        or not isinstance(candidates, list)
+        or len(candidates) > 200
+        or not all(isinstance(item, dict) for item in candidates)
+    ):
+        raise ValueError("base_result plan rows are invalid or too large")
+    selected_ids = frozenset(item["activity_id"] for item in rows)
+    if remove_activity_id not in selected_ids:
+        raise ValueError("activity to remove is not selected")
+    target_total = base_result.get("requested_total_target", 80)
+    if isinstance(target_total, bool) or not isinstance(target_total, int) or not 0 <= target_total <= 100:
+        raise ValueError("base_result requested_total_target is invalid")
+    internal = personalized_demo_plan(
+        preference, scenario="first_plan", target_total=target_total, include_internal=True,
+    )
+    planner_input = internal.pop("_planner_input")
+    engine = internal.pop("_engine")
+    score_callback = internal.pop("_score_callback")
+    if not selected_ids <= {item["activity"]["activity_id"] for item in planner_input["candidates"]}:
+        raise ValueError("base_result contains activities outside the eligible catalog")
+    return _ReviewContext(
+        selected_rows=rows,
+        selected_ids=selected_ids,
+        target_total=target_total,
+        base_summary=base_plan.get("score_summary") or {},
+        planner_input=planner_input,
+        engine=engine,
+        score_callback=score_callback,
+        internal=internal,
+    )
+
+
+def _seed_previous_plan(context: _ReviewContext, kept_rows: list) -> dict:
+    """Make ``kept_rows`` the previous plan and KEEP_TIME them all (never reshuffled)."""
+    planner_input = context.planner_input
+    seeded = sorted(
+        (
+            {"activity_id": item["activity_id"], "scheduled_blocks": deepcopy(item.get("scheduled_blocks", []))}
+            for item in kept_rows
+        ),
+        key=lambda item: item["activity_id"],
+    )
+    based_on = deepcopy(context.internal["plan"]["based_on"])
+    planner_input["previous_plan"] = {
+        "plan_version": plan_version(based_on, [(item["activity_id"], item["scheduled_blocks"]) for item in seeded]),
+        "based_on": based_on,
+        "selected_activities": seeded,
+    }
+    planner_input["keep_requests"] = [{"activity_id": item["activity_id"], "mode": "KEEP_TIME"} for item in seeded]
+    return planner_input
+
+
+def _cancel(planner_input: dict, activity_id: str) -> None:
+    for row in planner_input["candidates"]:
+        if row["activity"]["activity_id"] == activity_id:
+            row["participation"]["progress"] = "CANCELLED"
+
+
+def _target_state(summary: dict, target_total: int) -> dict:
+    projected = summary.get("projected_total")
+    met = isinstance(projected, (int, float)) and projected >= target_total - _TARGET_TOLERANCE
+    return {
+        "target_total": target_total,
+        "projected_total": projected,
+        "remaining_total": summary.get("remaining_total"),
+        "remaining_by_category": deepcopy(summary.get("remaining_by_category") or {}),
+        "target_met": bool(met),
+    }
+
+
+def _review_preview(
+    kind: str,
+    context: _ReviewContext,
+    plan: dict,
+    *,
+    remove_activity_id: str,
+    scenario: str,
+) -> dict:
+    after_ids = {item["activity_id"] for item in plan.get("selected_activities", [])}
+    state = _target_state(plan.get("score_summary") or {}, context.target_total)
+    return {
+        "status": "PREVIEW",
+        "kind": kind,
+        "requires_confirmation": True,
+        "remove_activity_id": remove_activity_id,
+        "add_activity_id": None,
+        "before": {
+            "projected_total": context.base_summary.get("projected_total"),
+            "activity_count": len(context.selected_ids),
+        },
+        "after": {
+            "projected_total": state["projected_total"],
+            "activity_count": len(after_ids),
+            "duration_minutes": _plan_minutes(plan),
+        },
+        **state,
+        "warnings": [] if state["target_met"] else ["BELOW_TARGET"],
+        "dropped_activity_ids": sorted(context.selected_ids - after_ids),
+        "added_activity_ids": sorted(after_ids - context.selected_ids),
+        "result": {**context.internal, "plan": plan, "scenario": scenario},
+    }
+
+
+def remove_planned_activity(preference: StudentPreference, base_result: dict, remove_activity_id: str) -> dict:
+    """Remove one activity and re-score the rest; nothing replaces it.
+
+    Every remaining activity is KEEP_TIME and the activity count is capped at the
+    number of remaining activities, so SP3 only re-scores and cannot add a
+    compensating activity. The result may be below the target: that is reported
+    through ``target_met=False`` and ``warnings=["BELOW_TARGET"]``, not as an error.
+    """
+    context = _review_context(preference, base_result, remove_activity_id)
+    remaining = [item for item in context.selected_rows if item["activity_id"] != remove_activity_id]
+    planner_input = _seed_previous_plan(context, remaining)
+    _cancel(planner_input, remove_activity_id)
+    limits = planner_input["limits"]
+    cap = len(remaining) if limits.get("max_activities") is None else min(limits["max_activities"], len(remaining))
+    limits["max_activities"] = cap
+    plan = build_plan(
+        planner_input, context.score_callback,
+        preference_utility=context.engine.score_set,
+        personalization_strategy=preference.strategy.value,
+    )
+    _require_valid_review_plan(planner_input, plan, context)
+    return _review_preview(
+        "REMOVE", context, plan,
+        remove_activity_id=remove_activity_id, scenario="personalized_remove_only",
+    )
+
+
+def what_if_skip_planned_activity(preference: StudentPreference, base_result: dict, skip_activity_id: str) -> dict:
+    """Preview the plan if ``skip_activity_id`` is skipped; nothing is applied.
+
+    ``what_if_skip`` runs with a KEEP_TIME request for every remaining selected
+    activity, so SP3 only adds compensating activities and never moves the others.
+    """
+    context = _review_context(preference, base_result, skip_activity_id)
+    planner_input = _seed_previous_plan(context, context.selected_rows)
+    # The skipped activity keeps its previous block but is no longer a keep request.
+    planner_input["keep_requests"] = [
+        item for item in planner_input["keep_requests"] if item["activity_id"] != skip_activity_id
+    ]
+    cancelled = deepcopy(planner_input)
+    _cancel(cancelled, skip_activity_id)
+    plan = what_if_skip(
+        planner_input, skip_activity_id, context.score_callback,
+        preference_utility=context.engine.score_set,
+        personalization_strategy=preference.strategy.value,
+    )
+    _require_valid_review_plan(cancelled, plan, context)
+    kept_blocks = {
+        item["activity_id"]: item.get("scheduled_blocks", [])
+        for item in context.selected_rows if item["activity_id"] != skip_activity_id
+    }
+    moved = sorted(
+        item["activity_id"] for item in plan.get("selected_activities", [])
+        if item["activity_id"] in kept_blocks and item["scheduled_blocks"] != kept_blocks[item["activity_id"]]
+    )
+    if moved:
+        raise ValueError("what-if moved an unaffected activity")
+    return _review_preview(
+        "WHAT_IF_SKIP", context, plan,
+        remove_activity_id=skip_activity_id, scenario="personalized_what_if_skip",
+    )
+
+
+def _require_valid_review_plan(planner_input: dict, plan: dict, context: _ReviewContext) -> None:
+    if plan.get("status") in {"ERROR", "NEEDS_DATA"}:
+        raise ValueError("SP3 could not score the review plan")
+    if plan.get("keep_conflicts"):
+        raise ValueError("review plan conflicts with an unaffected activity or hard limit")
+    if check_plan(planner_input, plan, context.score_callback):
+        raise ValueError("review plan failed SP3 independent validation")
+
+
+def _incomplete_planning_info(context: _ReviewContext, row: dict) -> str | None:
+    """Why an activity lacks the planning data a replacement needs, or None when complete."""
+    activity = row["activity"]
+    schedule = row.get("schedule") or {}
+    if not row.get("score_binding_ref"):
+        return "missing criterion/points binding"
+    if schedule.get("type") not in {"FIXED", "FLEXIBLE_WINDOW"} or not activity.get("start") or not activity.get("end"):
+        return "missing start or end"
+    mode = activity.get("mode")
+    if mode not in {"online", "offline", "hybrid"}:
+        return "missing participation mode"
+    if mode in {"offline", "hybrid"}:
+        feature = context.engine.features.get(activity["activity_id"])
+        if not activity.get("location") and (feature is None or not feature.campus_id):
+            return "missing campus"
+    return None
+
+
+def _deadline_sort_key(value: str | None) -> tuple:
+    """Later registration deadline first; a missing deadline sorts last."""
+    if not value:
+        return (1, 0.0)
+    return (0, -datetime.fromisoformat(value).timestamp())
+
+
+def list_swap_alternatives(
+    preference: StudentPreference,
+    base_result: dict,
+    remove_activity_id: str,
+    limit: int = REVIEW_DEFAULT_LIMIT,
+) -> dict:
+    """List valid replacements for ``remove_activity_id``, best first.
+
+    Each candidate is tried with ``preview_personalized_swap``. It is kept only
+    when SP3 validates the plan (0 checker violations, no keep conflicts), the
+    candidate has complete planning data, hard exclusions do not apply, and the
+    plan still reaches the target. If the base plan was already below the target,
+    the replacement must not lower the projected total instead.
+    Ranking: preference utility (higher), total plan duration (shorter),
+    registration deadline (later), activity_id.
+    """
+    if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= REVIEW_MAX_LIMIT:
+        raise ValueError(f"limit must be an integer from 1 to {REVIEW_MAX_LIMIT}")
+    context = _review_context(preference, base_result, remove_activity_id)
+    base_projected = context.base_summary.get("projected_total")
+    if isinstance(base_projected, bool) or not isinstance(base_projected, (int, float)):
+        raise ValueError("base_result has no projected total")
+    base_reached_target = base_projected >= context.target_total - _TARGET_TOLERANCE
+    floor = context.target_total if base_reached_target else base_projected
+
+    valid: list[dict] = []
+    filtered: list[dict] = []
+
+    def reject(activity_id: str, code: str, message: str) -> None:
+        filtered.append({"activity_id": activity_id, "code": code, "message": message})
+
+    for row in sorted(context.planner_input["candidates"], key=lambda item: item["activity"]["activity_id"]):
+        activity_id = row["activity"]["activity_id"]
+        if activity_id in context.selected_ids:
+            continue
+        hard = context.engine.hard_exclusion_reasons(activity_id)
+        if hard:
+            reject(activity_id, "HARD_EXCLUDED", "Excluded by the confirmed preference: " + ", ".join(hard) + ".")
+            continue
+        if row["feasibility"]["status"] != "FEASIBLE" or row["participation"]["progress"] != "NOT_STARTED":
+            reject(activity_id, "NOT_FEASIBLE", "Not feasible for this student.")
+            continue
+        missing = _incomplete_planning_info(context, row)
+        if missing is not None:
+            reject(activity_id, "INCOMPLETE_INFO", "Incomplete planning information: " + missing + ".")
+            continue
+        try:
+            preview = preview_personalized_swap(preference, base_result, remove_activity_id, activity_id)
+        except ValueError as exc:
+            reject(activity_id, "SWAP_REJECTED", str(exc))
+            continue
+        plan = preview["result"]["plan"]
+        projected = (plan.get("score_summary") or {}).get("projected_total")
+        if not isinstance(projected, (int, float)) or projected < floor - _TARGET_TOLERANCE:
+            reject(
+                activity_id, "BELOW_TARGET",
+                "The plan would not reach the target." if base_reached_target
+                else "The plan would score lower than the current plan.",
+            )
+            continue
+        entry = next((item for item in plan["selected_activities"] if item["activity_id"] == activity_id), None)
+        goal = next((r for r in (entry or {}).get("reasons", []) if r["code"] == "GOAL_CONTRIBUTION"), None)
+        if entry is None or goal is None or not goal.get("category_id"):
+            reject(activity_id, "INCOMPLETE_INFO", "Incomplete planning information: no scored criterion.")
+            continue
+        valid.append(_alternative_item(context, row, entry, goal, preview, remove_activity_id))
+
+    valid.sort(key=lambda item: (
+        -item["preference"]["utility"],
+        item["plan_duration_minutes"],
+        _deadline_sort_key(item["registration_deadline"]),
+        item["activity_id"],
+    ))
+    return {
+        "status": "ALTERNATIVES",
+        "remove_activity_id": remove_activity_id,
+        "target_total": context.target_total,
+        "base_projected_total": base_projected,
+        "required_projected_total": floor,
+        "target_rule": "REACH_TARGET" if base_reached_target else "NO_REGRESSION",
+        "total_valid": len(valid),
+        "limit": limit,
+        "items": valid[:limit],
+        "filtered_out": filtered,
+    }
+
+
+def _alternative_item(
+    context: _ReviewContext,
+    row: dict,
+    entry: dict,
+    goal: dict,
+    preview: dict,
+    remove_activity_id: str,
+) -> dict:
+    activity = row["activity"]
+    activity_id = activity["activity_id"]
+    plan = preview["result"]["plan"]
+    scored = context.engine.selected_breakdown(
+        {"contributions": [{"activity_id": activity_id, "category_id": goal["category_id"]}]}, [activity_id],
+    )[0]
+    feature = context.engine.features.get(activity_id)
+    summary = plan.get("score_summary") or {}
+    return {
+        "activity_id": activity_id,
+        "title": entry["title"],
+        "schedule_type": entry["schedule_type"],
+        "scheduled_blocks": deepcopy(entry["scheduled_blocks"]),
+        "criterion": goal["category_id"],
+        "effective_gain": goal["projected_added"],
+        "projected_total": summary.get("projected_total"),
+        "remaining_total": summary.get("remaining_total"),
+        "target_met": summary.get("remaining_total") == 0,
+        "duration_minutes": _plan_minutes({"selected_activities": [entry]}),
+        "plan_duration_minutes": preview["after"]["duration_minutes"],
+        "mode": activity.get("mode"),
+        "campus": None if feature is None else feature.campus_id,
+        "location": activity.get("location"),
+        "registration_deadline": activity.get("registration_deadline"),
+        "preference": {"utility": scored["utility"], "matches": scored["matches"]},
+        "added_activity_ids": preview["added_activity_ids"],
+        "dropped_activity_ids": preview["dropped_activity_ids"],
+        "extra_added_activity_ids": sorted(set(preview["added_activity_ids"]) - {activity_id}),
+        "preview_id": _preview_id(remove_activity_id, activity_id, preview["result"]),
+        "preview": preview,
+    }
+
+
+def _preview_id(remove_activity_id: str, add_activity_id: str, result: dict) -> str:
+    """Stateless id of a preview: the same swap on the same plan gives the same id."""
+    canonical = json.dumps(
+        [remove_activity_id, add_activity_id, _plan_signature(result)], separators=(",", ":"),
+    )
+    return "swap-" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+# REVIEW-DASH END
