@@ -1429,102 +1429,35 @@
               <span><b class="text-slate-300">Bản đề xuất tham khảo.</b> Điểm chỉ được ghi nhận sau khi nhà trường xác nhận.</span><span id="planDisclosureSource" class="dev-only font-mono text-amber-300">DEMO_ONLY · official_award_verified: false · SYNTHETIC-DEMO</span><span id="planRealSourceNote" class="hidden text-sky-300">Đang dùng kho bài thật (hoạt động từ bài đăng thật, sinh viên giả lập, mốc ngày 01/10/2026).</span>
             </div>
 
-            <nav class="grid grid-cols-1 gap-2 sm:grid-cols-3" aria-label="Hồ sơ và lịch">
-              <button type="button" onclick="document.getElementById('studentProfileSection').scrollIntoView({behavior:'smooth'})" class="rounded-xl border border-indigo-500/30 bg-indigo-950/20 px-4 py-3 text-left"><span class="block text-sm font-extrabold text-white">Hồ sơ sinh viên</span><span class="text-xs text-slate-400">Thông tin, mục tiêu và AI chỉnh sửa</span></button>
-              <button type="button" onclick="document.getElementById('personalScheduleSection').scrollIntoView({behavior:'smooth'})" class="rounded-xl border border-sky-500/30 bg-sky-950/20 px-4 py-3 text-left"><span class="block text-sm font-extrabold text-white">Lịch cá nhân</span><span class="text-xs text-slate-400">Lịch tuần và ngoại lệ</span></button>
-              <button type="button" onclick="document.getElementById('smartPlanSection').scrollIntoView({behavior:'smooth'})" class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 px-4 py-3 text-left"><span class="block text-sm font-extrabold text-white">Kế hoạch thông minh</span><span class="text-xs text-slate-400">Các phương án và lịch đề xuất</span></button>
-            </nav>
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#1b2537] pb-3">
+              <div class="inline-flex rounded-xl border border-[#1b2537] bg-[#080d18] p-1" role="tablist" aria-label="Hồ sơ và Lịch">
+                <button id="profileScheduleTabProfile" type="button" role="tab" aria-selected="true" onclick="setProfileScheduleTab('profile')" class="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-extrabold text-white shadow-sm transition">Hồ sơ</button>
+                <button id="profileScheduleTabSchedule" type="button" role="tab" aria-selected="false" onclick="setProfileScheduleTab('schedule')" class="rounded-lg px-4 py-2 text-xs font-bold text-slate-400 transition hover:text-white">Lịch</button>
+              </div>
+              <div class="flex items-center gap-2">
+                <span id="profileScheduleSaveStatus" class="hidden rounded-full border border-emerald-500/35 bg-emerald-950/40 px-3 py-1 text-[11px] font-bold text-emerald-300">Đã lưu thay đổi</span>
+                <button type="button" onclick="document.getElementById('smartPlanSection')?.scrollIntoView({behavior:'smooth'}) || document.getElementById('personalScheduleSection')?.scrollIntoView({behavior:'smooth'})" class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 px-3.5 py-2 text-xs font-bold text-emerald-200 transition hover:bg-emerald-950/40">Đến Kế hoạch thông minh ↓</button>
+              </div>
+            </div>
 
-            <section id="studentProfileSection" class="rounded-2xl border border-[#2b3a54] bg-[#080d18] p-4 lg:p-5 space-y-4">
-              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div><h3 class="text-base font-extrabold text-white">Hồ sơ sinh viên</h3><p class="text-xs text-slate-400">Một nguồn dữ liệu đã xác nhận cho onboarding, chỉnh sửa và lập kế hoạch.</p></div><span id="profileConfirmedBadge" class="rounded-full border border-emerald-500/30 bg-emerald-950/30 px-3 py-1 text-xs font-bold text-emerald-300">Đã lưu trên trình duyệt</span></div>
-              <div class="grid gap-3 sm:grid-cols-3"><label class="text-xs text-slate-400">Họ tên<input id="profileFullName" oninput="updateProfileManual()" class="mt-1 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2 text-white" /></label><label class="text-xs text-slate-400">Lớp<input id="profileClass" oninput="updateProfileManual()" class="mt-1 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2 text-white" /></label><label class="text-xs text-slate-400">Ngành<input id="profileMajor" oninput="updateProfileManual()" class="mt-1 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2 text-white" /></label></div>
-              <div class="grid gap-3 sm:grid-cols-2"><label class="text-xs text-slate-400">Mục tiêu ĐRL<input id="profileDrlTarget" type="number" min="0" max="100" oninput="updateProfileManual()" class="mt-1 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2 text-white" /></label><label class="text-xs text-slate-400">Giới hạn tham gia mỗi tuần (giờ, tùy chọn)<input id="profileWeeklyHours" type="number" min="0.5" max="168" step="0.5" oninput="updateProfileManual()" class="mt-1 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2 text-white" /></label></div>
-              <div><h4 class="text-xs font-extrabold uppercase tracking-wide text-slate-400">Điểm hiện có</h4><div id="profileScoresSummary" class="mt-2 grid gap-2 sm:grid-cols-5"></div></div>
-              <div class="rounded-xl border border-[#2b3a54] bg-[#0e1524] p-3"><h4 class="text-xs font-extrabold uppercase tracking-wide text-slate-400">Nguyện vọng đã xác nhận</h4><div id="profilePreferenceSummary" class="mt-1 text-xs text-slate-300">Chưa có nguyện vọng đã xác nhận.</div></div>
-              <details class="rounded-xl border border-violet-500/30 bg-violet-950/15 p-4"><summary class="cursor-pointer text-sm font-extrabold text-violet-200">AI chỉnh sửa hồ sơ</summary><p class="mt-2 text-xs text-slate-400">Mô tả một thay đổi. UniLife luôn hiển thị cũ → mới trước khi lưu.</p><form onsubmit="submitProfileAssistantMessage(event, 'profile')" class="mt-3 flex flex-col gap-2 sm:flex-row"><input id="profileAiInput" maxlength="2000" class="min-h-11 flex-1 rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 text-sm text-white" placeholder="Đổi mục tiêu của mình thành 90 điểm" /><button class="rounded-xl bg-violet-600 px-5 py-2 text-sm font-bold">Phân tích</button></form><div id="profileAiPreview" class="mt-3 hidden rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs"></div></details>
+            <div id="schedulePlanConflictNotice" class="hidden rounded-2xl border border-amber-400/40 bg-amber-950/35 p-4 text-xs text-amber-100"></div>
+
+            <!-- SUBPAGE 1: HỒ SƠ (manual controls matching onboarding) -->
+            <section id="profileSchedulePanelProfile" role="tabpanel" aria-labelledby="profileScheduleTabProfile" class="space-y-4">
+              <div id="profileScheduleProfileBody"></div>
+            </section>
+
+            <!-- SUBPAGE 2: LỊCH (exact shared interactive 15-min busy calendar) -->
+            <section id="profileSchedulePanelSchedule" role="tabpanel" aria-labelledby="profileScheduleTabSchedule" class="hidden space-y-4">
+              <div id="profileScheduleHeader"></div>
+              <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+                <div id="profileScheduleGrid" class="overflow-x-auto rounded-2xl border border-[#1b2537] bg-[#080d18] p-3"></div>
+                <aside id="profileScheduleSidebar" class="space-y-4"></aside>
+              </div>
             </section>
 
             <!-- Stepper 3 Bước Hành Trình (Kế hoạch ban đầu -> Khi lịch thay đổi -> Khi bỏ hoạt động) -->
             <div id="planStepper" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5"></div>
-
-            <!-- Day 4: AI-assisted preference review. AI output is never sent
-                 to the planner until the student explicitly confirms it. -->
-            <section class="hidden rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-4 lg:p-5 space-y-4" aria-labelledby="preferenceAssistantTitle">
-              <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
-                <div>
-                  <div class="flex flex-wrap items-center gap-2">
-                    <h3 id="preferenceAssistantTitle" class="text-base font-extrabold text-white">Cá nhân hóa kế hoạch theo nguyện vọng</h3>
-                    <span id="preferenceAiHealth" class="px-2 py-0.5 rounded-full text-[10px] font-bold border border-slate-600 text-slate-400">Đang kiểm tra AI…</span>
-                  </div>
-                  <p class="text-xs text-slate-300 mt-1 max-w-3xl">Mô tả điều bạn ưu tiên bằng tiếng Việt. Yêu cầu rõ ràng được nhận diện tức thì; AI chỉ xử lý câu khó hoặc mơ hồ. Bạn luôn được kiểm tra và xác nhận trước khi xếp lịch.</p>
-                </div>
-                <span id="preferenceConfirmedBadge" class="hidden px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 shrink-0 transition-all duration-300">✓ Đã xác nhận</span>
-              </div>
-
-              <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-3 items-end">
-                <label class="block">
-                  <span class="text-xs font-bold text-slate-200 block mb-1.5">Nguyện vọng của bạn</span>
-                  <textarea id="preferenceText" rows="3" maxlength="2000" oninput="onPreferenceTextChanged()" class="w-full rounded-xl bg-[#080d18] border border-[#223046] px-3.5 py-3 text-sm text-white placeholder:text-slate-500 focus:border-indigo-500 outline-none resize-y" placeholder="Ví dụ: Em thích Toán và AI, ưu tiên hoạt động mục 4, thích học online; nếu trực tiếp thì ưu tiên cơ sở Nguyễn Văn Cừ. Tối đa 4 hoạt động."></textarea>
-                </label>
-                <button id="btnInterpretPreference" type="button" onclick="interpretPreference()" class="h-11 px-5 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-bold transition">Phân tích nguyện vọng</button>
-              </div>
-              <div>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Chọn nhanh chủ đề quan tâm</span>
-                <div id="preferenceQuickTopics" class="flex flex-wrap gap-2">
-                  <button type="button" onclick="addPreferencePhrase('Toán học')" class="min-h-10 px-3 rounded-lg border border-violet-500/30 bg-violet-950/30 text-xs font-bold text-violet-200 hover:bg-violet-900/50">Toán học</button>
-                  <button type="button" onclick="addPreferencePhrase('Vật lý')" class="min-h-10 px-3 rounded-lg border border-emerald-500/30 bg-emerald-950/30 text-xs font-bold text-emerald-200 hover:bg-emerald-900/50">Vật lý</button>
-                  <button type="button" onclick="addPreferencePhrase('Hóa học')" class="min-h-10 px-3 rounded-lg border border-sky-500/30 bg-sky-950/30 text-xs font-bold text-sky-200 hover:bg-sky-900/50">Hóa học</button>
-                  <button type="button" onclick="addPreferencePhrase('Sinh học')" class="min-h-10 px-3 rounded-lg border border-lime-500/30 bg-lime-950/30 text-xs font-bold text-lime-200 hover:bg-lime-900/50">Sinh học</button>
-                  <button type="button" onclick="addPreferencePhrase('Tin học và lập trình')" class="min-h-10 px-3 rounded-lg border border-blue-500/30 bg-blue-950/30 text-xs font-bold text-blue-200 hover:bg-blue-900/50">Tin học &amp; Lập trình</button>
-                  <button type="button" onclick="addPreferencePhrase('Trí tuệ nhân tạo')" class="min-h-10 px-3 rounded-lg border border-fuchsia-500/30 bg-fuchsia-950/30 text-xs font-bold text-fuchsia-200 hover:bg-fuchsia-900/50">AI</button>
-                  <button type="button" onclick="addPreferencePhrase('Ngoại ngữ')" class="min-h-10 px-3 rounded-lg border border-cyan-500/30 bg-cyan-950/30 text-xs font-bold text-cyan-200 hover:bg-cyan-900/50">Ngoại ngữ</button>
-                  <button type="button" onclick="addPreferencePhrase('Kinh tế và tài chính')" class="min-h-10 px-3 rounded-lg border border-amber-500/30 bg-amber-950/30 text-xs font-bold text-amber-200 hover:bg-amber-900/50">Kinh tế &amp; Tài chính</button>
-                  <button type="button" onclick="addPreferencePhrase('Nghiên cứu')" class="min-h-10 px-3 rounded-lg border border-[#334155] bg-[#111827] text-xs font-bold text-slate-300 hover:bg-[#1e293b]">Nghiên cứu</button>
-                  <button type="button" onclick="addPreferencePhrase('Kỹ năng mềm')" class="min-h-10 px-3 rounded-lg border border-[#334155] bg-[#111827] text-xs font-bold text-slate-300 hover:bg-[#1e293b]">Kỹ năng mềm</button>
-                  <button type="button" onclick="addPreferencePhrase('Tình nguyện')" class="min-h-10 px-3 rounded-lg border border-[#334155] bg-[#111827] text-xs font-bold text-slate-300 hover:bg-[#1e293b]">Tình nguyện</button>
-                  <button type="button" onclick="addPreferencePhrase('Môi trường')" class="min-h-10 px-3 rounded-lg border border-[#334155] bg-[#111827] text-xs font-bold text-slate-300 hover:bg-[#1e293b]">Môi trường</button>
-                  <button type="button" onclick="addPreferencePhrase('Văn hóa và thể thao')" class="min-h-10 px-3 rounded-lg border border-[#334155] bg-[#111827] text-xs font-bold text-slate-300 hover:bg-[#1e293b]">Văn hóa &amp; Thể thao</button>
-                </div>
-              </div>
-
-              <div id="preferenceMessage" class="hidden rounded-xl border px-3.5 py-3 text-sm" role="status"></div>
-
-              <div id="preferenceReview" class="hidden rounded-xl bg-[#080d18] border border-[#223046] p-4 space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <h4 class="text-sm font-extrabold text-white">Kiểm tra kết quả AI</h4>
-                    <p class="text-xs text-amber-300 mt-0.5">Trọng số 1 = ít ưu tiên, 5 = rất ưu tiên. Hãy sửa hoặc xóa mục AI hiểu chưa đúng.</p>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <button id="btnDeleteSavedPreference" type="button" onclick="deleteSavedPreference()" class="hidden text-xs font-bold text-rose-400 hover:text-rose-300">Xóa nguyện vọng đã lưu</button>
-                    <button type="button" onclick="clearPreferenceDraft()" class="text-xs font-bold text-slate-400 hover:text-white">Làm lại</button>
-                  </div>
-                </div>
-                <div id="preferenceEditor" class="space-y-3"></div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <label class="text-xs text-slate-300">Tối đa hoạt động
-                    <input id="prefMaxActivities" type="number" min="1" max="20" onchange="updatePreferenceLimit('max_activities', this.value)" class="mt-1 w-full rounded-lg bg-[#0e1524] border border-[#223046] px-3 py-2 text-white" />
-                  </label>
-                  <label class="text-xs text-slate-300">Tổng thời lượng tối đa (phút)
-                    <input id="prefMaxDuration" type="number" min="30" max="10080" step="30" onchange="updatePreferenceLimit('max_duration_minutes', this.value)" class="mt-1 w-full rounded-lg bg-[#0e1524] border border-[#223046] px-3 py-2 text-white" />
-                  </label>
-                  <label class="text-xs text-slate-300">Chiến lược
-                    <select id="prefStrategy" onchange="updatePreferenceStrategy(this.value)" class="mt-1 w-full rounded-lg bg-[#0e1524] border border-[#223046] px-3 py-2 text-white">
-                      <option value="MINIMUM_EFFORT">Ít hoạt động / thời gian nhất</option>
-                      <option value="BALANCED">Cân bằng mục tiêu và sở thích</option>
-                      <option value="PREFERENCE_FIRST">Ưu tiên sở thích cao nhất</option>
-                    </select>
-                  </label>
-                </div>
-                <div id="confirmPreferenceRow" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl border border-[#223046] bg-[#0e1524] transition-all duration-200">
-                  <label id="confirmPreferenceLabel" class="flex items-start gap-2 text-xs text-slate-200 cursor-pointer">
-                    <input id="confirmPreferenceCheck" type="checkbox" onchange="updatePreferenceConfirmButton()" class="mt-0.5 rounded border-[#223046] text-indigo-600 focus:ring-indigo-500" />
-                    <span>Tôi đã kiểm tra và xác nhận các tiêu chí trên đúng với nguyện vọng của mình.<span id="confirmPreferenceHint" class="block mt-1 text-[11px] text-slate-500">Đánh dấu ô này để bật nút xác nhận.</span></span>
-                  </label>
-                  <button id="btnConfirmPreference" type="button" disabled onclick="confirmPreference()" class="px-4 py-2.5 rounded-xl bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-300 text-sm font-bold shrink-0 transition-all duration-200">Xác nhận để dùng khi xếp lịch</button>
-                </div>
-              </div>
-            </section>
 
             <!-- Horizontal Goal & Schedule Setting Bar -->
             <div id="personalScheduleSection" class="bg-[#080d18] rounded-xl border border-[#1b2537] p-4 lg:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
@@ -1623,7 +1556,25 @@
 
             <!-- Active Results Container -->
             <div id="plannerActiveResult" class="hidden space-y-5">
-              <section id="smartPlanSection" class="rounded-2xl border border-emerald-500/30 bg-emerald-950/10 p-4"><div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div><h3 class="font-extrabold text-white">Kế hoạch thông minh</h3><p id="planOptionsMessage" class="text-xs text-slate-400">Chuyển phương án tức thì, không tính lại.</p></div><button id="undoCustomPlanButton" type="button" onclick="undoCustomPlan()" class="hidden rounded-lg border border-amber-500/40 px-3 py-2 text-xs font-bold text-amber-300">Hoàn tác lịch tùy chỉnh</button></div><div id="planOptionsSelector" class="mt-3 grid gap-2 sm:grid-cols-3"></div></section>
+              <section id="smartPlanSection" class="rounded-2xl border border-emerald-500/30 bg-[#0e1524] p-5 shadow-xl space-y-4">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[#1b2537] pb-3">
+                  <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <h3 class="text-base font-black text-white">Kế hoạch thông minh · 3 phương án đề xuất</h3>
+                      <span id="plannerFlowStepBadge" class="rounded-full border border-indigo-400/30 bg-indigo-950/50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-200">Bước 1: Chọn phương án</span>
+                    </div>
+                    <p id="planOptionsMessage" class="mt-1 text-xs text-slate-400">Ba phương án được tính độc lập; chọn một phương án rồi chuyển sang màn hình Rà soát.</p>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <button id="undoCustomPlanButton" type="button" onclick="undoCustomPlan()" class="hidden rounded-xl border border-amber-500/40 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-950/40">Hoàn tác lịch tùy chỉnh</button>
+                    <button id="btnOpenPlanReview" type="button" onclick="openPlanReviewScreen(selectedPlanOptionIndex)" class="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-extrabold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-500">Rà soát phương án đã chọn →</button>
+                  </div>
+                </div>
+                <div id="planOptionsSelector" class="grid grid-cols-1 gap-3 lg:grid-cols-3"></div>
+              </section>
+
+              <!-- Dedicated Review Screen (Wireframe 08; delegates Confirm to Thao Duyen's contract) -->
+              <section id="planReviewScreen" class="hidden rounded-2xl border border-indigo-500/35 bg-[#0e1524] p-5 shadow-xl space-y-4" aria-label="Rà soát kế hoạch"></section>
 
               <!-- Stale Notice -->
               <div id="planStaleNotice" class="hidden p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-sm text-amber-200">
@@ -2607,7 +2558,10 @@
       if (name) name.textContent = currentStudent.full_name || "Sinh viên";
 
       const score = Math.min(100, Object.values(studentCategoryScores || {}).reduce((sum, item) => sum + safeNumber(item.current), 0));
-      const target = Math.max(0, Math.min(100, safeNumber(profile.goal.target_score || readLocalUserData(currentStudent.student_id).planner.target_total || 80)));
+      const target = normalizeDrlTarget(
+        profile.goal?.target_score,
+        normalizeDrlTarget(readLocalUserData(currentStudent.student_id).planner?.target_total, 80)
+      );
       const percent = target ? Math.min(100, Math.round(score / target * 100)) : 0;
       const goalSummary = document.getElementById("profileGoalSummary");
       const goalBar = document.getElementById("profileGoalBar");
@@ -3141,22 +3095,363 @@
       profile.exceptions = keptExceptions;
     }
 
-    function renderProfileWorkspace() {
-      const fields = { profileFullName: currentProfileDraft.profile?.full_name, profileClass: currentProfileDraft.profile?.class_name, profileMajor: currentProfileDraft.profile?.major };
-      Object.entries(fields).forEach(([id, value]) => { const input = document.getElementById(id); if (input) input.value = value || ""; });
-      const target = document.getElementById("profileDrlTarget");
-      const weeklyHours = document.getElementById("profileWeeklyHours");
-      if (target) target.value = currentProfileDraft.drl_target ?? 80;
-      if (weeklyHours) weeklyHours.value = currentProfileDraft.preference_patch?.weekly_participation_hours ?? "";
-      const scoreBox = document.getElementById("profileScoresSummary");
-      if (scoreBox) {
-        const sourceLabels = { confirmed: "Đã xác nhận", self_reported: "Tự khai", unknown: "Chưa biết" };
-        scoreBox.innerHTML = Object.keys(DEFAULT_SCORES_TEMPLATE).map(category => {
-          const score = currentProfileDraft.scores?.[category] || { value: null, source: "unknown" };
-          return `<div class="rounded-lg border border-[#2b3a54] p-2"><b class="text-white">${category}: ${score.value == null ? "—" : escapeHTML(score.value)}</b><span class="mt-1 block text-[10px] text-slate-500">${sourceLabels[score.source] || sourceLabels.unknown}</span></div>`;
-        }).join("");
+    let activeProfileScheduleTab = "profile";
+    let profileScheduleTopicQuery = "";
+
+    function setProfileScheduleTab(tab) {
+      activeProfileScheduleTab = tab === "schedule" ? "schedule" : "profile";
+      const tabProfile = document.getElementById("profileScheduleTabProfile");
+      const tabSchedule = document.getElementById("profileScheduleTabSchedule");
+      const panelProfile = document.getElementById("profileSchedulePanelProfile");
+      const panelSchedule = document.getElementById("profileSchedulePanelSchedule");
+      const isSchedule = activeProfileScheduleTab === "schedule";
+      if (panelProfile) panelProfile.classList.toggle("hidden", isSchedule);
+      if (panelSchedule) panelSchedule.classList.toggle("hidden", !isSchedule);
+      if (tabProfile) {
+        tabProfile.setAttribute("aria-selected", String(!isSchedule));
+        tabProfile.className = !isSchedule
+          ? "rounded-lg bg-indigo-600 px-4 py-2 text-xs font-extrabold text-white shadow-sm transition"
+          : "rounded-lg px-4 py-2 text-xs font-bold text-slate-400 transition hover:text-white";
       }
-      renderConfirmedPreferenceSummary();
+      if (tabSchedule) {
+        tabSchedule.setAttribute("aria-selected", String(isSchedule));
+        tabSchedule.className = isSchedule
+          ? "rounded-lg bg-indigo-600 px-4 py-2 text-xs font-extrabold text-white shadow-sm transition"
+          : "rounded-lg px-4 py-2 text-xs font-bold text-slate-400 transition hover:text-white";
+      }
+      if (isSchedule) renderProfileScheduleTab();
+      else renderProfileScheduleProfilePanel();
+    }
+
+    function inferProfileModeChoice() {
+      const g = currentProfileDraft?.goal || {};
+      if (g.mode_choice) return g.mode_choice;
+      const excl = confirmedPreference?.hard_exclusions?.modes || [];
+      const modes = (confirmedPreference?.mode_preferences || []).map(m => m.mode);
+      if (excl.includes("offline") && excl.includes("hybrid")) return "online_only";
+      if (modes.includes("online")) return "prefer_online";
+      if (modes.includes("offline")) return "prefer_offline";
+      return "any";
+    }
+
+    function inferProfileCampusChoice() {
+      const g = currentProfileDraft?.goal || {};
+      if (g.campus_choice) return g.campus_choice;
+      const excl = confirmedPreference?.hard_exclusions?.campus_ids || [];
+      const camps = (confirmedPreference?.campus_preferences || []).map(c => c.campus_id);
+      if (excl.includes("DONG_HOA")) return "only_nvc";
+      if (excl.includes("NVC")) return "only_dong_hoa";
+      if (camps.includes("NVC")) return "prefer_nvc";
+      if (camps.includes("DONG_HOA")) return "prefer_dong_hoa";
+      return "any";
+    }
+
+    function ensureProfileDraftGoal() {
+      currentProfileDraft.goal = currentProfileDraft.goal || { natural_text: "", target_score: 80, priorities: [], format: "", topics: [] };
+      const g = currentProfileDraft.goal;
+      if (!Array.isArray(g.priority_ids)) {
+        g.priority_ids = (confirmedPreference?.category_priorities || []).map(c => c.category_id);
+      }
+      if (!Array.isArray(g.topic_ids)) {
+        g.topic_ids = (confirmedPreference?.topic_preferences || []).map(t => t.topic_id);
+      }
+      if (!g.mode_choice) g.mode_choice = inferProfileModeChoice();
+      if (!g.campus_choice) g.campus_choice = inferProfileCampusChoice();
+      return g;
+    }
+
+    function psSetTargetPreset(score) {
+      const g = ensureProfileDraftGoal();
+      const val = normalizeDrlTarget(score, 80);
+      g.target_score = val;
+      currentProfileDraft.drl_target = val;
+      const input = document.getElementById("psDrlTarget");
+      if (input) input.value = val;
+      renderProfileScheduleProfilePanel();
+    }
+
+    function psSelectCategory(catId) {
+      const g = ensureProfileDraftGoal();
+      g.priority_ids = catId === "ANY" ? [] : (["C1", "C2", "C3", "C4", "C5"].includes(catId) ? [catId] : g.priority_ids);
+      g.priorities = g.priority_ids.map(id => PLAN_CAT_FULL[id] || id);
+      g.completed_questions = { ...(g.completed_questions || {}), q2: true };
+      renderProfileScheduleProfilePanel();
+    }
+
+    function psSelectMode(modeId) {
+      const g = ensureProfileDraftGoal();
+      const opt = ONBOARDING_MODE_OPTIONS.find(o => o.id === modeId);
+      if (!opt) return;
+      g.mode_choice = modeId;
+      g.format = opt.title;
+      g.completed_questions = { ...(g.completed_questions || {}), q3: true };
+      renderProfileScheduleProfilePanel();
+    }
+
+    function psSelectCampus(campusId) {
+      const g = ensureProfileDraftGoal();
+      if (!ONBOARDING_CAMPUS_OPTIONS.some(o => o.id === campusId)) return;
+      g.campus_choice = campusId;
+      g.completed_questions = { ...(g.completed_questions || {}), q4: true };
+      renderProfileScheduleProfilePanel();
+    }
+
+    function psSetTopicSearch(query) {
+      profileScheduleTopicQuery = String(query || "");
+      renderProfileScheduleProfilePanel(true);
+    }
+
+    function psToggleTopic(topicId) {
+      const g = ensureProfileDraftGoal();
+      if (!ONBOARDING_ALL_TOPICS.includes(topicId)) return;
+      g.topic_ids = g.topic_ids.includes(topicId)
+        ? g.topic_ids.filter(id => id !== topicId)
+        : [...g.topic_ids, topicId];
+      g.topics = g.topic_ids.map(id => PREF_LABELS[id] || id);
+      g.completed_questions = { ...(g.completed_questions || {}), q5: true };
+      renderProfileScheduleProfilePanel(true);
+    }
+
+    function saveProfileScheduleEdits() {
+      if (!currentProfileDraft) return;
+      const fullName = document.getElementById("psFullName")?.value.trim();
+      const faculty = document.getElementById("psFaculty")?.value.trim() ?? currentProfileDraft.faculty ?? "";
+      const cohort = document.getElementById("psCohort")?.value.trim() ?? currentProfileDraft.cohort ?? "";
+      const program = document.getElementById("psProgram")?.value.trim() ?? currentProfileDraft.program ?? "";
+      const semester = document.getElementById("psSemester")?.value || currentProfileDraft.semester || "HK1 · 2026–2027";
+      const rawTarget = document.getElementById("psDrlTarget")?.value;
+      const targetScore = normalizeDrlTarget(rawTarget, normalizeDrlTarget(currentProfileDraft.drl_target, 80));
+
+      currentProfileDraft.profile = {
+        ...(currentProfileDraft.profile || {}),
+        full_name: fullName || currentStudent?.full_name || currentProfileDraft.profile?.full_name || "",
+        major: faculty || currentProfileDraft.profile?.major || ""
+      };
+      currentProfileDraft.faculty = faculty;
+      currentProfileDraft.cohort = cohort;
+      currentProfileDraft.program = program;
+      currentProfileDraft.semester = semester;
+      currentProfileDraft.drl_target = targetScore;
+      const g = ensureProfileDraftGoal();
+      g.target_score = targetScore;
+      g.completed_questions = { ...(g.completed_questions || {}), q1: true, q2: true, q3: true, q4: true, q5: true };
+
+      if (currentStudent) {
+        if (fullName) currentStudent.full_name = fullName;
+        if (faculty) currentStudent.major = faculty;
+        localStorage.setItem("unilife_student", JSON.stringify(currentStudent));
+        const users = readLocalUsers();
+        const account = users.find(u => normalizeMssv(u.student_id) === normalizeMssv(currentStudent.student_id));
+        if (account) {
+          account.full_name = currentStudent.full_name;
+          account.major = faculty || account.major;
+          localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
+        }
+        const headerName = document.getElementById("headerUserName");
+        if (headerName) headerName.innerText = currentStudent.full_name || "Sinh viên";
+        const headerFac = document.getElementById("headerUserFaculty");
+        if (headerFac) headerFac.textContent = faculty || currentStudent.major || "Chưa cập nhật khoa";
+      }
+
+      syncConfirmedPreferenceFromProfile("onboarding");
+      markPlanStale();
+      persistCurrentUserData();
+      renderStudentProfile();
+      renderProfileScheduleProfilePanel();
+      renderSchedulePlanConflictNotice();
+      const badge = document.getElementById("profileScheduleSaveStatus");
+      if (badge) {
+        badge.classList.remove("hidden");
+        badge.textContent = "✓ Đã lưu hồ sơ";
+      }
+    }
+
+    function renderProfileScheduleProfilePanel(preserveSearchFocus = false) {
+      const container = document.getElementById("profileScheduleProfileBody");
+      if (!container || !currentProfileDraft) return;
+      const g = ensureProfileDraftGoal();
+      const targetScore = normalizeDrlTarget(g.target_score, normalizeDrlTarget(currentProfileDraft.drl_target, 80));
+      const semesters = ["HK3 · 2025–2026", "HK1 · 2026–2027"];
+      const queryLower = profileScheduleTopicQuery.trim().toLocaleLowerCase("vi");
+      const filteredTopics = ONBOARDING_ALL_TOPICS.filter(id => {
+        if (!queryLower) return true;
+        const label = (PREF_LABELS[id] || id).toLocaleLowerCase("vi");
+        return label.includes(queryLower) || id.includes(queryLower);
+      });
+      const fullNameVal = currentProfileDraft.profile?.full_name || currentStudent?.full_name || "";
+      const mssvVal = currentStudent?.student_id || "";
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <div class="rounded-2xl border border-[#1b2537] bg-[#080d18] p-4 sm:p-5 space-y-4">
+            <div>
+              <h3 class="text-sm font-extrabold text-white">Thông tin sinh viên</h3>
+              <p class="mt-0.5 text-xs text-slate-400">Đồng bộ trực tiếp với hồ sơ onboarding và tài khoản hiện tại.</p>
+            </div>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label class="text-xs font-bold text-slate-300">Họ và tên<input id="psFullName" value="${escapeHTML(fullNameVal)}" maxlength="100" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
+              <label class="text-xs font-bold text-slate-300">MSSV<input id="psStudentId" value="${escapeHTML(mssvVal)}" readonly class="mt-1.5 w-full rounded-xl border border-[#1b2537] bg-[#070b14] px-3 py-2 text-xs font-mono text-slate-400 outline-none" /></label>
+              <label class="text-xs font-bold text-slate-300">Khoa<input id="psFaculty" value="${escapeHTML(currentProfileDraft.faculty || "")}" maxlength="100" placeholder="Ví dụ: Khoa Công nghệ Thông tin" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
+              <label class="text-xs font-bold text-slate-300">Khóa tuyển<input id="psCohort" value="${escapeHTML(currentProfileDraft.cohort || "")}" maxlength="40" placeholder="Ví dụ: 2025" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
+              <label class="text-xs font-bold text-slate-300">Chương trình đào tạo<input id="psProgram" value="${escapeHTML(currentProfileDraft.program || "")}" maxlength="120" placeholder="Ví dụ: Chương trình chuẩn" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
+              <label class="text-xs font-bold text-slate-300">Học kỳ lập kế hoạch<select id="psSemester" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500">${semesters.map(s => `<option ${s === (currentProfileDraft.semester || "HK1 · 2026–2027") ? "selected" : ""}>${escapeHTML(s)}</option>`).join("")}</select></label>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-[#1b2537] bg-[#080d18] p-4 sm:p-5 space-y-4">
+            <div>
+              <h3 class="text-sm font-extrabold text-white">Mục tiêu ĐRL & Mục ưu tiên</h3>
+              <p class="mt-0.5 text-xs text-slate-400">Áp dụng trực tiếp vào bộ lập lịch SP3 khi bạn lưu.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              ${[65, 80, 90].map(score => `<button type="button" onclick="psSetTargetPreset(${score})" class="rounded-xl border px-3 py-2 text-xs font-bold transition ${targetScore === score ? "border-indigo-400 bg-indigo-500/25 text-white" : "border-[#223046] bg-[#0e1524] text-slate-300 hover:border-indigo-400/60"}">${score}đ</button>`).join("")}
+              <label class="inline-flex items-center gap-2 pl-2 text-xs font-bold text-slate-300">Tùy chỉnh:
+                <input id="psDrlTarget" type="number" min="0" max="100" value="${targetScore}" class="w-20 rounded-xl border border-[#223046] bg-[#0e1524] px-2.5 py-1.5 text-center text-xs font-extrabold text-white outline-none focus:border-indigo-500" />
+              </label>
+            </div>
+            <div>
+              <span class="block text-xs font-bold text-slate-300 mb-2">Mục điểm rèn luyện ưu tiên</span>
+              <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                ${ONBOARDING_CATEGORY_OPTIONS.map(opt => {
+                  const selected = opt.id === "ANY" ? g.priority_ids.length === 0 : g.priority_ids.includes(opt.id);
+                  return `<button type="button" onclick="psSelectCategory('${opt.id}')" class="rounded-xl border px-3 py-2 text-left text-xs font-bold transition ${selected ? "border-indigo-400 bg-indigo-500/20 text-white" : "border-[#223046] bg-[#0e1524] text-slate-300 hover:border-indigo-400/50"}">${escapeHTML(opt.title)}</button>`;
+                }).join("")}
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-[#1b2537] bg-[#080d18] p-4 sm:p-5 space-y-4">
+            <h3 class="text-sm font-extrabold text-white">Hình thức & Cơ sở tham gia</h3>
+            <div class="space-y-2">
+              <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">Hình thức</span>
+              <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                ${ONBOARDING_MODE_OPTIONS.map(opt => `<button type="button" onclick="psSelectMode('${opt.id}')" class="rounded-xl border p-2.5 text-left transition ${g.mode_choice === opt.id ? "border-indigo-400 bg-indigo-500/20 text-white" : "border-[#223046] bg-[#0e1524] text-slate-300 hover:border-indigo-400/50"}"><div class="flex items-center justify-between gap-1"><span class="text-xs font-bold">${escapeHTML(opt.title)}</span><span class="rounded-full border px-1.5 py-0.5 text-[9px] font-bold ${opt.badgeClass}">${opt.badge}</span></div></button>`).join("")}
+              </div>
+            </div>
+            <div class="space-y-2">
+              <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">Cơ sở</span>
+              <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                ${ONBOARDING_CAMPUS_OPTIONS.map(opt => `<button type="button" onclick="psSelectCampus('${opt.id}')" class="rounded-xl border p-2.5 text-left transition ${g.campus_choice === opt.id ? "border-indigo-400 bg-indigo-500/20 text-white" : "border-[#223046] bg-[#0e1524] text-slate-300 hover:border-indigo-400/50"}"><div class="flex items-center justify-between gap-1"><span class="text-xs font-bold">${escapeHTML(opt.title)}</span><span class="rounded-full border px-1.5 py-0.5 text-[9px] font-bold ${opt.badgeClass}">${opt.badge}</span></div></button>`).join("")}
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-[#1b2537] bg-[#080d18] p-4 sm:p-5 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="text-sm font-extrabold text-white">Chủ đề quan tâm (${g.topic_ids.length}/19)</h3>
+              <span class="rounded-full border border-indigo-400/30 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-bold text-indigo-200">Ưu tiên mềm</span>
+            </div>
+            <input id="psTopicSearch" type="search" value="${escapeHTML(profileScheduleTopicQuery)}" oninput="psSetTopicSearch(this.value)" placeholder="Tìm trong 19 chủ đề..." class="w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" />
+            <div class="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto pr-1">
+              ${filteredTopics.map(id => {
+                const selected = g.topic_ids.includes(id);
+                return `<button type="button" aria-pressed="${selected}" onclick="psToggleTopic('${id}')" class="rounded-full border px-2.5 py-1 text-[11px] font-bold transition ${selected ? "border-indigo-400 bg-indigo-500/25 text-white" : "border-[#223046] bg-[#0e1524] text-slate-300 hover:border-indigo-400/50"}">${selected ? "✓ " : ""}${escapeHTML(PREF_LABELS[id] || id)}</button>`;
+              }).join("") || `<span class="text-xs text-slate-500">Không tìm thấy chủ đề.</span>`}
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-end gap-3 pt-1">
+          <button id="btnSaveProfileSchedule" type="button" onclick="saveProfileScheduleEdits()" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-extrabold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-500">Lưu thay đổi hồ sơ</button>
+        </div>`;
+
+      if (preserveSearchFocus) {
+        const searchEl = document.getElementById("psTopicSearch");
+        if (searchEl) {
+          searchEl.focus();
+          const len = searchEl.value.length;
+          searchEl.setSelectionRange?.(len, len);
+        }
+      }
+    }
+
+    function renderProfileScheduleTab() {
+      const header = document.getElementById("profileScheduleHeader");
+      if (!currentProfileDraft) return;
+      const schedule = ensureOnboardingScheduleShape("profile");
+      if (header && schedule) {
+        const checked = Boolean(schedule.applies_to_semester);
+        const tabs = [["class", "Học trên lớp"], ["work", "Làm thêm"], ["personal", "Việc cá nhân"]];
+        const countByCat = cat => schedule.entries.filter(e => e.category === cat).length + schedule.slots.filter(s => String(s).startsWith(`${cat}|`)).length;
+        header.innerHTML = `
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 class="text-base font-extrabold text-white">Lịch bận cá nhân (07:00–21:00)</h3>
+              <p class="mt-0.5 text-xs text-slate-400">Kéo chuột trên lưới để chọn khung 15 phút; mọi thay đổi tự động đồng bộ với tài khoản.</p>
+            </div>
+            <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border ${checked ? "border-indigo-400/50 bg-indigo-950/40 text-indigo-100" : "border-[#223046] bg-[#080d18] text-slate-300"} px-3 py-2 text-xs font-bold transition">
+              <input id="profileAppliesSemester" type="checkbox" ${checked ? "checked" : ""} onchange="setOnboardingSemesterBusy(this.checked, 'profile')" class="h-4 w-4 rounded accent-indigo-500" />
+              <span>Áp dụng giống nhau cho cả học kỳ</span>
+            </label>
+          </div>
+          <div class="mt-3 flex flex-wrap items-center justify-between gap-3 border-b border-[#1b2537] pb-3">
+            <div class="flex flex-wrap gap-2" role="tablist" aria-label="Loại lịch bận">${tabs.map(([key, title]) => {
+              const meta = ONBOARDING_BUSY_CATEGORIES[key];
+              const active = activeOnboardingBusyCategory === key;
+              return `<button type="button" role="tab" aria-selected="${active}" onclick="setOnboardingBusyCategory('${key}', 'profile')" class="inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-bold transition ${active ? `${meta.badgeClass} shadow-sm` : "border-[#1b2537] bg-[#080d18] text-slate-400 hover:border-[#2b3a54] hover:text-white"}"><span class="h-2 w-2 rounded-full ${meta.dotClass}"></span>${title}<span class="rounded-md bg-black/25 px-1.5 py-0.5 text-[10px] planner-number">${countByCat(key)}</span></button>`;
+            }).join("")}</div>
+            <span class="text-[11px] text-slate-400">${checked ? "Đang lặp lại hằng tuần cho cả học kỳ." : "Đang chỉ áp dụng cho tuần đang chọn."}</span>
+          </div>`;
+      }
+      renderOnboardingSchedule("profile");
+      renderSchedulePlanConflictNotice();
+    }
+
+    function detectPlanBusyConflicts() {
+      const selected = currentPlannerData?.plan?.selected_activities || [];
+      if (!selected.length) return [];
+      const busy = collectBusyIntervals();
+      if (!busy.length) return [];
+      const titles = planTitleMap(currentPlannerData);
+      const conflicts = [];
+      selected.forEach(item => {
+        const blocks = item.scheduled_blocks || [];
+        const hit = blocks.some(block => busy.some(b => block.start < b.end && block.end > b.start));
+        if (hit) {
+          conflicts.push({
+            activity_id: item.activity_id,
+            title: titles[item.activity_id] || item.activity_id
+          });
+        }
+      });
+      return conflicts;
+    }
+
+    function renderSchedulePlanConflictNotice() {
+      const box = document.getElementById("schedulePlanConflictNotice");
+      if (!box) return;
+      if (!planStages.first && !currentPlannerData) {
+        box.classList.add("hidden");
+        box.innerHTML = "";
+        return;
+      }
+      const conflicts = detectPlanBusyConflicts();
+      if (conflicts.length) {
+        const names = conflicts.map(c => escapeHTML(c.title)).join(", ");
+        box.classList.remove("hidden");
+        box.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <b class="text-amber-200">Lịch bận mới trùng với kế hoạch hiện tại (${conflicts.length} hoạt động):</b>
+            <span class="block mt-1 text-amber-100/90">${names}. Kế hoạch cũ vẫn được giữ nguyên — bạn có thể tính lại khi sẵn sàng.</span>
+          </div>
+          <button type="button" onclick="document.getElementById('btnRunPlanner')?.scrollIntoView({behavior:'smooth'});document.getElementById('btnRunPlanner')?.focus();" class="shrink-0 rounded-xl bg-amber-500 px-3.5 py-2 text-xs font-extrabold text-slate-950 transition hover:bg-amber-400">Xem & tính lại kế hoạch</button>
+        </div>`;
+        return;
+      }
+      if (planInputsDirty) {
+        box.classList.remove("hidden");
+        box.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3">
+          <div><b class="text-amber-200">Hồ sơ hoặc lịch vừa thay đổi.</b> Kế hoạch hiện tại chưa bị ghi đè — bấm <b>Cập nhật kế hoạch</b> ở dưới để tính lại lộ trình mới.</div>
+          <button type="button" onclick="document.getElementById('btnRunPlanner')?.scrollIntoView({behavior:'smooth'});" class="shrink-0 rounded-xl border border-amber-400/50 bg-amber-500/20 px-3.5 py-2 text-xs font-bold text-amber-200 hover:bg-amber-500/30">Đến nút Cập nhật</button>
+        </div>`;
+        return;
+      }
+      box.classList.add("hidden");
+      box.innerHTML = "";
+    }
+
+    function renderProfileWorkspace() {
+      setProfileScheduleTab(activeProfileScheduleTab);
+      renderSchedulePlanConflictNotice();
     }
 
     function updateProfileManual() {
@@ -3360,6 +3655,12 @@
       persistCurrentUserData();
     }
 
+    function normalizeDrlTarget(value, fallback = 80) {
+      if (value === null || value === undefined || value === "") return fallback;
+      const num = Number(value);
+      return Number.isFinite(num) ? Math.max(0, Math.min(100, Math.round(num))) : fallback;
+    }
+
     function syncConfirmedPreferenceFromProfile(authoritativeSource = "auto") {
       currentProfileDraft.preference_patch = currentProfileDraft.preference_patch || {
         preferred_topics: [], preferred_categories: [], preferred_modes: [], preferred_campuses: [], max_activities: null, weekly_participation_hours: null
@@ -3367,9 +3668,10 @@
       const patch = currentProfileDraft.preference_patch;
       const goal = currentProfileDraft.goal || { natural_text: "", target_score: 80, priorities: [], format: "", topics: [] };
       const prefs = currentProfileDraft.preferences || { interest_fields: "", skills: "", personal_goals: "", favorite_activities: "" };
-      const targetScore = Number.isFinite(Number(goal.target_score))
-        ? Math.max(0, Math.min(100, Number(goal.target_score)))
-        : (Number.isFinite(Number(currentProfileDraft.drl_target)) ? Math.max(0, Math.min(100, Number(currentProfileDraft.drl_target))) : 80);
+      const targetScore = normalizeDrlTarget(
+        goal.target_score,
+        normalizeDrlTarget(currentProfileDraft.drl_target, 80)
+      );
       currentProfileDraft.drl_target = targetScore;
       currentProfileDraft.goal = { ...goal, target_score: targetScore };
       const plannerTarget = document.getElementById("inputPlanTarget");
@@ -3430,10 +3732,10 @@
             base.hard_exclusions.campus_ids = [];
           } else if (goal.campus_choice === "only_nvc") {
             campusIds = ["NVC"];
-            base.hard_exclusions.campus_ids = ["DONG_HOA"];
+            base.hard_exclusions.campus_ids = ["DONG_HOA", "OTHER"];
           } else if (goal.campus_choice === "only_dong_hoa") {
             campusIds = ["DONG_HOA"];
-            base.hard_exclusions.campus_ids = ["NVC"];
+            base.hard_exclusions.campus_ids = ["NVC", "OTHER"];
           } else {
             campusIds = [];
             base.hard_exclusions.campus_ids = [];
@@ -3805,12 +4107,48 @@
       return options.join("");
     }
 
-    function ensureOnboardingScheduleShape() {
-      if (!onboardingDraft) return null;
-      onboardingDraft.profile.busy_schedule = onboardingDraft.profile.busy_schedule || {
+    function getBusyCalendarContext(scope = "onboarding") {
+      if (scope === "profile") {
+        return {
+          scope: "profile",
+          profile: currentProfileDraft,
+          gridId: "profileScheduleGrid",
+          sidebarId: "profileScheduleSidebar",
+          idPrefix: "ps",
+          onChanged: () => {
+            syncBusyScheduleAndIntervals(currentProfileDraft);
+            if (currentStudent?.student_id) {
+              restoreOnboardingBusySchedule(currentProfileDraft.busy_schedule, readLocalUserData(currentStudent.student_id));
+            }
+            markPlanStale();
+            persistCurrentUserData();
+            renderSchedulePlanConflictNotice();
+            renderProfileScheduleTab();
+          }
+        };
+      }
+      return {
+        scope: "onboarding",
+        profile: onboardingDraft?.profile || null,
+        gridId: "onboardingScheduleGrid",
+        sidebarId: "onboardingScheduleSidebar",
+        idPrefix: "onboarding",
+        onChanged: () => {
+          if (!onboardingDraft) return;
+          syncBusyScheduleAndIntervals(onboardingDraft.profile);
+          persistOnboardingDraft();
+          renderOnboardingStep();
+        }
+      };
+    }
+
+    function ensureOnboardingScheduleShape(scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return null;
+      ctx.profile.busy_schedule = ctx.profile.busy_schedule || {
         applies_to_semester: false, week_start: AVAILABILITY_DEFAULT_WEEK_START, slots: [], entries: [], overrides: []
       };
-      const schedule = onboardingDraft.profile.busy_schedule;
+      const schedule = ctx.profile.busy_schedule;
       if (!/^\d{4}-\d{2}-\d{2}$/.test(schedule.week_start || "")) schedule.week_start = AVAILABILITY_DEFAULT_WEEK_START;
       if (!Array.isArray(schedule.slots)) schedule.slots = [];
       if (!Array.isArray(schedule.entries)) schedule.entries = [];
@@ -3979,10 +4317,11 @@
       return blocks;
     }
 
-    function renderOnboardingSchedule() {
-      const grid = document.getElementById("onboardingScheduleGrid");
-      if (!grid || !onboardingDraft) return;
-      const schedule = ensureOnboardingScheduleShape();
+    function renderOnboardingSchedule(scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      const grid = document.getElementById(ctx.gridId);
+      if (!grid || !ctx.profile) return;
+      const schedule = ensureOnboardingScheduleShape(scope);
       const weekStart = schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START;
       const weekEnd = addDaysToIsoDate(weekStart, 6);
       const headers = AVAILABILITY_DAYS.map((day, index) => {
@@ -4007,7 +4346,7 @@
             return `<div data-busy-block="override" class="absolute left-1 right-1 z-[4] overflow-hidden rounded-lg border border-dashed border-emerald-400/80 bg-emerald-950/85 px-1.5 py-1 text-left text-emerald-200 shadow-sm" style="top:${top + 1}px;height:${height}px">
               <div class="flex items-start justify-between gap-1">
                 <span class="truncate text-[10px] font-extrabold">Rảnh · Ghi đè</span>
-                <button type="button" onclick="event.stopPropagation();removeOnboardingBusyOverride('${escapeHTML(block.id)}')" aria-label="Xóa ngoại lệ" class="rounded px-1 text-[11px] leading-none text-emerald-200 hover:bg-emerald-800/70">×</button>
+                <button type="button" onclick="event.stopPropagation();removeOnboardingBusyOverride('${escapeHTML(block.id)}','${scope}')" aria-label="Xóa ngoại lệ" class="rounded px-1 text-[11px] leading-none text-emerald-200 hover:bg-emerald-800/70">×</button>
               </div>
               <span class="block text-[9px] planner-number opacity-90">${escapeHTML(block.start)}–${escapeHTML(block.end)}</span>
             </div>`;
@@ -4015,12 +4354,12 @@
           const isOverrideBusy = block.sourceType === "override";
           const isActiveCategory = block.category === activeOnboardingBusyCategory;
           const deleteHandler = block.sourceType === "entry"
-            ? `removeOnboardingBusyEntry('${escapeHTML(block.id)}')`
+            ? `removeOnboardingBusyEntry('${escapeHTML(block.id)}','${scope}')`
             : block.sourceType === "override"
-              ? `removeOnboardingBusyOverride('${escapeHTML(block.id)}')`
-              : `toggleOnboardingBusySlot('${escapeHTML(block.id)}')`;
+              ? `removeOnboardingBusyOverride('${escapeHTML(block.id)}','${scope}')`
+              : `toggleOnboardingBusySlot('${escapeHTML(block.id)}','${scope}')`;
           const selectHandler = block.sourceType === "entry"
-            ? `startEditOnboardingBusyEntry('${escapeHTML(block.id)}')`
+            ? `startEditOnboardingBusyEntry('${escapeHTML(block.id)}','${scope}')`
             : "";
           return `<div data-busy-block="${block.sourceType}" role="button" tabindex="0" ${selectHandler ? `onclick="event.stopPropagation();${selectHandler}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();${selectHandler}}"` : ""} aria-label="${escapeHTML(meta.label)} ${AVAILABILITY_DAYS[dayIndex]} ${block.start}–${block.end}" class="absolute left-1 right-1 z-[2] overflow-hidden rounded-lg border px-1.5 py-1 text-left shadow-sm transition ${meta.blockClass} ${isActiveCategory ? "opacity-100 ring-1 ring-white/20" : "opacity-75 hover:opacity-100"}" style="top:${top + 1}px;height:${height}px">
             <div class="flex items-start justify-between gap-1">
@@ -4030,13 +4369,13 @@
             <span class="block text-[9px] font-semibold planner-number opacity-90">${escapeHTML(block.start)}–${escapeHTML(block.end)}</span>
           </div>`;
         }).join("");
-        return `<div data-onboarding-day-col="${dayIndex}" data-date="${date}" onpointerdown="startOnboardingGridDrag(event, '${date}', ${dayIndex})" onpointermove="moveOnboardingGridDrag(event)" onpointerup="endOnboardingGridDrag(event)" onpointercancel="cancelOnboardingGridDrag()" class="onboarding-cal-col relative border-l border-[#1b2537]">${blocksHtml}</div>`;
+        return `<div data-onboarding-day-col="${dayIndex}" data-date="${date}" onpointerdown="startOnboardingGridDrag(event, '${date}', ${dayIndex}, '${scope}')" onpointermove="moveOnboardingGridDrag(event)" onpointerup="endOnboardingGridDrag(event)" onpointercancel="cancelOnboardingGridDrag()" class="onboarding-cal-col relative border-l border-[#1b2537]">${blocksHtml}</div>`;
       }).join("");
       grid.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-2 p-1 pb-3">
           <div class="flex items-center gap-2">
-            <button type="button" onclick="changeOnboardingBusyWeek(-1)" aria-label="Tuần trước" class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2b3a54] bg-[#0e1524] text-slate-300 transition hover:bg-[#162032] hover:text-white">‹</button>
-            <button type="button" onclick="changeOnboardingBusyWeek(1)" aria-label="Tuần sau" class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2b3a54] bg-[#0e1524] text-slate-300 transition hover:bg-[#162032] hover:text-white">›</button>
-            <button type="button" onclick="resetOnboardingBusyWeek()" class="rounded-xl border border-[#223046] bg-[#0e1524] px-2.5 py-1.5 text-[11px] font-bold text-slate-300 transition hover:border-indigo-400/50 hover:text-white">Tuần gốc</button>
+            <button type="button" onclick="changeOnboardingBusyWeek(-1, '${scope}')" aria-label="Tuần trước" class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2b3a54] bg-[#0e1524] text-slate-300 transition hover:bg-[#162032] hover:text-white">‹</button>
+            <button type="button" onclick="changeOnboardingBusyWeek(1, '${scope}')" aria-label="Tuần sau" class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2b3a54] bg-[#0e1524] text-slate-300 transition hover:bg-[#162032] hover:text-white">›</button>
+            <button type="button" onclick="resetOnboardingBusyWeek('${scope}')" class="rounded-xl border border-[#223046] bg-[#0e1524] px-2.5 py-1.5 text-[11px] font-bold text-slate-300 transition hover:border-indigo-400/50 hover:text-white">Tuần gốc</button>
           </div>
           <strong class="text-sm text-white planner-number">Tuần ${shortCalendarDate(weekStart)} – ${shortCalendarDate(weekEnd)}</strong>
           <span class="rounded-lg border border-[#1b2537] bg-[#0e1524] px-2.5 py-1 text-[11px] text-slate-400">Kéo để chọn · bước 15 phút</span>
@@ -4046,13 +4385,15 @@
           <div class="grid" style="grid-template-columns:52px repeat(7,minmax(88px,1fr))"><div class="relative h-[672px] bg-[#080d18]">${hourLabels}</div>${dayColumns}</div>
         </div>
         <p class="sm:hidden mt-3 text-[11px] text-indigo-300">Kéo ngang để xem đủ 7 ngày hoặc dùng biểu mẫu thêm nhanh bên dưới.</p>`;
-      renderOnboardingScheduleSidebar();
+      renderOnboardingScheduleSidebar(scope);
     }
 
-    function renderOnboardingScheduleSidebar() {
-      const sidebar = document.getElementById("onboardingScheduleSidebar");
-      if (!sidebar || !onboardingDraft) return;
-      const schedule = ensureOnboardingScheduleShape();
+    function renderOnboardingScheduleSidebar(scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      const sidebar = document.getElementById(ctx.sidebarId);
+      if (!sidebar || !ctx.profile) return;
+      const pfx = ctx.idPrefix;
+      const schedule = ensureOnboardingScheduleShape(scope);
       const weekStart = schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START;
       const entries = schedule.entries || [];
       const overrides = schedule.overrides || [];
@@ -4064,7 +4405,7 @@
         return sum + (period ? clockToMinutes(period.end) - clockToMinutes(period.start) : 0);
       }, 0);
       const totalHoursLabel = (totalMinutes / 60).toFixed(totalMinutes % 60 === 0 ? 0 : 2).replace(/\.00$/, "");
-      const weeklyHours = onboardingDraft.profile.preference_patch?.weekly_participation_hours ?? "";
+      const weeklyHours = ctx.profile.preference_patch?.weekly_participation_hours ?? "";
 
       const summaryRows = entries.map(entry => {
         const meta = ONBOARDING_BUSY_CATEGORIES[entry.category] || ONBOARDING_BUSY_CATEGORIES.class;
@@ -4083,8 +4424,8 @@
               ${Object.entries(ONBOARDING_BUSY_CATEGORIES).map(([k, v]) => `<option value="${k}" ${k === entry.category ? "selected" : ""}>${v.label}</option>`).join("")}
             </select>
             <div class="flex justify-end gap-2">
-              <button type="button" onclick="cancelEditOnboardingBusyEntry()" class="rounded-lg border border-[#2b3a54] px-2.5 py-1 text-[11px] font-bold text-slate-300">Hủy</button>
-              <button type="button" onclick="saveEditOnboardingBusyEntry('${escapeHTML(entry.id)}')" class="rounded-lg bg-indigo-600 px-2.5 py-1 text-[11px] font-bold text-white">Lưu</button>
+              <button type="button" onclick="cancelEditOnboardingBusyEntry('${scope}')" class="rounded-lg border border-[#2b3a54] px-2.5 py-1 text-[11px] font-bold text-slate-300">Hủy</button>
+              <button type="button" onclick="saveEditOnboardingBusyEntry('${escapeHTML(entry.id)}','${scope}')" class="rounded-lg bg-indigo-600 px-2.5 py-1 text-[11px] font-bold text-white">Lưu</button>
             </div>
           </div>`;
         }
@@ -4095,11 +4436,11 @@
               <div class="mt-0.5 text-[11px] text-slate-400 planner-number">${escapeHTML(displayDate)} · <b class="text-slate-200">${escapeHTML(entry.start)}–${escapeHTML(entry.end)}</b></div>
             </div>
             <div class="flex shrink-0 items-center gap-1">
-              <button type="button" onclick="startEditOnboardingBusyEntry('${escapeHTML(entry.id)}')" class="rounded-lg px-2 py-1 text-[11px] font-bold text-indigo-300 hover:bg-indigo-950/60">Sửa</button>
-              <button type="button" onclick="removeOnboardingBusyEntry('${escapeHTML(entry.id)}')" aria-label="Xóa khung bận" class="rounded-lg px-2 py-1 text-[11px] font-bold text-rose-300 hover:bg-rose-950/60">×</button>
+              <button type="button" onclick="startEditOnboardingBusyEntry('${escapeHTML(entry.id)}','${scope}')" class="rounded-lg px-2 py-1 text-[11px] font-bold text-indigo-300 hover:bg-indigo-950/60">Sửa</button>
+              <button type="button" onclick="removeOnboardingBusyEntry('${escapeHTML(entry.id)}','${scope}')" aria-label="Xóa khung bận" class="rounded-lg px-2 py-1 text-[11px] font-bold text-rose-300 hover:bg-rose-950/60">×</button>
             </div>
           </div>
-          ${schedule.applies_to_semester ? `<button type="button" onclick="overrideOnboardingRecurringBlock('${viewDateForWeekday}', '${escapeHTML(entry.start)}', '${escapeHTML(entry.end)}', '${escapeHTML(entry.category)}')" class="mt-1.5 text-[10px] font-bold text-emerald-300 hover:underline">+ Ghi đè rảnh ngày ${shortCalendarDate(viewDateForWeekday)}</button>` : ""}
+          ${schedule.applies_to_semester ? `<button type="button" onclick="overrideOnboardingRecurringBlock('${viewDateForWeekday}', '${escapeHTML(entry.start)}', '${escapeHTML(entry.end)}', '${escapeHTML(entry.category)}', '${scope}')" class="mt-1.5 text-[10px] font-bold text-emerald-300 hover:underline">+ Ghi đè rảnh ngày ${shortCalendarDate(viewDateForWeekday)}</button>` : ""}
         </div>`;
       }).join("");
 
@@ -4109,7 +4450,7 @@
             <span class="font-bold ${ov.kind === "available" ? "text-emerald-300" : "text-amber-200"}">${ov.kind === "available" ? "Rảnh (ghi đè)" : "Bận đột xuất"}</span>
             <span class="block text-slate-300 planner-number">${shortCalendarDate(ov.date)} · ${escapeHTML(ov.start)}–${escapeHTML(ov.end)}</span>
           </div>
-          <button type="button" onclick="removeOnboardingBusyOverride('${escapeHTML(ov.id)}')" aria-label="Xóa ngoại lệ" class="rounded-lg px-2 py-1 font-bold text-slate-300 hover:bg-black/30">×</button>
+          <button type="button" onclick="removeOnboardingBusyOverride('${escapeHTML(ov.id)}','${scope}')" aria-label="Xóa ngoại lệ" class="rounded-lg px-2 py-1 font-bold text-slate-300 hover:bg-black/30">×</button>
         </div>`).join("");
 
       const dayOptions = AVAILABILITY_DAYS.map((d, i) => {
@@ -4117,6 +4458,7 @@
         return `<option value="${i}|${dt}">${d} (${shortCalendarDate(dt)})</option>`;
       }).join("");
 
+      const weeklyHoursInputId = scope === "onboarding" ? "onboardingWeeklyParticipationHours" : "profileWeeklyParticipationHours";
       sidebar.innerHTML = `
         <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4">
           <div class="flex items-center justify-between gap-2">
@@ -4131,14 +4473,14 @@
         <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 space-y-2.5">
           <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Thêm nhanh (chạm / bàn phím)</h4>
           <div class="grid grid-cols-2 gap-2">
-            <label class="text-[11px] font-semibold text-slate-400">Ngày<select id="onboardingQuickDay" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${dayOptions}</select></label>
-            <label class="text-[11px] font-semibold text-slate-400">Loại<select id="onboardingQuickCat" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${Object.entries(ONBOARDING_BUSY_CATEGORIES).map(([k, v]) => `<option value="${k}" ${k === activeOnboardingBusyCategory ? "selected" : ""}>${v.label}</option>`).join("")}</select></label>
+            <label class="text-[11px] font-semibold text-slate-400">Ngày<select id="${pfx}QuickDay" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${dayOptions}</select></label>
+            <label class="text-[11px] font-semibold text-slate-400">Loại<select id="${pfx}QuickCat" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${Object.entries(ONBOARDING_BUSY_CATEGORIES).map(([k, v]) => `<option value="${k}" ${k === activeOnboardingBusyCategory ? "selected" : ""}>${v.label}</option>`).join("")}</select></label>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <label class="text-[11px] font-semibold text-slate-400">Bắt đầu<select id="onboardingQuickStart" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${onboardingTimeOptions(420, 1245, "08:00")}</select></label>
-            <label class="text-[11px] font-semibold text-slate-400">Kết thúc<select id="onboardingQuickEnd" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${onboardingTimeOptions(435, 1260, "10:00")}</select></label>
+            <label class="text-[11px] font-semibold text-slate-400">Bắt đầu<select id="${pfx}QuickStart" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${onboardingTimeOptions(420, 1245, "08:00")}</select></label>
+            <label class="text-[11px] font-semibold text-slate-400">Kết thúc<select id="${pfx}QuickEnd" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${onboardingTimeOptions(435, 1260, "10:00")}</select></label>
           </div>
-          <button type="button" onclick="submitOnboardingQuickBusy()" class="w-full rounded-xl bg-indigo-600/90 px-3 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">+ Thêm khung bận</button>
+          <button type="button" onclick="submitOnboardingQuickBusy('${scope}')" class="w-full rounded-xl bg-indigo-600/90 px-3 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">+ Thêm khung bận</button>
         </div>
 
         <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 space-y-2.5">
@@ -4147,21 +4489,21 @@
             <p class="mt-0.5 text-[11px] text-slate-500">Ghi đè rảnh vào ngày nghỉ học hoặc thêm bận đột xuất.</p>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <label class="text-[11px] font-semibold text-slate-400">Ngày<input id="onboardingOverrideDate" type="date" value="${weekStart}" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white" /></label>
-            <label class="text-[11px] font-semibold text-slate-400">Loại<select id="onboardingOverrideKind" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white"><option value="available">Rảnh (ghi đè lịch bận)</option><option value="busy">Bận đột xuất</option></select></label>
+            <label class="text-[11px] font-semibold text-slate-400">Ngày<input id="${pfx}OverrideDate" type="date" value="${weekStart}" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white" /></label>
+            <label class="text-[11px] font-semibold text-slate-400">Loại<select id="${pfx}OverrideKind" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white"><option value="available">Rảnh (ghi đè lịch bận)</option><option value="busy">Bận đột xuất</option></select></label>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <label class="text-[11px] font-semibold text-slate-400">Từ<select id="onboardingOverrideStart" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white">${onboardingTimeOptions(420, 1245, "08:00")}</select></label>
-            <label class="text-[11px] font-semibold text-slate-400">Đến<select id="onboardingOverrideEnd" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white">${onboardingTimeOptions(435, 1260, "10:00")}</select></label>
+            <label class="text-[11px] font-semibold text-slate-400">Từ<select id="${pfx}OverrideStart" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white">${onboardingTimeOptions(420, 1245, "08:00")}</select></label>
+            <label class="text-[11px] font-semibold text-slate-400">Đến<select id="${pfx}OverrideEnd" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white">${onboardingTimeOptions(435, 1260, "10:00")}</select></label>
           </div>
-          <button type="button" onclick="submitOnboardingOverride()" class="w-full rounded-xl border border-emerald-500/35 bg-emerald-500/15 px-3 py-2 text-xs font-bold text-emerald-200 transition hover:bg-emerald-500/25">+ Thêm ngoại lệ ngày</button>
+          <button type="button" onclick="submitOnboardingOverride('${scope}')" class="w-full rounded-xl border border-emerald-500/35 bg-emerald-500/15 px-3 py-2 text-xs font-bold text-emerald-200 transition hover:bg-emerald-500/25">+ Thêm ngoại lệ ngày</button>
           <div class="max-h-32 space-y-1.5 overflow-y-auto">${overrideRows}</div>
         </div>
 
         <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4">
-          <label for="onboardingWeeklyParticipationHours" class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">Giờ tham gia hoạt động / tuần (tùy chọn)</label>
+          <label for="${weeklyHoursInputId}" class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">Giờ tham gia hoạt động / tuần (tùy chọn)</label>
           <p class="mt-1 text-[11px] text-slate-500">Để trống nếu bạn không muốn giới hạn tổng thời lượng hoạt động mỗi tuần.</p>
-          <input id="onboardingWeeklyParticipationHours" type="number" min="0.5" max="168" step="0.5" value="${escapeHTML(weeklyHours)}" oninput="setOnboardingWeeklyHours(this.value)" placeholder="Ví dụ: 6 (giờ/tuần)" class="mt-2.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" />
+          <input id="${weeklyHoursInputId}" type="number" min="0.5" max="168" step="0.5" value="${escapeHTML(weeklyHours)}" oninput="setOnboardingWeeklyHours(this.value, '${scope}')" placeholder="Ví dụ: 6 (giờ/tuần)" class="mt-2.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" />
         </div>`;
     }
 
@@ -4190,12 +4532,13 @@
       ghost.textContent = `${minutesToClock(startMin)}–${minutesToClock(endMin)}`;
     }
 
-    function startOnboardingGridDrag(event, date, dayIndex) {
+    function startOnboardingGridDrag(event, date, dayIndex, scope = "onboarding") {
       if (event.button != null && event.button !== 0) return;
       if (event.target?.closest && event.target.closest("[data-busy-block]")) return;
       const colEl = event.currentTarget;
       const anchorMin = Math.min(ONBOARDING_CAL_END_MIN - 15, pointerMinutesInColumn(colEl, event.clientY));
       onboardingDragState = {
+        scope,
         colEl,
         date,
         dayIndex,
@@ -4232,7 +4575,7 @@
     function endOnboardingGridDrag(event) {
       if (!onboardingDragState) return;
       if (event && Number.isFinite(event.clientY)) moveOnboardingGridDrag(event);
-      const { date, dayIndex, startMin, endMin } = onboardingDragState;
+      const { date, dayIndex, startMin, endMin, scope } = onboardingDragState;
       cancelOnboardingGridDrag();
       addOnboardingBusyEntry({
         category: activeOnboardingBusyCategory,
@@ -4240,16 +4583,17 @@
         date,
         start: minutesToClock(startMin),
         end: minutesToClock(endMin)
-      });
+      }, scope);
     }
 
-    function addOnboardingBusyEntry({ category, weekday, date, start, end }) {
-      if (!onboardingDraft) return null;
-      const schedule = ensureOnboardingScheduleShape();
+    function addOnboardingBusyEntry({ category, weekday, date, start, end }, scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return null;
+      const schedule = ensureOnboardingScheduleShape(scope);
       const startMin = clockToMinutes(start);
       const endMin = clockToMinutes(end);
       if (!Number.isFinite(startMin) || !Number.isFinite(endMin) || startMin < ONBOARDING_CAL_START_MIN || endMin > ONBOARDING_CAL_END_MIN || endMin <= startMin) {
-        showOnboardingMessage("Khung giờ bận phải nằm trong 07:00–21:00 và giờ kết thúc phải sau giờ bắt đầu.");
+        if (scope === "onboarding") showOnboardingMessage("Khung giờ bận phải nằm trong 07:00–21:00 và giờ kết thúc phải sau giờ bắt đầu.");
         return null;
       }
       const normCategory = ONBOARDING_BUSY_CATEGORIES[category] ? category : "class";
@@ -4274,80 +4618,78 @@
         end: normEnd
       };
       schedule.entries.push(entry);
-      syncBusyScheduleAndIntervals(onboardingDraft.profile);
-      persistOnboardingDraft();
-      renderOnboardingStep();
+      ctx.onChanged();
       return entry;
     }
 
-    function startEditOnboardingBusyEntry(entryId) {
+    function startEditOnboardingBusyEntry(entryId, scope = "onboarding") {
       editingOnboardingEntryId = entryId;
-      renderOnboardingScheduleSidebar();
+      renderOnboardingScheduleSidebar(scope);
     }
 
-    function cancelEditOnboardingBusyEntry() {
+    function cancelEditOnboardingBusyEntry(scope = "onboarding") {
       editingOnboardingEntryId = null;
-      renderOnboardingScheduleSidebar();
+      renderOnboardingScheduleSidebar(scope);
     }
 
-    function saveEditOnboardingBusyEntry(entryId) {
+    function saveEditOnboardingBusyEntry(entryId, scope = "onboarding") {
       const start = document.getElementById(`editEntryStart_${entryId}`)?.value;
       const end = document.getElementById(`editEntryEnd_${entryId}`)?.value;
       const category = document.getElementById(`editEntryCat_${entryId}`)?.value;
-      updateOnboardingBusyEntry(entryId, { start, end, category });
+      updateOnboardingBusyEntry(entryId, { start, end, category }, scope);
     }
 
-    function updateOnboardingBusyEntry(entryId, updates) {
-      if (!onboardingDraft) return false;
-      const schedule = ensureOnboardingScheduleShape();
+    function updateOnboardingBusyEntry(entryId, updates, scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return false;
+      const schedule = ensureOnboardingScheduleShape(scope);
       const entry = schedule.entries.find(item => item.id === entryId);
       if (!entry) return false;
       const nextStart = updates.start ?? entry.start;
       const nextEnd = updates.end ?? entry.end;
       if (clockToMinutes(nextStart) >= clockToMinutes(nextEnd)) {
-        showOnboardingMessage("Giờ kết thúc phải sau giờ bắt đầu.");
+        if (scope === "onboarding") showOnboardingMessage("Giờ kết thúc phải sau giờ bắt đầu.");
         return false;
       }
       entry.start = nextStart;
       entry.end = nextEnd;
       if (updates.category && ONBOARDING_BUSY_CATEGORIES[updates.category]) entry.category = updates.category;
       editingOnboardingEntryId = null;
-      syncBusyScheduleAndIntervals(onboardingDraft.profile);
-      persistOnboardingDraft();
-      renderOnboardingStep();
+      ctx.onChanged();
       return true;
     }
 
-    function removeOnboardingBusyEntry(entryId) {
-      if (!onboardingDraft) return;
-      const schedule = ensureOnboardingScheduleShape();
+    function removeOnboardingBusyEntry(entryId, scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return;
+      const schedule = ensureOnboardingScheduleShape(scope);
       schedule.entries = schedule.entries.filter(item => item.id !== entryId);
       if (editingOnboardingEntryId === entryId) editingOnboardingEntryId = null;
-      syncBusyScheduleAndIntervals(onboardingDraft.profile);
-      persistOnboardingDraft();
-      renderOnboardingStep();
+      ctx.onChanged();
     }
 
-    function submitOnboardingQuickBusy() {
-      const dayVal = document.getElementById("onboardingQuickDay")?.value || "";
+    function submitOnboardingQuickBusy(scope = "onboarding") {
+      const pfx = getBusyCalendarContext(scope).idPrefix;
+      const dayVal = document.getElementById(`${pfx}QuickDay`)?.value || "";
       const [dayStr, date] = dayVal.split("|");
-      const category = document.getElementById("onboardingQuickCat")?.value || activeOnboardingBusyCategory;
-      const start = document.getElementById("onboardingQuickStart")?.value || "08:00";
-      const end = document.getElementById("onboardingQuickEnd")?.value || "10:00";
-      addOnboardingBusyEntry({ category, weekday: Number(dayStr), date, start, end });
+      const category = document.getElementById(`${pfx}QuickCat`)?.value || activeOnboardingBusyCategory;
+      const start = document.getElementById(`${pfx}QuickStart`)?.value || "08:00";
+      const end = document.getElementById(`${pfx}QuickEnd`)?.value || "10:00";
+      addOnboardingBusyEntry({ category, weekday: Number(dayStr), date, start, end }, scope);
     }
 
-    function addOnboardingBusyOverride({ date, kind, start, end, category = "personal", note = "" }) {
-      if (!onboardingDraft) return null;
-      const schedule = ensureOnboardingScheduleShape();
+    function addOnboardingBusyOverride({ date, kind, start, end, category = "personal", note = "" }, scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return null;
+      const schedule = ensureOnboardingScheduleShape(scope);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "") || !["available", "busy"].includes(kind)) {
-        showOnboardingMessage("Ngày hoặc loại ngoại lệ không hợp lệ.");
+        if (scope === "onboarding") showOnboardingMessage("Ngày hoặc loại ngoại lệ không hợp lệ.");
         return null;
       }
       const startMin = clockToMinutes(start);
       const endMin = clockToMinutes(end);
       if (!Number.isFinite(startMin) || !Number.isFinite(endMin) || startMin < ONBOARDING_CAL_START_MIN || endMin > ONBOARDING_CAL_END_MIN || endMin <= startMin) {
-        showOnboardingMessage("Giờ ngoại lệ phải nằm trong 07:00–21:00 và giờ kết thúc sau giờ bắt đầu.");
+        if (scope === "onboarding") showOnboardingMessage("Giờ ngoại lệ phải nằm trong 07:00–21:00 và giờ kết thúc sau giờ bắt đầu.");
         return null;
       }
       const exists = schedule.overrides.find(ov => ov.date === date && ov.kind === kind && ov.start === start && ov.end === end);
@@ -4362,56 +4704,67 @@
         note
       };
       schedule.overrides.push(override);
-      syncBusyScheduleAndIntervals(onboardingDraft.profile);
-      persistOnboardingDraft();
-      renderOnboardingSchedule();
+      ctx.onChanged();
       return override;
     }
 
-    function submitOnboardingOverride() {
-      const date = document.getElementById("onboardingOverrideDate")?.value || "";
-      const kind = document.getElementById("onboardingOverrideKind")?.value || "available";
-      const start = document.getElementById("onboardingOverrideStart")?.value || "08:00";
-      const end = document.getElementById("onboardingOverrideEnd")?.value || "10:00";
-      addOnboardingBusyOverride({ date, kind, start, end });
+    function submitOnboardingOverride(scope = "onboarding") {
+      const pfx = getBusyCalendarContext(scope).idPrefix;
+      const date = document.getElementById(`${pfx}OverrideDate`)?.value || "";
+      const kind = document.getElementById(`${pfx}OverrideKind`)?.value || "available";
+      const start = document.getElementById(`${pfx}OverrideStart`)?.value || "08:00";
+      const end = document.getElementById(`${pfx}OverrideEnd`)?.value || "10:00";
+      addOnboardingBusyOverride({ date, kind, start, end }, scope);
     }
 
-    function overrideOnboardingRecurringBlock(date, start, end, category) {
-      addOnboardingBusyOverride({ date, kind: "available", start, end, category });
+    function overrideOnboardingRecurringBlock(date, start, end, category, scope = "onboarding") {
+      addOnboardingBusyOverride({ date, kind: "available", start, end, category }, scope);
     }
 
-    function removeOnboardingBusyOverride(overrideId) {
-      if (!onboardingDraft) return;
-      const schedule = ensureOnboardingScheduleShape();
+    function removeOnboardingBusyOverride(overrideId, scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return;
+      const schedule = ensureOnboardingScheduleShape(scope);
       schedule.overrides = schedule.overrides.filter(ov => ov.id !== overrideId);
-      syncBusyScheduleAndIntervals(onboardingDraft.profile);
-      persistOnboardingDraft();
-      renderOnboardingSchedule();
+      ctx.onChanged();
     }
 
-    function setOnboardingWeeklyHours(value) {
-      if (!onboardingDraft) return;
-      onboardingDraft.profile.preference_patch = onboardingDraft.profile.preference_patch || {
+    function setOnboardingWeeklyHours(value, scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return;
+      ctx.profile.preference_patch = ctx.profile.preference_patch || {
         preferred_topics: [], preferred_categories: [], preferred_modes: [], preferred_campuses: [], max_activities: null, weekly_participation_hours: null
       };
       const trimmed = String(value ?? "").trim();
       if (!trimmed) {
-        onboardingDraft.profile.preference_patch.weekly_participation_hours = null;
+        ctx.profile.preference_patch.weekly_participation_hours = null;
       } else {
         const num = Number(trimmed);
         if (Number.isFinite(num) && num >= 0.5 && num <= 168) {
-          onboardingDraft.profile.preference_patch.weekly_participation_hours = num;
+          ctx.profile.preference_patch.weekly_participation_hours = num;
         }
       }
-      persistOnboardingDraft();
+      if (scope === "profile") {
+        markPlanStale();
+        persistCurrentUserData();
+        renderSchedulePlanConflictNotice();
+      } else {
+        persistOnboardingDraft();
+      }
     }
 
-    function resetOnboardingBusyWeek() {
-      if (!onboardingDraft) return;
-      const schedule = ensureOnboardingScheduleShape();
+    function resetOnboardingBusyWeek(scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return;
+      const schedule = ensureOnboardingScheduleShape(scope);
       schedule.week_start = AVAILABILITY_DEFAULT_WEEK_START;
-      persistOnboardingDraft();
-      renderOnboardingSchedule();
+      if (scope === "profile") {
+        persistCurrentUserData();
+        renderProfileScheduleTab();
+      } else {
+        persistOnboardingDraft();
+        renderOnboardingSchedule();
+      }
     }
 
     function onboardingWeekdayIndex(isoDate) {
@@ -4434,23 +4787,32 @@
       });
     }
 
-    function changeOnboardingBusyWeek(direction) {
-      if (!onboardingDraft) return;
-      const schedule = ensureOnboardingScheduleShape();
+    function changeOnboardingBusyWeek(direction, scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return;
+      const schedule = ensureOnboardingScheduleShape(scope);
       schedule.week_start = addDaysToIsoDate(schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START, direction * 7);
-      persistOnboardingDraft();
-      renderOnboardingSchedule();
+      if (scope === "profile") {
+        persistCurrentUserData();
+        renderProfileScheduleTab();
+      } else {
+        persistOnboardingDraft();
+        renderOnboardingSchedule();
+      }
     }
 
-    function setOnboardingBusyCategory(category) {
+    function setOnboardingBusyCategory(category, scope = "onboarding") {
       if (!["class", "work", "personal"].includes(category)) return;
       activeOnboardingBusyCategory = category;
-      renderOnboardingStep();
+      if (scope === "profile") renderProfileScheduleTab();
+      else renderOnboardingStep();
     }
 
-    function toggleOnboardingBusySlot(key) {
+    function toggleOnboardingBusySlot(key, scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return;
       const [category, date, periodKey] = key.split("|");
-      const schedule = ensureOnboardingScheduleShape();
+      const schedule = ensureOnboardingScheduleShape(scope);
       const dayIndex = onboardingWeekdayIndex(date);
       const slots = Array.isArray(schedule.slots) ? schedule.slots : [];
       const selected = isOnboardingBusySlotSelected(schedule, category, date, dayIndex, periodKey, slots);
@@ -4469,17 +4831,15 @@
       schedule.slots = selected
         ? slots.filter(slot => !matchesSlot(slot))
         : [...slots, key];
-      syncBusyScheduleAndIntervals(onboardingDraft.profile);
-      persistOnboardingDraft();
-      renderOnboardingStep();
+      ctx.onChanged();
     }
 
-    function setOnboardingSemesterBusy(value) {
-      const schedule = ensureOnboardingScheduleShape();
+    function setOnboardingSemesterBusy(value, scope = "onboarding") {
+      const ctx = getBusyCalendarContext(scope);
+      if (!ctx.profile) return;
+      const schedule = ensureOnboardingScheduleShape(scope);
       schedule.applies_to_semester = Boolean(value);
-      syncBusyScheduleAndIntervals(onboardingDraft.profile);
-      persistOnboardingDraft();
-      renderOnboardingStep();
+      ctx.onChanged();
     }
 
     let activeOnboardingGoalQuestion = 1;
@@ -4503,8 +4863,8 @@
       { id: "any", title: "Cơ sở nào cũng được", desc: "Không giới hạn cơ sở tổ chức hoạt động.", badge: "Không ràng buộc", badgeClass: "border-slate-600/50 bg-slate-800/60 text-slate-300" },
       { id: "prefer_nvc", title: "Ưu tiên cơ sở Nguyễn Văn Cừ (NVC)", desc: "Ưu tiên hoạt động tại NVC, vẫn cho phép cơ sở khác khi cần.", badge: "Ưu tiên mềm", badgeClass: "border-indigo-400/35 bg-indigo-500/15 text-indigo-200" },
       { id: "prefer_dong_hoa", title: "Ưu tiên cơ sở Đông Hòa (Linh Trung)", desc: "Ưu tiên hoạt động tại Đông Hòa, vẫn cho phép cơ sở khác khi cần.", badge: "Ưu tiên mềm", badgeClass: "border-indigo-400/35 bg-indigo-500/15 text-indigo-200" },
-      { id: "only_nvc", title: "Chỉ tham gia tại NVC", desc: "Loại trừ hoàn toàn hoạt động tại cơ sở Đông Hòa.", badge: "Loại trừ bắt buộc", badgeClass: "border-rose-400/40 bg-rose-500/15 text-rose-200" },
-      { id: "only_dong_hoa", title: "Chỉ tham gia tại Đông Hòa", desc: "Loại trừ hoàn toàn hoạt động tại cơ sở Nguyễn Văn Cừ.", badge: "Loại trừ bắt buộc", badgeClass: "border-rose-400/40 bg-rose-500/15 text-rose-200" }
+      { id: "only_nvc", title: "Chỉ tham gia trực tiếp tại NVC", desc: "Loại trừ hoạt động tại Đông Hòa, cơ sở khác và địa điểm trực tiếp chưa rõ; vẫn giữ hoạt động Online.", badge: "Loại trừ bắt buộc", badgeClass: "border-rose-400/40 bg-rose-500/15 text-rose-200" },
+      { id: "only_dong_hoa", title: "Chỉ tham gia trực tiếp tại Đông Hòa", desc: "Loại trừ hoạt động tại NVC, cơ sở khác và địa điểm trực tiếp chưa rõ; vẫn giữ hoạt động Online.", badge: "Loại trừ bắt buộc", badgeClass: "border-rose-400/40 bg-rose-500/15 text-rose-200" }
     ];
 
     const ONBOARDING_CATEGORY_OPTIONS = [
@@ -4945,7 +5305,7 @@
 
     function completeOnboarding() {
       const profile = onboardingDraft.profile;
-      profile.goal.target_score = Math.max(0, Math.min(100, safeNumber(profile.goal.target_score || 80)));
+      profile.goal.target_score = normalizeDrlTarget(profile.goal?.target_score, 80);
       profile.drl_target = profile.goal.target_score;
       profile.preferences = {
         ...profile.preferences,
@@ -6330,21 +6690,34 @@
 
     function buildCanonicalAvailability() {
       const dayNames = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+      const effectiveFrom = '2026-11-09';
+      const effectiveUntil = '2027-03-31';
       const policyDefaultBlocks = dayNames.map(day => ({ day_of_week: day, start_time: '07:00', end_time: '21:00' }));
+      const extraWeeklyAvailable = (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'available');
       const availableExceptionDays = new Map();
       (currentProfileDraft.exceptions || []).filter(item => item.kind === 'available').forEach(item => {
-        const blocks = availableExceptionDays.get(item.date) || [];
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(item.date || '') || item.date < effectiveFrom || item.date > effectiveUntil) return;
+        if (!item.start || !item.end || item.start >= item.end) return;
+        let blocks = availableExceptionDays.get(item.date);
+        if (!blocks) {
+          const dayIndex = onboardingWeekdayIndex(item.date);
+          blocks = [{ start_time: '07:00', end_time: '21:00' }].concat(
+            extraWeeklyAvailable
+              .filter(rule => Number(rule.weekday) === dayIndex)
+              .map(rule => ({ start_time: rule.start, end_time: rule.end }))
+          );
+          availableExceptionDays.set(item.date, blocks);
+        }
         blocks.push({ start_time: item.start, end_time: item.end });
-        availableExceptionDays.set(item.date, blocks);
       });
       return {
         availability_version: 'sp3-availability/0.2',
         timezone: 'Asia/Ho_Chi_Minh',
         week_start: AVAILABILITY_DEFAULT_WEEK_START,
         apply_scope: 'SEMESTER_WEEKLY',
-        effective_from: '2026-11-09',
-        effective_until: '2027-03-31',
-        weekly_blocks: policyDefaultBlocks.concat((currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'available').map(item => ({ day_of_week: dayNames[item.weekday], start_time: item.start, end_time: item.end }))),
+        effective_from: effectiveFrom,
+        effective_until: effectiveUntil,
+        weekly_blocks: policyDefaultBlocks.concat(extraWeeklyAvailable.map(item => ({ day_of_week: dayNames[item.weekday], start_time: item.start, end_time: item.end }))),
         exceptions: [...availableExceptionDays.entries()].map(([date, blocks]) => ({ date, blocks })),
         busy_intervals: collectBusyIntervals().map(item => ({ start: item.start, end: item.end })),
         weekly_participation_hours: currentProfileDraft.preference_patch?.weekly_participation_hours ?? null
@@ -6775,20 +7148,184 @@
       return data;
     }
 
+    let plannerScreenMode = 'options';
+
+    const PLAN_STRATEGY_META = {
+      MINIMUM_EFFORT: { title: 'Ít thời gian nhất', subtitle: 'Đạt mục tiêu với ít hoạt động và thời lượng thấp nhất.' },
+      BALANCED: { title: 'Cân bằng', subtitle: 'Cân đối giữa mục tiêu ĐRL, thời gian và sở thích.' },
+      PREFERENCE_FIRST: { title: 'Ưu tiên sở thích', subtitle: 'Tối đa hóa độ phù hợp với chủ đề, hình thức và cơ sở.' }
+    };
+
+    function formatPlanBaselineHonest(result) {
+      const hasVerifiedBaseline = Boolean(result?.score_summary?.official_baseline_verified);
+      const baseline = result?.score_summary?.baseline_total;
+      if (hasVerifiedBaseline && Number.isFinite(Number(baseline))) return `${baseline}đ`;
+      return 'Chưa biết (chưa xác minh)';
+    }
+
+    function normalizedThreeStrategyOptions(options) {
+      const order = ['MINIMUM_EFFORT', 'BALANCED', 'PREFERENCE_FIRST'];
+      const byStrategy = new Map((Array.isArray(options) ? options : []).map(opt => [opt.strategy, opt]));
+      return order.map(strategy => byStrategy.get(strategy) || {
+        strategy,
+        status: 'FAILED',
+        error: 'Chưa có kết quả cho chiến lược này.',
+        result: null
+      });
+    }
+
     function renderPlanOptionsSelector() {
       const box = document.getElementById('planOptionsSelector');
       const message = document.getElementById('planOptionsMessage');
       if (!box) return;
-      const labels = { MINIMUM_EFFORT: '\u00cdt th\u1eddi gian', BALANCED: 'C\u00e2n b\u1eb1ng', PREFERENCE_FIRST: 'Theo s\u1edf th\u00edch' };
-      box.innerHTML = cachedPlanOptions.map((option, index) => {
-        const title = escapeHTML(labels[option.strategy] || option.strategy);
+      const ordered = cachedPlanOptions.length ? normalizedThreeStrategyOptions(cachedPlanOptions) : [];
+      box.innerHTML = ordered.map((option, index) => {
+        const meta = PLAN_STRATEGY_META[option.strategy] || { title: option.strategy, subtitle: '' };
+        const realIdx = cachedPlanOptions.findIndex(item => item.strategy === option.strategy);
+        const targetIdx = realIdx >= 0 ? realIdx : index;
         if (option.status === 'FAILED' || !option.result) {
-          return `<button type="button" disabled class="rounded-xl border border-rose-500/30 bg-rose-950/20 p-3 text-left opacity-80"><span class="block text-sm font-extrabold text-white">${title}</span><span class="mt-1 block text-[11px] text-rose-300">Kh\u00f4ng th\u1ec3 t\u1ea1o ph\u01b0\u01a1ng \u00e1n: ${escapeHTML(option.error || 'd\u1eef li\u1ec7u l\u1ecbch kh\u00f4ng h\u1ee3p l\u1ec7')}</span></button>`;
+          return `<article data-strategy-card="${option.strategy}" data-status="FAILED" class="flex flex-col justify-between rounded-2xl border border-rose-500/35 bg-rose-950/15 p-4 text-left">
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <h4 class="text-sm font-black text-white">${escapeHTML(meta.title)}</h4>
+                <span class="rounded-full border border-rose-500/40 bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-200">Không khả thi</span>
+              </div>
+              <p class="mt-1 text-[11px] text-slate-400">${escapeHTML(meta.subtitle)}</p>
+              <p class="mt-3 rounded-xl border border-rose-500/25 bg-rose-950/30 p-2.5 text-[11px] text-rose-200">${escapeHTML(option.error || 'Không thể tạo phương án với ràng buộc hiện tại.')}</p>
+            </div>
+            <button type="button" disabled class="mt-4 w-full cursor-not-allowed rounded-xl border border-rose-500/20 bg-[#080d18] px-3 py-2 text-xs font-bold text-slate-500">Không thể chọn</button>
+          </article>`;
         }
-        const duplicate = option.duplicate_of ? `<span class="mt-1 block text-[11px] text-slate-500">Tr\u00f9ng l\u1ecbch v\u1edbi ph\u01b0\u01a1ng \u00e1n ${escapeHTML(labels[option.duplicate_of] || option.duplicate_of)}</span>` : '';
-        return `<button type="button" onclick="selectCachedPlanOption(${index})" class="rounded-xl border p-3 text-left ${index === selectedPlanOptionIndex ? 'border-emerald-400 bg-emerald-950/30' : 'border-[#2b3a54] bg-[#080d18]'}"><span class="block text-sm font-extrabold text-white">${title}</span><span class="mt-1 block text-[11px] text-slate-400">${option.projected_total ?? '\u2014'}\u0111 \u00b7 thi\u1ebfu ${option.target_shortfall ?? '\u2014'}\u0111 \u00b7 ${option.activity_count} ho\u1ea1t \u0111\u1ed9ng \u00b7 ${Math.round((option.duration_minutes || 0) / 6) / 10} gi\u1edd \u00b7 ph\u00f9 h\u1ee3p ${option.utility}</span><span class="text-[11px] ${option.target_met ? 'text-emerald-300' : 'text-amber-300'}">${option.target_met ? '\u0110\u1ea1t m\u1ee5c ti\u00eau' : 'Ch\u01b0a \u0111\u1ea1t \u0111\u1ee7 m\u1ee5c ti\u00eau'}</span>${duplicate}</button>`;
+        const selected = targetIdx === selectedPlanOptionIndex;
+        const dupMeta = option.duplicate_of ? (PLAN_STRATEGY_META[option.duplicate_of]?.title || option.duplicate_of) : null;
+        const hours = Math.round((option.duration_minutes || 0) / 6) / 10;
+        const titles = planTitleMap(option.result);
+        const acts = option.result.plan?.selected_activities || [];
+        const previewHtml = acts.slice(0, 3).map(act => {
+          const title = titles[act.activity_id] || act.activity_id;
+          const blk = act.scheduled_blocks?.[0];
+          const when = blk ? shortCalendarDate(blk.start.slice(0, 10)) : 'Linh hoạt';
+          return `<li class="flex items-center justify-between gap-2 truncate text-[11px] text-slate-300"><span class="truncate">• ${escapeHTML(title)}</span><span class="shrink-0 text-[10px] text-slate-500 planner-number">${escapeHTML(when)}</span></li>`;
+        }).join('') + (acts.length > 3 ? `<li class="text-[10px] font-bold text-indigo-300">+${acts.length - 3} hoạt động khác</li>` : '');
+        const gapText = option.target_met ? 'Đạt mục tiêu' : `Thiếu ${option.target_shortfall ?? '—'}đ`;
+        return `<article data-strategy-card="${option.strategy}" data-status="READY" class="flex flex-col justify-between rounded-2xl border p-4 text-left transition ${selected ? 'border-emerald-400 bg-emerald-950/20 shadow-lg shadow-emerald-950/30' : 'border-[#223046] bg-[#080d18] hover:border-indigo-400/50'}">
+          <div class="space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h4 class="text-sm font-black text-white">${escapeHTML(meta.title)}</h4>
+                <p class="mt-0.5 text-[11px] text-slate-400">${escapeHTML(meta.subtitle)}</p>
+              </div>
+              <span class="shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold ${option.target_met ? 'border-emerald-400/40 bg-emerald-500/15 text-emerald-200' : 'border-amber-400/40 bg-amber-500/15 text-amber-200'}">${escapeHTML(gapText)}</span>
+            </div>
+            ${dupMeta ? `<div class="rounded-lg border border-slate-700 bg-[#0e1524] px-2.5 py-1 text-[10px] font-semibold text-slate-400">Trùng lịch với phương án: <b class="text-slate-200">${escapeHTML(dupMeta)}</b></div>` : ''}
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="rounded-xl border border-[#1b2537] bg-[#0e1524] p-2.5"><span class="block text-[10px] text-slate-400">Dự kiến đạt</span><b class="text-base font-black text-indigo-300 planner-number">${option.projected_total ?? '—'}đ</b></div>
+              <div class="rounded-xl border border-[#1b2537] bg-[#0e1524] p-2.5"><span class="block text-[10px] text-slate-400">Phù hợp sở thích</span><b class="text-base font-black text-violet-300 planner-number">${option.utility ?? 0}</b></div>
+              <div class="rounded-xl border border-[#1b2537] bg-[#0e1524] p-2.5"><span class="block text-[10px] text-slate-400">Hoạt động</span><b class="text-sm font-extrabold text-white planner-number">${option.activity_count ?? acts.length}</b></div>
+              <div class="rounded-xl border border-[#1b2537] bg-[#0e1524] p-2.5"><span class="block text-[10px] text-slate-400">Thời lượng</span><b class="text-sm font-extrabold text-white planner-number">${hours} giờ</b></div>
+            </div>
+            <div class="text-[10px] text-slate-500">Điểm nền hiện tại: <span class="text-slate-300">${escapeHTML(formatPlanBaselineHonest(option.result))}</span></div>
+            <ul class="space-y-1 border-t border-[#1b2537] pt-2.5">${previewHtml || '<li class="text-[11px] text-slate-500">Không cần thêm hoạt động.</li>'}</ul>
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-2">
+            <button type="button" onclick="selectCachedPlanOption(${targetIdx})" class="rounded-xl border px-3 py-2 text-xs font-bold transition ${selected ? 'border-emerald-400/60 bg-emerald-500/20 text-emerald-200' : 'border-[#2b3a54] bg-[#0e1524] text-slate-200 hover:border-indigo-400/60'}">${selected ? '✓ Đang chọn' : 'Chọn phương án'}</button>
+            <button type="button" onclick="openPlanReviewScreen(${targetIdx})" class="rounded-xl bg-indigo-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">Rà soát →</button>
+          </div>
+        </article>`;
       }).join('');
-      if (message) message.textContent = planOptionsMessageText || 'Ba ph\u01b0\u01a1ng \u00e1n \u0111\u00e3 l\u01b0u; chuy\u1ec3n t\u1ee9c th\u00ec kh\u00f4ng t\u00ednh l\u1ea1i.';
+      if (message) message.textContent = planOptionsMessageText || 'Ba phương án đã được tính; chọn một phương án rồi chuyển sang Rà soát.';
+      if (plannerScreenMode === 'review') renderPlanReviewScreen();
+    }
+
+    function setPlannerScreenMode(mode) {
+      plannerScreenMode = mode === 'review' ? 'review' : 'options';
+      const reviewEl = document.getElementById('planReviewScreen');
+      const badge = document.getElementById('plannerFlowStepBadge');
+      if (reviewEl) reviewEl.classList.toggle('hidden', plannerScreenMode !== 'review');
+      if (badge) badge.textContent = plannerScreenMode === 'review' ? 'Bước 2: Rà soát & Xác nhận' : 'Bước 1: Chọn phương án';
+      if (plannerScreenMode === 'review') {
+        renderPlanReviewScreen();
+        reviewEl?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function openPlanReviewScreen(index) {
+      if (Number.isInteger(index) && cachedPlanOptions[index]?.result) {
+        selectCachedPlanOption(index);
+      }
+      if (!currentPlannerData) return;
+      setPlannerScreenMode('review');
+    }
+
+    function renderPlanReviewScreen() {
+      const box = document.getElementById('planReviewScreen');
+      if (!box || !currentPlannerData) return;
+      const option = cachedPlanOptions[selectedPlanOptionIndex] || {};
+      const meta = PLAN_STRATEGY_META[option.strategy] || { title: currentPlannerData.custom_plan_name || 'Phương án đang chọn', subtitle: '' };
+      const titles = planTitleMap(currentPlannerData);
+      const selectedActs = currentPlannerData.plan?.selected_activities || [];
+      const summary = currentPlannerData.plan?.score_summary || {};
+      const hasConfirmContract = typeof window.UniLifePlanReviewContract?.confirmPlan === 'function';
+      const rows = selectedActs.map(act => {
+        const title = titles[act.activity_id] || act.activity_id;
+        const blk = act.scheduled_blocks?.[0];
+        const when = blk ? formatPlanTimeRange(blk.start, blk.end) : 'Thời gian linh hoạt';
+        const tok = activityToken(act.activity_id);
+        return `<div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#1b2537] bg-[#080d18] p-3">
+          <div class="min-w-0">
+            <div class="text-xs font-extrabold text-white">${escapeHTML(title)}</div>
+            <div class="mt-0.5 text-[11px] text-slate-400 planner-number">${escapeHTML(when)}</div>
+          </div>
+          <div class="flex shrink-0 items-center gap-2">
+            <button type="button" onclick="openActivityAlternatives(activityFromToken('${tok}'))" class="rounded-lg border border-indigo-400/35 bg-indigo-500/10 px-2.5 py-1.5 text-[11px] font-bold text-indigo-200 hover:bg-indigo-500/20">Đổi hoạt động</button>
+            <button type="button" onclick="openPlannedActivityDetails(activityFromToken('${tok}'))" class="rounded-lg border border-rose-400/35 bg-rose-500/10 px-2.5 py-1.5 text-[11px] font-bold text-rose-200 hover:bg-rose-500/20">Xem trước khi bỏ</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      box.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#1b2537] pb-3">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-300">Màn hình Rà soát kế hoạch</span>
+            <h3 class="mt-0.5 text-lg font-black text-white">${escapeHTML(currentPlannerData.custom_plan_name || meta.title)}</h3>
+          </div>
+          <button type="button" onclick="setPlannerScreenMode('options')" class="rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-2 text-xs font-bold text-slate-300 hover:text-white">← Quay lại 3 phương án</button>
+        </div>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 text-xs">
+          <div class="rounded-xl border border-[#1b2537] bg-[#080d18] p-3"><span class="text-[10px] text-slate-400 block">Điểm nền hiện tại</span><b class="mt-1 block text-slate-200">${escapeHTML(formatPlanBaselineHonest(currentPlannerData))}</b></div>
+          <div class="rounded-xl border border-[#1b2537] bg-[#080d18] p-3"><span class="text-[10px] text-slate-400 block">Dự kiến đạt</span><b class="mt-1 block text-base font-black text-indigo-300 planner-number">${summary.projected_total ?? option.projected_total ?? '—'}đ</b></div>
+          <div class="rounded-xl border border-[#1b2537] bg-[#080d18] p-3"><span class="text-[10px] text-slate-400 block">Số hoạt động</span><b class="mt-1 block text-base font-black text-white planner-number">${selectedActs.length}</b></div>
+          <div class="rounded-xl border border-[#1b2537] bg-[#080d18] p-3"><span class="text-[10px] text-slate-400 block">Độ phù hợp</span><b class="mt-1 block text-base font-black text-violet-300 planner-number">${option.utility ?? 0}</b></div>
+        </div>
+        <div class="space-y-2">
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Danh sách hoạt động trong phương án</h4>
+          ${rows || '<p class="rounded-xl border border-dashed border-[#223046] p-4 text-center text-xs text-slate-500">Không có hoạt động nào trong kế hoạch này.</p>'}
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#1b2537] bg-[#080d18] p-4">
+          <p id="planReviewConfirmStatus" class="text-xs text-slate-300">${hasConfirmContract ? 'Sẵn sàng xác nhận kế hoạch chính thức qua module Review/Confirm.' : 'Điểm tích hợp sẵn sàng (UniLifePlanReviewContract.confirmPlan): chờ module confirmed_plan của Thảo Duyên để lưu kế hoạch chính thức.'}</p>
+          <button id="btnConfirmReviewedPlan" type="button" onclick="confirmSelectedPlanViaContract()" class="shrink-0 rounded-xl px-4 py-2.5 text-xs font-extrabold transition ${hasConfirmContract ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'border border-amber-400/40 bg-amber-950/30 text-amber-200 hover:bg-amber-950/50'}">Xác nhận kế hoạch</button>
+        </div>`;
+    }
+
+    async function confirmSelectedPlanViaContract() {
+      const status = document.getElementById('planReviewConfirmStatus');
+      if (!currentPlannerData) return;
+      const contract = window.UniLifePlanReviewContract;
+      if (typeof contract?.confirmPlan === 'function') {
+        const option = cachedPlanOptions[selectedPlanOptionIndex] || null;
+        await contract.confirmPlan({
+          student_id: currentStudent?.student_id || null,
+          strategy: option?.strategy || null,
+          option,
+          result: currentPlannerData,
+          source: SP3_SOURCE
+        });
+        if (status) status.textContent = '✓ Đã gửi yêu cầu xác nhận kế hoạch qua UniLifePlanReviewContract.';
+        return;
+      }
+      if (status) {
+        status.textContent = 'Chưa có module confirmed_plan của Thảo Duyên trên nhánh này (UniLifePlanReviewContract.confirmPlan chưa được đăng ký). Phương án đã chọn vẫn được giữ ở chế độ xem trước.';
+      }
     }
 
     function initialReadyPlanOptionIndex(options, preferredStrategy) {
@@ -7392,1111 +7929,4 @@
       const modal = document.getElementById('smartSwapModal');
       const content = document.getElementById('smartSwapContent');
       if (!modal || !content) return;
-      content.innerHTML = `<div class="space-y-3"><div><b class="text-white">Khung bận ${escapeHTML(formatPlanTimeRange(start, end))}</b><p class="mt-1 text-xs text-amber-300">Thay đổi lịch bận có thể làm kế hoạch hiện tại hết hiệu lực và sẽ cần SP3 tính lại.</p></div><div class="flex gap-2"><button type="button" onclick="document.getElementById('smartSwapModal').classList.add('hidden');document.getElementById('btnToggleBusySlots')?.click()" class="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold">Chỉnh lịch</button><button type="button" onclick="confirmBusyCalendarRemoval('${start}','${end}')" class="rounded-lg border border-rose-500/40 px-3 py-2 text-xs font-bold text-rose-200">Xóa và tính lại</button></div></div>`;
-      modal.classList.remove('hidden');
-    }
-
-    async function confirmBusyCalendarRemoval(start, end) {
-      const date = start.slice(0, 10);
-      const startTime = start.slice(11, 16);
-      const endTime = end.slice(11, 16);
-      const weekday = (() => { const day = new Date(start).getDay(); return day === 0 ? 6 : day - 1; })();
-      customBusyIntervals = customBusyIntervals.filter(item => item.start !== start || item.end !== end);
-      currentProfileDraft.exceptions = (currentProfileDraft.exceptions || []).filter(item => !(item.kind === 'busy' && item.date === date && item.start === startTime && item.end === endTime));
-      currentProfileDraft.weekly_intervals = (currentProfileDraft.weekly_intervals || []).filter(item => !(item.kind === 'busy' && Number(item.weekday) === weekday && item.start === startTime && item.end === endTime));
-      [...unavailableAvailabilitySlots].forEach(key => {
-        const [slotDate, periodKey] = key.split('|');
-        const period = AVAILABILITY_PERIODS.find(item => item.key === periodKey);
-        if (slotDate === date && period?.start === startTime && period?.end === endTime) unavailableAvailabilitySlots.delete(key);
-      });
-      document.getElementById('smartSwapModal')?.classList.add('hidden');
-      markPlanStale();
-      persistCurrentUserData();
-      await runSp3Planner();
-    }
-
-    async function previewCalendarActivityChange(kind, activityId) {
-      const content = document.getElementById('smartSwapContent');
-      if (!content || !confirmedPreference || !currentPlannerData) return;
-      content.innerHTML = '<p>Đang kiểm tra khả thi và tính lại toàn bộ kế hoạch…</p>';
-      try {
-        const response = await fetch(`${API_BASE}/api/sp3/personalized/${kind}-preview${sp3Query()}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ confirmed_profile: true, preference: plannerPreferencePayload(confirmedPreference), base_result: currentPlannerData, activity_id: activityId }) });
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.detail || 'Không thể tạo bản xem trước.');
-        pendingSwapPreview = data;
-        calendarPreviewChange = data;
-        renderPlanCalendar(data.result, planTitleMap(data.result), true);
-        content.innerHTML = `<div class="space-y-3"><div class="grid gap-3 sm:grid-cols-2"><div class="rounded-xl border border-[#2b3a54] p-3"><b>Trước</b><div class="mt-2 text-xs">${data.before.projected_total ?? '—'}đ · thiếu ${data.before.target_shortfall ?? '—'}đ · ${data.before.duration_minutes} phút</div></div><div class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3"><b>Sau</b><div class="mt-2 text-xs">${data.after.projected_total ?? '—'}đ · thiếu ${data.after.target_shortfall ?? '—'}đ · ${data.after.duration_minutes} phút</div></div></div><p class="text-xs text-slate-400">Bỏ: ${escapeHTML(data.dropped_activity_ids.join(', ')) || '—'} · Thêm: ${escapeHTML(data.added_activity_ids.join(', ')) || '—'}</p><button type="button" onclick="applySmartSwapPreview()" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold">Xác nhận Lịch tùy chỉnh</button></div>`;
-      } catch (error) {
-        calendarPreviewChange = null;
-        renderPlanCalendar(currentPlannerData, planTitleMap(currentPlannerData), true);
-        content.innerHTML = `<p class="text-rose-300">${escapeHTML(error.message)}</p><p class="mt-2 text-xs text-slate-500">Không có thay đổi nào được áp dụng.</p>`;
-      }
-    }
-
-    function openActivityAlternatives(activityId) {
-      const modal = document.getElementById('smartSwapModal');
-      const content = document.getElementById('smartSwapContent');
-      if (!modal || !content || !currentPlannerData) return;
-      if (SP3_SOURCE === 'real') {
-        content.innerHTML = '<p class="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 text-amber-200">Smart Swap chưa được hỗ trợ an toàn cho nguồn hoạt động thật. Kế hoạch hiện tại vẫn dùng dữ liệu thật và có thể đổi giữa các phương án đã tính.</p>';
-        modal.classList.remove('hidden');
-        return;
-      }
-      const selected = new Set((currentPlannerData.plan?.selected_activities || []).map(item => item.activity_id));
-      const candidates = (currentPlannerData.feasibility?.candidates || []).filter(item => item.feasibility?.status === 'FEASIBLE' && !selected.has(item.activity?.activity_id));
-      const utilityByActivity = new Map((currentPlannerData.personalization?.candidate_breakdown || []).map(item => [item.activity_id, item]));
-      content.innerHTML = candidates.length ? candidates.map(item => {
-        const activity = item.activity || {};
-        const schedule = item.schedule || {};
-        const utility = utilityByActivity.get(activity.activity_id) || { utility: 0, matches: [] };
-        const matches = (utility.matches || []).map(match => `${match.dimension}: ${match.value}`).join(', ');
-        const fixed = schedule.fixed_blocks?.[0];
-        const time = fixed ? formatPlanTimeRange(fixed.start, fixed.end) : (schedule.window_start ? `${formatPlanTimeRange(schedule.window_start, schedule.window_end)} · ${schedule.duration_minutes || 0} phút` : 'Thời gian linh hoạt');
-        return `<article class="rounded-xl border border-[#2b3a54] bg-[#080d18] p-3"><div class="flex items-start justify-between gap-3"><div><b class="text-white">${escapeHTML(activity.title || activity.activity_id)}</b><div class="mt-1 text-xs text-slate-400">${escapeHTML(time)} · ${escapeHTML(activity.mode || '')}</div><div class="mt-1 text-[11px] text-violet-300">Phù hợp: ${escapeHTML(utility.utility)}${matches ? ` · ${escapeHTML(matches)}` : ''}. Điểm và tác động sẽ được SP3 tính lại trên toàn kế hoạch.</div></div><button type="button" onclick="previewSmartSwap(activityFromToken('${activityToken(activityId)}'),activityFromToken('${activityToken(activity.activity_id)}'))" class="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white">Chọn</button></div></article>`;
-      }).join('') : '<p class="rounded-xl border border-dashed border-[#2b3a54] p-5 text-center text-slate-500">Không có hoạt động thay thế đủ điều kiện.</p>';
-      modal.classList.remove('hidden');
-    }
-
-    async function previewSmartSwap(removeActivityId, addActivityId) {
-      const content = document.getElementById('smartSwapContent');
-      if (!content || !confirmedPreference) {
-        if (content) content.innerHTML = '<p class="text-amber-300">Hãy xác nhận hồ sơ sở thích trước khi Smart Swap.</p>';
-        return;
-      }
-      content.innerHTML = '<p>Đang kiểm tra khả thi và tính lại toàn bộ điểm dự kiến…</p>';
-      try {
-        const response = await fetch(`${API_BASE}/api/sp3/personalized/swap-preview${sp3Query()}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ confirmed_profile: true, preference: plannerPreferencePayload(confirmedPreference), base_result: currentPlannerData, remove_activity_id: removeActivityId, add_activity_id: addActivityId }) });
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.detail || 'Không thể tạo bản xem trước thay thế.');
-        pendingSwapPreview = data;
-        calendarPreviewChange = data;
-        renderPlanCalendar(data.result, planTitleMap(data.result), true);
-        content.innerHTML = `<div class="grid gap-3 sm:grid-cols-2"><div class="rounded-xl border border-[#2b3a54] p-3"><b>Trước</b><div class="mt-2 text-xs">${data.before.projected_total ?? '—'}đ · thiếu ${data.before.target_shortfall ?? '—'}đ · ${data.before.activity_count} hoạt động · ${data.before.duration_minutes} phút</div></div><div class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3"><b>Sau</b><div class="mt-2 text-xs">${data.after.projected_total ?? '—'}đ · thiếu ${data.after.target_shortfall ?? '—'}đ · ${data.after.activity_count} hoạt động · ${data.after.duration_minutes} phút</div></div></div><p class="text-xs text-slate-400">Bỏ: ${escapeHTML(data.dropped_activity_ids.join(', ')) || '—'} · Thêm: ${escapeHTML(data.added_activity_ids.join(', ')) || '—'}</p><button type="button" onclick="applySmartSwapPreview()" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white">Xác nhận lưu Lịch tùy chỉnh</button>`;
-      } catch (error) {
-        calendarPreviewChange = null;
-        renderPlanCalendar(currentPlannerData, planTitleMap(currentPlannerData), true);
-        content.innerHTML = `<p class="text-rose-300">${escapeHTML(error.message)}</p><p class="mt-2 text-xs text-slate-500">Không có thay đổi nào được áp dụng.</p>`;
-      }
-    }
-
-    function applySmartSwapPreview() {
-      if (!pendingSwapPreview?.result) return;
-      customPlanBackup = JSON.parse(JSON.stringify(currentPlannerData));
-      currentPlannerData = JSON.parse(JSON.stringify(pendingSwapPreview.result));
-      currentPlannerData.custom_plan_name = 'Lịch tùy chỉnh';
-      planStages.first = currentPlannerData;
-      currentPlanStage = 'first';
-      pendingSwapPreview = null;
-      calendarPreviewChange = null;
-      document.getElementById('smartSwapModal')?.classList.add('hidden');
-      document.getElementById('undoCustomPlanButton')?.classList.remove('hidden');
-      renderSp3PlanResult();
-      persistCurrentUserData();
-    }
-
-    function undoCustomPlan() {
-      if (!customPlanBackup) return;
-      currentPlannerData = JSON.parse(JSON.stringify(customPlanBackup));
-      planStages.first = currentPlannerData;
-      currentPlanStage = 'first';
-      customPlanBackup = null;
-      document.getElementById('undoCustomPlanButton')?.classList.add('hidden');
-      renderSp3PlanResult();
-      persistCurrentUserData();
-    }
-
-    // ---- main renderer: draws whichever journey step is currently selected ----
-    function renderSp3PlanResult() {
-      const data = planStages[currentPlanStage];
-      if (!data) return;
-      showPlanPanels('active');
-
-      const prevData = currentPlanStage === 'replan' ? planStages.first
-        : currentPlanStage === 'whatif' ? planStages.replan : null;
-      const plan = data.plan || {};
-      const availability = data.availability || {};
-      const feasibility = data.feasibility || {};
-      const summary = plan.score_summary || {};
-      const titles = Object.assign({}, planTitleMap(data));
-      const isDev = currentViewMode === 'dev';
-
-      const stale = document.getElementById('planStaleNotice');
-      if (stale) stale.classList.toggle('hidden', !planInputsDirty);
-
-      renderPlanStepper();
-      renderPlanPersonalizationCard(data, titles);
-
-      // Summary header
-      const met = plan.status === 'TARGET_MET';
-      const statusBadge = document.getElementById('planStatusBadge');
-      if (statusBadge) {
-        statusBadge.innerText = isDev ? (plan.status || 'PROCESSED') : (met ? 'Đã đạt mục tiêu' : 'Đạt một phần mục tiêu');
-        statusBadge.className = met
-          ? 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-emerald-950/60 text-emerald-300 border border-emerald-500/40'
-          : 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-amber-950/60 text-amber-300 border border-amber-500/40';
-      }
-      const feasibilityBadge = document.getElementById('planFeasibilityBadge');
-      if (feasibilityBadge) feasibilityBadge.innerText = `Khả thi: ${plan.feasibility_conclusion || 'COMPUTED'}`;
-      const modeBadge = document.getElementById('planModeBadge');
-      const verifiedBadge = document.getElementById('planVerifiedBadge');
-      const verifiedVal = Boolean(data.official_award_verified ?? plan.official_award_verified ?? false);
-      if (modeBadge) modeBadge.innerText = data.mode || plan.mode || 'DEMO_ONLY';
-      if (verifiedBadge) verifiedBadge.innerText = `official_award_verified: ${verifiedVal}`;
-
-      const baseTotal = summary.baseline_total ?? 0;
-      const projTotal = summary.projected_total ?? 0;
-      const gainTotal = summary.gain_total ?? (projTotal - baseTotal);
-      const reqTarget = data.requested_total_target ?? 80;
-      const setText = (id, v) => { const n = document.getElementById(id); if (n) n.innerText = v; };
-      setText('planScoreOverview', `${baseTotal} → ${projTotal} / 100đ`);
-      setText('planBaselineScoreText', `${baseTotal}đ`);
-      setText('planGainScoreText', `+${gainTotal}đ`);
-      setText('planTargetScoreText', `${reqTarget}đ`);
-
-      // Category chips (C1..C5) — highlight gains and any remaining shortfall
-      const catContainer = document.getElementById('planCategoryBreakdown');
-      if (catContainer) {
-        const baseByCat = summary.baseline_by_category || {};
-        const projByCat = summary.projected_by_category || {};
-        const gainByCat = summary.gain_by_category || {};
-        const remainByCat = summary.remaining_by_category || {};
-        catContainer.innerHTML = ['C1', 'C2', 'C3', 'C4', 'C5'].map(cid => {
-          const b = baseByCat[cid] ?? 0;
-          const p = projByCat[cid] ?? b;
-          const g = gainByCat[cid] ?? (p - b);
-          const lack = remainByCat[cid] ?? 0;
-          const tone = lack > 0 ? 'bg-amber-950/40 border-amber-500/50 text-amber-200'
-            : (g > 0 ? 'bg-emerald-950/40 border-emerald-600/50 text-emerald-200' : 'bg-[#080d18] border-[#223046] text-slate-300');
-          return `
-            <div class="p-2.5 rounded-xl border ${tone}" title="${escapeHTML(PLAN_CAT_FULL[cid] || '')}">
-              <div class="flex items-center justify-between font-bold">
-                <span>${PLAN_CAT_LABELS[cid]}</span>
-                ${g > 0 ? `<span class="text-emerald-400 font-extrabold">+${g}đ</span>` : `<span class="text-slate-500">+0đ</span>`}
-              </div>
-              <div class="text-[11px] text-slate-400 mt-1">${b} → <b class="text-white">${p}đ</b>${lack > 0 ? ` <span class="text-amber-300 font-bold">· thiếu ${lack}đ</span>` : ''}</div>
-            </div>`;
-        }).join('');
-      }
-
-      // What changed / next action
-      renderPlanChangeCard(data, prevData, titles);
-
-      // Gather data for the tabs
-      const acts = plan.selected_activities || [];
-      const availIntervals = availability.available_intervals || [];
-      const feasCandidates = feasibility.candidates || [];
-      renderPlanCalendar(data, titles);
-      const feasOk = feasCandidates.filter(c => c.feasibility?.status === 'FEASIBLE').length;
-      const excluded = plan.excluded_candidates || [];
-      const warnings = plan.warnings || [];
-      const visibleWarnings = warnings.map(w => ({ w, text: planWarningText(w, plan, titles) }))
-        .filter(x => x.text || isDev);
-
-      // Tab bar
-      const showNotesTab = isDev || visibleWarnings.length > 0 || excluded.length > 0;
-      if (!showNotesTab && currentPlanTab === 'notes') currentPlanTab = 'selected';
-      const tabs = [
-        ['selected', 'Lộ trình đề xuất', acts.length],
-        ['avail', 'Khung giờ rảnh', availIntervals.length],
-        ['cand', 'Kiểm tra khả thi', `${feasOk}/${feasCandidates.length}`]
-      ];
-      if (showNotesTab) tabs.push(['notes', 'Chưa được chọn', visibleWarnings.length + excluded.length]);
-      const tabBar = document.getElementById('planTabBar');
-      if (tabBar) {
-        tabBar.innerHTML = tabs.map(([key, label, count]) => {
-          const on = key === currentPlanTab;
-          return `<button type="button" onclick="setPlanTab('${key}')" class="px-3.5 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 ${on ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-[#162032]'}">
-            ${label}
-            <span class="px-1.5 py-0.5 rounded-full text-[11px] font-bold ${on ? 'bg-indigo-500/60 text-white' : 'bg-[#162032] text-slate-300'}">${count}</span>
-          </button>`;
-        }).join('');
-      }
-      const panelIds = { selected: 'planPanelSelected', avail: 'planPanelAvail', cand: 'planPanelCand', notes: 'planPanelNotes' };
-      Object.entries(panelIds).forEach(([key, id]) => {
-        const panel = document.getElementById(id);
-        if (panel) panel.classList.toggle('hidden', key !== currentPlanTab);
-      });
-
-      // Panel: selected activities
-      const prevSelected = prevData ? new Map(((prevData.plan || {}).selected_activities || []).map(a => [a.activity_id, a])) : null;
-      const candMap = new Map(feasCandidates.map(c => [c.activity?.activity_id, c.activity]));
-      const panelSel = document.getElementById('planPanelSelected');
-      if (panelSel) {
-        panelSel.innerHTML = `<div class="dev-only font-mono text-xs text-slate-500">plan.selected_activities</div>` + (acts.length === 0
-          ? `<div class="p-4 text-center text-slate-400 text-sm">Không có hoạt động nào cần thêm để đạt mục tiêu này.</div>`
-          : acts.map((item, idx) => {
-              const blocks = item.scheduled_blocks || [];
-              const gains = (item.reasons || []).filter(r => r.category_id && (r.projected_added ?? 0) > 0);
-              const candAct = candMap.get(item.activity_id) || {};
-              let changeTag = '';
-              if (prevSelected) {
-                if (!prevSelected.has(item.activity_id)) changeTag = `<span class="px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">Mới</span>`;
-                else if (planBlocksSig(prevSelected.get(item.activity_id)) !== planBlocksSig(item)) changeTag = `<span class="px-2 py-0.5 rounded-md text-xs font-bold bg-sky-950/60 text-sky-300 border border-sky-500/40">Đổi giờ</span>`;
-              }
-              const timeDisplay = blocks.length > 0
-                ? blocks.map(b => formatPlanTimeRange(b.start, b.end)).join(' | ')
-                : formatPlanTimeRange(candAct.start, candAct.end);
-              const locDisplay = candAct.mode === 'online' ? 'Trực tuyến (Online)' : (candAct.location || 'Tại cơ sở trường');
-              const regDeadline = candAct.registration_deadline ? formatPlanDate(candAct.registration_deadline) : null;
-
-              return `
-                <div class="candidate-card rounded-xl border border-[#223046] bg-[#080d18] hover:border-indigo-500/60 transition overflow-hidden">
-                  <div onclick="toggleCandidateCard(this)" class="p-4 cursor-pointer space-y-2">
-                    <div class="flex items-start justify-between gap-3">
-                      <div class="flex items-start gap-3 min-w-0">
-                        <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">${idx + 1}</span>
-                        <div class="min-w-0">
-                          <h5 class="text-sm font-extrabold text-white leading-snug">${escapeHTML(item.title || item.activity_id)}</h5>
-                          <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400 mt-1">
-                            <span class="text-indigo-300 font-medium flex items-center gap-1">
-                              <svg class="w-3.5 h-3.5 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                              ${escapeHTML(timeDisplay)}
-                            </span>
-                            <span>•</span>
-                            <span>${escapeHTML(locDisplay)}</span>
-                          </div>
-                          <span class="dev-only text-xs font-mono text-slate-400 block mt-0.5">Mã: ${escapeHTML(item.activity_id)}</span>
-                        </div>
-                      </div>
-                      <div class="flex flex-wrap items-center justify-end gap-1.5 shrink-0">
-                        ${changeTag}
-                        ${gains.map(r => `<span class="px-2 py-0.5 rounded-md text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-500/40">+${r.projected_added}đ vào ${PLAN_CAT_LABELS[r.category_id] || escapeHTML(r.category_id)}</span>`).join('')}
-                        <span class="chevron-icon text-xs text-slate-400 ml-1 transition-transform duration-200">▼</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Expandable Detailed Drawer -->
-                  <div class="candidate-detail hidden px-4 pb-4 pt-2.5 border-t border-[#1b2537] bg-[#0c1220] space-y-2.5 text-xs">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300">
-                      <div><b class="text-slate-400">Thời gian tổ chức:</b> <span class="text-white font-medium">${escapeHTML(timeDisplay)}</span></div>
-                      <div><b class="text-slate-400">Địa điểm / Hình thức:</b> <span class="text-white font-medium">${escapeHTML(locDisplay)}</span></div>
-                      ${regDeadline ? `<div><b class="text-slate-400">Hạn đăng ký:</b> <span class="text-amber-300 font-medium">${escapeHTML(regDeadline)}</span></div>` : ''}
-                      <div><b class="text-slate-400">Quyền lợi ĐRL:</b> <span class="text-emerald-400 font-bold">${gains.map(r => `+${r.projected_added}đ ${PLAN_CAT_LABELS[r.category_id] || r.category_id}`).join(', ') || 'Cộng điểm theo quy chế'}</span></div>
-                    </div>
-                    ${candAct.completion_requirements ? `<div class="p-2.5 rounded-lg bg-[#080d18] border border-[#223046] text-slate-300"><b>Minh chứng hoàn thành:</b> ${escapeHTML(candAct.completion_requirements)}</div>` : ''}
-                  </div>
-                </div>`;
-            }).join(''));
-      }
-
-      // Panel: free intervals
-      const panelAvail = document.getElementById('planPanelAvail');
-      if (panelAvail) {
-        panelAvail.innerHTML = `
-          <div class="dev-only font-mono text-xs text-slate-500 mb-2">availability.available_intervals · ${escapeHTML(availability.calendar_version || 'cal')}</div>` + (availIntervals.length === 0
-          ? `<div class="p-4 text-center text-slate-400 text-sm">Không có khung giờ rảnh.</div>`
-          : `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${availIntervals.map((slot, i) => `
-              <div class="p-3 rounded-xl bg-[#080d18] border border-[#223046] text-sm">
-                <span class="font-mono font-bold text-indigo-400 mr-2">#${i + 1}</span>
-                <span class="text-slate-200">${escapeHTML(formatPlanDate(slot.start))} → ${escapeHTML(formatPlanDate(slot.end))}</span>
-              </div>`).join('')}</div>`);
-      }
-
-      // Panel: feasibility candidates
-      const panelCand = document.getElementById('planPanelCand');
-      if (panelCand) {
-        panelCand.innerHTML = `<div class="dev-only font-mono text-xs text-slate-500 mb-2">feasibility.candidates</div>` + (feasCandidates.length === 0
-          ? `<div class="p-4 text-center text-slate-400 text-sm">Không có ứng viên.</div>`
-          : `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">${feasCandidates.map(c => {
-              const act = c.activity || {};
-              const st = c.feasibility?.status || 'UNKNOWN';
-              const reasons = c.feasibility?.reason_codes || [];
-              const stCls = st === 'FEASIBLE'
-                ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
-                : (st === 'NEEDS_REVIEW' ? 'bg-amber-950/60 text-amber-300 border-amber-500/40' : 'bg-rose-950/60 text-rose-300 border-rose-500/40');
-              const stLabel = st === 'FEASIBLE' ? 'Khả thi' : (st === 'NEEDS_REVIEW' ? 'Cần duyệt' : 'Không khả thi');
-              const timeDisplay = formatPlanTimeRange(act.start, act.end);
-              const locDisplay = act.mode === 'online' ? 'Trực tuyến (Online)' : (act.location || 'Tại cơ sở trường');
-              const reasonDesc = formatFeasibilityReason(st, reasons, act);
-              const regDeadline = act.registration_deadline ? formatPlanDate(act.registration_deadline) : null;
-
-              return `
-                <div class="candidate-card rounded-xl bg-[#080d18] border border-[#223046] hover:border-indigo-500/60 transition overflow-hidden">
-                  <div onclick="toggleCandidateCard(this)" class="p-3.5 cursor-pointer flex items-start justify-between gap-2.5">
-                    <div class="min-w-0 flex-1 space-y-1">
-                      <div class="font-bold text-sm text-white leading-snug flex items-center gap-1.5">
-                        <span class="dev-only font-mono font-bold text-indigo-300 text-xs">${escapeHTML(act.activity_id)}</span>
-                        <span class="truncate">${escapeHTML(act.title || act.activity_id)}</span>
-                      </div>
-                      <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                        <span class="text-indigo-300 font-medium flex items-center gap-1">
-                          <svg class="w-3.5 h-3.5 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                          ${escapeHTML(timeDisplay)}
-                        </span>
-                        <span>•</span>
-                        <span>${escapeHTML(locDisplay)}</span>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-1.5 shrink-0 pt-0.5">
-                      <span class="px-2.5 py-0.5 rounded-md text-xs font-bold border ${stCls}">
-                        ${stLabel}<span class="dev-only font-mono ml-1 opacity-75">(${escapeHTML(st)})</span>
-                      </span>
-                      <span class="chevron-icon text-xs text-slate-400 transition-transform duration-200">▼</span>
-                    </div>
-                  </div>
-
-                  <!-- Expandable Detailed Drawer -->
-                  <div class="candidate-detail hidden px-3.5 pb-3.5 pt-2.5 border-t border-[#1b2537] bg-[#0c1220] space-y-2.5 text-xs">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300">
-                      <div><b class="text-slate-400">Thời gian diễn ra:</b> <span class="text-white font-medium">${escapeHTML(timeDisplay)}</span></div>
-                      <div><b class="text-slate-400">Địa điểm / Hình thức:</b> <span class="text-white font-medium">${escapeHTML(locDisplay)}</span></div>
-                      ${regDeadline ? `<div><b class="text-slate-400">Hạn đăng ký:</b> <span class="text-amber-300 font-medium">${escapeHTML(regDeadline)}</span></div>` : ''}
-                      <div><b class="text-slate-400">Đối tượng:</b> <span class="text-slate-200">${escapeHTML((act.audience || []).join(', ') || 'Sinh viên toàn trường')}</span></div>
-                    </div>
-                    <div class="p-2.5 rounded-lg ${st === 'FEASIBLE' ? 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-200' : (st === 'NEEDS_REVIEW' ? 'bg-amber-950/40 border border-amber-500/30 text-amber-200' : 'bg-rose-950/40 border border-rose-500/30 text-rose-200')}">
-                      <b>Đánh giá khả thi:</b> ${reasonDesc}
-                    </div>
-                    ${act.completion_requirements ? `<div class="text-slate-400"><b>Minh chứng hoàn thành:</b> ${escapeHTML(act.completion_requirements)}</div>` : ''}
-                  </div>
-                </div>`;
-            }).join('')}</div>`);
-      }
-
-      // Panel: notes (warnings) + excluded candidates
-      const panelNotes = document.getElementById('planPanelNotes');
-      if (panelNotes) {
-        const warnHtml = visibleWarnings.length === 0
-          ? `<div class="text-sm text-slate-400">Không có thông tin bổ sung.</div>`
-          : visibleWarnings.map(({ w, text }) => `
-              <div class="flex items-start gap-2 text-sm text-amber-200 bg-amber-950/40 p-3 rounded-xl border border-amber-500/30">
-                <span class="mt-0.5">⚠️</span>
-                <span>${escapeHTML(text || w.message || '')}<span class="dev-only font-mono text-xs text-amber-400 ml-2">[${escapeHTML(w.code || 'WARN')}]</span></span>
-              </div>`).join('');
-        const exclHtml = excluded.length === 0
-          ? `<div class="text-sm text-slate-400">Tất cả ứng viên khả thi đã được xét.</div>`
-          : excluded.map(e => `
-              <div class="flex items-start justify-between gap-3 text-sm bg-[#080d18] p-3 rounded-xl border border-[#223046]">
-                <span class="font-bold text-slate-200 min-w-0">${escapeHTML(titles[e.activity_id] || e.activity_id)}<span class="dev-only font-mono text-xs text-indigo-300 ml-2">${escapeHTML(e.activity_id)} · ${escapeHTML(e.code || '')}</span></span>
-                <span class="text-slate-400 text-right shrink-0 max-w-[55%]">${escapeHTML(planExcludeReason(e))}</span>
-              </div>`).join('');
-        panelNotes.innerHTML = `
-          <div class="space-y-2">
-            <h5 class="text-sm font-extrabold text-white">Điều cần biết <span class="dev-only font-mono text-xs text-slate-500 font-normal">(plan.warnings)</span></h5>
-            ${warnHtml}
-          </div>
-          <div class="space-y-2">
-            <h5 class="text-sm font-extrabold text-white">Hoạt động chưa được chọn <span class="dev-only font-mono text-xs text-slate-500 font-normal">(plan.excluded_candidates)</span></h5>
-            ${exclHtml}
-          </div>`;
-      }
-    }
-
-    function formatPlanTimeRange(startStr, endStr) {
-      if (!startStr) return "Thời gian linh hoạt";
-      try {
-        const s = new Date(startStr);
-        if (isNaN(s.getTime())) return startStr;
-        const pad = n => String(n).padStart(2, '0');
-        const sTime = `${pad(s.getHours())}:${pad(s.getMinutes())}`;
-        const sDate = `${pad(s.getDate())}/${pad(s.getMonth() + 1)}`;
-        if (!endStr) return `${sTime} ngày ${sDate}`;
-        const e = new Date(endStr);
-        if (isNaN(e.getTime())) return `${sTime} ngày ${sDate}`;
-        const eTime = `${pad(e.getHours())}:${pad(e.getMinutes())}`;
-        const eDate = `${pad(e.getDate())}/${pad(e.getMonth() + 1)}`;
-        if (sDate === eDate) {
-          return `${sTime} — ${eTime} ngày ${sDate}`;
-        }
-        return `${sTime} ngày ${sDate} — ${eTime} ngày ${eDate}`;
-      } catch {
-        return `${startStr} — ${endStr || ''}`;
-      }
-    }
-
-    function formatFeasibilityReason(st, reasonCodes, act) {
-      const codes = reasonCodes || [];
-      if (st === 'FEASIBLE') {
-        return '✓ Khớp hoàn toàn với khung giờ rảnh, không bị trùng lịch và đủ điều kiện tham gia.';
-      }
-      if (st === 'NEEDS_REVIEW') {
-        if (codes.includes('MISSING_SCHEDULE_TYPE')) {
-          return '⚠️ Thông báo hoạt động chưa có lịch ca cụ thể, đang chờ trường xác nhận.';
-        }
-        return '⚠️ Cần đối chiếu thêm thông tin trước khi xếp lịch chính thức.';
-      }
-      if (codes.includes('OUTSIDE_AVAILABILITY')) {
-        return '✗ Diễn ra ngoài khung giờ rảnh (trùng giờ học hoặc lịch bận cá nhân bạn đã chọn).';
-      }
-      if (codes.includes('ALREADY_COMPLETED')) {
-        return '✗ Bạn đã hoàn thành hoạt động này trong học kỳ rồi (không tính điểm lần 2).';
-      }
-      if (codes.includes('CANCELLED')) {
-        return '✗ Hoạt động này bạn đã giả định bỏ tham gia.';
-      }
-      return '✗ Không khả thi để xếp vào lộ trình.';
-    }
-
-    function toggleCandidateCard(btnEl) {
-      const card = btnEl.closest('.candidate-card') || btnEl.closest('.rounded-xl') || btnEl.parentElement;
-      if (!card) return;
-      const detail = card.querySelector('.candidate-detail');
-      const chevron = card.querySelector('.chevron-icon');
-      if (detail) {
-        const isHidden = detail.classList.toggle('hidden');
-        if (chevron) {
-          chevron.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
-        }
-      }
-    }
-
-    function formatPlanDate(isoStr) {
-      if (!isoStr) return "";
-      try {
-        const d = new Date(isoStr);
-        if (isNaN(d.getTime())) return isoStr;
-        const pad = n => String(n).padStart(2, '0');
-        return `${pad(d.getHours())}:${pad(d.getMinutes())} ngày ${pad(d.getDate())}/${pad(d.getMonth() + 1)}`;
-      } catch {
-        return isoStr;
-      }
-    }
-
-    // ========================================================================
-    // BACKEND HEALTH CHECK
-    // ========================================================================
-    async function checkBackendHealth() {
-      try {
-        const res = await fetch(`${API_BASE}/api/health`);
-        if (res.ok) {
-          const data = await res.json();
-          backendAvailable = true;
-          window.serverSupportsCommit = ("saved_activities" in data);
-          document.getElementById('backendStatusPill').className = "flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-500/40";
-          document.getElementById('backendStatusText').innerText = `API Online (${data.total_rules} rules)`;
-          return true;
-        }
-      } catch (err) {
-        console.warn("FastAPI backend unavailable: no score simulation permitted.");
-      }
-      backendAvailable = false;
-      document.getElementById('backendStatusPill').className = "flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200";
-      document.getElementById('backendStatusText').innerText = "API Offline";
-      return false;
-    }
-
-    // ========================================================================
-    // RUN PIPELINE (PURE PREVIEW VIA POST /api/evaluate — NO SIDE EFFECTS)
-    // ========================================================================
-    async function runAnalysisPipeline() {
-      const rawBox = document.getElementById("inputRawContent").value.trim();
-      const titleBox = document.getElementById("sp1TitleInput").value.trim();
-      if (currentActivityInputMode === "manual" && !titleBox) {
-        alert("Vui lòng nhập tên hoạt động trước khi kiểm tra điểm.");
-        return;
-      }
-      if (!rawBox && !titleBox) {
-        alert("Vui lòng nhập nội dung thông báo hoặc tên hoạt động trước khi kiểm tra điểm.");
-        return;
-      }
-
-      const effectiveRawContent = buildEffectiveAnnouncementText();
-
-      const btn = document.getElementById("btnRunPipeline");
-      btn.disabled = true;
-      btn.innerText = "Đang kiểm tra...";
-
-      const studentId = currentStudent ? currentStudent.student_id : "25127242";
-      const simulateDemo = document.getElementById("inputSimulateDemo").checked;
-
-      // Omit current_category_scores when talking to the updated backend so it evaluates
-      // against the authoritative server-side saved scoreboard of this student.
-      const reqBody = {
-        post_id: document.getElementById("inputPostId").value.trim(),
-        publisher: document.getElementById("inputPublisher").value.trim(),
-        platform: "facebook",
-        date_posted: document.getElementById("inputDatePosted").value,
-        url: document.getElementById("inputUrl").value.trim(),
-        raw_content: effectiveRawContent,
-        has_evidence: document.getElementById("inputEvidence").checked,
-        rule_override: document.getElementById("inputRuleOverride").value,
-        student_id: studentId,
-        simulate_demo: simulateDemo
-      };
-      if (window.serverSupportsCommit === false) {
-        reqBody.current_category_scores = studentCategoryScores;
-      }
-
-      let result = null;
-      try {
-        const resp = await fetch(`${API_BASE}/api/evaluate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(reqBody)
-        });
-        if (resp.ok) {
-          result = await resp.json();
-          backendAvailable = true;
-        } else {
-          const errData = await resp.json().catch(() => ({}));
-          alert("Không thể phân tích thông báo: " + (errData.detail || resp.statusText));
-        }
-      } catch (err) {
-        await checkBackendHealth();
-        alert("Không kết nối được máy chủ. Vui lòng bật server bằng lệnh `python run_server.py`.");
-      }
-
-      if (result) {
-        window.serverSupportsCommit = Boolean(result.commit !== undefined);
-        lastPreviewWasSaved = false;
-        lastRawResponse = result;
-        lastEvaluatedPayload = reqBody;
-        renderEvaluationResult(result, studentId);
-      }
-
-      btn.disabled = false;
-      btn.innerText = "Kiểm tra điểm";
-    }
-
-    function runClientFallback() {
-      throw new Error("Simulated point calculations are intentionally disabled; use the FastAPI backend.");
-    }
-
-    // ========================================================================
-    // RENDER EVALUATION RESULT TO UI (PREVIEW STATE)
-    // ========================================================================
-    function renderEvaluationResult(res, studentId) {
-      document.getElementById("sp2EmptyState").classList.add("hidden");
-      document.getElementById("sp2ActiveResult").classList.remove("hidden");
-
-      const sp1 = res.sp1 || {};
-      const rec = sp1.record || {};
-      const meta = sp1.meta || {};
-      const sp2 = res.sp2 || {};
-      const dedup = res.dedup || {};
-      const commitInfo = res.commit || {};
-
-      const badgeEl = document.getElementById("resDecisionBadge");
-      badgeEl.innerText = formatBadgeForMode(sp2, false);
-      if (sp2.decision === "DEMO_CONFIRMED" && sp2.confirmed_added > 0) {
-        badgeEl.className = "px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-emerald-100 text-emerald-800";
-      } else if (sp2.decision === "PROJECTED" && sp2.projected_added > 0) {
-        badgeEl.className = "px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-sky-100 text-sky-800";
-      } else if (sp2.decision === "REJECTED_DUPLICATE") {
-        badgeEl.className = "px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-rose-100 text-rose-800";
-      } else {
-        badgeEl.className = "px-4 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide bg-amber-100 text-amber-800";
-      }
-
-      const ruleObj = sp2.rule || {};
-      document.getElementById("resRuleCode").innerText = ruleObj.rule_id
-        ? `Rule: ${ruleObj.rule_id} (Mục ${ruleObj.criterion_id || '—'})`
-        : "Chưa gán rule";
-      document.getElementById("resCategoryName").innerText = sp2.category_name
-        ? sp2.category_name
-        : "Chưa xác định nhóm";
-
-      const effectiveDelta = (sp2.confirmed_added || 0) + (sp2.projected_added || 0);
-      const addedEl = document.getElementById("resAddedPoints");
-      if (sp2.confirmed_added > 0) {
-        addedEl.innerText = `+${sp2.confirmed_added} điểm`;
-        addedEl.className = "text-3xl font-black text-emerald-400 mt-1.5";
-      } else if (sp2.projected_added > 0) {
-        addedEl.innerText = `+${sp2.projected_added} điểm (Dự kiến)`;
-        addedEl.className = "text-3xl font-black text-indigo-400 mt-1.5";
-      } else {
-        addedEl.innerText = `+0 điểm`;
-        addedEl.className = "text-3xl font-black text-slate-400 mt-1.5";
-      }
-
-      document.getElementById("resAnnouncedVsRule").innerText =
-        `Bài đăng: ${sp2.announced_points != null ? '+' + sp2.announced_points + 'đ' : 'N/A'} | Quy chế: ${sp2.rule_points != null ? '+' + sp2.rule_points + 'đ' : 'N/A'}`;
-
-      if (sp2.category_id && sp2.category_cap != null) {
-        const targetAfter = sp2.decision === "PROJECTED" ? sp2.hypothetical_category_after : sp2.category_after;
-        document.getElementById("resCatBeforeAfter").innerText =
-          `${sp2.category_before} → ${targetAfter} / ${sp2.category_cap}đ`;
-        document.getElementById("resCatMissing").innerText =
-          `[Dev] Thiếu ${sp2.category_missing}đ`;
-      } else {
-        document.getElementById("resCatBeforeAfter").innerText = "Không đổi";
-        document.getElementById("resCatMissing").innerText = "[Dev] N/A";
-      }
-
-      document.getElementById("resExplanation").innerText = formatExplanationForMode(sp2.explanation, sp2, dedup);
-      document.getElementById("resCitation").innerText = sp2.citation || "—";
-
-      const dedupPill = document.getElementById("resDedupPill");
-      dedupPill.innerText = dedup.is_duplicate
-        ? `Trùng lặp (${Math.round((dedup.similarity || 1) * 100)}% — ${dedup.match_id})`
-        : dedup.catalog_match
-          ? `Có trong kho nguồn (${Math.round((dedup.similarity || 1) * 100)}%) — vẫn được ước lượng`
-          : "Unique (MinHash-LSH OK)";
-
-      // Preview on the right-hand scoreboard WITHOUT mutating studentCategoryScores:
-      // The big center number stays at the saved confirmed score while the sky-blue preview arc
-      // shows the pending addition that will be applied if the user clicks "Lưu vào bảng điểm".
-      const displayScores = JSON.parse(JSON.stringify(studentCategoryScores));
-      const catId = sp2.category_id;
-      if (catId && displayScores[catId] && effectiveDelta > 0) {
-        const curSaved = Number(displayScores[catId].current || 0);
-        const existingProj = Number(
-          sp2.existing_projected != null ? sp2.existing_projected : (displayScores[catId].projected || 0)
-        );
-        const maxCap = Number(displayScores[catId].max || 30);
-        displayScores[catId].projected = Math.min(maxCap - curSaved, existingProj + effectiveDelta);
-      }
-      renderCategoryBars(displayScores, catId, effectiveDelta, sp2.decision, effectiveDelta > 0);
-
-      // Configure the explicit Commit / Save bar (works both withres.commit and fallback when server hasn't restarted)
-      const saveBar = document.getElementById("saveToProfileBar");
-      const btnSave = document.getElementById("btnSaveToProfile");
-      const saveText = document.getElementById("saveToProfileText");
-      const effectiveKind = commitInfo.kind || (
-        (sp2.decision === "DEMO_CONFIRMED" || sp2.decision === "PROJECTED") && effectiveDelta > 0 && catId
-          ? "score"
-          : (sp2.decision === "NEEDS_REVIEW" && !commitInfo.already_in_review ? "review" : null)
-      );
-      if (saveBar && btnSave && saveText) {
-        if (effectiveKind === "score" && effectiveDelta > 0 && catId) {
-          saveBar.classList.remove("hidden");
-          saveBar.className = "flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 p-4 rounded-xl bg-emerald-950/50 border border-emerald-600/50 text-emerald-200 transition";
-          btnSave.disabled = false;
-          btnSave.className = "px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-xs transition flex items-center justify-center gap-2 shrink-0 cursor-pointer";
-          if (commitInfo.upgrade_of) {
-            btnSave.innerHTML = `
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-              <span>Xác nhận hoàn thành (+${sp2.confirmed_added}đ)</span>
-            `;
-            saveText.innerHTML = `Nâng cấp hoạt động đã lưu từ <b>Dự kiến</b> sang <b>Đã xác nhận (+${sp2.confirmed_added} điểm)</b>:`;
-          } else if (sp2.confirmed_added > 0) {
-            btnSave.innerHTML = `
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-              <span>Lưu vào bảng điểm (+${sp2.confirmed_added}đ)</span>
-            `;
-            saveText.innerHTML = `Hoạt động đủ điều kiện <b>+${sp2.confirmed_added} điểm</b>. Bấm lưu để cộng chính thức vào bảng điểm:`;
-          } else {
-            btnSave.innerHTML = `
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-              <span>Lưu điểm dự kiến (+${sp2.projected_added}đ)</span>
-            `;
-            saveText.innerHTML = `Hoạt động dự kiến <b>+${sp2.projected_added} điểm</b>. Bấm lưu để ghi nhận vào điểm dự kiến:`;
-          }
-        } else if (effectiveKind === "review") {
-          saveBar.classList.remove("hidden");
-          saveBar.className = "flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 p-4 rounded-xl bg-amber-950/50 border border-amber-600/50 text-amber-200 transition";
-          btnSave.disabled = false;
-          btnSave.className = "px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm shadow-xs transition flex items-center justify-center gap-2 shrink-0 cursor-pointer";
-          btnSave.innerHTML = `<span>Gửi vào hàng đợi duyệt</span>`;
-          saveText.innerHTML = `Bạn có thể bổ sung điều kiện ở khung bên dưới rồi kiểm tra lại, hoặc gửi bài đăng vào hàng đợi rà soát:`;
-        } else {
-          saveBar.classList.add("hidden");
-        }
-      }
-
-      const firstLine = document.getElementById("inputRawContent").value.trim().split(/\r?\n/)[0].trim();
-      const extractedTitle = rec.title || firstLine || "";
-      const extractedTime = formatTimeRangeFromRec(rec, meta.evidence);
-      const extractedLoc = formatLocationFromRec(rec);
-      const extractedPts = rec.points != null ? String(rec.points) : "";
-      const extractedReq = rec.completion_requirements || "";
-
-      if (extractedTitle) document.getElementById("sp1TitleInput").value = extractedTitle;
-      if (extractedTime) document.getElementById("sp1TimeInput").value = extractedTime;
-      if (extractedLoc) document.getElementById("sp1LocationInput").value = extractedLoc;
-      if (extractedPts) document.getElementById("sp1PointsInput").value = extractedPts;
-      document.getElementById("sp1ReqInput").value = extractedReq || "";
-      eventFieldsEditedByUser = false;
-
-      document.getElementById("sp1StatusFlags").innerText =
-        (meta.flags && meta.flags.length > 0) ? `Flags: ${meta.flags.join(", ")}` : `status: ${meta.status || 'valid'}`;
-
-      populateInspectorTable(rec, meta, dedup);
-    }
-
-    function populateInspectorTable(rec, meta, dedup) {
-      document.getElementById("inspMetaStatus").innerText = meta.status || "—";
-      document.getElementById("inspPubStatus").innerText = meta.publication_status || "REVIEW_REQUIRED";
-      document.getElementById("inspMetaRouted").innerText = meta.routed_to || "—";
-      document.getElementById("inspMetaDedup").innerText = dedup.is_duplicate ? `DUPLICATE (${dedup.match_id})` : "UNIQUE";
-      document.getElementById("inspMetaFlags").innerText = JSON.stringify(meta.flags || []);
-      document.getElementById("inspMetaDerived").innerText = JSON.stringify({
-        drl_recognized: meta.drl_recognized,
-        derived: meta.derived || {}
-      });
-
-      const evidence = meta.evidence || {};
-      const tbody = document.getElementById("inspectorTableBody");
-      tbody.innerHTML = CONTRACT_14_FIELDS.map((field, idx) => {
-        const val = rec[field];
-        const ev = evidence[field] || ((field === "start" || field === "end") ? evidence.time : "—") || "—";
-        return `
-          <tr class="hover:bg-[#0c1220]">
-            <td class="py-2.5 px-4 text-center text-slate-500">${idx + 1}</td>
-            <td class="py-2.5 px-4 font-bold text-indigo-400">${escapeHTML(field)}</td>
-            <td class="py-2.5 px-4 text-slate-200 break-all">${escapeHTML(typeof val === 'object' ? JSON.stringify(val) : String(val ?? 'null'))}</td>
-            <td class="py-2.5 px-4 text-slate-400">${escapeHTML(typeof ev === 'object' ? JSON.stringify(ev) : String(ev))}</td>
-          </tr>
-        `;
-      }).join("");
-    }
-
-    function copyRawJson() {
-      if (!lastRawResponse) return;
-      navigator.clipboard.writeText(JSON.stringify(lastRawResponse, null, 2));
-      alert("Đã sao chép JSON!");
-    }
-
-    function copySessionJsonPath() {
-      navigator.clipboard.writeText("data/sessions/current_session.json");
-      alert("Đã sao chép đường dẫn: data/sessions/current_session.json\n(Bạn có thể mở trực tiếp file này trên máy để xem dữ liệu đã lưu)");
-    }
-
-    // ========================================================================
-    // EXPLICIT COMMIT TO SERVER SCOREBOARD (POST /api/commit) & RESTORATION
-    // ========================================================================
-    async function saveCurrentEvaluationToProfile() {
-      if (!lastRawResponse || !lastEvaluatedPayload) return;
-      const sp2 = lastRawResponse.sp2 || {};
-      const btnSave = document.getElementById("btnSaveToProfile");
-      const saveText = document.getElementById("saveToProfileText");
-
-      if (btnSave) {
-        btnSave.disabled = true;
-        btnSave.innerHTML = `<span>Đang lưu...</span>`;
-      }
-
-      try {
-        let resp = null;
-        if (window.serverSupportsCommit !== false) {
-          const { current_category_scores, ...commitPayload } = lastEvaluatedPayload;
-          resp = await fetch(`${API_BASE}/api/commit`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(commitPayload)
-          });
-        }
-
-        let commitData = null;
-        if (!resp || resp.status === 404) {
-          // Graceful fallback if the running server process has not been restarted yet
-          window.serverSupportsCommit = false;
-          const catId = sp2.category_id;
-          const confAdded = Number(sp2.confirmed_added || 0);
-          const projAdded = Number(sp2.projected_added || 0);
-          if (catId && studentCategoryScores[catId] && (confAdded > 0 || projAdded > 0)) {
-            const maxCap = Number(studentCategoryScores[catId].max || 30);
-            if (confAdded > 0) {
-              studentCategoryScores[catId].current = Math.min(maxCap, Number(studentCategoryScores[catId].current || 0) + confAdded);
-            } else {
-              const room = Math.max(0, maxCap - Number(studentCategoryScores[catId].current || 0));
-              studentCategoryScores[catId].projected = Math.min(room, Number(studentCategoryScores[catId].projected || 0) + projAdded);
-            }
-            const rec = (lastRawResponse.sp1 && lastRawResponse.sp1.record) || {};
-            savedActivitiesForStudent.unshift({
-              commit_id: `local_${Date.now()}`,
-              title: rec.title || "Hoạt động vừa lưu",
-              category_id: catId,
-              confirmed_added: confAdded,
-              projected_added: projAdded
-            });
-            renderSavedActivitiesBox();
-            updateResetBaselineButton();
-          }
-          commitData = {
-            kind: sp2.decision === "NEEDS_REVIEW" ? "review" : "score",
-            category_id: sp2.category_id,
-            confirmed_added: confAdded,
-            projected_added: projAdded
-          };
-        } else if (!resp.ok) {
-          const errData = await resp.json().catch(() => ({}));
-          alert(errData.detail || "Không thể lưu hoạt động.");
-          if (btnSave) btnSave.disabled = false;
-          return;
-        } else {
-          window.serverSupportsCommit = true;
-          commitData = await resp.json();
-          if (commitData.scores) {
-            applyServerScorePayload(commitData.scores);
-          }
-        }
-
-        if (commitData.kind === "review") {
-          renderCategoryBars(studentCategoryScores);
-          if (btnSave) {
-            btnSave.className = "px-5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-amber-300 font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2 shrink-0";
-            btnSave.innerHTML = `<span class="text-amber-300 font-bold">Đã gửi vào hàng đợi duyệt ✓</span>`;
-          }
-          if (saveText) {
-            saveText.innerHTML = `<b>Đã ghi nhận!</b> Bài đăng đã được chuyển vào Hàng đợi rà soát trong Kho hoạt động.`;
-          }
-        } else {
-          const catId = commitData.category_id || sp2.category_id;
-          const added = Number(commitData.confirmed_added || commitData.projected_added || 0);
-          renderCategoryBars(studentCategoryScores, catId, added, sp2.decision, false);
-
-          const badgeEl = document.getElementById("resDecisionBadge");
-          if (badgeEl) {
-            badgeEl.innerText = formatBadgeForMode(sp2, true);
-          }
-
-          if (btnSave) {
-            btnSave.className = "px-5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-emerald-300 font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2 shrink-0";
-            btnSave.innerHTML = `
-              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-              <span class="text-emerald-300 font-bold">Đã lưu vào bảng điểm ✓</span>
-            `;
-          }
-          if (saveText && catId && studentCategoryScores[catId]) {
-            saveText.innerHTML = `<b>Thành công!</b> Đã cộng <b>+${added} điểm</b> vào ${studentCategoryScores[catId].name}. Bạn có thể bấm <b>Đặt lại</b> ở trên để nhập tiếp hoạt động khác.`;
-          }
-        }
-
-        lastPreviewWasSaved = true;
-        persistCurrentUserData();
-        await loadActivitiesFromApi();
-      } catch (err) {
-        alert("Lỗi kết nối máy chủ khi lưu điểm.");
-        if (btnSave) btnSave.disabled = false;
-      }
-    }
-
-    async function resetScoreBaselineToDefault() {
-      await resetSessionData();
-    }
-
-    function updateResetBaselineButton() {
-      const btn = document.getElementById("btnResetScoreBaseline");
-      if (!btn) return;
-      let total = 0;
-      let totalProj = 0;
-      Object.values(studentCategoryScores).forEach(info => {
-        total += Number(info.current || 0);
-        totalProj += Number(info.projected || 0);
-      });
-      if (total !== defaultBaselineTotal || totalProj > 0 || savedActivitiesForStudent.length > 0) {
-        btn.classList.remove("hidden");
-      } else {
-        btn.classList.add("hidden");
-      }
-    }
-
-    // ========================================================================
-    // LOAD ACTIVITIES CATALOG & LEAD AUDIT
-    // ========================================================================
-    async function loadActivitiesFromApi() {
-      try {
-        const [actRes, catRes] = await Promise.all([
-          fetch(`${API_BASE}/api/activities`),
-          fetch(`${API_BASE}/api/sp3/catalog${sp3Query()}`).catch(() => null)
-        ]);
-
-        const actData = (actRes && actRes.ok) ? await actRes.json() : {};
-        const catData = (catRes && catRes.ok) ? await catRes.json() : null;
-
-        const catalogRows = catData?.activities || [];
-        const newPostDrafts = catData?.new_post_drafts || [];
-        const validList = catalogRows.length > 0
-          ? catalogRows
-          : (actData.activities || actData.valid_activities || []).map(a => ({ activity: a, publication_status: "REVIEW_REQUIRED", score_binding_verified: false }));
-        const reviewList = actData.review_queue || [];
-
-        const actCount = catData?.activity_count ?? validList.length;
-        const draftCount = catData?.unstructured_new_posts ?? newPostDrafts.length;
-
-        document.getElementById("validCountBadge").innerHTML = `<span>${actCount} hoạt động</span> <span class="dev-only font-mono text-[11px] opacity-80">(Catalog)</span>`;
-        document.getElementById("sidebarActCount").innerText = actCount;
-        const draftBadge = document.getElementById("sp3DraftCountBadge");
-        if (draftBadge) draftBadge.innerHTML = `<span>${draftCount} bài nguồn</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>`;
-        const draftsTabBadge = document.getElementById("sp3DraftsTabBadge");
-        if (draftsTabBadge) draftsTabBadge.innerHTML = `<span>${newPostDrafts.length} bản nháp</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>`;
-
-        document.getElementById("reviewCountBadge").innerText = `${reviewList.length} bài chờ duyệt`;
-        const qBadge = document.getElementById("reviewQueueTabBadge");
-        if (qBadge) qBadge.innerText = `${reviewList.length} bài`;
-
-        document.getElementById("validActivitiesList").innerHTML = validList.length === 0
-          ? `<div class="p-6 text-center text-slate-400 text-sm">Chưa có hoạt động nào trong kho.</div>`
-          : validList.map((row, idx) => {
-              const a = row.activity || row;
-              const qa = row.data_qa || null;
-              const pubStatus = row.publication_status || "REVIEW_REQUIRED";
-              const dt = a["4_datetimes"] || {};
-              const timeDisplay = a.start ? formatIsoToVietnamese(a.start) : (dt.start_datetime || 'Chưa rõ');
-              const locDisplay = a.location || (a.mode === 'online' ? 'Trực tuyến' : 'Cơ sở trường');
-              const ptsDisplay = a.points != null ? `Thông báo: +${a.points}đ` : 'Chưa rõ điểm';
-              const qaHtml = qa
-                ? `<div class="dev-only text-[11px] font-mono text-indigo-300 bg-indigo-950/40 border border-indigo-500/30 rounded-lg px-2.5 py-1.5">
-                     <b>Data QA (${escapeHTML(qa.status || 'checked')} • ${escapeHTML(qa.semester || '')}):</b> ${escapeHTML(qa.notes || '')}
-                   </div>`
-                : '';
-              return `
-                <div class="p-4 rounded-xl bg-[#080d18] hover:bg-[#0c1220] border border-[#223046] transition space-y-2">
-                  <div class="flex items-start justify-between gap-3">
-                    <div class="font-bold text-sm text-white leading-snug">
-                      <span class="text-xs font-mono font-bold text-indigo-400 mr-1.5">#${idx + 1}</span>
-                      <span>${escapeHTML(a.title || a.activity_id)}</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                      <span class="dev-only px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">
-                        ${escapeHTML(pubStatus)}
-                      </span>
-                      <span class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-amber-950/50 text-amber-200 border border-amber-500/30 whitespace-nowrap">
-                        ${escapeHTML(ptsDisplay)}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-400 pt-1.5 border-t border-[#1b2537]">
-                    <div><b>Đơn vị:</b> <span class="text-slate-200">${escapeHTML(a.source?.publisher || a.organizer || 'Trường ĐH KHTN')}</span></div>
-                    <div><b>Thời gian:</b> <span class="text-slate-200 font-mono">${escapeHTML(timeDisplay)}</span></div>
-                    <div class="sm:col-span-2"><b>Địa điểm:</b> <span class="text-slate-200">${escapeHTML(locDisplay)}</span></div>
-                  </div>
-                  ${qaHtml}
-                </div>
-              `;
-            }).join("");
-        renderRecommendedActivities(validList);
-
-        const draftsEl = document.getElementById("sp3NewDraftsList");
-        if (draftsEl) {
-          draftsEl.innerHTML = newPostDrafts.length === 0
-            ? `<div class="p-6 text-center text-slate-400 text-sm bg-[#080d18] rounded-xl border border-dashed border-[#223046]">Không có bản nháp mới.</div>`
-            : newPostDrafts.map((d, idx) => {
-                const rec = d.activity || {};
-                const flags = d.review_flags || [];
-                const pubSt = d.publication_status || "REVIEW_REQUIRED";
-                return `
-                  <div class="p-3.5 rounded-xl bg-[#080d18] border border-amber-500/40 space-y-2">
-                    <div class="flex items-start justify-between gap-2">
-                      <div class="font-bold text-xs text-white leading-snug">
-                        <span class="font-mono text-amber-400 mr-1">#${idx + 1}</span>
-                        ${escapeHTML(rec.title || rec.activity_id || 'Bản nháp bài đăng mới')}
-                      </div>
-                      <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40 shrink-0">
-                        <span>Chờ rà soát</span>
-                        <span class="dev-only font-mono text-[9px] ml-1">(${escapeHTML(pubSt)})</span>
-                      </span>
-                    </div>
-                    <div class="dev-only text-[11px] font-mono text-slate-400 flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#1b2537]">
-                      <span>Mã: ${escapeHTML(rec.activity_id || '—')}</span>
-                      <span class="text-rose-300">score_binding_verified: ${String(Boolean(d.score_binding_verified))}</span>
-                    </div>
-                    <div class="dev-only text-[11px] font-mono text-amber-300">
-                      <b>Cờ kỹ thuật:</b> ${escapeHTML(flags.join(", ") || 'Chờ duyệt nội dung')}
-                    </div>
-                    <div class="text-xs text-slate-400">
-                      Hoạt động mới đang chờ ban tổ chức và CTSV duyệt minh chứng &amp; điểm ĐRL.
-                    </div>
-                  </div>
-                `;
-              }).join("");
-        }
-
-        document.getElementById("reviewQueueList").innerHTML = reviewList.length === 0
-          ? `<div class="p-6 text-center text-slate-400 text-sm bg-[#080d18] rounded-xl border border-dashed border-[#223046]">
-               Hiện không có bài đăng nào cần duyệt trong phiên.
-             </div>`
-          : reviewList.map((item, idx) => `
-              <div class="p-3.5 rounded-xl bg-[#080d18] border border-amber-500/40 space-y-1.5">
-                <div class="flex items-start justify-between gap-2">
-                  <div class="font-bold text-sm text-amber-300 leading-snug">
-                    <span class="text-xs font-mono text-amber-400 mr-1">#${idx + 1}</span>
-                    ${escapeHTML(item.record?.title || item.title || 'Bài đăng cần rà soát')}
-                  </div>
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40 shrink-0">Chờ duyệt</span>
-                </div>
-                <div class="text-xs font-mono text-amber-400">
-                  <b>Cờ:</b> ${escapeHTML((item.meta?.flags || item.flags || []).join(", ") || 'REVIEW_REQUIRED')}
-                </div>
-              </div>
-            `).join("");
-      } catch (e) {}
-    }
-
-    async function loadLeadAuditFromApi() {
-      const container = document.getElementById("leadAuditContainer");
-      if (!container) return;
-      try {
-        const res = await fetch(`${API_BASE}/api/lead/audit`);
-        if (!res.ok) return;
-        const data = await res.json();
-        const ds = data.dataset || {};
-        const dups = data.duplicate_candidate_groups || [];
-
-        container.innerHTML = `
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="p-2.5 rounded-lg bg-[#080d18] border border-[#223046]">
-              <span class="text-slate-400 block">Bản ghi kiểm toán</span>
-              <span class="text-base font-bold text-white">${ds.record_count ?? 20}</span>
-            </div>
-            <div class="p-2.5 rounded-lg bg-[#080d18] border border-[#223046]">
-              <span class="text-slate-400 block">Lỗi Schema</span>
-              <span class="text-base font-bold text-emerald-400">${(ds.schema_errors || []).length}</span>
-            </div>
-          </div>
-          <div class="text-[11px] font-mono text-slate-400 pt-1">
-            Quy chế: ${escapeHTML(data.regulation_id)} • Trùng chéo: ${dups.length} nhóm
-          </div>
-        `;
-      } catch (e) {}
-    }
-
-    // ========================================================================
-    // INITIALIZATION
-    // ========================================================================
-    window.addEventListener("DOMContentLoaded", async () => {
-      // Close busy slots popover when clicking outside
-      document.addEventListener('click', (e) => {
-        const popover = document.getElementById('busySlotsPopover');
-        const btn = document.getElementById('btnToggleBusySlots');
-        if (popover && !popover.classList.contains('hidden')) {
-          if (!popover.contains(e.target) && !btn?.contains(e.target)) {
-            toggleBusySlotsPopover(true);
-          }
-        }
-      });
-
-      renderCategoryBars(studentCategoryScores);
-      updateResetBaselineButton();
-      await checkBackendHealth();
-      await checkPreferenceAIHealth();
-      await loadE2ECasesFromApi();
-      await loadActivitiesFromApi();
-
-      let savedStudentId = null;
-      try {
-        const savedTheme = localStorage.getItem("unilife_theme");
-        setTheme(savedTheme === "light" ? "light" : "dark", false);
-        savedStudentId = localStorage.getItem(CURRENT_USER_KEY);
-      } catch (error) {
-        console.error("Could not read UniLife browser settings:", error);
-        openLoginModal("login");
-        showAuthMessage("Không thể đọc dữ liệu trong trình duyệt này. Hãy bật localStorage rồi tải lại trang.", "error");
-        return;
-      }
-
-      if (savedStudentId) {
-        try {
-          const account = readLocalUsers().find(user => normalizeMssv(user.student_id) === normalizeMssv(savedStudentId));
-          if (!account) {
-            localStorage.removeItem(CURRENT_USER_KEY);
-            openLoginModal("login");
-            showAuthMessage("Không tìm thấy tài khoản của phiên trước. Vui lòng đăng nhập lại hoặc đăng ký.", "error");
-            return;
-          }
-          currentStudent = {
-            student_id: account.student_id,
-            full_name: account.full_name,
-            class: account.class || "",
-            major: account.major || "Sinh viên",
-            demo_only: true
-          };
-          const accountData = readLocalUserData(account.student_id);
-          if (accountData.profile.onboarding_started && !accountData.profile.completed_onboarding) {
-            beginOnboarding(account);
-            return;
-          }
-          await applyCurrentStudent(currentStudent);
-          if (!maybeStartOnboarding()) showWorkspace();
-        } catch (error) {
-          console.error("Could not restore the local UniLife account:", error);
-          openLoginModal("login");
-          showAuthMessage(error.message || "Không thể khôi phục tài khoản trong trình duyệt.", "error");
-        }
-      }
-    });
-  </script>
-</body>
-</html>
+... [truncated for diff preview]
