@@ -372,7 +372,7 @@
           <a href="#home" class="hover:text-cyan-300 transition">Home</a>
           <div class="galaxy-task-menu">
             <a href="#features" aria-haspopup="true" class="hover:text-cyan-300 transition inline-flex items-center gap-1">
-              Tác vụ
+              Features
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
             </a>
             <div class="galaxy-task-dropdown">
@@ -582,9 +582,13 @@
       <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-[#0e1524] rounded-2xl shadow-2xl border border-[#1b2537] py-2 z-50">
         <div class="px-4 py-2.5 border-b border-[#1b2537]">
           <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Sinh viên đang chọn</p>
-          <p class="text-sm font-bold text-white mt-0.5">Khoa Công nghệ Thông tin</p>
+          <p id="headerUserFaculty" class="text-sm font-bold text-white mt-0.5">Chưa cập nhật khoa</p>
         </div>
         <div class="py-1">
+          <button onclick="switchTab('profile'); document.getElementById('userDropdown').classList.add('hidden')" class="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-[#11192b] font-medium transition flex items-center gap-2">
+            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="M5 20a7 7 0 0 1 14 0"/></svg>
+            Hồ sơ sinh viên
+          </button>
           <button onclick="openLoginModal()" class="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-[#11192b] font-medium transition flex items-center gap-2">
             <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             Đổi tài khoản sinh viên
@@ -631,6 +635,10 @@
             <button id="tabBtnDashboard" onclick="switchTab('dashboard')" class="nav-btn-active w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 11.5 12 4l9 7.5M5.5 10v9.5h13V10M9 19.5v-6h6v6"/></svg>
               <span class="text-sm font-bold">Tổng quan</span>
+            </button>
+            <button id="tabBtnProfile" onclick="switchTab('profile')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="M5 20a7 7 0 0 1 14 0"/></svg>
+              <span class="text-sm font-bold">Hồ sơ sinh viên</span>
             </button>
             <button id="tabBtnDiscoverActivities" onclick="switchTab('activities', 'discover')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="m16 16 4 4"/></svg>
@@ -1699,6 +1707,99 @@
 
         </div>
 
+        <div id="viewProfile" class="hidden space-y-6 xl:min-h-[calc(100vh-9rem)] xl:grid xl:grid-rows-[minmax(0,1fr)_minmax(0,2fr)] xl:space-y-0">
+          <section class="grid grid-cols-1 xl:grid-cols-[minmax(230px,1fr)_2fr] gap-5 rounded-3xl border border-[#1b2537] bg-[#0e1524] p-5 sm:p-7 shadow-xl">
+            <div class="flex flex-col items-center justify-center rounded-2xl border border-[#223046] bg-[#080d18] p-6 text-center">
+              <div id="profileAvatarDisplay" class="flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl border border-indigo-400/30 bg-indigo-950/50 shadow-lg shadow-indigo-950/30">
+                <span role="img" aria-label="Logo UniLife" class="text-2xl font-black tracking-tight text-white">Uni<span class="text-cyan-300">Life</span></span>
+              </div>
+              <p id="profileDisplayName" class="mt-4 text-lg font-extrabold text-white">Sinh viên</p>
+              <p class="mt-1 text-xs text-slate-400">Hồ sơ UniLife</p>
+              <label for="profileAvatarInput" class="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#2b3a54] px-3.5 py-2 text-xs font-bold text-slate-200 transition hover:border-indigo-400/60 hover:bg-indigo-950/30">
+                <span>✎</span> Tải ảnh đại diện
+              </label>
+              <input id="profileAvatarInput" type="file" accept="image/*" class="hidden" onchange="saveProfileAvatar(event)" />
+              <p class="mt-2 text-[10px] text-slate-500">Ảnh được lưu trên thiết bị này (tối đa 2 MB).</p>
+            </div>
+            <div class="flex flex-col justify-center">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-[.2em] text-indigo-300">Thông tin chung</p>
+                  <h1 class="mt-1 text-2xl font-black text-white">Hồ sơ sinh viên</h1>
+                </div>
+                <button type="button" onclick="saveProfileBasics()" class="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">Lưu thông tin</button>
+              </div>
+              <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <label class="text-xs font-semibold text-slate-400">MSSV<input id="profileStudentId" readonly class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-slate-300 outline-none" /></label>
+                <label class="text-xs font-semibold text-slate-400">Họ và tên<input id="profileName" maxlength="100" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" /></label>
+                <label class="text-xs font-semibold text-slate-400">Khoa<input id="profileFaculty" maxlength="100" placeholder="Ví dụ: Khoa Công nghệ Thông tin" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" /></label>
+                <label class="text-xs font-semibold text-slate-400">Khóa tuyển<input id="profileCohort" maxlength="40" placeholder="Ví dụ: 2025" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" /></label>
+                <label class="text-xs font-semibold text-slate-400">Học kỳ lập kế hoạch<select id="profileSemester" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500"><option>HK3 · 2025–2026</option><option>HK1 · 2026–2027</option></select></label>
+                <label class="text-xs font-semibold text-slate-400 sm:col-span-2">Chương trình học<input id="profileProgram" maxlength="120" placeholder="Ví dụ: Chương trình chuẩn" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" /></label>
+              </div>
+              <div class="mt-5 rounded-2xl border border-indigo-400/20 bg-indigo-950/20 p-4">
+                <div class="flex items-center justify-between gap-3 text-xs">
+                  <span class="font-bold text-slate-300">Tiến độ mục tiêu học kỳ</span>
+                  <span id="profileGoalSummary" class="font-extrabold text-indigo-200">0 / 80 điểm</span>
+                </div>
+                <div class="mt-3 h-2.5 overflow-hidden rounded-full bg-[#080d18]"><div id="profileGoalBar" class="bar-transition h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-400" style="width:0%"></div></div>
+                <p id="profileGoalCaption" class="mt-2 text-[11px] text-slate-400">Tiếp tục ghi nhận hoạt động để theo dõi tiến độ.</p>
+                <div id="profileGoalDetails" class="mt-2 text-[11px] leading-relaxed text-indigo-100/80"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="overflow-hidden rounded-3xl border border-[#1b2537] bg-[#0e1524] shadow-xl">
+            <div class="border-b border-[#1b2537] p-4 sm:px-6">
+              <div class="flex flex-wrap gap-6" role="tablist" aria-label="Thông tin chi tiết hồ sơ">
+                <button id="profileTabScores" type="button" onclick="setProfileTab('scores')" class="relative whitespace-nowrap px-1 pb-3 text-sm font-bold text-slate-400 transition">Bảng điểm</button>
+                <button id="profileTabActivities" type="button" onclick="setProfileTab('activities')" class="relative whitespace-nowrap px-1 pb-3 text-sm font-bold text-slate-400 transition">Lịch sử tham gia hoạt động</button>
+                <button id="profileTabInterests" type="button" onclick="setProfileTab('interests')" class="relative whitespace-nowrap px-1 pb-3 text-sm font-bold text-slate-400 transition">Sở thích</button>
+              </div>
+            </div>
+            <div id="profilePanelScores" class="space-y-5 p-4 sm:p-6">
+              <div class="flex flex-wrap items-end justify-between gap-3">
+                <div><h2 class="text-lg font-extrabold text-white">Bảng điểm rèn luyện</h2><p class="mt-1 text-xs text-slate-400">Nhập điểm từng học kỳ; xếp loại được suy ra tự động.</p></div>
+                <div class="flex flex-wrap items-end gap-2">
+                  <label class="text-[11px] font-semibold text-slate-400">Học kỳ<input id="gradeSemesterInput" maxlength="60" placeholder="HK1 2026–2027" class="mt-1 block w-40 rounded-lg border border-[#223046] bg-[#080d18] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
+                  <label class="text-[11px] font-semibold text-slate-400">Điểm<input id="gradePointsInput" type="number" min="0" max="100" placeholder="0–100" class="mt-1 block w-24 rounded-lg border border-[#223046] bg-[#080d18] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
+                  <button type="button" onclick="addProfileGrade()" class="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white hover:bg-indigo-500">+ Thêm kỳ</button>
+                </div>
+              </div>
+              <div class="overflow-x-auto rounded-xl border border-[#223046]">
+                <table class="w-full min-w-[520px] text-left text-xs">
+                  <thead class="bg-[#080d18] text-slate-400"><tr><th class="px-4 py-3">Học kỳ học</th><th class="px-4 py-3">Số điểm</th><th class="px-4 py-3">Xếp loại</th><th class="px-4 py-3 text-right">Thao tác</th></tr></thead>
+                  <tbody id="profileGradeRows" class="divide-y divide-[#1b2537]"></tbody>
+                </table>
+              </div>
+              <div class="rounded-2xl border border-[#223046] bg-[#080d18] p-4">
+                <h3 class="text-sm font-extrabold text-white">Biểu đồ điểm theo học kỳ</h3>
+                <div id="profileGradeChart" class="mt-4 flex min-h-40 items-end gap-3 overflow-x-auto px-2 pb-2"></div>
+              </div>
+            </div>
+            <div id="profilePanelActivities" class="hidden p-4 sm:p-6">
+              <h2 class="text-lg font-extrabold text-white">Lịch sử tham gia hoạt động</h2>
+              <p class="mt-1 text-xs text-slate-400">Các hoạt động được lưu hoặc ghi nhận trong tài khoản UniLife.</p>
+              <div class="mt-4 overflow-x-auto rounded-xl border border-[#223046]">
+                <table class="w-full min-w-[650px] text-left text-xs">
+                  <thead class="bg-[#080d18] text-slate-400"><tr><th class="px-4 py-3">Tên hoạt động</th><th class="px-4 py-3">Thời gian</th><th class="px-4 py-3">Mục điểm</th><th class="px-4 py-3">Điểm cộng</th></tr></thead>
+                  <tbody id="profileActivityRows" class="divide-y divide-[#1b2537]"></tbody>
+                </table>
+              </div>
+            </div>
+            <div id="profilePanelInterests" class="hidden space-y-4 p-4 sm:p-6">
+              <div><h2 class="text-lg font-extrabold text-white">Sở thích & cá nhân hóa</h2><p class="mt-1 text-xs text-slate-400">Cập nhật thông tin để UniLife gợi ý kế hoạch phù hợp hơn.</p></div>
+              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <label class="text-xs font-semibold text-slate-400">Lĩnh vực quan tâm<textarea id="profileInterestFields" rows="3" placeholder="Ví dụ: Công nghệ, tình nguyện..." class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500"></textarea></label>
+                <label class="text-xs font-semibold text-slate-400">Kỹ năng muốn phát triển<textarea id="profileSkills" rows="3" placeholder="Ví dụ: Thuyết trình, lập trình..." class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500"></textarea></label>
+                <label class="text-xs font-semibold text-slate-400">Mục tiêu cá nhân<textarea id="profilePersonalGoals" rows="3" placeholder="Điều bạn muốn đạt được..." class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500"></textarea></label>
+                <label class="text-xs font-semibold text-slate-400">Loại hoạt động yêu thích<textarea id="profileFavoriteActivities" rows="3" placeholder="Ví dụ: Workshop, thể thao..." class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500"></textarea></label>
+              </div>
+              <div class="flex justify-end"><button type="button" onclick="saveProfilePreferences()" class="rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-500">Lưu sở thích</button></div>
+            </div>
+          </section>
+        </div>
+
   </div>
 
   <!-- ======================================================================== -->
@@ -1727,7 +1828,7 @@
               <div class="grid gap-4 sm:grid-cols-2"><label class="text-xs font-bold text-slate-300">Mục tiêu ĐRL<input id="onboardingTarget" type="number" min="0" max="100" value="80" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Nhóm ưu tiên<select id="onboardingCategories" multiple class="mt-1.5 min-h-28 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-2"><option value="C1">C1 · Học tập</option><option value="C2">C2 · Nội quy</option><option value="C3">C3 · Văn hóa</option><option value="C4">C4 · Cộng đồng</option><option value="C5">C5 · Cán bộ/CLB</option></select></label><label class="text-xs font-bold text-slate-300 sm:col-span-2">Sở thích hoạt động<input id="onboardingInterests" placeholder="Ví dụ: tình nguyện, AI" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label></div>
               <fieldset class="rounded-xl border border-[#2b3a54] p-3"><legend class="px-1 text-xs font-bold text-slate-300">Hình thức và cơ sở ưu tiên</legend><div class="flex flex-wrap gap-4 text-xs text-slate-300"><label><input type="checkbox" name="onboardingMode" value="online" class="mr-1" />Online</label><label><input type="checkbox" name="onboardingMode" value="offline" class="mr-1" />Trực tiếp</label><label><input type="checkbox" name="onboardingMode" value="hybrid" class="mr-1" />Kết hợp</label><label><input type="checkbox" name="onboardingCampus" value="NVC" class="mr-1" />Nguyễn Văn Cừ</label><label><input type="checkbox" name="onboardingCampus" value="DONG_HOA" class="mr-1" />Đông Hòa</label></div></fieldset><div id="onboardingReview" class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 text-sm text-slate-300"></div>
             </section>
-            <div class="mt-7 flex items-center justify-between border-t border-[#223046] pt-5"><button id="onboardingBack" type="button" onclick="changeOnboardingStep(-1)" class="rounded-xl border border-[#2b3a54] px-4 py-2.5 text-sm font-bold text-slate-300">Quay lại</button><button id="onboardingNext" type="button" onclick="changeOnboardingStep(1)" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-extrabold">Tiếp tục</button><button id="onboardingComplete" type="button" onclick="completeOnboarding()" class="hidden rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-extrabold">Xác nhận và lưu</button></div>
+            <div class="mt-7 flex items-center justify-between border-t border-[#223046] pt-5"><button id="onboardingBack" type="button" onclick="changeOnboardingStep(-1)" class="rounded-xl border border-[#2b3a54] px-4 py-2.5 text-sm font-bold text-slate-300">Quay lại</button><button id="onboardingNext" type="button" onclick="changeOnboardingStep(1)" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-extrabold">Tiếp tục</button><button id="onboardingComplete" type="button" onclick="completeOnboardingWizard()" class="hidden rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-extrabold">Xác nhận và lưu</button></div>
           </main>
           <aside class="rounded-3xl border border-indigo-500/30 bg-indigo-950/20 p-5">
             <h2 class="font-extrabold">AI hỗ trợ điền hồ sơ</h2><p class="mt-1 text-xs text-slate-400">Phạm vi: hồ sơ, lịch tuần, mục tiêu ĐRL và sở thích. Đề xuất chỉ được áp dụng sau khi bạn xác nhận.</p><div id="onboardingAiChips" class="mt-3 flex flex-wrap gap-2"></div><div id="onboardingAiMessages" class="mt-3 min-h-24 max-h-56 space-y-2 overflow-y-auto rounded-xl border border-[#223046] bg-[#080d18] p-3 text-xs"><p class="text-slate-300">Chọn ví dụ hoặc mô tả một thay đổi. Nếu thiếu dữ kiện, AI sẽ hỏi từng câu.</p></div><form class="mt-3 space-y-2" onsubmit="submitProfileAssistantMessage(event, 'onboarding')"><textarea id="onboardingAiInput" maxlength="2000" rows="3" class="w-full rounded-xl border border-[#2b3a54] bg-[#080d18] p-3 text-sm" placeholder="Mình muốn đạt 95 điểm, thứ Hai học 7h30–17h30..."></textarea><button class="w-full rounded-xl bg-violet-600 py-2.5 text-sm font-bold">Phân tích bằng AI</button></form><div id="onboardingAiPreview" class="mt-3 hidden rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs"></div>
@@ -1781,12 +1882,46 @@
           <label for="registerPassword" class="block text-xs font-bold text-slate-300 mb-1.5">Mật khẩu</label>
           <input id="registerPassword" name="new-password" type="password" required minlength="8" autocomplete="new-password" placeholder="Tối thiểu 8 ký tự" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
         </div>
+        <div>
+          <label for="registerPasswordConfirm" class="block text-xs font-bold text-slate-300 mb-1.5">Xác nhận mật khẩu</label>
+          <input id="registerPasswordConfirm" name="confirm-password" type="password" required minlength="8" autocomplete="new-password" placeholder="Nhập lại mật khẩu" class="w-full px-3.5 py-2.5 rounded-xl bg-[#080d18] border border-[#223046] text-sm text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
+        </div>
         <button id="btnSubmitRegister" type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition">Tạo tài khoản</button>
       </form>
 
       <p class="text-[11px] leading-relaxed text-slate-500">
         Tài khoản được lưu trên trình duyệt này. Đây là đăng nhập cục bộ để dùng thử, không thay thế hệ thống xác thực an toàn trên máy chủ.
       </p>
+    </div>
+  </div>
+
+  <div id="onboardingModal" class="hidden fixed inset-0 z-[110] overflow-y-auto bg-[#080c14]/95 p-3 backdrop-blur-md sm:p-6">
+    <div class="mx-auto my-2 max-w-4xl overflow-hidden rounded-3xl border border-[#1b2537] bg-[#0e1524] shadow-2xl sm:my-6">
+      <div class="flex items-center justify-between border-b border-[#1b2537] px-5 py-4 sm:px-7">
+        <div><p class="text-[11px] font-bold uppercase tracking-[.2em] text-indigo-300">UniLife · Thiết lập hồ sơ</p><h2 class="mt-1 text-lg font-extrabold text-white">Cá nhân hóa hành trình của bạn</h2></div>
+        <span id="onboardingStepLabel" class="rounded-full border border-indigo-400/30 bg-indigo-950/40 px-3 py-1 text-xs font-bold text-indigo-200">Bước 1 / 3</span>
+      </div>
+      <div class="grid grid-cols-3 gap-2 px-5 pt-5 sm:px-7" aria-label="Tiến trình thiết lập hồ sơ">
+        <div id="onboardingStepMarker1" class="rounded-xl border p-3 text-center text-[11px] font-bold">1 · Thông tin của bạn</div>
+        <div id="onboardingStepMarker2" class="rounded-xl border p-3 text-center text-[11px] font-bold">2 · Lịch bận</div>
+        <div id="onboardingStepMarker3" class="rounded-xl border p-3 text-center text-[11px] font-bold">3 · Mục tiêu</div>
+      </div>
+      <div id="onboardingMessage" class="hidden mx-5 mt-4 rounded-xl border px-3 py-2.5 text-sm sm:mx-7" role="status"></div>
+      <div id="onboardingContent" class="min-h-[420px] p-5 sm:p-7"></div>
+      <div class="flex flex-col-reverse justify-between gap-3 border-t border-[#1b2537] px-5 py-4 sm:flex-row sm:px-7">
+        <button id="onboardingBackButton" type="button" onclick="previousOnboardingStep()" class="rounded-xl border border-[#2b3a54] px-5 py-2.5 text-sm font-bold text-slate-300 transition hover:bg-[#11192b]">Quay lại</button>
+        <button id="onboardingNextButton" type="button" onclick="nextOnboardingStep()" class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500">Tiếp tục</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="welcomeModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-3xl border border-emerald-400/20 bg-[#0e1524] p-7 text-center shadow-2xl">
+      <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/15 text-3xl text-emerald-300">✓</div>
+      <p class="mt-5 text-[11px] font-bold uppercase tracking-[.2em] text-emerald-300">UniLife</p>
+      <h2 class="mt-2 text-2xl font-black text-white">Cảm ơn bạn đã tin chọn UniLife!</h2>
+      <p class="mt-3 text-sm leading-relaxed text-slate-300">Chào mừng bạn đến với hành trình học kỳ mới. Hồ sơ và mục tiêu đã được lưu trên thiết bị này.</p>
+      <button type="button" onclick="finishWelcome()" class="mt-6 w-full rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-indigo-500">Bắt đầu khám phá</button>
     </div>
   </div>
 
@@ -2408,6 +2543,236 @@
       if (progressBar) progressBar.style.width = `${progress}%`;
     }
 
+    let activeProfileTab = "scores";
+
+    function currentLocalProfile() {
+      if (!currentStudent?.student_id) return null;
+      return readLocalUserData(currentStudent.student_id).profile;
+    }
+
+    function saveLocalProfile(profile) {
+      if (!currentStudent?.student_id) return;
+      const data = readLocalUserData(currentStudent.student_id);
+      data.profile = {
+        ...data.profile,
+        ...profile,
+        profile: {
+          ...(data.profile?.profile || {}),
+          ...(profile?.profile || {}),
+          full_name: currentStudent.full_name || profile?.profile?.full_name || data.profile?.profile?.full_name || "",
+          major: profile?.faculty || profile?.profile?.major || data.profile?.profile?.major || ""
+        }
+      };
+      if (Number.isFinite(Number(profile?.goal?.target_score))) {
+        data.profile.drl_target = Math.max(0, Math.min(100, Number(profile.goal.target_score)));
+      }
+      data.updated_at = new Date().toISOString();
+      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+    }
+
+    function setProfileTab(tab) {
+      activeProfileTab = ["scores", "activities", "interests"].includes(tab) ? tab : "scores";
+      ["scores", "activities", "interests"].forEach(name => {
+        const panel = document.getElementById(`profilePanel${capitalize(name)}`);
+        const button = document.getElementById(`profileTab${capitalize(name)}`);
+        if (panel) panel.classList.toggle("hidden", name !== activeProfileTab);
+        if (button) {
+          button.className = name === activeProfileTab
+            ? "relative whitespace-nowrap px-1 pb-3 text-sm font-bold text-indigo-300 transition after:absolute after:inset-x-0 after:-bottom-[1px] after:h-0.5 after:bg-indigo-400"
+            : "relative whitespace-nowrap px-1 pb-3 text-sm font-bold text-slate-400 transition hover:text-white";
+          button.setAttribute("aria-selected", String(name === activeProfileTab));
+        }
+      });
+    }
+
+    function renderStudentProfile() {
+      if (!currentStudent?.student_id) return;
+      const profile = currentLocalProfile();
+      if (!profile) return;
+      const avatar = document.getElementById("profileAvatarDisplay");
+      if (avatar) {
+        avatar.innerHTML = profile.avatar_data_url
+          ? `<img src="${escapeHTML(profile.avatar_data_url)}" alt="Ảnh đại diện" class="h-full w-full object-cover" />`
+          : `<span role="img" aria-label="Logo UniLife" class="text-2xl font-black tracking-tight text-white">Uni<span class="text-cyan-300">Life</span></span>`;
+      }
+      const setValue = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.value = value || "";
+      };
+      setValue("profileStudentId", currentStudent.student_id);
+      setValue("profileName", currentStudent.full_name);
+      setValue("profileFaculty", profile.faculty);
+      setValue("profileCohort", profile.cohort);
+      setValue("profileSemester", profile.semester);
+      setValue("profileProgram", profile.program);
+      setValue("profileInterestFields", profile.preferences.interest_fields);
+      setValue("profileSkills", profile.preferences.skills);
+      setValue("profilePersonalGoals", profile.preferences.personal_goals);
+      setValue("profileFavoriteActivities", profile.preferences.favorite_activities);
+      const name = document.getElementById("profileDisplayName");
+      if (name) name.textContent = currentStudent.full_name || "Sinh viên";
+
+      const score = Math.min(100, Object.values(studentCategoryScores || {}).reduce((sum, item) => sum + safeNumber(item.current), 0));
+      const target = Math.max(0, Math.min(100, safeNumber(profile.goal.target_score || readLocalUserData(currentStudent.student_id).planner.target_total || 80)));
+      const percent = target ? Math.min(100, Math.round(score / target * 100)) : 0;
+      const goalSummary = document.getElementById("profileGoalSummary");
+      const goalBar = document.getElementById("profileGoalBar");
+      const goalCaption = document.getElementById("profileGoalCaption");
+      if (goalSummary) goalSummary.textContent = `${Math.round(score)} / ${target} điểm`;
+      if (goalBar) goalBar.style.width = `${percent}%`;
+      if (goalCaption) goalCaption.textContent = score >= target ? "Bạn đã đạt mục tiêu điểm học kỳ." : `Còn ${Math.max(0, target - Math.round(score))} điểm để chạm mục tiêu.`;
+      const goalDetails = document.getElementById("profileGoalDetails");
+      if (goalDetails) {
+        const summary = profile.goal.natural_text ? `<p>${escapeHTML(profile.goal.natural_text)}</p>` : "";
+        const tags = [...(profile.goal.priorities || []), ...(profile.goal.topics || [])].filter(Boolean);
+        const chips = tags.map(tag => `<span class="mr-1 mt-1 inline-flex rounded-full border border-indigo-400/20 bg-indigo-400/10 px-2 py-0.5">${escapeHTML(tag)}</span>`).join("");
+        const format = profile.goal.format ? `<span class="mt-1 block text-slate-400">Hình thức mong muốn: ${escapeHTML(profile.goal.format)}</span>` : "";
+        goalDetails.innerHTML = `${summary}${chips}${format}`;
+      }
+
+      const grades = Array.isArray(profile.score_history) ? profile.score_history : [];
+      const rows = document.getElementById("profileGradeRows");
+      if (rows) rows.innerHTML = grades.length ? grades.map((grade, index) => `
+        <tr><td class="px-4 py-3 font-semibold text-slate-200">${escapeHTML(grade.semester)}</td>
+          <td class="px-4 py-3 font-mono font-bold text-indigo-300">${safeNumber(grade.score)} / 100</td>
+          <td class="px-4 py-3 text-slate-300">${escapeHTML(getGradeLabel(safeNumber(grade.score)))}</td>
+          <td class="px-4 py-3 text-right"><button type="button" onclick="removeProfileGrade(${index})" class="rounded-lg px-2 py-1 text-rose-300 hover:bg-rose-950/40">Xóa</button></td></tr>
+      `).join("") : `<tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">Chưa có dữ liệu. Hãy thêm điểm của một học kỳ.</td></tr>`;
+
+      const chart = document.getElementById("profileGradeChart");
+      if (chart) {
+        if (!grades.length) {
+          chart.innerHTML = `<p class="m-auto text-xs text-slate-500">Biểu đồ sẽ hiển thị sau khi bạn thêm điểm học kỳ.</p>`;
+        } else {
+          const best = Math.max(...grades.map(grade => safeNumber(grade.score)));
+          chart.innerHTML = grades.map(grade => {
+            const value = Math.max(0, Math.min(100, safeNumber(grade.score)));
+            return `<div class="flex min-w-[72px] flex-1 flex-col items-center justify-end gap-2">
+              <span class="text-[11px] font-bold ${value === best ? "text-amber-300" : "text-indigo-300"}">${value}${value === best ? " ★" : ""}</span>
+              <div class="flex h-28 w-full max-w-14 items-end overflow-hidden rounded-t-lg bg-[#11192b]"><div class="w-full rounded-t-lg ${value === best ? "bg-gradient-to-t from-amber-600 to-amber-300" : "bg-gradient-to-t from-blue-700 to-indigo-400"}" style="height:${value}%"></div></div>
+              <span class="max-w-20 truncate text-center text-[10px] text-slate-400" title="${escapeHTML(grade.semester)}">${escapeHTML(grade.semester)}</span>
+            </div>`;
+          }).join("");
+        }
+      }
+
+      const activityRows = document.getElementById("profileActivityRows");
+      if (activityRows) {
+        const activities = Array.isArray(savedActivitiesForStudent) ? savedActivitiesForStudent : [];
+        activityRows.innerHTML = activities.length ? activities.map(item => {
+          const points = safeNumber(item.confirmed_added) > 0 ? item.confirmed_added : item.projected_added;
+          const status = safeNumber(item.confirmed_added) > 0 ? "" : " (dự kiến)";
+          return `<tr><td class="px-4 py-3 font-semibold text-slate-200">${escapeHTML(item.title || item.commit_id || "Hoạt động UniLife")}</td>
+            <td class="px-4 py-3 text-slate-400">${escapeHTML(item.start || item.created_at || item.time || "Đang cập nhật")}</td>
+            <td class="px-4 py-3 text-slate-300">${escapeHTML(item.category_id || "Đang cập nhật")}</td>
+            <td class="px-4 py-3 font-bold text-emerald-300">+${safeNumber(points)}đ${status}</td></tr>`;
+        }).join("") : `<tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">Chưa có hoạt động nào được lưu hoặc ghi nhận.</td></tr>`;
+      }
+      setProfileTab(activeProfileTab);
+    }
+
+    function saveProfileBasics() {
+      const profile = currentLocalProfile();
+      if (!profile) return;
+      const fullName = document.getElementById("profileName").value.trim();
+      if (!fullName) {
+        window.alert("Vui lòng nhập họ và tên.");
+        return;
+      }
+      currentStudent.full_name = fullName;
+      profile.faculty = document.getElementById("profileFaculty").value.trim();
+      profile.cohort = document.getElementById("profileCohort").value.trim();
+      profile.semester = document.getElementById("profileSemester").value;
+      profile.program = document.getElementById("profileProgram").value.trim();
+      saveLocalProfile(profile);
+      localStorage.setItem("unilife_student", JSON.stringify(currentStudent));
+      const users = readLocalUsers();
+      const account = users.find(user => normalizeMssv(user.student_id) === normalizeMssv(currentStudent.student_id));
+      if (account) {
+        account.full_name = fullName;
+        account.major = profile.faculty || account.major;
+        localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
+      }
+      applyCurrentStudent(currentStudent);
+      renderStudentProfile();
+    }
+
+    function saveProfilePreferences() {
+      const profile = currentLocalProfile();
+      if (!profile) return;
+      profile.preferences = {
+        interest_fields: document.getElementById("profileInterestFields").value.trim(),
+        skills: document.getElementById("profileSkills").value.trim(),
+        personal_goals: document.getElementById("profilePersonalGoals").value.trim(),
+        favorite_activities: document.getElementById("profileFavoriteActivities").value.trim()
+      };
+      saveLocalProfile(profile);
+      window.alert("Sở thích đã được lưu vào hồ sơ của bạn.");
+    }
+
+    function addProfileGrade() {
+      const semesterInput = document.getElementById("gradeSemesterInput");
+      const pointsInput = document.getElementById("gradePointsInput");
+      const semester = semesterInput.value.trim();
+      const score = Number(pointsInput.value);
+      if (!semester || !Number.isFinite(score) || score < 0 || score > 100) {
+        window.alert("Nhập học kỳ và điểm hợp lệ trong khoảng 0–100.");
+        return;
+      }
+      const profile = currentLocalProfile();
+      if (!profile) return;
+      const existing = profile.score_history.findIndex(row => row.semester.toLocaleLowerCase("vi") === semester.toLocaleLowerCase("vi"));
+      if (existing >= 0) profile.score_history[existing] = { semester, score };
+      else profile.score_history.push({ semester, score });
+      saveLocalProfile(profile);
+      semesterInput.value = "";
+      pointsInput.value = "";
+      renderStudentProfile();
+    }
+
+    function removeProfileGrade(index) {
+      const profile = currentLocalProfile();
+      if (!profile || !Number.isInteger(index) || !profile.score_history[index]) return;
+      profile.score_history.splice(index, 1);
+      saveLocalProfile(profile);
+      renderStudentProfile();
+    }
+
+    function saveProfileAvatar(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        window.alert("Vui lòng chọn một tệp hình ảnh.");
+        event.target.value = "";
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        window.alert("Ảnh đại diện cần nhỏ hơn 2 MB.");
+        event.target.value = "";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const profile = currentLocalProfile();
+        if (!profile || typeof reader.result !== "string") return;
+        try {
+          profile.avatar_data_url = reader.result;
+          saveLocalProfile(profile);
+          renderStudentProfile();
+        } catch (error) {
+          console.error("Could not save the selected profile image:", error);
+          window.alert("Không thể lưu ảnh. Hãy chọn ảnh nhỏ hơn hoặc giải phóng dung lượng trình duyệt.");
+        }
+        event.target.value = "";
+      };
+      reader.onerror = () => {
+        console.error("Could not read the selected profile image.");
+        window.alert("Không đọc được ảnh đã chọn.");
+        event.target.value = "";
+      };
+      reader.readAsDataURL(file);
+    }
+
     function renderRecommendedActivities(rows) {
       const container = document.getElementById("recommendedActivitiesList");
       if (!container) return;
@@ -2478,13 +2843,6 @@
         student_id: mssv,
         onboarding_status: isNewRegistration ? "NOT_STARTED" : "COMPLETED",
         onboarding_step: 1,
-        profile: {
-          profile: { full_name: "", class_name: "", major: "" },
-          drl_target: 80,
-          weekly_intervals: [],
-          exceptions: [],
-          preference_patch: { preferred_topics: [], preferred_categories: [], preferred_modes: [], preferred_campuses: [], max_activities: null, weekly_participation_hours: null }
-        },
         score_sources: {},
         canonical_availability: { timezone: "Asia/Ho_Chi_Minh", apply_scope: "SEMESTER_WEEKLY", effective_from: "2026-11-09", effective_until: "2027-03-31", weekly_blocks: [], exceptions: [], busy_intervals: [], weekly_participation_hours: null },
         manual_busy_intervals: [],
@@ -2494,6 +2852,35 @@
         category_scores: cloneDefaultScores(),
         default_baseline_total: 0,
         saved_activities: [],
+        profile: {
+          profile: { full_name: "", class_name: "", major: "" },
+          drl_target: 80,
+          weekly_intervals: [],
+          exceptions: [],
+          preference_patch: { preferred_topics: [], preferred_categories: [], preferred_modes: [], preferred_campuses: [], max_activities: null, weekly_participation_hours: null },
+          faculty: "",
+          cohort: "",
+          program: "",
+          semester: "HK1 · 2026–2027",
+          avatar_data_url: "",
+          score_history: [],
+          preferences: {
+            interest_fields: "",
+            skills: "",
+            personal_goals: "",
+            favorite_activities: ""
+          },
+          goal: {
+            natural_text: "",
+            target_score: 80,
+            priorities: [],
+            format: "",
+            topics: []
+          },
+          busy_schedule: { applies_to_semester: false, week_start: "2026-11-09", slots: [] },
+          completed_onboarding: !isNewRegistration,
+          onboarding_started: false
+        },
         planner: {
           target_total: 80,
           plan_stages: { first: null, replan: null, whatif: null },
@@ -2511,13 +2898,39 @@
       const defaults = createDefaultLocalUserData(mssv, false);
       const legacy = !saved.schema_version;
       const needsMigration = Number(saved.schema_version) !== 2;
+      const savedProfile = saved.profile || {};
+      const targetScore = Number.isFinite(Number(savedProfile.goal?.target_score))
+        ? Number(savedProfile.goal.target_score)
+        : (Number.isFinite(Number(savedProfile.drl_target)) ? Number(savedProfile.drl_target) : 80);
       const migrated = {
         ...defaults,
         ...saved,
         schema_version: 2,
         student_id: mssv,
         onboarding_status: legacy ? "COMPLETED" : (["NOT_STARTED", "IN_PROGRESS", "COMPLETED"].includes(saved.onboarding_status) ? saved.onboarding_status : "COMPLETED"),
-        profile: { ...defaults.profile, ...(saved.profile || {}), profile: { ...defaults.profile.profile, ...(saved.profile?.profile || {}) } },
+        profile: {
+          ...defaults.profile,
+          ...savedProfile,
+          drl_target: targetScore,
+          profile: { ...defaults.profile.profile, ...(savedProfile.profile || {}) },
+          weekly_intervals: Array.isArray(savedProfile.weekly_intervals) ? savedProfile.weekly_intervals : [],
+          exceptions: Array.isArray(savedProfile.exceptions) ? savedProfile.exceptions : [],
+          preference_patch: { ...defaults.profile.preference_patch, ...(savedProfile.preference_patch || {}) },
+          score_history: Array.isArray(savedProfile.score_history) ? savedProfile.score_history : [],
+          preferences: { ...defaults.profile.preferences, ...(savedProfile.preferences || {}) },
+          goal: {
+            ...defaults.profile.goal,
+            ...(savedProfile.goal || {}),
+            target_score: targetScore,
+            priorities: Array.isArray(savedProfile.goal?.priorities) ? savedProfile.goal.priorities : [],
+            topics: Array.isArray(savedProfile.goal?.topics) ? savedProfile.goal.topics : []
+          },
+          busy_schedule: {
+            ...defaults.profile.busy_schedule,
+            ...(savedProfile.busy_schedule || {}),
+            slots: Array.isArray(savedProfile.busy_schedule?.slots) ? savedProfile.busy_schedule.slots : []
+          }
+        },
         canonical_availability: { ...defaults.canonical_availability, ...(saved.canonical_availability || {}) },
         category_scores: saved.category_scores || defaults.category_scores,
         saved_activities: Array.isArray(saved.saved_activities) ? saved.saved_activities : [],
@@ -2562,13 +2975,17 @@
     function maybeStartOnboarding() {
       if (!currentStudent?.student_id) return false;
       const data = readLocalUserData(currentStudent.student_id);
-      if (data.onboarding_status === "COMPLETED") return false;
+      if (data.onboarding_status === "COMPLETED" && data.profile?.completed_onboarding !== false) return false;
+      if (document.getElementById("onboardingModal")) {
+        beginOnboarding(currentStudent);
+        return true;
+      }
       data.onboarding_status = "IN_PROGRESS";
       onboardingStep = Math.max(1, Math.min(3, Number(data.onboarding_step || 1)));
       localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
       hydrateOnboardingFormFromDraft();
       renderOnboardingIntervals();
-      renderOnboardingStep();
+      renderOnboardingWizardStep();
       document.getElementById("onboardingWizard").classList.remove("hidden");
       return true;
     }
@@ -2616,7 +3033,7 @@
       const data = readLocalUserData(currentStudent.student_id);
       data.onboarding_status = "IN_PROGRESS";
       data.onboarding_step = onboardingStep;
-      data.profile = JSON.parse(JSON.stringify(currentProfileDraft));
+      data.profile = { ...data.profile, ...JSON.parse(JSON.stringify(currentProfileDraft)) };
       localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
     }
 
@@ -2629,7 +3046,7 @@
       data.onboarding_step = onboardingStep;
       data.profile_assistant_history = [];
       localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
-      renderOnboardingStep();
+      renderOnboardingWizardStep();
     }
 
     function resetOnboardingAssistantState() {
@@ -2644,7 +3061,7 @@
       profileAssistantConversation = [];
     }
 
-    function renderOnboardingStep() {
+    function renderOnboardingWizardStep() {
       document.querySelectorAll(".onboarding-step").forEach(section => section.classList.toggle("hidden", Number(section.dataset.onboardingStep) !== onboardingStep));
       document.getElementById("onboardingProgress").textContent = `Bước ${onboardingStep} / 3`;
       document.getElementById("onboardingBack").classList.toggle("invisible", onboardingStep === 1);
@@ -2690,13 +3107,13 @@
       box.innerHTML = currentProfileDraft.weekly_intervals.map((item, index) => `<div class="flex items-center justify-between rounded-lg border border-[#2b3a54] px-3 py-2 text-xs"><span>${item.kind === 'busy' ? 'Bận' : 'Rảnh'} · ${AVAILABILITY_DAYS[item.weekday]} · ${item.start}–${item.end} · hằng tuần</span><button type="button" onclick="currentProfileDraft.weekly_intervals.splice(${index},1);renderOnboardingIntervals()" class="text-rose-300">Xóa</button></div>`).join("") || '<p class="text-xs text-slate-500">Chưa thêm lịch tuần; bạn có thể bỏ qua và nhập thủ công sau.</p>';
     }
 
-    async function completeOnboarding() {
+    async function completeOnboardingWizard() {
       saveOnboardingStep();
       if (!currentProfileDraft.profile.full_name) return;
       currentProfileDraft.weekly_intervals = (currentProfileDraft.weekly_intervals || []).map(item => ({ ...item, confirmed: true }));
       currentProfileDraft.exceptions = (currentProfileDraft.exceptions || []).map(item => ({ ...item, confirmed: true }));
       const data = readLocalUserData(currentStudent.student_id);
-      data.profile = JSON.parse(JSON.stringify(currentProfileDraft));
+      data.profile = { ...data.profile, ...JSON.parse(JSON.stringify(currentProfileDraft)), completed_onboarding: true, onboarding_started: false };
       data.onboarding_status = "COMPLETED";
       data.onboarding_step = 3;
       data.canonical_availability = buildCanonicalAvailability();
@@ -2997,10 +3414,28 @@
       const saved = readLocalUserData(mssv);
       const targetInput = document.getElementById("inputPlanTarget");
       const target = targetInput ? Number(targetInput.value) : Number(saved.planner.target_total || 80);
+      const normalizedTarget = Number.isFinite(target) ? Math.max(0, Math.min(100, target)) : 80;
       saved.category_scores = JSON.parse(JSON.stringify(studentCategoryScores));
       saved.default_baseline_total = Number(defaultBaselineTotal || 0);
       saved.saved_activities = JSON.parse(JSON.stringify(savedActivitiesForStudent || []));
-      saved.profile = JSON.parse(JSON.stringify(currentProfileDraft));
+      saved.profile = {
+        ...saved.profile,
+        ...JSON.parse(JSON.stringify(currentProfileDraft)),
+        drl_target: Number.isFinite(Number(currentProfileDraft.drl_target)) ? Number(currentProfileDraft.drl_target) : normalizedTarget,
+        profile: { ...(saved.profile?.profile || {}), ...(currentProfileDraft.profile || {}) },
+        faculty: saved.profile?.faculty ?? currentProfileDraft.faculty ?? "",
+        cohort: saved.profile?.cohort ?? currentProfileDraft.cohort ?? "",
+        program: saved.profile?.program ?? currentProfileDraft.program ?? "",
+        semester: saved.profile?.semester ?? currentProfileDraft.semester ?? "HK1 · 2026–2027",
+        avatar_data_url: saved.profile?.avatar_data_url ?? currentProfileDraft.avatar_data_url ?? "",
+        score_history: Array.isArray(saved.profile?.score_history) ? saved.profile.score_history : [],
+        preferences: { ...(saved.profile?.preferences || {}) },
+        goal: {
+          ...(saved.profile?.goal || {}),
+          target_score: Number.isFinite(Number(currentProfileDraft.drl_target)) ? Number(currentProfileDraft.drl_target) : normalizedTarget
+        },
+        busy_schedule: saved.profile?.busy_schedule || { applies_to_semester: false, slots: [] }
+      };
       saved.profile_assistant_history = JSON.parse(JSON.stringify(profileAssistantConversation.slice(-20)));
       saved.confirmed_preference = confirmedPreference ? JSON.parse(JSON.stringify(confirmedPreference)) : null;
       saved.canonical_availability = buildCanonicalAvailability();
@@ -3008,7 +3443,7 @@
       saved.unavailable_slots = [...unavailableAvailabilitySlots];
       saved.planner = {
         ...saved.planner,
-        target_total: Number.isFinite(target) ? Math.max(0, Math.min(100, target)) : 80,
+        target_total: normalizedTarget,
         plan_stages: JSON.parse(JSON.stringify(planStages)),
         current_stage: currentPlanStage,
         cached_plan_options: JSON.parse(JSON.stringify(cachedPlanOptions)),
@@ -3125,6 +3560,434 @@
       clearAuthMessage();
     }
 
+    let onboardingDraft = null;
+    let activeOnboardingBusyCategory = "class";
+    let onboardingEditableLists = { priorities: false, topics: false };
+    let welcomeTimeout = null;
+
+    function persistOnboardingDraft() {
+      if (!currentStudent?.student_id || !onboardingDraft) return;
+      const data = readLocalUserData(currentStudent.student_id);
+      data.profile = {
+        ...data.profile,
+        ...onboardingDraft.profile,
+        goal: { ...data.profile.goal, ...onboardingDraft.profile.goal },
+        busy_schedule: { ...data.profile.busy_schedule, ...onboardingDraft.profile.busy_schedule }
+      };
+      data.updated_at = new Date().toISOString();
+      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+    }
+
+    function beginOnboarding(user) {
+      currentStudent = {
+        student_id: user.student_id,
+        full_name: user.full_name,
+        class: user.class || "",
+        major: user.major || "Sinh viên",
+        demo_only: true
+      };
+      localStorage.setItem("unilife_student", JSON.stringify(currentStudent));
+      localStorage.setItem(CURRENT_USER_KEY, currentStudent.student_id);
+      const accountData = readLocalUserData(currentStudent.student_id);
+      const busySchedule = accountData.profile.busy_schedule;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(busySchedule.week_start || "")) {
+        busySchedule.week_start = AVAILABILITY_DEFAULT_WEEK_START;
+      }
+      busySchedule.slots = busySchedule.slots.map(slot => {
+        const parts = String(slot).split("|");
+        if (parts.length !== 3 || /^\d{4}-\d{2}-\d{2}$/.test(parts[1])) return slot;
+        const dayIndex = Number(parts[1]);
+        return Number.isInteger(dayIndex) && dayIndex >= 0 && dayIndex <= 6
+          ? `${parts[0]}|${addDaysToIsoDate(busySchedule.week_start, dayIndex)}|${parts[2]}`
+          : slot;
+      });
+      accountData.profile.onboarding_started = true;
+      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(accountData));
+      onboardingDraft = {
+        full_name: currentStudent.full_name,
+        student_id: currentStudent.student_id,
+        profile: JSON.parse(JSON.stringify(accountData.profile)),
+        commitment: false
+      };
+      onboardingStep = 1;
+      activeOnboardingBusyCategory = "class";
+      onboardingEditableLists = { priorities: false, topics: false };
+      closeLoginModal();
+      renderOnboardingStep();
+      document.getElementById("onboardingModal").classList.remove("hidden");
+      applyCurrentStudent(currentStudent).catch(error => {
+        console.error("Could not initialize the new student's workspace:", error);
+        showOnboardingMessage("Không thể tải một số dữ liệu lúc này. Bạn vẫn có thể tiếp tục thiết lập hồ sơ.");
+      });
+    }
+
+    function updateOnboardingProfileField(field, value) {
+      if (!onboardingDraft) return;
+      if (field === "full_name") onboardingDraft.full_name = value;
+      else if (field === "student_id") onboardingDraft.student_id = value;
+      else onboardingDraft.profile[field] = value;
+      persistOnboardingDraft();
+    }
+
+    function renderOnboardingStep() {
+      if (!onboardingDraft) return;
+      const content = document.getElementById("onboardingContent");
+      const label = document.getElementById("onboardingStepLabel");
+      const back = document.getElementById("onboardingBackButton");
+      const next = document.getElementById("onboardingNextButton");
+      const message = document.getElementById("onboardingMessage");
+      if (message) message.className = "hidden mx-5 mt-4 rounded-xl border px-3 py-2.5 text-sm sm:mx-7";
+      if (label) label.textContent = `Bước ${onboardingStep} / 3`;
+      [1, 2, 3].forEach(step => {
+        const marker = document.getElementById(`onboardingStepMarker${step}`);
+        if (!marker) return;
+        marker.className = step === onboardingStep
+          ? "rounded-xl border border-indigo-400/40 bg-indigo-950/40 p-3 text-center text-[11px] font-bold text-indigo-200"
+          : step < onboardingStep
+            ? "rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3 text-center text-[11px] font-bold text-emerald-300"
+            : "rounded-xl border border-[#223046] bg-[#080d18] p-3 text-center text-[11px] font-bold text-slate-500";
+      });
+      if (back) back.textContent = onboardingStep === 1 ? "Quay lại" : "Quay lại";
+      if (next) next.textContent = onboardingStep === 3 ? "Xác nhận" : "Tiếp tục";
+
+      if (onboardingStep === 1) {
+        const semesters = ["HK3 · 2025–2026", "HK1 · 2026–2027"];
+        content.innerHTML = `
+          <div class="mb-5"><h3 class="text-xl font-black text-white">Thông tin của bạn</h3><p class="mt-1 text-sm text-slate-400">Hoàn thiện hồ sơ sinh viên để cá nhân hóa trải nghiệm UniLife.</p></div>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <label class="text-xs font-bold text-slate-300">Họ và tên<input value="${escapeHTML(onboardingDraft.full_name)}" maxlength="100" oninput="updateOnboardingProfileField('full_name', this.value)" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500" /></label>
+            <label class="text-xs font-bold text-slate-300">MSSV<input value="${escapeHTML(onboardingDraft.student_id)}" readonly class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-slate-400 outline-none" /></label>
+            <label class="text-xs font-bold text-slate-300">Khoa<input value="${escapeHTML(onboardingDraft.profile.faculty)}" maxlength="100" oninput="updateOnboardingProfileField('faculty', this.value)" placeholder="Ví dụ: Khoa Công nghệ Thông tin" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500" /></label>
+            <label class="text-xs font-bold text-slate-300">Khóa tuyển<input value="${escapeHTML(onboardingDraft.profile.cohort)}" maxlength="40" oninput="updateOnboardingProfileField('cohort', this.value)" placeholder="Ví dụ: 2025" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500" /></label>
+            <label class="text-xs font-bold text-slate-300">Chương trình học<input value="${escapeHTML(onboardingDraft.profile.program)}" maxlength="120" oninput="updateOnboardingProfileField('program', this.value)" placeholder="Ví dụ: Chương trình chuẩn" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500" /></label>
+            <label class="text-xs font-bold text-slate-300">Học kỳ lập kế hoạch<select onchange="updateOnboardingProfileField('semester', this.value)" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500">${semesters.map(value => `<option ${value === onboardingDraft.profile.semester ? "selected" : ""}>${escapeHTML(value)}</option>`).join("")}</select></label>
+          </div>`;
+      } else if (onboardingStep === 2) {
+        const checked = onboardingDraft.profile.busy_schedule.applies_to_semester;
+        const tabs = [
+          ["class", "Học trên lớp"], ["work", "Làm thêm"], ["personal", "Việc cá nhân"]
+        ];
+        content.innerHTML = `
+          <div class="flex flex-wrap items-start justify-between gap-3"><div><h3 class="text-xl font-black text-white">Lịch bận trong tuần</h3><p class="mt-1 text-sm text-slate-400">Chọn khung giờ bận; lịch này sẽ được lưu cùng hồ sơ để tham khảo khi lập kế hoạch.</p></div>
+            <label class="inline-flex items-center gap-2 rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2 text-xs font-semibold text-slate-300"><input type="checkbox" ${checked ? "checked" : ""} onchange="setOnboardingSemesterBusy(this.checked)" class="h-4 w-4 accent-indigo-500" />Áp dụng cho cả học kỳ</label>
+          </div>
+          <div class="mt-5 border-b border-[#1b2537]">
+            <div class="flex flex-wrap gap-6" role="tablist" aria-label="Loại lịch bận">${tabs.map(([key, title]) => `<button type="button" role="tab" aria-selected="${activeOnboardingBusyCategory === key}" onclick="setOnboardingBusyCategory('${key}')" class="${activeOnboardingBusyCategory === key ? "relative whitespace-nowrap px-1 pb-3 text-sm font-bold text-indigo-300 after:absolute after:inset-x-0 after:-bottom-[1px] after:h-0.5 after:bg-indigo-400" : "relative whitespace-nowrap px-1 pb-3 text-sm font-bold text-slate-400 transition hover:text-white"}">${title}</button>`).join("")}</div>
+          </div>
+          <div id="onboardingScheduleGrid" class="mt-4 overflow-x-auto rounded-2xl border border-[#223046] bg-[#080d18] p-3" role="tabpanel"></div>
+          <p class="mt-3 text-[11px] text-slate-500">Chọn hoặc bỏ chọn các khung giờ bận. Lịch của từng loại được lưu riêng biệt.</p>`;
+        renderOnboardingSchedule();
+      } else {
+        const goal = onboardingDraft.profile.goal;
+        const priorities = Array.isArray(goal.priorities) ? goal.priorities : [];
+        const topics = Array.isArray(goal.topics) ? goal.topics : [];
+        content.innerHTML = `
+          <div><h3 class="text-xl font-black text-white">Mục tiêu học kỳ</h3><p class="mt-1 text-sm text-slate-400">Viết mục tiêu bằng ngôn ngữ tự nhiên. Bạn có thể tự chỉnh mọi thông tin trước khi lưu.</p></div>
+          <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
+            <textarea id="onboardingGoalText" rows="3" oninput="updateOnboardingGoalText(this.value)" placeholder="Bạn mong muốn đạt được gì trong học kỳ này?" class="w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500">${escapeHTML(goal.natural_text)}</textarea>
+            <button type="button" onclick="analyzeOnboardingGoal()" class="self-start rounded-xl border border-indigo-400/30 bg-indigo-500/15 px-5 py-3 text-sm font-bold text-indigo-200 transition hover:bg-indigo-500/25">Phân tích</button>
+          </div>
+          <div id="onboardingAnalysisMessage" class="mt-2 text-[11px] text-slate-500">Phân tích hỗ trợ nhập nhanh bằng từ khóa; hãy rà soát và chỉnh sửa kết quả.</div>
+          <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl border border-[#223046] bg-[#080d18] p-4">
+              <div class="flex items-center justify-between"><label for="onboardingGoalScore" class="text-xs font-bold text-slate-300">Điểm mục tiêu</label><button type="button" onclick="toggleOnboardingEdit('onboardingGoalScore')" class="text-[11px] font-bold text-indigo-300">Chỉnh sửa</button></div>
+              <input id="onboardingGoalScore" type="number" min="0" max="100" value="${safeNumber(goal.target_score) || 80}" disabled oninput="updateOnboardingGoalField('target_score', this.value)" class="mt-3 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2.5 text-sm text-white outline-none disabled:opacity-70 focus:border-indigo-500" />
+            </div>
+            <div class="rounded-2xl border border-[#223046] bg-[#080d18] p-4">
+              <div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-300">Hình thức</span><button type="button" onclick="toggleOnboardingEdit('onboardingGoalFormat')" class="text-[11px] font-bold text-indigo-300">Chỉnh sửa</button></div>
+              <input id="onboardingGoalFormat" value="${escapeHTML(goal.format)}" disabled oninput="updateOnboardingGoalField('format', this.value)" placeholder="Trực tiếp, trực tuyến..." class="mt-3 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2.5 text-sm text-white outline-none disabled:opacity-70 focus:border-indigo-500" />
+            </div>
+            <div class="rounded-2xl border border-[#223046] bg-[#080d18] p-4">
+              <div class="flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-slate-300">Mục ưu tiên</span><div class="flex gap-3"><button type="button" onclick="toggleOnboardingListEdit('priorities')" class="text-[11px] font-bold text-indigo-300">Chỉnh sửa</button><button type="button" onclick="addOnboardingListItem('priorities')" class="text-[11px] font-bold text-indigo-300">+ Thêm mục</button></div></div>
+              <div class="mt-3 space-y-2">${priorities.map((item, index) => `<div class="flex gap-2"><input data-onboarding-list="priorities" ${onboardingEditableLists.priorities ? "" : "disabled"} value="${escapeHTML(item)}" oninput="updateOnboardingListItem('priorities', ${index}, this.value)" class="min-w-0 flex-1 rounded-lg border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none disabled:opacity-70 focus:border-indigo-500" /><button type="button" onclick="removeOnboardingListItem('priorities', ${index})" aria-label="Xóa mục ưu tiên" class="px-2 text-rose-300">×</button></div>`).join("") || `<p class="text-[11px] text-slate-500">Chưa thêm mục ưu tiên.</p>`}</div>
+            </div>
+            <div class="rounded-2xl border border-[#223046] bg-[#080d18] p-4">
+              <div class="flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-slate-300">Chủ đề</span><div class="flex gap-3"><button type="button" onclick="toggleOnboardingListEdit('topics')" class="text-[11px] font-bold text-indigo-300">Chỉnh sửa</button><button type="button" onclick="addOnboardingListItem('topics')" class="text-[11px] font-bold text-indigo-300">+ Thêm chủ đề</button></div></div>
+              <div class="mt-3 space-y-2">${topics.map((item, index) => `<div class="flex gap-2"><input data-onboarding-list="topics" ${onboardingEditableLists.topics ? "" : "disabled"} value="${escapeHTML(item)}" oninput="updateOnboardingListItem('topics', ${index}, this.value)" class="min-w-0 flex-1 rounded-lg border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none disabled:opacity-70 focus:border-indigo-500" /><button type="button" onclick="removeOnboardingListItem('topics', ${index})" aria-label="Xóa chủ đề" class="px-2 text-rose-300">×</button></div>`).join("") || `<p class="text-[11px] text-slate-500">Chưa thêm chủ đề.</p>`}</div>
+            </div>
+          </div>
+          <label class="mt-5 flex items-start gap-3 rounded-xl border border-amber-400/20 bg-amber-950/20 p-4 text-xs leading-relaxed text-amber-100"><input id="onboardingCommitment" type="checkbox" ${onboardingDraft.commitment ? "checked" : ""} onchange="onboardingDraft.commitment = this.checked" class="mt-0.5 h-4 w-4 shrink-0 accent-amber-400" />Tôi xác nhận thông tin đã cung cấp là chính xác và hiểu rằng kết quả UniLife chỉ mang tính hỗ trợ, không thay thế xác nhận chính thức của nhà trường.</label>`;
+      }
+    }
+
+    function renderOnboardingSchedule() {
+      const grid = document.getElementById("onboardingScheduleGrid");
+      if (!grid || !onboardingDraft) return;
+      const busySlots = new Set(onboardingDraft.profile.busy_schedule.slots || []);
+      const weekStart = onboardingDraft.profile.busy_schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START;
+      const weekEnd = addDaysToIsoDate(weekStart, 6);
+      const headers = AVAILABILITY_DAYS.map((day, index) => {
+        const date = addDaysToIsoDate(weekStart, index);
+        return `<div class="py-2.5 text-center border-l border-[#1b2537]"><span class="block text-xs font-extrabold text-slate-200">${day}</span><span class="text-[10px] text-slate-500 planner-number">${date.slice(8, 10)}/${date.slice(5, 7)}</span></div>`;
+      }).join("");
+      const hourLabels = Array.from({ length: 15 }, (_, index) => {
+        const hour = 7 + index;
+        return `<span class="absolute right-2 -translate-y-1/2 text-[10px] text-slate-500 planner-number" style="top:${index * 48}px">${String(hour).padStart(2, "0")}:00</span>`;
+      }).join("");
+      const dayColumns = AVAILABILITY_DAYS.map((_, dayIndex) => {
+        const date = addDaysToIsoDate(weekStart, dayIndex);
+        const blocks = AVAILABILITY_PERIODS.map(period => {
+          const key = `${activeOnboardingBusyCategory}|${date}|${period.key}`;
+          const busy = isOnboardingBusySlotSelected(
+            onboardingDraft.profile.busy_schedule,
+            activeOnboardingBusyCategory,
+            date,
+            dayIndex,
+            period.key,
+            busySlots
+          );
+          const [startHour, startMinute] = period.start.split(":").map(Number);
+          const [endHour, endMinute] = period.end.split(":").map(Number);
+          const top = ((startHour * 60 + startMinute - 420) / 60) * 48;
+          const height = ((endHour * 60 + endMinute - startHour * 60 - startMinute) / 60) * 48;
+          const status = busy ? "Bận" : "Rảnh";
+          return `<button type="button" aria-pressed="${busy}" aria-label="${AVAILABILITY_DAYS[dayIndex]} ${period.label}, ${period.time}: ${status}" title="${period.label} · ${period.time}" onclick="toggleOnboardingBusySlot('${key}')" class="absolute left-1 right-1 z-[1] overflow-hidden rounded-md border px-1.5 py-1 text-left transition ${busy ? "border-rose-400/50 bg-rose-500/70 text-white hover:bg-rose-500/85" : "border-slate-600/50 bg-slate-800/35 text-slate-400 hover:border-indigo-400/60 hover:bg-indigo-950/60"}" style="top:${top + 3}px;height:${height - 6}px">
+            <span class="block text-[10px] font-extrabold">${status} · ${period.label}</span><span class="block mt-1 text-[9px] planner-number opacity-80">${period.time}</span>
+          </button>`;
+        }).join("");
+        return `<div class="plan-calendar-day relative border-l border-[#1b2537]">${blocks}</div>`;
+      }).join("");
+      grid.innerHTML = `<div class="flex items-center justify-between gap-3 p-1 pb-3">
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="changeOnboardingBusyWeek(-1)" aria-label="Tuần trước" class="w-10 h-10 rounded-xl border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">‹</button>
+            <button type="button" onclick="changeOnboardingBusyWeek(1)" aria-label="Tuần sau" class="w-10 h-10 rounded-xl border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">›</button>
+          </div>
+          <strong class="text-sm text-white planner-number text-center">Tuần ${shortCalendarDate(weekStart)} – ${shortCalendarDate(weekEnd)}</strong>
+          <span class="hidden sm:inline text-[11px] text-slate-500">07:00–21:00</span>
+        </div>
+        <div class="plan-calendar-board">
+          <div class="grid bg-[#0b101b] border-b border-[#1b2537]" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div></div>${headers}</div>
+          <div class="grid" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div class="relative h-[672px] bg-[#080d18]">${hourLabels}</div>${dayColumns}</div>
+        </div>
+        <p class="sm:hidden mt-3 text-[11px] text-indigo-300">Kéo ngang để xem đủ 7 ngày trong tuần.</p>`;
+    }
+
+    function onboardingWeekdayIndex(isoDate) {
+      const weekday = new Date(`${isoDate}T00:00:00Z`).getUTCDay();
+      return (weekday + 6) % 7;
+    }
+
+    function isOnboardingBusySlotSelected(schedule, category, date, dayIndex, periodKey, slots) {
+      return [...slots].some(slot => {
+        const [slotCategory, slotDateOrDay, slotPeriod] = String(slot).split("|");
+        if (slotCategory !== category || slotPeriod !== periodKey) return false;
+        const isDate = /^\d{4}-\d{2}-\d{2}$/.test(slotDateOrDay);
+        const slotDayIndex = isDate ? onboardingWeekdayIndex(slotDateOrDay) : Number(slotDateOrDay);
+        if (!Number.isInteger(slotDayIndex) || slotDayIndex !== dayIndex) return false;
+        if (schedule.applies_to_semester) return true;
+        const slotDate = isDate
+          ? slotDateOrDay
+          : addDaysToIsoDate(schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START, slotDayIndex);
+        return slotDate === date;
+      });
+    }
+
+    function changeOnboardingBusyWeek(direction) {
+      if (!onboardingDraft) return;
+      const schedule = onboardingDraft.profile.busy_schedule;
+      schedule.week_start = addDaysToIsoDate(schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START, direction * 7);
+      persistOnboardingDraft();
+      renderOnboardingSchedule();
+    }
+
+    function setOnboardingBusyCategory(category) {
+      if (!["class", "work", "personal"].includes(category)) return;
+      activeOnboardingBusyCategory = category;
+      renderOnboardingStep();
+    }
+
+    function toggleOnboardingBusySlot(key) {
+      const [category, date, periodKey] = key.split("|");
+      const schedule = onboardingDraft.profile.busy_schedule;
+      const dayIndex = onboardingWeekdayIndex(date);
+      const slots = Array.isArray(schedule.slots) ? schedule.slots : [];
+      const selected = isOnboardingBusySlotSelected(schedule, category, date, dayIndex, periodKey, slots);
+      const matchesSlot = slot => {
+        const [slotCategory, slotDateOrDay, slotPeriod] = String(slot).split("|");
+        if (slotCategory !== category || slotPeriod !== periodKey) return false;
+        const isDate = /^\d{4}-\d{2}-\d{2}$/.test(slotDateOrDay);
+        const slotDayIndex = isDate ? onboardingWeekdayIndex(slotDateOrDay) : Number(slotDateOrDay);
+        if (!Number.isInteger(slotDayIndex) || slotDayIndex !== dayIndex) return false;
+        if (schedule.applies_to_semester) return true;
+        const slotDate = isDate
+          ? slotDateOrDay
+          : addDaysToIsoDate(schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START, slotDayIndex);
+        return slotDate === date;
+      };
+      schedule.slots = selected
+        ? slots.filter(slot => !matchesSlot(slot))
+        : [...slots, key];
+      persistOnboardingDraft();
+      renderOnboardingSchedule();
+    }
+
+    function setOnboardingSemesterBusy(value) {
+      onboardingDraft.profile.busy_schedule.applies_to_semester = Boolean(value);
+      persistOnboardingDraft();
+      renderOnboardingSchedule();
+    }
+
+    function updateOnboardingGoalText(value) {
+      onboardingDraft.profile.goal.natural_text = value;
+      persistOnboardingDraft();
+    }
+
+    function updateOnboardingGoalField(field, value) {
+      onboardingDraft.profile.goal[field] = field === "target_score"
+        ? Math.max(0, Math.min(100, safeNumber(value)))
+        : value;
+      persistOnboardingDraft();
+    }
+
+    function updateOnboardingListItem(field, index, value) {
+      onboardingDraft.profile.goal[field][index] = value;
+      persistOnboardingDraft();
+    }
+
+    function addOnboardingListItem(field) {
+      onboardingEditableLists[field] = true;
+      onboardingDraft.profile.goal[field].push("");
+      renderOnboardingStep();
+      const inputs = document.querySelectorAll(`#onboardingContent input[data-onboarding-list="${field}"]`);
+      if (inputs.length) inputs[inputs.length - 1].focus();
+      persistOnboardingDraft();
+    }
+
+    function toggleOnboardingListEdit(field) {
+      onboardingEditableLists[field] = !onboardingEditableLists[field];
+      renderOnboardingStep();
+    }
+
+    function removeOnboardingListItem(field, index) {
+      onboardingDraft.profile.goal[field].splice(index, 1);
+      renderOnboardingStep();
+      persistOnboardingDraft();
+    }
+
+    function toggleOnboardingEdit(id) {
+      const field = document.getElementById(id);
+      if (!field) return;
+      field.disabled = !field.disabled;
+      if (!field.disabled) field.focus();
+    }
+
+    function analyzeOnboardingGoal() {
+      const goal = onboardingDraft.profile.goal;
+      const text = String(goal.natural_text || "").trim();
+      const scoreMatch = text.match(/(?:điểm mục tiêu|mục tiêu|đrl)?\s*(\d{1,3})\s*(?:điểm|đ|\/100)/i);
+      if (scoreMatch) goal.target_score = Math.max(0, Math.min(100, Number(scoreMatch[1])));
+      const categoryTerms = [
+        ["Tình nguyện / cộng đồng", /tình nguyện|cộng đồng|hiến máu/i],
+        ["Học thuật / nghiên cứu", /học thuật|nghiên cứu|học tập|điểm số/i],
+        ["Thể thao / văn nghệ", /thể thao|văn nghệ|văn hóa/i],
+        ["Kỹ năng / nghề nghiệp", /kỹ năng|nghề nghiệp|thực tập|việc làm/i]
+      ];
+      const foundPriorities = categoryTerms.filter(([, pattern]) => pattern.test(text)).map(([label]) => label);
+      if (foundPriorities.length) goal.priorities = foundPriorities;
+      const topicMatches = ["công nghệ", "lập trình", "trí tuệ nhân tạo", "môi trường", "ngoại ngữ", "tài chính", "sức khỏe", "an toàn"]
+        .filter(topic => text.toLocaleLowerCase("vi").includes(topic));
+      if (topicMatches.length) goal.topics = topicMatches;
+      goal.format = /trực tuyến|online|webinar/i.test(text) ? "Trực tuyến" : /kết hợp|hybrid/i.test(text) ? "Kết hợp" : "Trực tiếp";
+      persistOnboardingDraft();
+      renderOnboardingStep();
+      const status = document.getElementById("onboardingAnalysisMessage");
+      if (status) status.textContent = "Đã phân tích gợi ý. Hãy kiểm tra và chỉnh sửa các trường trước khi xác nhận.";
+    }
+
+    function showOnboardingMessage(message) {
+      const box = document.getElementById("onboardingMessage");
+      if (!box) return;
+      box.textContent = message;
+      box.className = "mx-5 mt-4 rounded-xl border border-rose-500/40 bg-rose-950/40 px-3 py-2.5 text-sm text-rose-200 sm:mx-7";
+    }
+
+    function previousOnboardingStep() {
+      if (onboardingStep > 1) {
+        onboardingStep--;
+        renderOnboardingStep();
+        return;
+      }
+      onboardingDraft.profile.onboarding_started = false;
+      persistOnboardingDraft();
+      document.getElementById("onboardingModal").classList.add("hidden");
+      showWorkspace("profile");
+    }
+
+    function nextOnboardingStep() {
+      if (onboardingStep === 1) {
+        const fullName = String(onboardingDraft.full_name || "").trim();
+        let studentId;
+        try {
+          if (!fullName) throw new Error("Vui lòng nhập họ và tên.");
+          studentId = validateMssv(onboardingDraft.student_id);
+        } catch (error) {
+          showOnboardingMessage(error.message);
+          return;
+        }
+        onboardingDraft.full_name = fullName;
+        onboardingDraft.student_id = studentId;
+        onboardingStep = 2;
+        persistOnboardingDraft();
+        renderOnboardingStep();
+        return;
+      }
+      if (onboardingStep === 2) {
+        onboardingStep = 3;
+        renderOnboardingStep();
+        return;
+      }
+      if (!document.getElementById("onboardingCommitment")?.checked) {
+        showOnboardingMessage("Vui lòng xác nhận cam kết trước khi hoàn tất thiết lập.");
+        return;
+      }
+      completeOnboarding();
+    }
+
+    function completeOnboarding() {
+      const profile = onboardingDraft.profile;
+      profile.goal.target_score = Math.max(0, Math.min(100, safeNumber(profile.goal.target_score || 80)));
+      profile.drl_target = profile.goal.target_score;
+      profile.preferences = {
+        ...profile.preferences,
+        interest_fields: profile.preferences.interest_fields || profile.goal.topics.join(", "),
+        personal_goals: profile.preferences.personal_goals || profile.goal.natural_text,
+        favorite_activities: profile.preferences.favorite_activities || profile.goal.priorities.join(", ")
+      };
+      profile.completed_onboarding = true;
+      profile.onboarding_started = false;
+      currentStudent.student_id = onboardingDraft.student_id;
+      currentStudent.full_name = onboardingDraft.full_name.trim();
+      localStorage.setItem("unilife_student", JSON.stringify(currentStudent));
+      localStorage.setItem(CURRENT_USER_KEY, currentStudent.student_id);
+      saveLocalProfile(profile);
+      const data = readLocalUserData(currentStudent.student_id);
+      data.onboarding_status = "COMPLETED";
+      data.onboarding_step = 3;
+      data.planner.target_total = profile.goal.target_score || data.planner.target_total;
+      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      const users = readLocalUsers();
+      const account = users.find(user => normalizeMssv(user.student_id) === normalizeMssv(currentStudent.student_id));
+      if (account) {
+        account.full_name = currentStudent.full_name;
+        account.major = profile.faculty || account.major;
+        localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
+      }
+      persistOnboardingDraft();
+      applyCurrentStudent(currentStudent);
+      document.getElementById("onboardingModal").classList.add("hidden");
+      document.getElementById("welcomeModal").classList.remove("hidden");
+      showWorkspace("profile");
+      window.clearTimeout(welcomeTimeout);
+      welcomeTimeout = window.setTimeout(finishWelcome, 4000);
+    }
+
+    function finishWelcome() {
+      window.clearTimeout(welcomeTimeout);
+      document.getElementById("welcomeModal").classList.add("hidden");
+      renderStudentProfile();
+      switchTab("profile");
+    }
+
     async function startLocalSession(user) {
       persistCurrentUserData();
       readLocalUserData(user.student_id);
@@ -3204,8 +4067,10 @@
         const fullName = document.getElementById("registerName").value.trim();
         const mssv = validateMssv(document.getElementById("registerMssv").value);
         const password = document.getElementById("registerPassword").value;
+        const confirmPassword = document.getElementById("registerPasswordConfirm").value;
         if (!fullName) throw new Error("Vui lòng nhập họ và tên.");
         if (password.length < 8) throw new Error("Mật khẩu cần có ít nhất 8 ký tự.");
+        if (password !== confirmPassword) throw new Error("Mật khẩu xác nhận không khớp.");
 
         const users = readLocalUsers();
         if (users.some(account => normalizeMssv(account.student_id) === mssv)) {
@@ -3228,7 +4093,7 @@
         accountData.profile.profile.full_name = fullName;
         localStorage.setItem(localUserDataKey(mssv), JSON.stringify(accountData));
         localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify([...users, user]));
-        await startLocalSession(user);
+        beginOnboarding(user);
       } catch (error) {
         console.error("Local account registration failed:", error);
         showAuthMessage(error.message || "Không thể tạo tài khoản. Vui lòng thử lại.", "error");
@@ -3266,20 +4131,23 @@
       document.getElementById("headerUserName").innerText = st.full_name || "Sinh viên";
       document.getElementById("headerUserMssv").innerText = st.student_id;
       const initials = (st.full_name || "SV").split(" ").slice(-2).map(w => w[0]).join("").toUpperCase();
-      document.getElementById("headerAvatar").innerText = initials || "SV";
       const accountData = readLocalUserData(st.student_id);
       currentProfileDraft = JSON.parse(JSON.stringify(accountData.profile));
+      currentProfileDraft.profile = currentProfileDraft.profile || { full_name: "", class_name: "", major: "" };
       if (!currentProfileDraft.profile.full_name) currentProfileDraft.profile.full_name = st.full_name || "";
       profileAssistantConversation = Array.isArray(accountData.profile_assistant_history) ? accountData.profile_assistant_history : [];
       pendingProfileProposal = null;
       preferenceDraft = null;
       confirmedPreference = null;
       activePlanPreference = null;
-      customBusyIntervals = Array.isArray(accountData.manual_busy_intervals) ? JSON.parse(JSON.stringify(accountData.manual_busy_intervals)) : [];
-      assistantAvailableIntervals = [];
-      unavailableAvailabilitySlots.clear();
-      (accountData.unavailable_slots || []).forEach(key => unavailableAvailabilitySlots.add(String(key)));
-      renderProfileWorkspace();
+      const facultyLabel = document.getElementById("headerUserFaculty");
+      if (facultyLabel) facultyLabel.textContent = accountData.profile.faculty || st.major || "Chưa cập nhật khoa";
+      const headerAvatar = document.getElementById("headerAvatar");
+      if (headerAvatar) {
+        headerAvatar.innerHTML = accountData.profile.avatar_data_url
+          ? `<img src="${escapeHTML(accountData.profile.avatar_data_url)}" alt="" class="h-full w-full rounded-full object-cover" />`
+          : escapeHTML(initials || "SV");
+      }
       studentCategoryScores = normalizeStoredScores(accountData.category_scores);
       defaultBaselineTotal = Number(accountData.default_baseline_total || 0);
       savedActivitiesForStudent = accountData.saved_activities;
@@ -3298,6 +4166,9 @@
         updatePreferenceConfirmButton();
       }
       restoreLocalPlannerState(accountData);
+      restoreOnboardingBusySchedule(accountData.profile.busy_schedule, accountData);
+      renderProfileWorkspace();
+      renderStudentProfile();
     }
 
     async function syncProfileFromApi(mssv) {
@@ -3630,7 +4501,7 @@
     // TAB SWITCHER
     // ========================================================================
     function switchTab(tab, action) {
-      const tabs = ['dashboard', 'calculator', 'activities', 'snapshot', 'plan', 'testSuites', 'inspector'];
+      const tabs = ['dashboard', 'profile', 'calculator', 'activities', 'snapshot', 'plan', 'testSuites', 'inspector'];
       const taskTabButtons = {
         dashboard: ['tabBtnDashboard'],
         calculator: ['tabBtnCalculator', 'tabBtnDrlTracker'],
@@ -3668,6 +4539,9 @@
       }
       if (tab === 'snapshot') {
         runSnapshotEvaluation();
+      }
+      if (tab === 'profile') {
+        renderStudentProfile();
       }
       if (tab === 'plan' && !currentPlannerData) {
         // Auto-run first plan with default 80 on first view for seamless experience
@@ -3721,6 +4595,12 @@
       if (currentProfileDraft) currentProfileDraft.drl_target = num;
       const profileTarget = document.getElementById('profileDrlTarget');
       if (profileTarget) profileTarget.value = num;
+      if (currentStudent?.student_id) {
+        const data = readLocalUserData(currentStudent.student_id);
+        data.profile.drl_target = num;
+        if (data.profile.goal) data.profile.goal.target_score = num;
+        localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      }
       markPlanStale();
       persistCurrentUserData();
       renderWorkspaceOverview();
@@ -4046,17 +4926,52 @@
       { key: 'evening', label: 'Tối', time: '17:00–21:00', start: '17:00', end: '21:00' }
     ];
     const unavailableAvailabilitySlots = new Set();
+    const recurringAvailabilitySlots = new Set();
+    const recurringAvailabilityOverrides = new Set();
     let availabilityWeekStart = AVAILABILITY_DEFAULT_WEEK_START;
     let customBusyIntervals = [];
+
+    function restoreOnboardingBusySchedule(schedule, accountData = null) {
+      unavailableAvailabilitySlots.clear();
+      recurringAvailabilitySlots.clear();
+      recurringAvailabilityOverrides.clear();
+      (accountData?.unavailable_slots || []).forEach(key => unavailableAvailabilitySlots.add(String(key)));
+      availabilityWeekStart = /^\d{4}-\d{2}-\d{2}$/.test(schedule?.week_start || "")
+        ? schedule.week_start
+        : AVAILABILITY_DEFAULT_WEEK_START;
+      const slots = Array.isArray(schedule?.slots) ? schedule.slots : [];
+      slots.forEach(slot => {
+        const parts = String(slot).split("|");
+        if (parts.length !== 3) return;
+        const isDate = /^\d{4}-\d{2}-\d{2}$/.test(parts[1]);
+        const dayIndex = isDate ? onboardingWeekdayIndex(parts[1]) : Number(parts[1]);
+        const period = AVAILABILITY_PERIODS.find(item => item.key === parts[2]);
+        if (!Number.isInteger(dayIndex) || dayIndex < 0 || dayIndex > 6 || !period) return;
+        if (schedule?.applies_to_semester) {
+          recurringAvailabilitySlots.add(`${dayIndex}|${period.key}`);
+        } else {
+          const date = isDate ? parts[1] : addDaysToIsoDate(availabilityWeekStart, dayIndex);
+          unavailableAvailabilitySlots.add(`${date}|${period.key}`);
+        }
+      });
+      customBusyIntervals = Array.isArray(accountData?.manual_busy_intervals)
+        ? JSON.parse(JSON.stringify(accountData.manual_busy_intervals))
+        : [];
+      assistantAvailableIntervals = [];
+    }
 
     function addDaysToIsoDate(isoDate, days) {
       const [year, month, day] = isoDate.split('-').map(Number);
       return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
     }
 
-    function isAvailabilityCellBusy(date, period, activeBusyIntervals) {
+    function isAvailabilityCellBusy(date, period, activeBusyIntervals, dayIndex) {
       const key = `${date}|${period.key}`;
       if (unavailableAvailabilitySlots.has(key)) return true;
+      if (Number.isInteger(dayIndex)) {
+        const recurringKey = `${dayIndex}|${period.key}`;
+        if (recurringAvailabilitySlots.has(recurringKey) && !recurringAvailabilityOverrides.has(key)) return true;
+      }
       const cellStart = `${date}T${period.start}:00+07:00`;
       const cellEnd = `${date}T${period.end}:00+07:00`;
       return (activeBusyIntervals || []).some(item => item.start < cellEnd && item.end > cellStart);
@@ -4074,7 +4989,7 @@
         const cells = AVAILABILITY_DAYS.map((label, dayIndex) => {
           const date = addDaysToIsoDate(availabilityWeekStart, dayIndex);
           const key = `${date}|${period.key}`;
-          const free = !isAvailabilityCellBusy(date, period, activeBusyIntervals);
+          const free = !isAvailabilityCellBusy(date, period, activeBusyIntervals, dayIndex);
           return `<button type="button" data-free="${free}" aria-pressed="${!free}" aria-label="${label} ${period.label}: ${free ? 'rảnh' : 'bận'}" onclick="toggleAvailabilitySlot('${key}')" class="availability-cell rounded-xl border px-2 py-2 text-center text-[11px] font-bold">
             <span class="block">${free ? 'Rảnh' : 'Bận'}</span><span class="block mt-0.5 text-[9px] opacity-70">${period.time}</span>
           </button>`;
@@ -4098,8 +5013,18 @@
     }
 
     function toggleAvailabilitySlot(key) {
-      if (unavailableAvailabilitySlots.has(key)) unavailableAvailabilitySlots.delete(key);
-      else unavailableAvailabilitySlots.add(key);
+      const [date, periodKey] = key.split('|');
+      const weekday = new Date(`${date}T00:00:00Z`).getUTCDay();
+      const dayIndex = (weekday + 6) % 7;
+      const recurringKey = `${dayIndex}|${periodKey}`;
+      if (recurringAvailabilitySlots.has(recurringKey)) {
+        if (recurringAvailabilityOverrides.has(key)) recurringAvailabilityOverrides.delete(key);
+        else recurringAvailabilityOverrides.add(key);
+      } else if (unavailableAvailabilitySlots.has(key)) {
+        unavailableAvailabilitySlots.delete(key);
+      } else {
+        unavailableAvailabilitySlots.add(key);
+      }
       renderAvailabilityPicker();
       markPlanStale();
       persistCurrentUserData();
@@ -4107,6 +5032,8 @@
 
     function resetAvailabilityPicker() {
       unavailableAvailabilitySlots.clear();
+      recurringAvailabilitySlots.clear();
+      recurringAvailabilityOverrides.clear();
       availabilityWeekStart = AVAILABILITY_DEFAULT_WEEK_START;
       customBusyIntervals = [];
       assistantAvailableIntervals = [];
@@ -4190,9 +5117,19 @@
     function updateBusySlotsBadge() {
       const badge = document.getElementById('busySlotsBadge');
       if (!badge) return;
+      const busySlots = new Set(unavailableAvailabilitySlots);
+      for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+        const date = addDaysToIsoDate(availabilityWeekStart, dayIndex);
+        AVAILABILITY_PERIODS.forEach(period => {
+          const key = `${date}|${period.key}`;
+          if (recurringAvailabilitySlots.has(`${dayIndex}|${period.key}`) && !recurringAvailabilityOverrides.has(key)) {
+            busySlots.add(key);
+          }
+        });
+      }
       const weeklyBusyCount = (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'busy').length;
       const exceptionBusyCount = (currentProfileDraft.exceptions || []).filter(item => item.kind === 'busy').length;
-      const count = unavailableAvailabilitySlots.size + customBusyIntervals.length + weeklyBusyCount + exceptionBusyCount;
+      const count = busySlots.size + customBusyIntervals.length + weeklyBusyCount + exceptionBusyCount;
       badge.innerText = count ? `${count} khung bận` : 'Tất cả rảnh';
       if (count > 0) {
         badge.className = "px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950/70 text-amber-300 border border-amber-500/30";
@@ -4216,12 +5153,35 @@
 
     function collectBusyIntervals() {
       const intervals = [...customBusyIntervals];
-      unavailableAvailabilitySlots.forEach(key => {
+      const busySlots = new Set(unavailableAvailabilitySlots);
+      for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+        const date = addDaysToIsoDate(availabilityWeekStart, dayIndex);
+        AVAILABILITY_PERIODS.forEach(period => {
+          const key = `${date}|${period.key}`;
+          if (recurringAvailabilitySlots.has(`${dayIndex}|${period.key}`) && !recurringAvailabilityOverrides.has(key)) {
+            busySlots.add(key);
+          }
+        });
+      }
+      busySlots.forEach(key => {
         const [date, periodKey] = key.split('|');
         const period = AVAILABILITY_PERIODS.find(item => item.key === periodKey);
         if (!period || !date) return;
         intervals.push({ start: `${date}T${period.start}:00+07:00`, end: `${date}T${period.end}:00+07:00` });
       });
+      const recurringRules = [...recurringAvailabilitySlots].map(item => {
+        const [weekdayStr, periodKey] = String(item).split('|');
+        const period = AVAILABILITY_PERIODS.find(p => p.key === periodKey);
+        return period ? { weekday: Number(weekdayStr), start: period.start, end: period.end, periodKey } : null;
+      }).filter(Boolean);
+      if (recurringRules.length) {
+        expandWeeklyProfileIntervals(recurringRules, '2026-10-01', '2027-03-31').forEach(interval => {
+          const date = interval.start.slice(0, 10);
+          const period = AVAILABILITY_PERIODS.find(p => `${date}T${p.start}:00+07:00` === interval.start && `${date}T${p.end}:00+07:00` === interval.end);
+          if (period && recurringAvailabilityOverrides.has(`${date}|${period.key}`)) return;
+          intervals.push({ start: interval.start, end: interval.end });
+        });
+      }
       intervals.push(...expandWeeklyProfileIntervals(
         (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'busy'),
         '2026-10-01',
@@ -6371,6 +7331,11 @@
             major: account.major || "Sinh viên",
             demo_only: true
           };
+          const accountData = readLocalUserData(account.student_id);
+          if (accountData.profile.onboarding_started && !accountData.profile.completed_onboarding) {
+            beginOnboarding(account);
+            return;
+          }
           await applyCurrentStudent(currentStudent);
           if (!maybeStartOnboarding()) showWorkspace();
         } catch (error) {
