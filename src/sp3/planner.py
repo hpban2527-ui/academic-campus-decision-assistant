@@ -82,7 +82,7 @@ from sp3.contract import (
     validate_baseline,
     validate_context,
     validate_intervals,
-    validate_keep_requests,
+    parse_keep_requests,
     validate_participation,
     validate_plan_version,
     validate_previous_plan,
@@ -162,8 +162,14 @@ class _PlannerInput:
     previous: PreviousPlan | None
     previous_json: Mapping[str, tuple[Mapping[str, str], ...]]
     kept: tuple[str, ...]
+    forced: tuple[str, ...]
     retained: frozenset[str]
     based_on: Mapping[str, Any]
+
+    @property
+    def required(self) -> tuple[str, ...]:
+        """Base set of every plan: KEEP_TIME and FORCE_INCLUDE activities, sorted by ID."""
+        return tuple(sorted((*self.kept, *self.forced)))
 
     def eligible(self, candidate: _Candidate) -> bool:
         """Selectable: FEASIBLE, progress NOT_STARTED and not already counted."""
@@ -338,28 +344,29 @@ def build_plan(
         plan = _parse_input(planner_input)
     except ContractError as error:
         return _invalid_input_output(planner_input, error)
-    conflicts = _keep_conflicts(plan)
+    extra = tuple(c for c in plan.candidates if plan.eligible(c) and c.activity_id not in plan.required)
+    use_guided = len(extra) > 12
+    scheduling = _Scheduling(plan, max_flexible_per_set, fast_flexible=use_guided)
+    conflicts = _keep_conflicts(plan, scheduling)
     if conflicts:
         return _keep_conflict_output(plan, conflicts)
 
-    extra = tuple(c for c in plan.candidates if plan.eligible(c) and c.activity_id not in plan.kept)
-    use_guided = len(extra) > 12
-    scheduling = _Scheduling(plan, max_flexible_per_set, fast_flexible=use_guided)
     scorer = _Scorer(plan, score_plan)
     flags = _SearchFlags()
     try:
-        base_schedule = scheduling(plan.kept)
-        # Keep requests passed _keep_conflicts, so the kept blocks are a valid schedule.
+        base_schedule = scheduling(plan.required)
+        # Keep requests passed _keep_conflicts, so the required set has a valid schedule.
         assert base_schedule.status is ScheduleStatus.SCHEDULED
         base = _evaluate(
             plan,
             scorer,
-            plan.kept,
+            plan.required,
             base_schedule,
             preference_utility,
             personalization_strategy,
         )
-        if plan.previous is None and base.meets_targets:
+        # ALREADY_MET is the empty plan; a forced base set that meets the targets is a normal plan.
+        if plan.previous is None and not plan.forced and base.meets_targets:
             return _already_met_output(plan, base, scheduling)
         search = _guided_search if use_guided else _search
         outcome = search(
@@ -440,7 +447,7 @@ def _parse_input(planner_input: Mapping[str, Any]) -> _PlannerInput:
     conflicts = _parse_conflicts(planner_input["conflict_pairs"], set(ids))
     _check_conflict_coverage(candidates, conflicts)
     previous = validate_previous_plan(planner_input["previous_plan"], "planner_input.previous_plan")
-    kept = validate_keep_requests(planner_input["keep_requests"], previous, "planner_input.keep_requests")
+    keeps = parse_keep_requests(planner_input["keep_requests"], previous, "planner_input.keep_requests")
     ordered = tuple(sorted(candidates, key=lambda c: c.activity_id))
     by_id = {c.activity_id: c for c in ordered}
     included = frozenset(baseline["included_activity_ids"])
@@ -472,7 +479,8 @@ def _parse_input(planner_input: Mapping[str, Any]) -> _PlannerInput:
         included=included,
         previous=previous,
         previous_json=previous_json,
-        kept=tuple(sorted(kept)),
+        kept=tuple(sorted(keeps.keep_time)),
+        forced=tuple(sorted(keeps.force_include)),
         retained=retained,
         based_on=build_based_on(context, None if previous is None else previous.plan_version),
     )
@@ -608,59 +616,99 @@ def _check_conflict_coverage(candidates: Sequence[_Candidate], conflicts: frozen
 
 # --- Keep requests (section 10.4) -------------------------------------------
 
-def _keep_conflicts(plan: _PlannerInput) -> list[dict[str, Any]]:
-    """Every conflict of the keep requests, listed per kept activity.
+def _keep_conflicts(plan: _PlannerInput, scheduling: _Scheduling) -> list[dict[str, Any]]:
+    """Every conflict of the keep requests, listed per required activity.
 
-    Per activity, the first that applies: NOT_LISTED, NOT_ELIGIBLE,
-    FIXED_CHANGED, BLOCK_INVALID. For each pair of kept activities that pass
-    those checks: BLOCK_OVERLAP when their kept blocks overlap, otherwise
-    CONFLICT when the pair is a declared conflict. For the whole keep set:
-    LIMIT on every kept activity when the number of kept activities, or the
-    planned minutes of those that pass, exceed a stated limit. Entries are
+    Required activities are the KEEP_TIME and FORCE_INCLUDE ones. Per activity,
+    the first that applies: NOT_LISTED, NOT_ELIGIBLE; for KEEP_TIME only,
+    FIXED_CHANGED, BLOCK_INVALID. For each pair of required activities that pass
+    those checks: BLOCK_OVERLAP when their known blocks overlap (kept blocks, or
+    the sessions of a forced FIXED activity), otherwise CONFLICT when the pair is
+    a declared conflict. Then NO_TIME: a FORCE_INCLUDE activity without any
+    conflict above that the scheduler cannot place together with the
+    conflict-free KEEP_TIME blocks, or, when each fits alone, every such forced
+    activity if they cannot all be placed together. For the whole keep set:
+    LIMIT on every required activity when the number of required activities, or
+    the planned minutes of those that pass, exceed a stated limit. Entries are
     ordered by activity ID, then code order, then the other activity's ID.
     """
-    if not plan.kept:
+    required = plan.required
+    if not required:
         return []
-    assert plan.previous is not None
-    # (code, other kept activity or "", message) per kept activity.
-    found: dict[str, list[tuple[KeepConflictCode, str, str]]] = {activity_id: [] for activity_id in plan.kept}
+    # (code, other required activity or "", message) per required activity.
+    found: dict[str, list[tuple[KeepConflictCode, str, str]]] = {activity_id: [] for activity_id in required}
     valid: list[str] = []
-    for activity_id in plan.kept:
+    for activity_id in required:
         candidate = plan.by_id.get(activity_id)
-        blocks = plan.previous.blocks[activity_id]
         if candidate is None:
-            found[activity_id].append((KeepConflictCode.NOT_LISTED, "", "The kept activity is no longer listed among the candidates."))
+            found[activity_id].append((KeepConflictCode.NOT_LISTED, "", f"The {_noun(plan, activity_id)} activity is no longer listed among the candidates."))
         elif not plan.eligible(candidate):
             found[activity_id].append((KeepConflictCode.NOT_ELIGIBLE, "", _ineligible_message(plan, candidate)))
-        elif candidate.schedule.type is ScheduleType.FIXED and not same_instants(blocks, candidate.schedule.fixed_blocks):
-            found[activity_id].append((KeepConflictCode.FIXED_CHANGED, "", "The fixed sessions changed since the previous plan."))
-        elif candidate.schedule.type is ScheduleType.FLEXIBLE_WINDOW and not valid_flexible_blocks(candidate.schedule, blocks, plan.available, *plan.window):
-            found[activity_id].append((KeepConflictCode.BLOCK_INVALID, "", "The kept block is no longer one sitting inside the usable window and available time."))
+        elif activity_id in plan.kept:
+            blocks = plan.previous.blocks[activity_id]
+            if candidate.schedule.type is ScheduleType.FIXED and not same_instants(blocks, candidate.schedule.fixed_blocks):
+                found[activity_id].append((KeepConflictCode.FIXED_CHANGED, "", "The fixed sessions changed since the previous plan."))
+            elif candidate.schedule.type is ScheduleType.FLEXIBLE_WINDOW and not valid_flexible_blocks(candidate.schedule, blocks, plan.available, *plan.window):
+                found[activity_id].append((KeepConflictCode.BLOCK_INVALID, "", "The kept block is no longer one sitting inside the usable window and available time."))
+            else:
+                valid.append(activity_id)
         else:
             valid.append(activity_id)
     for index, left in enumerate(valid):
         for right in valid[index + 1:]:
-            if any(overlaps(a, b) for a in plan.previous.blocks[left] for b in plan.previous.blocks[right]):
-                code, text = KeepConflictCode.BLOCK_OVERLAP, "The kept block overlaps kept activity {}."
+            left_blocks, right_blocks = _known_blocks(plan, left), _known_blocks(plan, right)
+            if left_blocks and right_blocks and any(overlaps(a, b) for a in left_blocks for b in right_blocks):
+                noun = "kept" if left in plan.kept and right in plan.kept else "required"
+                code, text = KeepConflictCode.BLOCK_OVERLAP, f"The {noun} block overlaps {noun} activity {{}}."
             elif frozenset((left, right)) in plan.conflicts:
-                code, text = KeepConflictCode.CONFLICT, "The kept activity conflicts with kept activity {}."
+                noun = "kept" if left in plan.kept and right in plan.kept else "required"
+                code, text = KeepConflictCode.CONFLICT, f"The {noun} activity conflicts with {noun} activity {{}}."
             else:
                 continue
             found[left].append((code, right, text.format(right)))
             found[right].append((code, left, text.format(left)))
+    forced = [activity_id for activity_id in plan.forced if not found[activity_id]]
+    if forced:
+        kept = [activity_id for activity_id in plan.kept if not found[activity_id]]
+        unplaced = []
+        for activity_id in forced:
+            status = scheduling((*kept, activity_id)).status
+            if status is not ScheduleStatus.SCHEDULED:
+                unplaced.append((activity_id, status))
+        for activity_id, status in unplaced:
+            found[activity_id].append((KeepConflictCode.NO_TIME, "", (
+                "No free slot places the forced activity together with the kept blocks."
+                if status is ScheduleStatus.UNSCHEDULABLE
+                else "Placing the forced activity was not determined within the scheduling limit."
+            )))
+        if not unplaced and scheduling((*kept, *forced)).status is not ScheduleStatus.SCHEDULED:
+            for activity_id in forced:
+                found[activity_id].append((KeepConflictCode.NO_TIME, "", "The forced activities cannot all be placed together with the kept blocks."))
     limits = plan.limits
     minutes = math.fsum(plan.by_id[activity_id].minutes for activity_id in valid)
-    if (limits.max_activities is not None and len(plan.kept) > limits.max_activities) or (
+    if (limits.max_activities is not None and len(required) > limits.max_activities) or (
         limits.max_duration_minutes is not None and minutes > limits.max_duration_minutes + ABS_TOLERANCE
     ):
-        for activity_id in plan.kept:
-            found[activity_id].append((KeepConflictCode.LIMIT, "", "Keeping every kept activity exceeds a stated limit."))
+        for activity_id in required:
+            found[activity_id].append((KeepConflictCode.LIMIT, "", f"Keeping every {'required' if plan.forced else 'kept'} activity exceeds a stated limit."))
     order = list(KeepConflictCode)
     return [
         {"activity_id": activity_id, "code": code.value, "message": message}
-        for activity_id in plan.kept
+        for activity_id in required
         for code, _, message in sorted(found[activity_id], key=lambda item: (order.index(item[0]), item[1]))
     ]
+
+
+def _noun(plan: _PlannerInput, activity_id: str) -> str:
+    return "kept" if activity_id in plan.kept else "required"
+
+
+def _known_blocks(plan: _PlannerInput, activity_id: str) -> tuple[Interval, ...]:
+    """Blocks fixed before scheduling: kept blocks or a forced FIXED activity's sessions."""
+    if activity_id in plan.kept:
+        return plan.previous.blocks[activity_id]
+    schedule = plan.by_id[activity_id].schedule
+    return schedule.fixed_blocks if schedule is not None and schedule.type is ScheduleType.FIXED else ()
 
 
 def _ineligible_message(plan: _PlannerInput, candidate: _Candidate) -> str:
@@ -818,11 +866,11 @@ def _guided_search(
     pool = _select_working_pool(plan, extra, 40)
     max_added = min(
         len(pool),
-        10 if plan.limits.max_activities is None else max(0, plan.limits.max_activities - len(plan.kept)),
+        10 if plan.limits.max_activities is None else max(0, plan.limits.max_activities - len(plan.required)),
     )
     if max_added <= 0:
         return _SearchOutcome(base, _SearchStop.BUDGET)
-    kept = set(plan.kept)
+    kept = set(plan.required)
     options = tuple(c for c in pool if not any(frozenset((c.activity_id, k)) in plan.conflicts for k in kept))
     best = base
     met_size: int | None = len(base.activity_ids) if base.meets_targets else None
@@ -859,7 +907,7 @@ def _guided_search(
     for candidate in options:
         if scorer.evaluated >= budget:
             break
-        subset = tuple(sorted((*plan.kept, candidate.activity_id)))
+        subset = tuple(sorted((*plan.required, candidate.activity_id)))
         found = evaluate(subset)
         if found is not None:
             singles.append((candidate, found))
@@ -907,7 +955,7 @@ def _guided_search(
         if scorer.evaluated >= budget or not beam:
             break
         if plan.previous is None and personalization_strategy != "PREFERENCE_FIRST":
-            if met_size is not None and len(plan.kept) + size > met_size:
+            if met_size is not None and len(plan.required) + size > met_size:
                 break
         next_beam: dict[tuple[str, ...], _Evaluation] = {}
         for parent in beam:
@@ -955,7 +1003,8 @@ def _search(
     changes, so every valid subset is scored up to the budget.
     """
     best = base
-    met_size: int | None = None
+    # A forced base set can meet every target before anything is added (no previous plan).
+    met_size: int | None = len(base.activity_ids) if base.meets_targets else None
     # PREFERENCE_FIRST may intentionally choose a larger set with greater
     # utility, so the v0.2 activity-count dominance proof no longer applies.
     prune_dominated = plan.previous is None and personalization_strategy != "PREFERENCE_FIRST"
@@ -994,7 +1043,7 @@ def _valid_subsets(
     and no larger subset exists once a size produces none. An UNDETERMINED
     subset is neither yielded nor extended; it is recorded in ``flags``.
     """
-    kept = plan.kept
+    kept = plan.required
     addable = [c for c in extra if not any(frozenset((c.activity_id, k)) in plan.conflicts for k in kept)]
     ids = [c.activity_id for c in addable]
     minutes = [c.minutes for c in addable]

@@ -10,15 +10,23 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Mapping, Sequence
 from urllib.parse import urlparse
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 CONTRACT_VERSION = "sp3-planner/0.2"
 TIMEZONE = "Asia/Ho_Chi_Minh"
+_VIETNAM_TZ = timezone(timedelta(hours=7))
+
+
+def _local_timezone():
+    try:
+        return ZoneInfo(TIMEZONE)
+    except ZoneInfoNotFoundError:
+        return _VIETNAM_TZ
 
 _REQUEST_FIELDS = {
     "contract_version",
@@ -532,7 +540,7 @@ def _resolve_schedule(
     if parsed.start >= parsed.end:
         return None, {"UNSUPPORTED_SCHEDULE"}
     mode = parsed.entry["activity"]["mode"]
-    local_timezone = ZoneInfo(TIMEZONE)
+    local_timezone = _local_timezone()
     same_local_date = (
         parsed.start.astimezone(local_timezone).date()
         == parsed.end.astimezone(local_timezone).date()

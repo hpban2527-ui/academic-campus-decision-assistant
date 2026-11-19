@@ -66,7 +66,7 @@ from sp3.contract import (
     valid_flexible_blocks,
     validate_blocks,
     validate_intervals,
-    validate_keep_requests,
+    parse_keep_requests,
     validate_participation,
     validate_previous_plan,
     validate_schedule,
@@ -144,7 +144,10 @@ class _Checker:
         self.window = tuple(timestamp(context[key], "context." + key) for key in ("window_start", "window_end", "as_of"))
         self.available = validate_intervals(planner_input["available_intervals"], "available_intervals")
         self.previous = validate_previous_plan(planner_input["previous_plan"], "previous_plan")
-        self.kept = sorted(validate_keep_requests(planner_input["keep_requests"], self.previous, "keep_requests"))
+        keeps = parse_keep_requests(planner_input["keep_requests"], self.previous, "keep_requests")
+        self.kept = sorted(keeps.keep_time)
+        self.forced = sorted(keeps.force_include)
+        self.required = sorted(keeps.required)
         self.previous_blocks = {} if self.previous is None else dict(self.previous.blocks)
         self.retained = {
             activity_id for activity_id in self.previous_blocks
@@ -170,9 +173,9 @@ class _Checker:
             self.check_based_on()
             if self.output["pending_confirmation"] != self.pending_confirmation():
                 self.flag("PENDING_CONFIRMATION", "pending_confirmation must list completed, uncounted activities.")
-        expected_conflicts = self.expected_keep_conflicts()
+        expected_conflicts, undecided = self.expected_keep_conflicts()
         if status == PlannerStatus.KEEP_CONFLICT.value:
-            self.check_keep_conflict(expected_conflicts)
+            self.check_keep_conflict(expected_conflicts, undecided)
             return
         if self.output["keep_conflicts"]:
             self.flag("KEEP_CONFLICT_SHAPE", "keep_conflicts must be empty unless the status is KEEP_CONFLICT.")
@@ -264,30 +267,37 @@ class _Checker:
     def minutes(self, activity_id: str) -> float:
         return self.schedules[activity_id].planned_minutes
 
-    def expected_keep_conflicts(self) -> list[tuple[str, str]]:
+    def expected_keep_conflicts(self) -> tuple[list[tuple[str, str]], set[str]]:
         """(activity_id, code) entries that section 10.4 requires, in output order.
 
-        Pair-level codes appear once per other kept activity, ordered by its ID.
+        Pair-level codes appear once per other required activity, ordered by its
+        ID. The second value lists forced activities whose NO_TIME entry the
+        brute force cannot decide (too many flexible activities); a planner
+        NO_TIME entry for those is accepted, its absence too.
         """
-        if not self.kept:
-            return []
-        found: dict[str, list[tuple[str, str]]] = {activity_id: [] for activity_id in self.kept}
+        if not self.required:
+            return [], set()
+        found: dict[str, list[tuple[str, str]]] = {activity_id: [] for activity_id in self.required}
         passing = []
-        for activity_id in self.kept:
-            blocks = self.previous_blocks[activity_id]
+        for activity_id in self.required:
             schedule = self.schedules.get(activity_id)
             if activity_id not in self.candidates:
                 found[activity_id].append((KeepConflictCode.NOT_LISTED.value, ""))
             elif not self.is_eligible(activity_id):
                 found[activity_id].append((KeepConflictCode.NOT_ELIGIBLE.value, ""))
-            elif schedule.type is ScheduleType.FIXED and not same_instants(blocks, schedule.fixed_blocks):
-                found[activity_id].append((KeepConflictCode.FIXED_CHANGED.value, ""))
-            elif schedule.type is ScheduleType.FLEXIBLE_WINDOW and not valid_flexible_blocks(schedule, blocks, self.available, *self.window):
-                found[activity_id].append((KeepConflictCode.BLOCK_INVALID.value, ""))
+            elif activity_id in self.kept:
+                blocks = self.previous_blocks[activity_id]
+                if schedule.type is ScheduleType.FIXED and not same_instants(blocks, schedule.fixed_blocks):
+                    found[activity_id].append((KeepConflictCode.FIXED_CHANGED.value, ""))
+                elif schedule.type is ScheduleType.FLEXIBLE_WINDOW and not valid_flexible_blocks(schedule, blocks, self.available, *self.window):
+                    found[activity_id].append((KeepConflictCode.BLOCK_INVALID.value, ""))
+                else:
+                    passing.append(activity_id)
             else:
                 passing.append(activity_id)
         for left, right in combinations(passing, 2):
-            if any(overlaps(a, b) for a in self.previous_blocks[left] for b in self.previous_blocks[right]):
+            left_blocks, right_blocks = self.known_blocks(left), self.known_blocks(right)
+            if left_blocks and right_blocks and any(overlaps(a, b) for a in left_blocks for b in right_blocks):
                 code = KeepConflictCode.BLOCK_OVERLAP.value
             elif frozenset((left, right)) in self.conflicts:
                 code = KeepConflictCode.CONFLICT.value
@@ -295,21 +305,47 @@ class _Checker:
                 continue
             found[left].append((code, right))
             found[right].append((code, left))
+        undecided: set[str] = set()
+        forced = [activity_id for activity_id in self.forced if not found[activity_id]]
+        if forced:
+            kept = [activity_id for activity_id in self.kept if not found[activity_id]]
+            unplaced = []
+            for activity_id in forced:
+                joint = self.schedulable([*kept, activity_id])
+                if joint is None:
+                    undecided.add(activity_id)
+                elif not joint:
+                    unplaced.append(activity_id)
+            for activity_id in unplaced:
+                found[activity_id].append((KeepConflictCode.NO_TIME.value, ""))
+            if not unplaced and not undecided:
+                if self.schedulable([*kept, *forced]) is False:
+                    for activity_id in forced:
+                        found[activity_id].append((KeepConflictCode.NO_TIME.value, ""))
+            elif not unplaced:
+                undecided = set(forced)
         limits = self.input["limits"]
         minutes = math.fsum(self.minutes(a) for a in passing)
-        if (limits["max_activities"] is not None and len(self.kept) > limits["max_activities"]) or (
+        if (limits["max_activities"] is not None and len(self.required) > limits["max_activities"]) or (
             limits["max_duration_minutes"] is not None and minutes > limits["max_duration_minutes"] + ABS_TOLERANCE
         ):
-            for activity_id in self.kept:
+            for activity_id in self.required:
                 found[activity_id].append((KeepConflictCode.LIMIT.value, ""))
         order = [code.value for code in KeepConflictCode]
         return [
             (activity_id, code)
-            for activity_id in self.kept
+            for activity_id in self.required
             for code, _ in sorted(found[activity_id], key=lambda item: (order.index(item[0]), item[1]))
-        ]
+        ], undecided
 
-    def check_keep_conflict(self, expected: list[tuple[str, str]]) -> None:
+    def known_blocks(self, activity_id: str) -> tuple[Interval, ...]:
+        """Blocks fixed before scheduling: kept blocks or a forced FIXED activity's sessions."""
+        if activity_id in self.kept:
+            return self.previous_blocks[activity_id]
+        schedule = self.schedules[activity_id]
+        return schedule.fixed_blocks if schedule.type is ScheduleType.FIXED else ()
+
+    def check_keep_conflict(self, expected: list[tuple[str, str]], undecided: set[str]) -> None:
         output = self.output
         if output["selected_activities"] or output["excluded_candidates"] or output["dropped_activities"]:
             self.flag("KEEP_CONFLICT_SHAPE", "KEEP_CONFLICT must not select, exclude or drop activities.")
@@ -323,8 +359,11 @@ class _Checker:
         for entry in entries:
             if set(entry) != KEEP_CONFLICT_FIELDS or not isinstance(entry["message"], str) or not entry["message"].strip():
                 self.flag("KEEP_CONFLICT_SHAPE", "keep_conflicts entries need activity_id, code and a message.")
-        listed = [(entry["activity_id"], entry["code"]) for entry in entries]
-        if not expected or listed != expected:
+        listed = [
+            (entry["activity_id"], entry["code"]) for entry in entries
+            if not (entry["code"] == KeepConflictCode.NO_TIME.value and entry["activity_id"] in undecided)
+        ]
+        if (not expected and not undecided) or listed != expected:
             self.flag("KEEP_CONFLICT_MISMATCH", "keep_conflicts must list every section 10.4 conflict in order.")
 
     # Selection and exclusions
@@ -377,6 +416,9 @@ class _Checker:
         for activity_id in self.kept:
             if activity_id not in parsed or not same_instants(parsed[activity_id], self.previous_blocks[activity_id]):
                 self.flag("KEEP_NOT_HONORED", "a kept activity must be selected with its previous blocks.", activity_id)
+        for activity_id in self.forced:
+            if activity_id not in parsed:
+                self.flag("FORCE_NOT_HONORED", "a force-included activity must be selected.", activity_id)
         for left, right in combinations(selected_ids, 2):
             if frozenset((left, right)) in self.conflicts:
                 self.flag("SELECTED_CONFLICT", f"selected activities {left} and {right} conflict.", left)
@@ -510,7 +552,7 @@ class _Checker:
 
         Returns None when a subset is too large for the brute force.
         """
-        extras = [a for a in self.eligible_ids() if a not in self.kept]
+        extras = [a for a in self.eligible_ids() if a not in self.required]
         total = 0
         uncertain = False
 
@@ -532,7 +574,7 @@ class _Checker:
                         continue
                 visit(index + 1, candidate)
 
-        visit(0, list(self.kept))
+        visit(0, list(self.required))
         return None if uncertain else total
 
     def check_search(self, status: str, selected_ids: list[str]) -> None:

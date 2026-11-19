@@ -26,7 +26,7 @@ def test_interpret_sends_schema_and_validates_output(valid_preference_payload):
         assert body["think"] is False
         assert body["keep_alive"] == "30m"
         assert body["options"]["temperature"] == 0
-        assert body["options"]["num_predict"] == 512
+        assert body["options"]["num_predict"] == 1024
         assert body["format"]["type"] == "object"
         assert body["messages"][1]["content"] == "Em thích toán"
         return httpx.Response(
