@@ -967,8 +967,9 @@ vm.runInContext(mainScript, sandbox);
     assert mon_16 == [("2026-11-16T07:00:00+07:00", "2026-11-16T21:00:00+07:00")]
 
 
+
 @pytest.mark.skipif(shutil.which("node") is None, reason="Node.js is required for frontend integration test")
-def test_task5_options_cards_duplicates_partial_failure_and_review_contract() -> None:
+def test_task5_options_cards_duplicates_partial_failure_and_review_navigation() -> None:
     pref = StudentPreference.model_validate({
         "topic_preferences": [{"topic_id": "technology", "weight": 5}],
         "category_priorities": [{"category_id": "C1", "weight": 5}],
@@ -982,7 +983,6 @@ def test_task5_options_cards_duplicates_partial_failure_and_review_contract() ->
     real_opts = real_plan_options(pref, target_total=80, busy_intervals=[], availability_request=None)
     assert [o["strategy"] for o in real_opts["options"]] == ["MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"]
 
-    # Build a synthetic partial-failure + duplicate payload derived from real_opts
     opts_with_dup_and_fail = json.loads(json.dumps(real_opts["options"]))
     opts_with_dup_and_fail[1]["duplicate_of"] = "MINIMUM_EFFORT"
     opts_with_dup_and_fail[2] = {
@@ -1046,15 +1046,17 @@ vm.runInContext(mainScript, sandbox);
   sandbox.__realOptions = {json.dumps(real_opts["options"])};
   sandbox.__mixedOptions = {json.dumps(opts_with_dup_and_fail)};
 
-  // 1. Render real-source 3 strategy cards
+  // 1. Real-source 3 strategy cards
   vm.runInContext(`
+    SP3_SOURCE = 'real';
     cachedPlanOptions = __realOptions;
     selectedPlanOptionIndex = initialReadyPlanOptionIndex(__realOptions, 'BALANCED');
+    setPlannerScreenMode('options');
     renderPlanOptionsSelector();
   `, sandbox);
   const realCardsHtml = sandbox.document.getElementById('planOptionsSelector').innerHTML;
 
-  // 2. Render duplicate + partial failure cards, verify selecting ready card 1 works and failed card 2 is ignored
+  // 2. Duplicate + partial failure cards: selecting ready card 1 works, failed card 2 is ignored
   vm.runInContext(`
     cachedPlanOptions = __mixedOptions;
     selectedPlanOptionIndex = 0;
@@ -1062,30 +1064,22 @@ vm.runInContext(mainScript, sandbox);
     selectCachedPlanOption(2);
   `, sandbox);
   const mixedHtml = sandbox.document.getElementById('planOptionsSelector').innerHTML;
-  const selectedAfterMixed = vm.runInContext("selectedPlanOptionIndex", sandbox);
+  const selectedAfterMixed = vm.runInContext('selectedPlanOptionIndex', sandbox);
 
-  // 3. Open dedicated review screen -> test missing contract message, then registered contract delegation
+  // 3. Mutually exclusive Options <-> Review screens + Back button + real-source swap disabled
   sandbox.openPlanReviewScreen(1);
-  const reviewHidden = sandbox.document.getElementById('planReviewScreen').classList.contains('hidden');
-  const reviewHtml = sandbox.document.getElementById('planReviewScreen').innerHTML;
-  await sandbox.confirmSelectedPlanViaContract();
-  const missingContractMsg = sandbox.document.getElementById('planReviewConfirmStatus').textContent;
-
-  let delegatedPayload = null;
-  sandbox.window.UniLifePlanReviewContract = {{
-    async confirmPlan(payload) {{ delegatedPayload = payload; }}
+  const onReview = {{
+    optionsHidden: sandbox.document.getElementById('smartPlanSection').classList.contains('hidden'),
+    reviewHidden: sandbox.document.getElementById('planReviewScreen').classList.contains('hidden'),
+    reviewHtml: sandbox.document.getElementById('planReviewScreen').innerHTML,
   }};
-  await sandbox.confirmSelectedPlanViaContract();
+  sandbox.setPlannerScreenMode('options');
+  const afterBack = {{
+    optionsHidden: sandbox.document.getElementById('smartPlanSection').classList.contains('hidden'),
+    reviewHidden: sandbox.document.getElementById('planReviewScreen').classList.contains('hidden'),
+  }};
 
-  console.log(JSON.stringify({{
-    realCardsHtml,
-    mixedHtml,
-    selectedAfterMixed,
-    reviewHidden,
-    reviewHtml,
-    missingContractMsg,
-    delegatedStrategy: delegatedPayload?.strategy || null
-  }}));
+  console.log(JSON.stringify({{ realCardsHtml, mixedHtml, selectedAfterMixed, onReview, afterBack }}));
 }})();
 """
     raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
@@ -1099,167 +1093,27 @@ vm.runInContext(mainScript, sandbox);
     assert "Trùng lịch với phương án" in res["mixedHtml"]
     assert res["selectedAfterMixed"] == 1
 
-    assert res["reviewHidden"] is False
-    assert "Màn hình Rà soát kế hoạch" in res["reviewHtml"]
-    assert "Chưa có module confirmed_plan của Thảo Duyên" in res["missingContractMsg"]
-    assert res["delegatedStrategy"] == "BALANCED"
-
-
-
-
-
-
-
-
-  // 1. Create account, finish onboarding with initial schedule + score_history + avatar
-  const user = { student_id: '25127444', full_name: 'Tab Tester', class: '25CTT1', major: 'CNTT' };
-  const initData = sandbox.createDefaultLocalUserData(user.student_id, true);
-  initData.profile.score_history = [{ semester: 'HK2 2025-2026', score: 86 }];
-  initData.profile.avatar_data_url = 'data:image/png;base64,abc';
-  sandbox.localStorage.setItem('unilife_data_' + user.student_id, JSON.stringify(initData));
-  sandbox.localStorage.setItem('unilife_users', JSON.stringify([user]));
-  sandbox.beginOnboarding(user);
-  vm.runInContext(`
-    nextOnboardingStep();
-    setOnboardingSemesterBusy(true);
-    addOnboardingBusyEntry({ category: 'class', weekday: 0, date: '2026-11-09', start: '08:00', end: '10:00' });
-    setOnboardingWeeklyHours('5');
-    nextOnboardingStep();
-    selectOnboardingTargetPreset(80);
-    selectOnboardingCategoryChoice('C1');
-    selectOnboardingModeChoice('prefer_online');
-    selectOnboardingCampusChoice('prefer_nvc');
-    toggleOnboardingTopicId('technology');
-    finishOnboardingTopics(false);
-    nextOnboardingStep();
-  `, sandbox);
-  await vm.runInContext("applyCurrentStudent({ student_id: '25127444', full_name: 'Tab Tester', major: 'CNTT' })", sandbox);
-
-  // 2. Test tab switching: Hồ sơ <-> Lịch
-  vm.runInContext("setProfileScheduleTab('schedule');", sandbox);
-  const onScheduleTab = snap("({ tab: activeProfileScheduleTab, profileHidden: document.getElementById('profileSchedulePanelProfile').classList.contains('hidden'), scheduleHidden: document.getElementById('profileSchedulePanelSchedule').classList.contains('hidden') })");
-  vm.runInContext("setProfileScheduleTab('profile');", sandbox);
-  const onProfileTab = snap("({ tab: activeProfileScheduleTab, profileHidden: document.getElementById('profileSchedulePanelProfile').classList.contains('hidden'), scheduleHidden: document.getElementById('profileSchedulePanelSchedule').classList.contains('hidden') })");
-
-  // 3. Edit Hồ sơ sub-tab & save -> verify unrelated fields preserved
-  vm.runInContext(`
-    document.getElementById('psFullName').value = 'Tab Tester Updated';
-    document.getElementById('psFaculty').value = 'Khoa Toán - Tin';
-    document.getElementById('psCohort').value = '2024';
-    document.getElementById('psProgram').value = 'Chất lượng cao';
-    document.getElementById('psSemester').value = 'HK3 · 2025–2026';
-    document.getElementById('psDrlTarget').value = '92';
-    psSelectCategory('C4');
-    psSelectMode('online_only');
-    psSelectCampus('only_nvc');
-    psToggleTopic('volunteer');
-    saveProfileScheduleEdits();
-  `, sandbox);
-
-  // 4. Attach an existing plan with a scheduled activity on Tuesday 2026-11-10 09:00-11:00, then drag a conflicting busy block in Lịch tab
-  vm.runInContext(`
-    const existingPlan = {
-      plan: {
-        selected_activities: [{
-          activity_id: 'SEM-A',
-          scheduled_blocks: [{ start: '2026-11-10T09:00:00+07:00', end: '2026-11-10T11:00:00+07:00' }]
-        }]
-      },
-      feasibility: { candidates: [{ activity: { activity_id: 'SEM-A', title: 'Hội thảo Khoa học' } }] }
-    };
-    planStages.first = existingPlan;
-    currentPlannerData = existingPlan;
-    planInputsDirty = false;
-    setProfileScheduleTab('schedule');
-    addOnboardingBusyEntry({ category: 'work', weekday: 1, date: '2026-11-10', start: '08:30', end: '10:30' }, 'profile');
-    overrideOnboardingRecurringBlock('2026-11-16', '08:00', '10:00', 'class', 'profile');
-  `, sandbox);
-  const conflictSnap = snap(`({
-    dirty: planInputsDirty,
-    conflicts: detectPlanBusyConflicts(),
-    noticeHidden: document.getElementById('schedulePlanConflictNotice').classList.contains('hidden'),
-    noticeHtml: document.getElementById('schedulePlanConflictNotice').innerHTML,
-    planStillIntact: currentPlannerData?.plan?.selected_activities?.[0]?.activity_id === 'SEM-A'
-  })`);
-
-  // 5. Reload and verify persistence across tabs & onboarding model
-  await vm.runInContext("applyCurrentStudent({ student_id: '25127444', full_name: 'Tab Tester Updated', major: 'Khoa Toán - Tin' })", sandbox);
-  const reloaded = snap(`({
-    profile: readLocalUserData('25127444').profile,
-    preference: plannerPreferencePayload(confirmedPreference),
-    availability: plannerAvailabilityPayload(),
-    target: Number(document.getElementById('inputPlanTarget').value)
-  })`);
-
-  console.log(JSON.stringify({ onScheduleTab, onProfileTab, conflictSnap, reloaded }));
-})();
-"""
-    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
-    res = json.loads(raw)
-
-    assert res["onScheduleTab"] == {"tab": "schedule", "profileHidden": True, "scheduleHidden": False}
-    assert res["onProfileTab"] == {"tab": "profile", "profileHidden": False, "scheduleHidden": True}
-
-    conf = res["conflictSnap"]
-    assert conf["dirty"] is True
-    assert conf["conflicts"] == [{"activity_id": "SEM-A", "title": "Hội thảo Khoa học"}]
-    assert conf["noticeHidden"] is False
-    assert "Hội thảo Khoa học" in conf["noticeHtml"]
-    assert conf["planStillIntact"] is True  # non-destructive!
-
-    rel = res["reloaded"]
-    assert rel["target"] == 92
-    assert rel["profile"]["faculty"] == "Khoa Toán - Tin"
-    assert rel["profile"]["semester"] == "HK3 · 2025–2026"
-    # Unrelated fields preserved!
-    assert rel["profile"]["score_history"] == [{"semester": "HK2 2025-2026", "score": 86}]
-    assert rel["profile"]["avatar_data_url"] == "data:image/png;base64,abc"
-    assert rel["preference"]["limits"]["max_duration_minutes"] == 300  # 5h * 60 preserved!
-    assert [c["category_id"] for c in rel["preference"]["category_priorities"]] == ["C4"]
-    assert rel["preference"]["hard_exclusions"]["modes"] == ["offline", "hybrid"]
-    assert rel["preference"]["hard_exclusions"]["campus_ids"] == ["DONG_HOA", "OTHER"]
-    assert set(t["topic_id"] for t in rel["preference"]["topic_preferences"]) == {"technology", "volunteer"}
-
-    # Resolved SP3 availability honors both the new Tuesday busy block AND the Monday 2026-11-16 available override
-    resolved = resolve_availability(
-        rel["availability"],
-        window_start="2026-11-09T00:00:00+07:00",
-        window_end="2026-11-17T23:59:59+07:00",
-    )
-    avail = resolved["available_intervals"]
-    tue_10 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-10")]
-    mon_16 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-16")]
-    assert tue_10 == [
-        ("2026-11-10T07:00:00+07:00", "2026-11-10T08:30:00+07:00"),
-        ("2026-11-10T10:30:00+07:00", "2026-11-10T21:00:00+07:00"),
-    ]
-    assert mon_16 == [("2026-11-16T07:00:00+07:00", "2026-11-16T21:00:00+07:00")]
+    # Options and Review are mutually exclusive
+    assert res["onReview"]["optionsHidden"] is True
+    assert res["onReview"]["reviewHidden"] is False
+    assert "Bước 2 · Rà soát kế hoạch" in res["onReview"]["reviewHtml"]
+    assert 'data-review-action="swap" disabled' in res["onReview"]["reviewHtml"]
+    assert res["afterBack"] == {"optionsHidden": False, "reviewHidden": True}
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="Node.js is required for frontend integration test")
-def test_task5_options_cards_duplicates_partial_failure_and_review_contract() -> None:
+def test_task5_review_swap_remove_and_confirmation_persistence_semantics() -> None:
     pref = StudentPreference.model_validate({
-        "topic_preferences": [{"topic_id": "technology", "weight": 5}],
+        "topic_preferences": [{"topic_id": "mathematics", "weight": 5}],
         "category_priorities": [{"category_id": "C1", "weight": 5}],
-        "campus_preferences": [{"campus_id": "NVC", "weight": 5}],
+        "campus_preferences": [],
         "mode_preferences": [],
         "time_preferences": [],
         "limits": {"max_activities": None, "max_duration_minutes": None, "max_fee": None},
         "hard_exclusions": {"campus_ids": [], "modes": [], "time_slots": []},
         "strategy": "BALANCED",
     })
-    real_opts = real_plan_options(pref, target_total=80, busy_intervals=[], availability_request=None)
-    assert [o["strategy"] for o in real_opts["options"]] == ["MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"]
-
-    # Build a synthetic partial-failure + duplicate payload derived from real_opts
-    opts_with_dup_and_fail = json.loads(json.dumps(real_opts["options"]))
-    opts_with_dup_and_fail[1]["duplicate_of"] = "MINIMUM_EFFORT"
-    opts_with_dup_and_fail[2] = {
-        "strategy": "PREFERENCE_FIRST",
-        "status": "FAILED",
-        "error": "Không tìm thấy lịch hợp lệ cho chiến lược này.",
-        "result": None,
-    }
+    syn_opts = personalized_plan_options(pref, target_total=80, busy_intervals=[], availability_request=None)
 
     js = f"""
 const fs = require('fs');
@@ -1312,70 +1166,76 @@ vm.createContext(sandbox);
 vm.runInContext(mainScript, sandbox);
 
 (async () => {{
-  sandbox.__realOptions = {json.dumps(real_opts["options"])};
-  sandbox.__mixedOptions = {json.dumps(opts_with_dup_and_fail)};
-
-  // 1. Render real-source 3 strategy cards
+  sandbox.__synOptions = {json.dumps(syn_opts["options"])};
   vm.runInContext(`
-    cachedPlanOptions = __realOptions;
-    selectedPlanOptionIndex = initialReadyPlanOptionIndex(__realOptions, 'BALANCED');
-    renderPlanOptionsSelector();
+    SP3_SOURCE = 'synthetic';
+    cachedPlanOptions = __synOptions;
+    selectedPlanOptionIndex = initialReadyPlanOptionIndex(__synOptions, 'BALANCED');
+    openPlanReviewScreen(selectedPlanOptionIndex);
   `, sandbox);
-  const realCardsHtml = sandbox.document.getElementById('planOptionsSelector').innerHTML;
 
-  // 2. Render duplicate + partial failure cards, verify selecting ready card 1 works and failed card 2 is ignored
-  vm.runInContext(`
-    cachedPlanOptions = __mixedOptions;
-    selectedPlanOptionIndex = 0;
-    selectCachedPlanOption(1);
-    selectCachedPlanOption(2);
-  `, sandbox);
-  const mixedHtml = sandbox.document.getElementById('planOptionsSelector').innerHTML;
-  const selectedAfterMixed = vm.runInContext("selectedPlanOptionIndex", sandbox);
-
-  // 3. Open dedicated review screen -> test missing contract message, then registered contract delegation
-  sandbox.openPlanReviewScreen(1);
-  const reviewHidden = sandbox.document.getElementById('planReviewScreen').classList.contains('hidden');
   const reviewHtml = sandbox.document.getElementById('planReviewScreen').innerHTML;
-  await sandbox.confirmSelectedPlanViaContract();
-  const missingContractMsg = sandbox.document.getElementById('planReviewConfirmStatus').textContent;
+  const firstActId = vm.runInContext('currentPlannerData.plan.selected_activities[0].activity_id', sandbox);
 
-  let delegatedPayload = null;
+  // Swap & Remove actions work on synthetic without throwing ReferenceError
+  sandbox.openReviewActivitySwap(firstActId);
+  const swapModalOpen = !sandbox.document.getElementById('smartSwapModal').classList.contains('hidden');
+  sandbox.openPlannedActivityDetails(firstActId);
+  const removeModalHtml = sandbox.document.getElementById('smartSwapContent').innerHTML;
+
+  // Confirmation semantics:
+  // 1) Missing contract
+  const rMissing = await sandbox.confirmSelectedPlanViaContract();
+  const msgMissing = sandbox.document.getElementById('planReviewConfirmStatus').textContent;
+
+  // 2) Contract returns persisted=false (must NOT report success)
   sandbox.window.UniLifePlanReviewContract = {{
-    async confirmPlan(payload) {{ delegatedPayload = payload; }}
+    async confirmPlan() {{ return {{ persisted: false, error: 'Server offline' }}; }}
   }};
-  await sandbox.confirmSelectedPlanViaContract();
+  const rNotPersisted = await sandbox.confirmSelectedPlanViaContract();
+  const msgNotPersisted = sandbox.document.getElementById('planReviewConfirmStatus').textContent;
+
+  // 3) Contract throws error (must catch safely & NOT report success)
+  sandbox.window.UniLifePlanReviewContract = {{
+    async confirmPlan() {{ throw new Error('Network timeout'); }}
+  }};
+  const rError = await sandbox.confirmSelectedPlanViaContract();
+  const msgError = sandbox.document.getElementById('planReviewConfirmStatus').textContent;
+
+  // 4) Contract confirms actual persistence
+  sandbox.window.UniLifePlanReviewContract = {{
+    async confirmPlan(payload) {{ return {{ persisted: true, plan_id: 'plan-1', strategy: payload.strategy }}; }}
+  }};
+  const rSuccess = await sandbox.confirmSelectedPlanViaContract();
+  const msgSuccess = sandbox.document.getElementById('planReviewConfirmStatus').textContent;
 
   console.log(JSON.stringify({{
-    realCardsHtml,
-    mixedHtml,
-    selectedAfterMixed,
-    reviewHidden,
     reviewHtml,
-    missingContractMsg,
-    delegatedStrategy: delegatedPayload?.strategy || null
+    swapModalOpen,
+    removeModalHtml,
+    rMissing, msgMissing,
+    rNotPersisted, msgNotPersisted,
+    rError, msgError,
+    rSuccess, msgSuccess
   }}));
 }})();
 """
     raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
     res = json.loads(raw)
 
-    for strategy in ("MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"):
-        assert f'data-strategy-card="{strategy}"' in res["realCardsHtml"]
-    assert "Chưa biết (chưa xác minh)" in res["realCardsHtml"]
+    assert 'data-review-action="swap" onclick=' in res["reviewHtml"]
+    assert 'data-review-action="remove" onclick=' in res["reviewHtml"]
+    assert res["swapModalOpen"] is True
+    assert "Thử bỏ hoạt động" in res["removeModalHtml"]
 
-    assert 'data-strategy-card="PREFERENCE_FIRST" data-status="FAILED"' in res["mixedHtml"]
-    assert "Trùng lịch với phương án" in res["mixedHtml"]
-    assert res["selectedAfterMixed"] == 1
+    assert res["rMissing"] == {"confirmed": False, "reason": "CONTRACT_UNAVAILABLE"}
+    assert "Chưa có module confirmed_plan của Thảo Duyên" in res["msgMissing"]
 
-    assert res["reviewHidden"] is False
-    assert "Màn hình Rà soát kế hoạch" in res["reviewHtml"]
-    assert "Chưa có module confirmed_plan của Thảo Duyên" in res["missingContractMsg"]
-    assert res["delegatedStrategy"] == "BALANCED"
+    assert res["rNotPersisted"] == {"confirmed": False, "reason": "Server offline"}
+    assert "✓" not in res["msgNotPersisted"] and "Server offline" in res["msgNotPersisted"]
 
+    assert res["rError"] == {"confirmed": False, "reason": "Network timeout"}
+    assert "✓" not in res["msgError"] and "Network timeout" in res["msgError"]
 
-
-
-
-
-
+    assert res["rSuccess"]["confirmed"] is True
+    assert "✓ Kế hoạch đã được xác nhận và lưu thành công." in res["msgSuccess"]
