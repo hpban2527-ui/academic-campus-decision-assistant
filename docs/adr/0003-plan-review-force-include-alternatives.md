@@ -210,10 +210,13 @@ Browser flow (register, plan, review, swap, remove, confirm, busy change, replan
 
 - Browser acceptance on desktop/mobile is still pending. This execution environment rejects localhost
   connections with Windows socket error 10013; controller tests do not replace browser acceptance.
-- Onboarding continues directly to planning and option review after the final profile step (2026-11-20).
-  The saved target, confirmed preferences and current availability feed one planner request. The welcome
-  redirect is skipped; only explicit plan confirmation opens the confirmed dashboard. Planner failures keep
-  the saved profile and expose the existing retry action.
+- Onboarding is one five-step dialog: profile, availability, goals, plan options, and review/confirmation
+  (2026-11-20). Steps four and five mount the existing option and review components inside the same frame;
+  standalone planner entry points still use those components as dialogs. Back navigation keeps profile
+  inputs; returning from review reuses options, while returning to profile steps starts a fresh build.
+  Profile completion remains false
+  until the reviewed plan is successfully stored; a reload resumes incomplete planning at cached options.
+  Planner/save failures keep onboarding open for retry. Only final confirmation opens the dashboard.
 - Ngoc must review the availability parameter on her preview wrappers, the shared remove-only path,
   FORCE_INCLUDE handling and the marked controller hooks before final integration by An.
 
@@ -245,9 +248,11 @@ Browser flow (register, plan, review, swap, remove, confirm, busy change, replan
 
 ### Manual checklist (if no browser can be driven)
 
-1. New account: finish the profile and goal, press "Lập lịch & review", and verify options open automatically.
-2. Choose an option to review; confirm the plan and verify the home dashboard opens. A planning error must
-   keep the saved profile and allow retry without completing onboarding again.
+1. New account: finish the profile and goal, press "Lập lịch & review", and verify step four shows options in
+   the same onboarding frame. Return to goals, change a value and build again.
+2. Choose an option; verify step five shows review in that frame. Check change/undo and back navigation.
+   Confirm through the wizard footer; only then should onboarding close and the home dashboard open.
+   Planning or save errors must keep the wizard incomplete and allow retry.
 3. Header shows "Hom nay" with the planner's date (not today's system date); the agenda lists the activities with
    time, place, "+Xd . Muc N" and the registration deadline.
 4. Progress block shows the baseline, the planned gain and the target from the plan (60 -> 80 / target 80), never

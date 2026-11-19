@@ -157,13 +157,15 @@ def register(page: Cdp, name: str, mssv: str, *, plan_onboarding: bool = False, 
         # Other scenarios use a saved account fixture and exercise planning separately.
         # The real onboarding transition is covered with plan_onboarding=True below.
         page.js("""(() => { const hook = window.reviewDashAfterOnboarding;
+          rdOnboardingReset();
           window.reviewDashAfterOnboarding = undefined;
           try { completeOnboarding(); finishWelcome(); }
           finally { window.reviewDashAfterOnboarding = hook; } })()""")
     page.wait(f"!!currentStudent && currentStudent.student_id === {json.dumps(mssv)}")
     if not plan_onboarding:
         page.js("applyCurrentStudent(currentStudent)")
-    page.wait("!document.getElementById('workspaceApp').classList.contains('hidden')")
+    if not plan_onboarding:
+        page.wait("!document.getElementById('workspaceApp').classList.contains('hidden')")
 
 
 def visible(page: Cdp, element_id: str) -> bool:
@@ -448,48 +450,61 @@ def friendly_errors(page: Cdp, mssv: str) -> None:
         page.js("if (window.__reviewOriginalFetch) { window.fetch = window.__reviewOriginalFetch; delete window.__reviewOriginalFetch; } SP3_SOURCE = 'synthetic';")
 
 
-def after_onboarding(page: Cdp, mssv_saved: str, mssv_missing: str) -> None:
-    """Final onboarding click -> one plan request -> options -> review -> confirm -> dashboard."""
+def after_onboarding(page: Cdp, mssv_saved: str, mssv_retry: str) -> None:
+    """Options and review stay in one five-step onboarding dialog, including back and retry."""
     register(page, "After onboarding", mssv_saved, plan_onboarding=True, target=70)
     page.wait("!!planStages.first && !document.getElementById('planOptionsScreen').classList.contains('hidden')", 40)
     assert page.js("document.getElementById('inputPlanTarget').value") == "70"
     assert page.js("planStages.first.requested_total_target") == 70
-    assert not page.js("document.getElementById('viewPlan').classList.contains('hidden')"), "planner page must be shown"
+    assert visible(page, "onboardingModal")
+    assert page.js("document.getElementById('onboardingStepLabel').innerText") == "Bước 4 / 5"
+    assert page.js("document.getElementById('planOptionsScreen').parentElement.id") == "onboardingOptionsHost"
+    assert page.js("getComputedStyle(document.getElementById('planOptionsScreen')).position") == "static"
+    assert page.js("document.getElementById('planOptionsScreen').getAttribute('aria-modal')") is None
+    assert not page.js("readLocalUserData(currentStudent.student_id).profile.completed_onboarding")
     assert page.js("window.__sp3Calls") == 1, "the first plan must be requested exactly once"
     assert not visible(page, "welcomeModal")
     assert stored_plan(page) is None, "profile completion must not confirm a plan"
     assert "Mục tiêu 70 điểm" in page.js("document.getElementById('posSubtitle').innerText")
-    assert page.js("runSp3Planner.name") == "runSp3Planner", "the temporary stub must be removed again"
+    assert page.js("Array.from(document.querySelectorAll('#posCards [data-pos-action=\"confirm\"]')).every(button => button.offsetParent === null)")
+    page.js("document.getElementById('onboardingBackButton').click()")
+    assert page.js("onboardingStep") == 3 and visible(page, "onboardingModal")
+    page.js("selectOnboardingTargetPreset(75); document.getElementById('onboardingNextButton').click()")
+    page.wait("onboardingStep === 4 && !rdOnboardingFlow.busy && rdPosVisible()", 40)
+    assert page.js("planStages.first.requested_total_target") == 75
     page.js("document.querySelector('[data-pos-card] [data-pos-action=\"review\"]').click()")
     assert visible(page, "planReviewScreen") and stored_plan(page) is None
-    assert page.js("prvDraft.result.requested_total_target") == 70
-    page.js("document.querySelector('#prvPanel button[onclick=\"prvConfirm()\"]').click()")
-    page.wait("!document.getElementById('viewDashboard').classList.contains('hidden') && !!readLocalUserData(currentStudent.student_id).confirmed_plan")
-    assert stored_plan(page)["target_total"] == 70
+    assert page.js("prvDraft.result.requested_total_target") == 75
+    assert page.js("document.getElementById('onboardingStepLabel').innerText") == "Bước 5 / 5"
+    assert page.js("document.getElementById('planReviewScreen').parentElement.id") == "onboardingReviewHost"
+    page.js("document.querySelector('[data-review-actions] button').focus(); document.activeElement.click()")
+    page.wait("prvDraft.panel.mode === 'change' && !prvDraft.busy", 40)
+    press(page, "Escape", "Escape", 27)
+    assert page.js("onboardingStep") == 5 and page.js("prvDraft.panel.mode") == "summary"
+    page.shot(f"onboarding_{mssv_saved}_5_review")
+    page.js("document.getElementById('onboardingNextButton').click()")
+    page.wait("document.getElementById('onboardingModal').classList.contains('hidden') && !!readLocalUserData(currentStudent.student_id).confirmed_plan")
+    page.wait("!document.getElementById('workspaceApp').classList.contains('hidden')")
+    assert stored_plan(page)["target_total"] == 75
+    assert page.js("readLocalUserData(currentStudent.student_id).onboarding_status") == "COMPLETED"
+    assert page.js("!document.getElementById('onboardingModal').contains(document.getElementById('planReviewScreen'))")
 
     page.js("logoutLocalAccount()")
     page.js("showWorkspace()")
-    register(page, "No saved goal", mssv_missing)
-    # Model an unset goal at the read boundary. Registration and profile
-    # migration normally supply a default before this helper runs.
-    page.js("""(() => {
-      const read = readLocalUserData;
-      const studentId = currentStudent.student_id;
-      window.readLocalUserData = id => {
-        const data = read(id);
-        if (id === studentId) data.profile.drl_target = null;
-        return data;
-      };
-      currentProfileDraft.drl_target = null;
-      window.__sp3Calls = 0;
-      try { reviewDashAfterOnboarding(); } finally { window.readLocalUserData = read; }
-    })()""")
-    page.wait("!!document.getElementById('rdTargetPrompt')")
-    assert page.js("document.getElementById('rdTargetPrompt').innerText") == "Bạn muốn đạt bao nhiêu điểm rèn luyện học kỳ này?"
-    assert page.js("document.activeElement.id") == "inputPlanTarget"
-    time.sleep(1.0)
-    assert not page.js("!!planStages.first") and page.js("window.__sp3Calls") == 0, "no silent default plan"
-    assert not visible(page, "planOptionsScreen")
+    page.js("""window.__onboardFetch = window.fetch;
+      window.fetch = (url, options) => String(url).includes('/personalized/options')
+        ? Promise.reject(new TypeError('Failed to fetch')) : window.__onboardFetch(url, options);""")
+    try:
+        register(page, "Onboarding retry", mssv_retry, plan_onboarding=True, target=70)
+        page.wait("!!document.getElementById('onboardingPlanError').innerText")
+        assert visible(page, "onboardingModal") and page.js("onboardingStep") == 4
+        assert not page.js("readLocalUserData(currentStudent.student_id).profile.completed_onboarding")
+        assert stored_plan(page) is None
+    finally:
+        page.js("window.fetch = window.__onboardFetch")
+    page.js("document.getElementById('onboardingRetryPlan').click()")
+    page.wait("rdPosVisible() && !rdOnboardingFlow.busy", 40)
+    assert visible(page, "onboardingModal")
 
 
 def real_source_clock(page: Cdp) -> None:

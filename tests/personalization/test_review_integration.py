@@ -151,13 +151,20 @@ def _run_panel_controllers(data):
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="Node.js is required for controller integration")
 @pytest.mark.parametrize("mobile", [False, True])
-@pytest.mark.parametrize("scenario", ["onboarding", "onboarding_error", "onboarding_delayed", "onboarding_switch"])
+@pytest.mark.parametrize("scenario", ["onboarding", "onboarding_error", "onboarding_back", "onboarding_reload", "onboarding_stale", "onboarding_storage", "onboarding_confirm_error"])
 def test_onboarding_plans_once_then_reviews_before_confirmation(review_case, mobile, scenario):
     payload, preference, _, _ = review_case
     data = {"preference": payload, "mobile": mobile, "scenario": scenario,
             "options": personalized_plan_options(preference, target_total=85)["options"]}
     if scenario == "onboarding_error":
         data["failure"] = "options"
+    if scenario == "onboarding_back":
+        base = data["options"][1]["result"]
+        activity_id = base["plan"]["selected_activities"][0]["activity_id"]
+        data.update(_panel_payload(preference, base, activity_id))
+        data["activityId"] = activity_id
+    if scenario == "onboarding_confirm_error":
+        data["options"][1]["result"]["completion_offer"] = {"offer_id": "mock-confirmation-offer"}
     _run_panel_controllers(data)
 
 

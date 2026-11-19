@@ -29,7 +29,7 @@ def test_dashboard_assistant_is_replaced_by_one_time_onboarding_and_profile_edit
     assert "AI chỉnh sửa hồ sơ" not in HTML
     assert 'id="profileAiInput"' not in HTML
     assert 'id="onboardingScores"' not in HTML
-    assert "Bước 1 / 3" in HTML
+    assert "Bước 1 / 5" in HTML
     assert "hydrateOnboardingFormFromDraft" not in HTML
     assert "resetOnboardingAssistantState" not in HTML
     assert "mapTopicInputsToTopicIds" in HTML

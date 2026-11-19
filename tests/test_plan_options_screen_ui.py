@@ -94,7 +94,7 @@ def test_choose_and_review_selects_then_opens_the_review() -> None:
 
 def test_confirm_now_goes_through_cpd_request_confirm() -> None:
     body = _function("reviewDashChoosePlanOption")
-    assert "mode === 'confirm'" in body
+    assert "mode === 'confirm' && !rdOnboardingActive()" in body
     assert "cpdRequestConfirm(data, label, () => {" in body
     assert "reviewDashClosePlanOptions();" in body and "switchTab('dashboard')" in body
     assert "confirmConfirmedPlan(" not in body  # never bypasses the diff modal
@@ -104,7 +104,7 @@ def test_review_header_can_return_to_the_options_without_recomputing() -> None:
     assert 'id="prvBackToOptions"' in HTML and "Quay lại phương án" in HTML
     assert _inside_marker(HTML.index('id="prvBackToOptions"'))
     body = _function("reviewDashBackToPlanOptions")
-    assert "closePlanReview();" in body and "reviewDashOpenPlanOptions();" in body and "fetch(" not in body
+    assert "closePlanReview(true);" in body and "reviewDashOpenPlanOptions();" in body and "fetch(" not in body
 
 
 def test_reopen_entry_in_the_confirm_bar() -> None:
@@ -120,9 +120,9 @@ def test_esc_and_focus_handling() -> None:
     assert "event.key !== 'Tab'" in body  # focus stays inside the dialog
 
 
-def test_onboarding_continues_to_planning_before_the_dashboard_welcome() -> None:
+def test_onboarding_options_and_review_are_steps_in_the_same_dialog() -> None:
     assert "function reviewDashAfterOnboarding()" in HTML
-    assert "drl_target" in _function("reviewDashAfterOnboarding")
+    assert "drl_target" in _function("rdOnboardingBuildPlan")
     assert "Bạn muốn đạt bao nhiêu điểm rèn luyện học kỳ này?" in HTML
     onboarding = _function("completeOnboarding")
     call = "return reviewDashAfterOnboarding();"
@@ -131,6 +131,15 @@ def test_onboarding_continues_to_planning_before_the_dashboard_welcome() -> None
     assert onboarding.index(call) < onboarding.index('showWorkspace("dashboard")')
     assert "window.clearTimeout(welcomeTimeout)" in onboarding
     assert "Lập lịch & review" in _function("renderOnboardingStep")
+    assert 'id="onboardingOptionsHost"' in HTML and 'id="onboardingReviewHost"' in HTML
+    for step in range(1, 6):
+        assert f'id="onboardingStepMarker{step}"' in HTML
+    assert "host.appendChild(screen)" in _function("rdOnboardingBegin")
+    assert "screen.removeAttribute('aria-modal')" in _function("rdOnboardingBegin")
+    assert "onboardingStep !== 5" in _function("cpdStoreConfirmedPlan")
+    assert "data.onboarding_status = 'COMPLETED'" in _function("cpdStoreConfirmedPlan")
+    assert "'IN_PROGRESS'" in onboarding and "!withPlanReview" in onboarding
+    assert "rdOnboardingReset()" in _function("rdOnboardingFinish")
 
 
 def test_friendly_error_mapping_covers_the_source_real_422() -> None:

@@ -12,6 +12,7 @@ const listeners = new Map();
 const timers = new Map();
 const intervals = new Map();
 let nextTimer = 0;
+const optionReleases = [];
 function element(id) {
   if (!elements.has(id)) {
     const classes = new Set(['planReviewScreen', 'planOptionsScreen', 'planDiffModal'].includes(id) ? ['hidden'] : []);
@@ -21,15 +22,22 @@ function element(id) {
       classList: { add: (...items) => items.forEach(x => classes.add(x)),
         remove: (...items) => items.forEach(x => classes.delete(x)), contains: x => classes.has(x),
         toggle(x, force) { const on = force === undefined ? !classes.has(x) : force; on ? classes.add(x) : classes.delete(x); return on; } },
-      setAttribute() {}, getAttribute() { return null; }, appendChild() {}, remove() {},
-      focus() { sandbox.document.activeElement = value; }, contains(child) { return child?.id === id || (id === 'prvChangePanel' && /^prv(Choose|Cancel|Remove|More|Apply|Change)/.test(child?.id || '')); }, scrollIntoView() {}, setSelectionRange() {}, insertAdjacentHTML() {}, insertAdjacentElement() {},
+      attributes: {}, setAttribute(name, item) { value.attributes[name] = item; }, getAttribute(name) { return value.attributes[name] ?? null; }, removeAttribute(name) { delete value.attributes[name]; },
+      appendChild(child) { if (child.parentNode) child.parentNode.children = child.parentNode.children.filter(x => x !== child); child.parentNode = value; value.children.push(child); },
+      insertBefore(child) { value.appendChild(child); }, remove() {},
+      focus() { sandbox.document.activeElement = value; }, contains(child) { for (let item = child; item; item = item.parentNode) if (item === value) return true; return id === 'prvChangePanel' && /^prv(Choose|Cancel|Remove|More|Apply|Change)/.test(child?.id || ''); }, scrollIntoView() {}, setSelectionRange() {}, insertAdjacentHTML() {}, insertAdjacentElement() {},
       addEventListener() {}, querySelector() { return null; }, querySelectorAll() { return []; },
-      closest() { return { classList: { add() {}, remove() {}, toggle() {} } }; } };
+      closest(selector) { if (selector === '.hidden') { for (let item = value; item; item = item.parentNode) if (item.classList.contains('hidden')) return item; return null; } return { classList: { add() {}, remove() {}, toggle() {} } }; } };
     elements.set(id, value);
+    const parents = {onboardingOptionsHost:'onboardingPlanStep', onboardingReviewHost:'onboardingPlanStep',
+      onboardingPlanStep:'onboardingModal', onboardingNextButton:'onboardingModal', onboardingBackButton:'onboardingModal',
+      planDiffError:'planDiffModal', prvConfirmError:'prvPanel', prvPanel:'planReviewScreen', posError:'planOptionsScreen'};
+    value.parentNode = id === 'body' ? null : element(parents[id] || 'body');
+    if (['planOptionsScreen', 'planReviewScreen'].includes(id)) { value.attributes.role = 'dialog'; value.attributes['aria-modal'] = 'true'; }
   }
   return elements.get(id);
 }
-const sandbox = { console, Date, Math, JSON, Set, Map, Array, Object, Number, String, Boolean, RegExp, Error, Promise,
+const sandbox = { console, Date, Math, JSON, Set, Map, Array, Object, Number, String, Boolean, RegExp, Error, Promise, URLSearchParams,
   parseInt, parseFloat, isNaN, isFinite, encodeURIComponent, decodeURIComponent, btoa, atob, escape, unescape,
   tailwind: {}, performance: { now: () => 0 }, navigator: { clipboard: { writeText: async () => {} } },
   setTimeout(callback, delay) { const id = ++nextTimer; timers.set(id, {callback, delay}); return id; },
@@ -49,8 +57,13 @@ const sandbox = { console, Date, Math, JSON, Set, Map, Array, Object, Number, St
   fetch: async (url, options) => {
     const body = options?.body ? JSON.parse(options.body) : null;
     requests.push({ url, body });
+    if (url.includes('/api/sp3/confirmed-plan') && options?.method === 'POST') {
+      if (input.failConfirmation) { input.failConfirmation = false; return {ok:false,status:503,json:async () => ({detail:'Please retry confirmation'})}; }
+      return {ok:true,json:async () => ({student_id:'25127881',plan_version:input.options[1].result.plan.plan_version,activities:{}})};
+    }
     if (url.includes('/personalized/options')) {
       if (input.failure === 'options') throw new Error('Failed to fetch');
+      if (input.holdOptions) return new Promise(resolve => optionReleases.push(resolve));
       return { ok: true, json: async () => ({options: input.options}) };
     }
     let part = null;
@@ -73,12 +86,14 @@ const run = code => vm.runInContext(code, sandbox);
 const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
 (async () => {
   if (input.scenario?.startsWith('onboarding')) {
+    const settle = async () => { for (let i = 0; i < 80; i++) await Promise.resolve(); };
     const user = {student_id:'25127881', full_name:'Onboarding reviewer', major:'CNTT'};
     const key = 'unilife_data_' + user.student_id;
     const data = () => JSON.parse(storage.get(key));
     storage.set(key, JSON.stringify(sandbox.createDefaultLocalUserData(user.student_id, true)));
     storage.set('unilife_users', JSON.stringify([user]));
-    sandbox.beginOnboarding(user);
+    sandbox.beginOnboarding(user); await settle();
+    assert.equal(element('onboardingStepLabel').textContent, 'Bước 1 / 5');
     run(`SP3_SOURCE = 'synthetic'; onboardingStep = 3;
       selectOnboardingTargetPreset(85);
       selectOnboardingCategoryChoice('C1');
@@ -88,54 +103,109 @@ const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
         weekday:0, start:'14:00', end:'15:00'});
       renderOnboardingStep();`);
     assert.equal(element('onboardingNextButton').textContent, 'Lập lịch & review');
-    const delayed = input.scenario === 'onboarding_delayed' || input.scenario === 'onboarding_switch';
-    if (delayed) element('workspaceApp').classList.add('hidden');
+    element('workspaceApp').classList.add('hidden');
+    if (input.scenario === 'onboarding_stale') input.holdOptions = true;
     sandbox.nextOnboardingStep();
-    if (delayed) {
-      assert.equal(requests.filter(x => x.url.includes('/personalized/options')).length, 0);
-      if (input.scenario === 'onboarding_switch') run("currentStudent = {student_id:'25127882'};");
-      for (const [id, timer] of [...timers]) {
-        if (timer.delay === 400) { timers.delete(id); timer.callback(); }
-      }
-      for (const callback of [...intervals.values()]) callback();
-      if (input.scenario === 'onboarding_switch') {
-        assert.equal(requests.filter(x => x.url.includes('/personalized/options')).length, 0);
-        console.log(JSON.stringify({passed:true,scenario:input.scenario}));return;
-      }
-    }
-    for (let i = 0; i < 60; i++) await Promise.resolve();
     const calls = () => requests.filter(x => x.url.includes('/personalized/options'));
-    assert.equal(calls().length, 1, 'profile completion requests a plan exactly once');
+    if (input.scenario === 'onboarding_stale') {
+      assert.equal(calls().length, 1);
+      sandbox.previousOnboardingStep();
+      assert.equal(run('onboardingStep'), 3);
+      input.holdOptions = false; sandbox.nextOnboardingStep(); await settle();
+      optionReleases[0]({ok:true,json:async () => ({options:[...input.options].reverse()})});
+      await settle();
+      assert.equal(run('cachedPlanOptions[0].strategy'), input.options[0].strategy);
+    }
+    await settle();
+    assert.equal(calls().length, input.scenario === 'onboarding_stale' ? 2 : 1);
     assert.equal(calls()[0].body.total_target, 85);
     assert.equal(calls()[0].body.preference.limits.max_duration_minutes, null);
     assert.ok(calls()[0].body.preference.category_priorities.some(c => c.category_id === 'C1'));
     assert.ok(calls()[0].body.availability.busy_intervals.some(b => b.start.includes('2026-11-09T14:00')));
     assert.equal(data().profile.drl_target, 85);
     assert.equal(data().confirmed_plan, null);
-    assert.equal(element('onboardingModal').classList.contains('hidden'), true);
+    assert.equal(data().onboarding_status, 'IN_PROGRESS');
+    assert.equal(data().profile.completed_onboarding, false);
+    assert.equal(element('onboardingModal').classList.contains('hidden'), false);
     assert.equal(element('welcomeModal').classList.contains('hidden'), true);
-    assert.equal([...timers.values()].some(t => t.callback === sandbox.finishWelcome), false);
-    assert.equal(element('viewPlan').classList.contains('hidden'), false);
+    assert.equal(element('workspaceApp').classList.contains('hidden'), true);
+    assert.equal(element('planOptionsScreen').parentNode.id, 'onboardingOptionsHost');
+    assert.equal(element('planReviewScreen').parentNode.id, 'onboardingReviewHost');
+    assert.equal(element('planOptionsScreen').getAttribute('aria-modal'), null);
     if (input.scenario === 'onboarding_error') {
       assert.equal(run('!!planStages.first'), false);
-      assert.equal(element('plannerErrorState').classList.contains('hidden'), false);
-      assert.equal(element('btnRunPlanner').disabled, false);
-      assert.equal(element('planOptionsScreen').classList.contains('hidden'), true);
-      assert.equal(data().profile.completed_onboarding, true, 'saved profile survives a planning error');
-      input.failure = null; await sandbox.runSp3Planner();
-      assert.equal(calls().length, 2, 'the user can retry without repeating onboarding');
+      assert.ok(element('onboardingPlanError').textContent);
+      assert.equal(element('onboardingRetryPlan').classList.contains('hidden'), false);
+      assert.equal(data().profile.completed_onboarding, false);
+      input.failure = null; await sandbox.rdOnboardingBuildPlan();
+      assert.equal(calls().length, 2);
     }
     assert.equal(element('planOptionsScreen').classList.contains('hidden'), false);
+    assert.equal(element('onboardingStepLabel').textContent, 'Bước 4 / 5');
     assert.equal(run('planStages.first.requested_total_target'), 85);
-    sandbox.reviewDashChoosePlanOption(1, 'review');
+    // Even the standalone confirm shortcut must pass through review inside onboarding.
+    sandbox.reviewDashChoosePlanOption(1, 'confirm');
     assert.equal(element('planReviewScreen').classList.contains('hidden'), false);
-    assert.equal(data().confirmed_plan, null, 'review must not confirm automatically');
-    sandbox.reviewDashBackToPlanOptions();
-    sandbox.reviewDashChoosePlanOption(1, 'review');
-    assert.equal(calls().length, input.scenario === 'onboarding_error' ? 2 : 1);
-    sandbox.prvConfirm();
+    assert.equal(element('onboardingStepLabel').textContent, 'Bước 5 / 5');
+    assert.equal(data().confirmed_plan, null);
+    if (input.scenario === 'onboarding_back') {
+      const token = sandbox.activityToken(input.activityId);
+      element('prv-change-' + token).focus(); await sandbox.prvOpenChange(token);
+      const escape = {key:'Escape', defaultPrevented:false, preventDefault(){this.defaultPrevented=true;}, stopPropagation(){}};
+      for (const listener of listeners.get('keydown') || []) listener(escape);
+      assert.equal(run('onboardingStep'), 5);
+      assert.equal(run('prvDraft.panel.mode'), 'summary', 'Esc closes the change panel before navigating wizard steps');
+      await sandbox.prvOpenChange(token); sandbox.prvApplyRemoval();
+      sandbox.confirm = () => false; sandbox.previousOnboardingStep();
+      assert.equal(run('onboardingStep'), 5, 'declining discard preserves the edited review');
+      sandbox.confirm = () => true;
+      sandbox.previousOnboardingStep();
+      assert.equal(run('onboardingStep'), 4);
+      sandbox.previousOnboardingStep();
+      assert.equal(run('onboardingStep'), 3);
+      sandbox.previousOnboardingStep(); assert.equal(run('onboardingStep'), 2);
+      sandbox.nextOnboardingStep(); assert.equal(run('onboardingStep'), 3);
+      sandbox.nextOnboardingStep(); await settle();
+      assert.equal(calls().length, 2);
+      sandbox.reviewDashChoosePlanOption(1, 'review');
+    }
+    const modal = element('onboardingModal');
+    modal.querySelectorAll = () => [element('onboardingBackButton'), element('onboardingNextButton')];
+    element('onboardingNextButton').focus();
+    for (const listener of listeners.get('keydown') || []) listener({key:'Tab',preventDefault(){this.defaultPrevented=true;}});
+    assert.equal(sandbox.document.activeElement.id, 'onboardingBackButton');
+    if (input.scenario === 'onboarding_reload') {
+      assert.equal(data().onboarding_step, 5);
+      sandbox.reviewDashCloseAccountDialogs(); sandbox.beginOnboarding(user); await settle();
+      assert.equal(run('onboardingStep'), 4);
+      assert.equal(calls().length, 1, 'resume reuses saved engine options');
+      assert.equal(element('planOptionsScreen').parentNode.id, 'onboardingOptionsHost');
+      sandbox.reviewDashChoosePlanOption(1, 'review');
+    }
+    if (input.scenario === 'onboarding_storage') {
+      failWrites = true; sandbox.nextOnboardingStep(); failWrites = false;
+      assert.equal(data().confirmed_plan, null);
+      assert.equal(data().profile.completed_onboarding, false);
+      assert.equal(element('onboardingModal').classList.contains('hidden'), false);
+      assert.ok(element('onboardingPlanError').textContent);
+    }
+    if (input.scenario === 'onboarding_confirm_error') {
+      input.failConfirmation = true; sandbox.nextOnboardingStep(); await settle();
+      assert.equal(data().confirmed_plan, null);
+      assert.equal(data().profile.completed_onboarding, false);
+      assert.equal(element('onboardingModal').classList.contains('hidden'), false);
+      assert.equal(element('onboardingNextButton').disabled, false, 'failed confirmation allows retry');
+      assert.ok(element('onboardingPlanError').textContent);
+    }
+    sandbox.nextOnboardingStep(); await settle();
     assert.equal(data().confirmed_plan.plan_version, input.options[1].result.plan.plan_version);
+    assert.equal(data().onboarding_status, 'COMPLETED');
+    assert.equal(data().profile.completed_onboarding, true);
+    assert.equal(element('onboardingModal').classList.contains('hidden'), true);
     assert.equal(element('viewDashboard').classList.contains('hidden'), false);
+    assert.equal(element('planOptionsScreen').parentNode.id, 'body');
+    assert.equal(element('planReviewScreen').parentNode.id, 'body');
+    assert.equal(element('planOptionsScreen').getAttribute('aria-modal'), 'true');
     console.log(JSON.stringify({passed:true,scenario:input.scenario}));return;
   }
   run(`currentStudent = {student_id: 'SYN-REVIEW-01', full_name: 'Synthetic reviewer'};
