@@ -27,7 +27,9 @@ from personalization.profile_assistant import (
     ProfileAssistantDraft,
     ProfileExtraction,
     ProfilePatchAction,
+    deterministic_profile_extraction,
     merge_profile_extraction,
+    merge_profile_extractions,
 )
 
 __all__ = [
@@ -51,5 +53,7 @@ __all__ = [
     "ProfileAssistantDraft",
     "ProfileExtraction",
     "ProfilePatchAction",
+    "deterministic_profile_extraction",
     "merge_profile_extraction",
+    "merge_profile_extractions",
 ]

@@ -89,7 +89,8 @@ def test_profile_editor_confirms_before_applying_existing_planner_state() -> Non
     html = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
 
     assert 'id="unilifeAssistant"' not in html
-    assert 'id="onboardingWizard"' in html
+    assert 'id="onboardingModal"' in html
+    assert 'id="onboardingWizard"' not in html
     assert "function confirmProfileProposal" in html
     assert "/api/profile-assistant/interpret" in html
     assert "customBusyIntervals" in html

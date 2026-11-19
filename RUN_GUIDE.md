@@ -15,6 +15,7 @@ Hệ thống là ứng dụng Web hoàn chỉnh tích hợp luồng xử lý t�
 4. **Thư Viện Kịch Bản Mẫu (5 Ca E2E) & Chạy Hàng Loạt (Batch Run)**: Có nút nạp mẫu test nhanh (`⚡ 5 Kịch Bản E2E`) và tab riêng cho phép chạy hàng loạt cả 5 ca kiểm thử tự động trực quan.
 5. **Khung Nghiệm Thu Kỹ Thuật (Inspector Tab)**: Tra cứu toàn bộ 15 trường dữ liệu thô, bằng chứng trích xuất (grounding evidence), cờ kiểm tra (`meta.flags`), và phân luồng (`activities.json` vs `review_queue.json`).
 6. **Bộ 5 Ca Kiểm Thử E2E Tự Động**: Đạt 100% PASS qua test suite `pytest`.
+7. **Đăng ký & Hồ sơ sinh viên**: Tài khoản mới đi qua onboarding 3 bước (thông tin, lịch bận, mục tiêu); hồ sơ lưu bảng điểm, lịch sử hoạt động và sở thích trên trình duyệt hiện tại.
 
 ---
 

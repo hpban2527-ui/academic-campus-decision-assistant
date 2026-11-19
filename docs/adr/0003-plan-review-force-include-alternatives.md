@@ -65,7 +65,7 @@ planner (baseline 60, target 80).
 - API of the validators: `parse_keep_requests` returns `KeepRequests(keep_time, force_include)`;
   `validate_keep_requests` keeps returning the `KEEP_TIME` IDs.
 
-## D11. Review endpoints (synthetic source; `source=real` returns 422 like the swap preview)
+## D11. Review endpoints (synthetic and real sources after Phase 1-2 integration)
 
 All request bodies set `confirmed_profile: true` and carry `preference` and `base_result` (one engine result,
 as for swap-preview). Every response is stateless; nothing is stored or applied.
@@ -182,8 +182,7 @@ same reason.
 - States: loading, API error (the last valid draft is kept; "Thu lai"), no alternatives. Edit buttons are disabled
   until a preference is confirmed (the review endpoints need one); confirming still works.
 - Confirm calls `confirmConfirmedPlan` and opens the dashboard. The draft lives in memory only; it is not persisted.
-- All requests send `plannerAvailabilityPayload()` (D13) and use `sp3Query()`, so `source=real` shows the API's
-  422 message until `_sp3_review_backend` is switched.
+- All requests send `plannerAvailabilityPayload()` (D13) and use `sp3Query()`; Phase 1-2 enables real-source review.
 
 ## D15. Confirming over an existing confirmed plan (added 2026-11-19)
 
@@ -212,14 +211,30 @@ Browser flow (register, plan, review, swap, remove, confirm, busy change, replan
 
 ## Open points
 
-- `preview_personalized_swap` rebuilds the plan from the default synthetic availability; it ignores the
-  student's custom availability and busy intervals because `SmartSwapRequest` carries none. Review results can
-  therefore place an activity in time the student marked busy. Needs a decision by Ngoc (add `availability`
-  to the request and pass it to `personalized_demo_plan`).
-- `source=real` is rejected for every review endpoint until Ngoc's functions support it; the endpoints share one
-  guard (`_sp3_review_backend`) to change.
-- Single-activity `Xem hoat dong thay the` in the planner screen still uses its own list; wiring it to
-  `/alternatives` is the next UI step (the full review screen is out of scope here).
+- Browser acceptance on desktop/mobile is still pending. This execution environment rejects localhost
+  connections with Windows socket error 10013; controller tests do not replace browser acceptance.
+- Phase 3 (opening the planner after onboarding) is not wired; it requires a separate product decision.
+- Ngoc must review the availability parameter on her preview wrappers, the shared remove-only path,
+  FORCE_INCLUDE handling and the marked controller hooks before final integration by An.
+
+## Phase 1-2 integration with Nhu_Ngoc ee14c95 (2026-11-19, uncommitted)
+
+- Ngoc's `_preview_personalized_change` is the only swap/add implementation. Flexible replacements use the
+  existing FORCE_INCLUDE revision 0.2.1; the wire string remains `sp3-planner/0.2`.
+- Swap/remove/alternatives/what-if accept current request availability and support `source=real`. They do not
+  reuse availability from an older result. Both removal routes delegate to `remove_planned_activity` and never
+  add compensation; what-if is the separate compensating preview.
+- Preference explanations are refreshed by the preference engine after every edit. Points and feasibility
+  remain SP2/SP3 outputs.
+- One full-screen review dialog and shared detail renderer serve both planner entry points. The old alternatives
+  and activity-detail entry points redirect into this flow; their compatibility bodies remain inactive.
+- `UniLifePlanReviewContract.confirmPlan` resolves only after persistence or explicit cancellation of the diff.
+  Confirmation stores the edited result, updates the planner state, and opens the home dashboard.
+- `REVIEW_ALLOW_ADD = false` removes free-slot add entry points while retaining their implementation. The
+  optional participation-hours editor is hidden and UI planner requests always set the duration cap to null.
+- All local HTML/controller changes relative to Ngoc's integration base are inside REVIEW-DASH markers.
+  Her busy-calendar profile callback and busy deletion already save through `persistCurrentUserData`; onboarding
+  draft writes remain local drafts and were not rewritten.
 
 ## Verification
 

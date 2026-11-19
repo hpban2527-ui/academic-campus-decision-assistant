@@ -259,15 +259,23 @@ def personalized_demo_plan(
         stored = fixture["steps"][name]
         feasibility_request = deepcopy(stored["feasibility_request"])
         context = feasibility_request["context"]
-        active_availability_request = deepcopy(
-            availability_request if availability_request is not None else stored["availability_request"]
-        )
-        active_availability_request["busy_intervals"].extend(custom_busy or [])
-        availability = resolve_availability(
-            active_availability_request,
-            window_start=context["window_start"],
-            window_end=context["window_end"],
-        )
+        if (
+            isinstance(availability_request, dict)
+            and "available_intervals" in availability_request
+            and "calendar_version" in availability_request
+            and "weekly_blocks" not in availability_request
+        ):
+            availability = deepcopy(availability_request)
+        else:
+            active_availability_request = deepcopy(
+                availability_request if availability_request is not None else stored["availability_request"]
+            )
+            active_availability_request["busy_intervals"].extend(custom_busy or [])
+            availability = resolve_availability(
+                active_availability_request,
+                window_start=context["window_start"],
+                window_end=context["window_end"],
+            )
         feasibility_request["available_intervals"] = availability["available_intervals"]
         feasibility_request["context"]["calendar_version"] = availability["calendar_version"]
         feasibility = assess_feasibility(
@@ -438,33 +446,40 @@ def personalized_plan_options(
     busy_intervals: list[dict[str, str]] | None = None,
     availability_request: dict | None = None,
 ) -> dict:
-    """Compute each supported strategy once and deduplicate identical schedules."""
+    """Compute each supported strategy independently and retain all three cards."""
 
     attempted = []
     options = []
-    seen: set[str] = set()
+    seen: dict[str, str] = {}
     for strategy in ("MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"):
-        candidate_preference = preference.model_copy(update={"strategy": PlanningStrategy(strategy)})
-        # Revalidate because model_copy intentionally skips Pydantic validation.
-        candidate_preference = StudentPreference.model_validate(candidate_preference.model_dump())
-        result = personalized_demo_plan(
-            candidate_preference,
-            target_total=target_total,
-            busy_intervals=busy_intervals,
-            availability_request=availability_request,
-        )
-        signature = _plan_signature(result)
-        attempted.append({"strategy": strategy, "signature": signature})
-        if signature in seen:
+        try:
+            candidate_preference = preference.model_copy(update={"strategy": PlanningStrategy(strategy)})
+            # Revalidate because model_copy intentionally skips Pydantic validation.
+            candidate_preference = StudentPreference.model_validate(candidate_preference.model_dump())
+            result = personalized_demo_plan(
+                candidate_preference,
+                target_total=target_total,
+                busy_intervals=busy_intervals,
+                availability_request=availability_request,
+            )
+        except (KeyError, TypeError, ValueError, RuntimeError) as exc:
+            attempted.append({"strategy": strategy, "status": "FAILED", "error": str(exc)})
+            options.append({"strategy": strategy, "status": "FAILED", "error": str(exc), "result": None})
             continue
-        seen.add(signature)
+        signature = _plan_signature(result)
+        duplicate_of = seen.get(signature)
+        seen.setdefault(signature, strategy)
+        attempted.append({"strategy": strategy, "status": "READY", "signature": signature})
         plan = result["plan"]
         score = plan.get("score_summary") or {}
         options.append(
             {
                 "strategy": strategy,
+                "status": "READY",
                 "signature": signature,
+                "duplicate_of": duplicate_of,
                 "projected_total": score.get("projected_total"),
+                "target_shortfall": score.get("remaining_total"),
                 "target_met": score.get("remaining_total") == 0 if score else False,
                 "activity_count": len(plan.get("selected_activities", [])),
                 "duration_minutes": _plan_minutes(plan),
@@ -473,14 +488,15 @@ def personalized_plan_options(
                 "result": result,
             }
         )
+    ready_count = sum(1 for item in options if item.get("status") == "READY")
     return {
         "options": options,
         "attempted": attempted,
-        "deduplicated": len(attempted) - len(options),
+        "deduplicated": 0,
         "message": (
             None
-            if len(options) == len(attempted)
-            else "Mot so chien luoc tao cung mot lich kha thi nen da duoc gop lai."
+            if ready_count
+            else "Không có chiến lược nào tạo được lịch hợp lệ với dữ liệu hiện tại."
         ),
     }
 
@@ -488,28 +504,52 @@ def personalized_plan_options(
 def preview_personalized_swap(
     preference: StudentPreference,
     base_result: dict,
-    remove_activity_id: str,
-    add_activity_id: str | None,
-    # REVIEW-DASH START
-    # REVIEW-DASH: availability pass-through (needs Ngoc review)
+    remove_activity_id: str | None,
+    add_activity_id: str | None = None,
+    *,
+    source: str = "synthetic",
     availability_request: dict | None = None,
-    # REVIEW-DASH END
 ) -> dict:
-    """Preview a safe replacement through SP3 whole-plan scoring.
+    """Preview a safe replacement through SP3 whole-plan scoring."""
+    return _preview_personalized_change(preference, base_result, remove_activity_id, add_activity_id, source=source, availability_request=availability_request)
 
-    A FIXED replacement is seeded into the previous plan and kept with
-    KEEP_TIME. A flexible replacement is requested with FORCE_INCLUDE (contract
-    revision 0.2.1) so the planner places it around the kept blocks; when it
-    cannot, the keep conflict fails the preview closed. ``add_activity_id=None``
-    removes the activity only (see ``remove_planned_activity``).
+
+def preview_personalized_addition(
+    preference: StudentPreference, base_result: dict, add_activity_id: str, *, source: str = "synthetic",
+    availability_request: dict | None = None,
+) -> dict:
+    """Preview adding one fixed-time activity while keeping unaffected selections."""
+    return _preview_personalized_change(preference, base_result, None, add_activity_id, source=source, availability_request=availability_request)
+
+
+def preview_personalized_removal(
+    preference: StudentPreference, base_result: dict, remove_activity_id: str, *, source: str = "synthetic",
+    availability_request: dict | None = None,
+) -> dict:
+    """Preview removing one activity only; never add compensation."""
+    return _preview_personalized_change(preference, base_result, remove_activity_id, None, source=source, availability_request=availability_request)
+
+
+def _preview_personalized_change(
+    preference: StudentPreference,
+    base_result: dict,
+    remove_activity_id: str | None,
+    add_activity_id: str | None,
+    *,
+    source: str = "synthetic",
+    availability_request: dict | None = None,
+) -> dict:
+    """Validate a calendar edit by rebuilding and independently checking the whole plan.
+
+    Fixed additions use KEEP_TIME; flexible additions use FORCE_INCLUDE (revision 0.2.1).
+    Every other selected block stays fixed, and remove-only uses the shared removal path.
     """
 
-    # REVIEW-DASH START
-    if add_activity_id is None:
+    if add_activity_id is None and remove_activity_id is not None:
         return remove_planned_activity(
-            preference, base_result, remove_activity_id, availability_request=availability_request,
+            preference, base_result, remove_activity_id,
+            availability_request=availability_request, source=source,
         )
-    # REVIEW-DASH END
 
     if not isinstance(base_result, dict):
         raise ValueError("base_result must be an object")
@@ -524,42 +564,38 @@ def preview_personalized_swap(
         or len(selected_rows) > 20
         or not all(isinstance(item, dict) for item in selected_rows)
         or not isinstance(candidate_rows, list)
-        or len(candidate_rows) > 200
+        or len(candidate_rows) > 500
         or not all(isinstance(item, dict) for item in candidate_rows)
     ):
         raise ValueError("base_result plan rows are invalid or too large")
 
-    if remove_activity_id == add_activity_id:
+    if remove_activity_id is None and add_activity_id is None:
+        raise ValueError("calendar change must add or remove an activity")
+    if remove_activity_id is not None and remove_activity_id == add_activity_id:
         raise ValueError("replacement activity must be different")
     selected = {
         item.get("activity_id")
         for item in base_result.get("plan", {}).get("selected_activities", [])
     }
-    if remove_activity_id not in selected:
+    if remove_activity_id is not None and remove_activity_id not in selected:
         raise ValueError("activity to remove is not selected")
-    if add_activity_id in selected:
+    if add_activity_id is not None and add_activity_id in selected:
         raise ValueError("replacement activity is already selected")
     candidates = {
         item.get("activity", {}).get("activity_id"): item
         for item in base_result.get("feasibility", {}).get("candidates", [])
     }
-    candidate = candidates.get(add_activity_id)
-    if not candidate:
-        raise ValueError("replacement activity is not in the eligible catalog")
-    feasibility = candidate.get("feasibility", {})
-    if feasibility.get("status") != "FEASIBLE":
-        raise ValueError("replacement activity is not feasible")
+    candidate = candidates.get(add_activity_id) if add_activity_id is not None else None
+    if add_activity_id is not None:
+        if not candidate:
+            raise ValueError("replacement activity is not in the eligible catalog")
+        feasibility = candidate.get("feasibility", {})
+        if feasibility.get("status") != "FEASIBLE":
+            raise ValueError("replacement activity is not feasible")
     target_total = base_result.get("requested_total_target", 80)
     if isinstance(target_total, bool) or not isinstance(target_total, int) or not 0 <= target_total <= 100:
         raise ValueError("base_result requested_total_target is invalid")
-    internal = personalized_demo_plan(
-        preference,
-        scenario="first_plan",
-        target_total=target_total,
-        include_internal=True,
-        # REVIEW-DASH: availability pass-through (needs Ngoc review)
-        availability_request=availability_request,
-    )
+    internal = _review_internal(preference, base_result, target_total, availability_request, source)
     planner_input = internal.pop("_planner_input")
     engine = internal.pop("_engine")
     score_callback = internal.pop("_score_callback")
@@ -569,25 +605,24 @@ def preview_personalized_swap(
     }
     if not selected <= set(by_id):
         raise ValueError("base_result contains activities outside the eligible catalog")
-    replacement = by_id.get(add_activity_id)
-    if replacement is None:
-        raise ValueError("replacement activity is outside the eligible catalog")
-    schedule = replacement.get("schedule") or {}
-    # REVIEW-DASH START
-    force_include = schedule.get("type") == "FLEXIBLE_WINDOW"
-    if not force_include and (schedule.get("type") != "FIXED" or not schedule.get("fixed_blocks")):
-        raise ValueError("replacement activity has no usable schedule")
-    # REVIEW-DASH END
+    schedule = None
+    force_include = False
+    if add_activity_id is not None:
+        replacement = by_id.get(add_activity_id)
+        if replacement is None:
+            raise ValueError("replacement activity is outside the eligible catalog")
+        schedule = replacement.get("schedule") or {}
+        force_include = schedule.get("type") == "FLEXIBLE_WINDOW"
+        if not force_include and (schedule.get("type") != "FIXED" or not schedule.get("fixed_blocks")):
+            raise ValueError("replacement activity has no usable schedule")
 
     seeded = [
         {"activity_id": item["activity_id"], "scheduled_blocks": deepcopy(item.get("scheduled_blocks", []))}
         for item in base_result["plan"].get("selected_activities", [])
-        if item["activity_id"] != remove_activity_id
+        if remove_activity_id is None or item["activity_id"] != remove_activity_id
     ]
-    # REVIEW-DASH START
-    if not force_include:
+    if add_activity_id is not None and schedule is not None and not force_include:
         seeded.append({"activity_id": add_activity_id, "scheduled_blocks": deepcopy(schedule["fixed_blocks"])})
-    # REVIEW-DASH END
     seeded.sort(key=lambda item: item["activity_id"])
     # build_based_on fields come from the fresh plan output and are safer than
     # reconstructing the upstream version tuple here.
@@ -601,15 +636,13 @@ def preview_personalized_swap(
         {"activity_id": item["activity_id"], "mode": "KEEP_TIME"}
         for item in seeded
     ]
-    # REVIEW-DASH START
     if force_include:
         planner_input["keep_requests"].append({"activity_id": add_activity_id, "mode": "FORCE_INCLUDE"})
-    # REVIEW-DASH END
     for candidate_row in planner_input["candidates"]:
         activity_id = candidate_row["activity"]["activity_id"]
         original_candidate = candidates.get(activity_id)
         originally_feasible = original_candidate and original_candidate.get("feasibility", {}).get("status") == "FEASIBLE"
-        if activity_id == remove_activity_id or not originally_feasible:
+        if (remove_activity_id is not None and activity_id == remove_activity_id) or not originally_feasible:
             candidate_row["participation"]["progress"] = "CANCELLED"
     preview_plan = build_plan(
         planner_input,
@@ -619,12 +652,12 @@ def preview_personalized_swap(
     )
     violations = check_plan(planner_input, preview_plan, score_callback, input_snapshot=deepcopy(planner_input))
     if violations:
-        raise ValueError("replacement failed SP3 independent validation")
+        raise ValueError("calendar change failed SP3 independent validation")
     if preview_plan.get("keep_conflicts"):
-        raise ValueError("replacement conflicts with an unaffected activity or hard limit")
-    preview = {**internal, "plan": preview_plan, "scenario": "personalized_smart_swap"}
+        raise ValueError("calendar change conflicts with an unaffected activity or hard limit")
+    preview = _review_result(internal, preview_plan, engine, "personalized_calendar_change")
     after_ids = {item["activity_id"] for item in preview_plan.get("selected_activities", [])}
-    if add_activity_id not in after_ids:
+    if add_activity_id is not None and add_activity_id not in after_ids:
         raise ValueError(
             "SP3 cannot safely force this replacement; choose an alternative selected by the validated replan"
         )
@@ -638,11 +671,13 @@ def preview_personalized_swap(
         "add_activity_id": add_activity_id,
         "before": {
             "projected_total": before_summary.get("projected_total"),
+            "target_shortfall": before_summary.get("remaining_total"),
             "activity_count": len(before_ids),
             "duration_minutes": _plan_minutes(base_result["plan"]),
         },
         "after": {
             "projected_total": after_summary.get("projected_total"),
+            "target_shortfall": after_summary.get("remaining_total"),
             "activity_count": len(after_ids),
             "duration_minutes": _plan_minutes(preview["plan"]),
         },
@@ -663,6 +698,42 @@ REVIEW_MAX_LIMIT = 10
 _TARGET_TOLERANCE = 1e-9
 
 
+def _review_internal(preference, base_result, target_total, availability_request, source):
+    if source not in {"synthetic", "real"}:
+        raise ValueError("source must be 'synthetic' or 'real'")
+    if source == "real":
+        from api.sp3_real import real_plan
+        return real_plan(
+            "first_plan", target_total=target_total, preference=preference,
+            availability_request=availability_request, include_internal=True,
+        )
+    if base_result.get("data_source") == "SP1-STORE-V2":
+        raise ValueError("a real-source plan requires source=real")
+    return personalized_demo_plan(
+        preference, target_total=target_total,
+        availability_request=availability_request, include_internal=True,
+    )
+
+
+def _review_result(internal, plan, engine, scenario):
+    """Refresh preference explanations from the final plan, using the preference engine."""
+    result = {**internal, "plan": plan, "scenario": scenario, "checker_violations": 0}
+    contributions = [
+        {"activity_id": item["activity_id"], "category_id": reason["category_id"]}
+        for item in plan.get("selected_activities", [])
+        for reason in item.get("reasons", [])
+        if reason["code"] == "GOAL_CONTRIBUTION" and reason.get("category_id")
+    ]
+    ids = [item["activity_id"] for item in plan.get("selected_activities", [])]
+    breakdown = engine.selected_breakdown({"contributions": contributions}, ids)
+    result["personalization"] = {
+        **internal.get("personalization", {}),
+        "selected_breakdown": breakdown,
+        "total_utility": engine.score_set(tuple(ids), {"contributions": contributions}),
+    }
+    return result
+
+
 @dataclass(frozen=True)
 class _ReviewContext:
     selected_rows: list
@@ -680,6 +751,7 @@ def _review_context(
     base_result: dict,
     remove_activity_id: str,
     availability_request: dict | None = None,
+    *, source: str = "synthetic",
 ) -> _ReviewContext:
     """Validate a client-held base result and rebuild trusted planner state for it."""
     if not isinstance(base_result, dict):
@@ -695,7 +767,7 @@ def _review_context(
         or len(rows) > 20
         or not all(isinstance(item, dict) and isinstance(item.get("activity_id"), str) for item in rows)
         or not isinstance(candidates, list)
-        or len(candidates) > 200
+        or len(candidates) > 500
         or not all(isinstance(item, dict) for item in candidates)
     ):
         raise ValueError("base_result plan rows are invalid or too large")
@@ -706,10 +778,7 @@ def _review_context(
     if isinstance(target_total, bool) or not isinstance(target_total, int) or not 0 <= target_total <= 100:
         raise ValueError("base_result requested_total_target is invalid")
     # The student's own availability (same schema as /personalized/plan); None = the fixture default.
-    internal = personalized_demo_plan(
-        preference, scenario="first_plan", target_total=target_total, include_internal=True,
-        availability_request=availability_request,
-    )
+    internal = _review_internal(preference, base_result, target_total, availability_request, source)
     planner_input = internal.pop("_planner_input")
     engine = internal.pop("_engine")
     score_callback = internal.pop("_score_callback")
@@ -783,10 +852,13 @@ def _review_preview(
         "add_activity_id": None,
         "before": {
             "projected_total": context.base_summary.get("projected_total"),
+            "target_shortfall": context.base_summary.get("remaining_total"),
             "activity_count": len(context.selected_ids),
+            "duration_minutes": _plan_minutes({"selected_activities": context.selected_rows}),
         },
         "after": {
             "projected_total": state["projected_total"],
+            "target_shortfall": state["remaining_total"],
             "activity_count": len(after_ids),
             "duration_minutes": _plan_minutes(plan),
         },
@@ -795,7 +867,7 @@ def _review_preview(
         "dropped_activity_ids": sorted(context.selected_ids - after_ids),
         "added_activity_ids": sorted(after_ids - context.selected_ids),
         # Every plan reaching this point passed check_plan (a violation raises), so the count is 0.
-        "result": {**context.internal, "plan": plan, "scenario": scenario, "checker_violations": 0},
+        "result": _review_result(context.internal, plan, context.engine, scenario),
     }
 
 
@@ -804,6 +876,7 @@ def remove_planned_activity(
     base_result: dict,
     remove_activity_id: str,
     availability_request: dict | None = None,
+    *, source: str = "synthetic",
 ) -> dict:
     """Remove one activity and re-score the rest; nothing replaces it.
 
@@ -812,7 +885,7 @@ def remove_planned_activity(
     compensating activity. The result may be below the target: that is reported
     through ``target_met=False`` and ``warnings=["BELOW_TARGET"]``, not as an error.
     """
-    context = _review_context(preference, base_result, remove_activity_id, availability_request)
+    context = _review_context(preference, base_result, remove_activity_id, availability_request, source=source)
     remaining = [item for item in context.selected_rows if item["activity_id"] != remove_activity_id]
     planner_input = _seed_previous_plan(context, remaining)
     _cancel(planner_input, remove_activity_id)
@@ -836,13 +909,14 @@ def what_if_skip_planned_activity(
     base_result: dict,
     skip_activity_id: str,
     availability_request: dict | None = None,
+    *, source: str = "synthetic",
 ) -> dict:
     """Preview the plan if ``skip_activity_id`` is skipped; nothing is applied.
 
     ``what_if_skip`` runs with a KEEP_TIME request for every remaining selected
     activity, so SP3 only adds compensating activities and never moves the others.
     """
-    context = _review_context(preference, base_result, skip_activity_id, availability_request)
+    context = _review_context(preference, base_result, skip_activity_id, availability_request, source=source)
     planner_input = _seed_previous_plan(context, context.selected_rows)
     # The skipped activity keeps its previous block but is no longer a keep request.
     planner_input["keep_requests"] = [
@@ -912,6 +986,7 @@ def list_swap_alternatives(
     remove_activity_id: str,
     limit: int = REVIEW_DEFAULT_LIMIT,
     availability_request: dict | None = None,
+    *, source: str = "synthetic",
 ) -> dict:
     """List valid replacements for ``remove_activity_id``, best first.
 
@@ -925,7 +1000,7 @@ def list_swap_alternatives(
     """
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= REVIEW_MAX_LIMIT:
         raise ValueError(f"limit must be an integer from 1 to {REVIEW_MAX_LIMIT}")
-    context = _review_context(preference, base_result, remove_activity_id, availability_request)
+    context = _review_context(preference, base_result, remove_activity_id, availability_request, source=source)
     base_projected = context.base_summary.get("projected_total")
     if isinstance(base_projected, bool) or not isinstance(base_projected, (int, float)):
         raise ValueError("base_result has no projected total")
@@ -956,7 +1031,7 @@ def list_swap_alternatives(
         try:
             preview = preview_personalized_swap(
                 preference, base_result, remove_activity_id, activity_id,
-                availability_request=availability_request,
+                availability_request=availability_request, source=source,
             )
         except ValueError as exc:
             reject(activity_id, "SWAP_REJECTED", str(exc))
