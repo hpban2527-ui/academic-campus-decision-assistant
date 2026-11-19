@@ -1239,3 +1239,440 @@ vm.runInContext(mainScript, sandbox);
 
     assert res["rSuccess"]["confirmed"] is True
     assert "✓ Kế hoạch đã được xác nhận và lưu thành công." in res["msgSuccess"]
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="Node.js is required for frontend integration test")
+def test_navigation_view_isolation_onboarding_to_dashboard_and_program_select() -> None:
+    # 1. #viewProfile must NOT have xl:grid on its top-level element (which overrode hidden at >=1280px)
+    assert '<div id="viewProfile" class="hidden">' in HTML
+    assert 'id="viewProfile" class="hidden space-y-6 xl:min-h' not in HTML
+    # 2. All 3 program controls are selects with exactly 2 choices
+    assert '<select id="profileProgram"' in HTML
+    assert '<select id="psProgram"' in HTML
+    assert '<select id="onboardingProgram"' in HTML
+    assert 'STUDENT_PROGRAMS = ["Chương trình Chuẩn", "Chương trình Chất lượng cao"]' in HTML
+
+    js = r"""
+const fs = require('fs');
+const vm = require('vm');
+const html = fs.readFileSync('web/index.html', 'utf8');
+const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(m => m[1]);
+const mainScript = scripts[scripts.length - 1];
+
+const storage = new Map();
+const elements = new Map();
+function getEl(id) {
+  if (!elements.has(id)) {
+    const classes = new Set(id.startsWith('view') && id !== 'viewDashboard' ? ['hidden'] : []);
+    elements.set(id, {
+      id, value: id === 'inputPlanTarget' ? '80' : '', innerText: '', textContent: '', innerHTML: '',
+      checked: true, disabled: false, hidden: classes.has('hidden'), style: {}, className: '', children: [{}, {}],
+      classList: {
+        add(...cs){ cs.forEach(c => classes.add(c)); },
+        remove(...cs){ cs.forEach(c => classes.delete(c)); },
+        toggle(c, force){ if (force === undefined) { if (classes.has(c)) { classes.delete(c); return false; } classes.add(c); return true; } if (force) classes.add(c); else classes.delete(c); return force; },
+        contains(c){ return classes.has(c); }
+      },
+      setAttribute(){}, querySelector(){ return null; }, querySelectorAll(){ return []; },
+      insertAdjacentHTML(){}, focus(){}, appendChild(){}, remove(){}, scrollIntoView(){}, setSelectionRange(){}
+    });
+  }
+  return elements.get(id);
+}
+
+const sandbox = {
+  console, Date, Math, Number, String, Boolean, Array, Object, Set, Map, RegExp, JSON, Error, Promise,
+  parseInt, parseFloat, isNaN, isFinite, encodeURIComponent, decodeURIComponent, btoa, atob, unescape, escape,
+  setTimeout: () => 1, clearTimeout: () => {}, setInterval: () => 1, clearInterval: () => {},
+  requestAnimationFrame: fn => fn(), scrollTo(){},
+  addEventListener(){}, removeEventListener(){}, alert(){},
+  performance: { now: () => 0 },
+  localStorage: {
+    getItem: k => storage.has(k) ? storage.get(k) : null,
+    setItem: (k, v) => storage.set(k, String(v)),
+    removeItem: k => storage.delete(k)
+  },
+  fetch: async () => ({ ok: false, status: 404, json: async () => ({}) }),
+  document: {
+    body: getEl('body'), readyState: 'complete', addEventListener(){},
+    getElementById: id => getEl(id), querySelector: () => null, querySelectorAll: () => [],
+    createElement: () => ({ style: {}, className: '', textContent: '', remove(){} })
+  }
+};
+sandbox.window = sandbox;
+vm.createContext(sandbox);
+vm.runInContext(mainScript, sandbox);
+
+(async () => {
+  // A. Legacy program normalization
+  const norm = {
+    clc: sandbox.normalizeStudentProgram('CLC'),
+    chatLuongCao: sandbox.normalizeStudentProgram('Chất lượng cao'),
+    daiTra: sandbox.normalizeStudentProgram('Đại trà'),
+    chuan: sandbox.normalizeStudentProgram('Chương trình chuẩn'),
+    empty: sandbox.normalizeStudentProgram(''),
+  };
+
+  // B. Legacy saved account migration preserves unrelated data & normalizes program
+  const legacySaved = {
+    schema_version: 1,
+    student_id: '25127111',
+    profile: { faculty: 'CNTT', program: 'CLC', score_history: [{ semester: 'HK1', score: 85 }] }
+  };
+  sandbox.localStorage.setItem('unilife_data_25127111', JSON.stringify(legacySaved));
+  const migrated = sandbox.readLocalUserData('25127111');
+
+  // C. Registration -> onboarding (select CLC) -> completeOnboarding -> finishWelcome -> lands on dashboard
+  const user = { student_id: '25127222', full_name: 'Nav Tester', class: '25CTT1', major: 'CNTT' };
+  sandbox.localStorage.setItem('unilife_data_' + user.student_id, JSON.stringify(sandbox.createDefaultLocalUserData(user.student_id, true)));
+  sandbox.localStorage.setItem('unilife_users', JSON.stringify([user]));
+  sandbox.beginOnboarding(user);
+  vm.runInContext(`
+    updateOnboardingProfileField('program', 'Chương trình Chất lượng cao');
+    nextOnboardingStep();
+    nextOnboardingStep();
+    selectOnboardingTargetPreset(80);
+    selectOnboardingCategoryChoice('C1');
+    selectOnboardingModeChoice('any');
+    selectOnboardingCampusChoice('any');
+    finishOnboardingTopics(true);
+    nextOnboardingStep();
+    finishWelcome();
+  `, sandbox);
+
+  const afterWelcome = {
+    dashboardVisible: !sandbox.document.getElementById('viewDashboard').classList.contains('hidden') && !sandbox.document.getElementById('viewDashboard').hidden,
+    profileHidden: sandbox.document.getElementById('viewProfile').classList.contains('hidden') && sandbox.document.getElementById('viewProfile').hidden,
+  };
+
+  // D. Switch across every sidebar page and verify ONLY that single view is visible
+  const tabs = ['dashboard', 'profile', 'calculator', 'activities', 'snapshot', 'plan', 'testSuites', 'inspector'];
+  const tabIsolation = {};
+  for (const t of tabs) {
+    sandbox.switchTab(t);
+    const visible = tabs.filter(other => {
+      const el = sandbox.document.getElementById('view' + sandbox.capitalize(other));
+      return !el.classList.contains('hidden') && !el.hidden;
+    });
+    tabIsolation[t] = visible;
+  }
+
+  // E. Reload and verify program persisted to both Student Profile and Planning Profile
+  await vm.runInContext("applyCurrentStudent({ student_id: '25127222', full_name: 'Nav Tester', major: 'CNTT' })", sandbox);
+  const reloadedProgram = {
+    stored: sandbox.readLocalUserData('25127222').profile.program,
+    profileSelect: sandbox.document.getElementById('profileProgram').value,
+    psHtmlHasSelected: sandbox.document.getElementById('profileScheduleProfileBody').innerHTML.includes('value="Chương trình Chất lượng cao" selected'),
+  };
+
+  console.log(JSON.stringify({ norm, migratedProgram: migrated.profile.program, migratedScores: migrated.profile.score_history, afterWelcome, tabIsolation, reloadedProgram }));
+})();
+"""
+    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    res = json.loads(raw)
+
+    assert res["norm"] == {
+        "clc": "Chương trình Chất lượng cao",
+        "chatLuongCao": "Chương trình Chất lượng cao",
+        "daiTra": "Chương trình Chuẩn",
+        "chuan": "Chương trình Chuẩn",
+        "empty": "Chương trình Chuẩn",
+    }
+    assert res["migratedProgram"] == "Chương trình Chất lượng cao"
+    assert res["migratedScores"] == [{"semester": "HK1", "score": 85}]
+    assert res["afterWelcome"] == {"dashboardVisible": True, "profileHidden": True}
+    for tab, visible_list in res["tabIsolation"].items():
+        assert visible_list == [tab]
+    assert res["reloadedProgram"] == {
+        "stored": "Chương trình Chất lượng cao",
+        "profileSelect": "Chương trình Chất lượng cao",
+        "psHtmlHasSelected": True,
+    }
+
+
+def test_profile_schedule_strict_separation_activity_calendar_availability_and_no_demos():
+    """Verify TASK 2: Hồ sơ & Lịch strict subpage separation, activity calendar first,
+    separate personal availability subview affecting SP3, no demo scenarios, and
+    options -> review -> confirm returning to activity calendar.
+    """
+    html = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+
+    # 1. Static DOM & demo-scenario removal checks
+    for forbidden in [
+        'id="planStepper"',
+        'id="planChangeCard"',
+        "Tình huống mẫu",
+        "Khi lịch của bạn thay đổi",
+        "Khi bạn bỏ một hoạt động",
+        "Mô phỏng thay đổi lịch",
+    ]:
+        assert forbidden not in html, f"Demo scenario markup/copy must be removed: {forbidden}"
+
+    view_plan_start = html.index('id="viewPlan"')
+    view_profile_start = html.index('id="viewProfile"')
+    view_plan_html = html[view_plan_start:view_profile_start]
+
+    profile_panel_start = view_plan_html.index('id="profileSchedulePanelProfile"')
+    schedule_panel_start = view_plan_html.index('id="profileSchedulePanelSchedule"')
+    profile_panel_html = view_plan_html[profile_panel_start:schedule_panel_start]
+    schedule_panel_html = view_plan_html[schedule_panel_start:]
+
+    # Profile subpage contains ONLY planning preferences, no Planner calendars or options
+    assert 'id="profileScheduleProfileBody"' in profile_panel_html
+    for must_not_be_in_profile in [
+        'id="planCalendarView"',
+        'id="smartPlanSection"',
+        'id="planReviewScreen"',
+        'id="profileAvailabilitySubview"',
+    ]:
+        assert must_not_be_in_profile not in profile_panel_html
+
+    # Schedule subpage owns all 4 mutually exclusive subviews + required buttons
+    for must_be_in_schedule in [
+        'id="scheduleActivityCalendarSubview"',
+        'id="profileAvailabilitySubview"',
+        'id="smartPlanSection"',
+        'id="planReviewScreen"',
+        'id="btnOpenPersonalAvailability"',
+        "Lịch bận/rảnh của tôi",
+        "Lập kế hoạch lần đầu",
+    ]:
+        assert must_be_in_schedule in schedule_panel_html
+
+    # 2. Runtime behavior in Node VM + actual Python SP3 resolve_availability check
+    js = r"""
+const fs = require('fs');
+const vm = require('vm');
+const html = fs.readFileSync('web/index.html', 'utf8');
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
+
+const elements = new Map();
+function makeEl(id) {
+  if (!elements.has(id)) {
+    const classes = new Set();
+    elements.set(id, {
+      id, value: id === 'inputPlanTarget' ? '80' : '', innerText: '', textContent: '', innerHTML: '',
+      checked: false, disabled: false, hidden: false, style: {}, dataset: {},
+      classList: {
+        add: (...c) => c.forEach(x => classes.add(x)),
+        remove: (...c) => c.forEach(x => classes.delete(x)),
+        toggle: (c, f) => { if (f === undefined) { classes.has(c) ? classes.delete(c) : classes.add(c); } else if (f) classes.add(c); else classes.delete(c); },
+        contains: c => classes.has(c)
+      },
+      setAttribute(k, v) { this[k] = v; },
+      getAttribute(k) { return this[k]; },
+      focus() {}, scrollIntoView() {}, scrollTo() {},
+      querySelector() { return makeEl(id + ':q'); },
+      querySelectorAll() { return []; },
+      appendChild() {}
+    });
+  }
+  return elements.get(id);
+}
+
+const storage = new Map();
+let fetchCalls = 0;
+const sandbox = {
+  console, Math, Date, JSON, Set, Map, Array, Object, Number, String, Boolean, RegExp, Promise, Error,
+  parseInt, parseFloat, isNaN, encodeURIComponent, decodeURIComponent, btoa, atob, escape, unescape,
+  setTimeout: () => 0, clearTimeout: () => {}, requestAnimationFrame: cb => cb(),
+  localStorage: {
+    getItem: k => storage.has(k) ? storage.get(k) : null,
+    setItem: (k, v) => storage.set(k, String(v)),
+    removeItem: k => storage.delete(k)
+  },
+  document: {
+    readyState: 'complete',
+    body: { classList: { toggle() {}, add() {}, remove() {} }, style: {}, appendChild() {} },
+    getElementById: id => makeEl(id),
+    querySelector: () => makeEl('qs'),
+    querySelectorAll: () => [],
+    addEventListener: () => {},
+    createElement: () => makeEl('dyn_' + Math.random())
+  },
+  window: { addEventListener: () => {}, scrollTo: () => {}, innerWidth: 1440 },
+  tailwind: {},
+  navigator: { clipboard: { writeText: async () => {} } },
+  fetch: async () => { fetchCalls += 1; return { ok: false, json: async () => ({}) }; },
+  alert: () => {}, confirm: () => true,
+};
+sandbox.window.document = sandbox.document;
+sandbox.window.localStorage = sandbox.localStorage;
+vm.createContext(sandbox);
+vm.runInContext(scripts, sandbox);
+
+function subviewState() {
+  const ids = ['scheduleActivityCalendarSubview', 'profileAvailabilitySubview', 'smartPlanSection', 'planReviewScreen'];
+  const visible = ids.filter(id => {
+    const el = sandbox.document.getElementById(id);
+    return !el.classList.contains('hidden') && !el.hidden;
+  });
+  return {
+    tab: vm.runInContext('activeProfileScheduleTab', sandbox),
+    subview: vm.runInContext('activeScheduleSubview', sandbox),
+    profileHidden: sandbox.document.getElementById('profileSchedulePanelProfile').classList.contains('hidden'),
+    scheduleHidden: sandbox.document.getElementById('profileSchedulePanelSchedule').classList.contains('hidden'),
+    visibleSubviews: visible,
+    emptyVisible: !sandbox.document.getElementById('plannerEmptyState').classList.contains('hidden'),
+    activeVisible: !sandbox.document.getElementById('plannerActiveResult').classList.contains('hidden'),
+    confirmBadgeText: sandbox.document.getElementById('planConfirmationBadge').textContent,
+    confirmBadgeHidden: sandbox.document.getElementById('planConfirmationBadge').classList.contains('hidden'),
+  };
+}
+
+(async () => {
+  await vm.runInContext("currentStudent = { student_id: '25127333', full_name: 'Task2 Tester', major: 'CNTT' }; applyCurrentStudent(currentStudent);", sandbox);
+  vm.runInContext("SP3_SOURCE = 'real';", sandbox);
+  fetchCalls = 0;
+
+  // 1. Switching to plan tab must NOT silently run SP3 planner
+  sandbox.switchTab('plan');
+  const fetchAfterSwitchToPlan = fetchCalls;
+
+  // 2. Profile tab shows ONLY profile panel
+  sandbox.setProfileScheduleTab('profile');
+  const onProfile = subviewState();
+
+  // 3. Schedule tab opens on activity calendar subview first with empty state (no plan yet)
+  sandbox.setProfileScheduleTab('schedule');
+  const onScheduleEmpty = subviewState();
+
+  // 4. Open personal availability separately, add a busy block, save & return to activity calendar
+  sandbox.openPersonalAvailabilitySubview();
+  const onAvailability = subviewState();
+  vm.runInContext(`
+    addOnboardingBusyEntry({
+      category: 'class',
+      title: 'Thực hành CTDL',
+      date: '2026-11-09',
+      weekday: 0,
+      start: '09:00',
+      end: '11:00',
+      recurring: true
+    }, 'profile');
+    saveAndClosePersonalAvailability();
+  `, sandbox);
+  const afterSaveAvailability = subviewState();
+
+  // 5. Simulate 3 options generated -> choose option -> review -> confirm unavailable -> confirm available
+  const samplePlan = {
+    mode: 'DEMO_ONLY',
+    requested_total_target: 80,
+    activities: [{ activity_id: 'ACT-MON', title: 'Workshop CTDL Sáng Thứ 2' }],
+    plan: {
+      status: 'TARGET_MET',
+      score_summary: { baseline_total: 0, projected_total: 80, gain_total: 80, official_baseline_verified: false },
+      selected_activities: [{
+        activity_id: 'ACT-MON',
+        scheduled_blocks: [{ start: '2026-11-09T09:30:00+07:00', end: '2026-11-09T10:30:00+07:00' }]
+      }]
+    },
+    availability: { available_intervals: [] },
+    feasibility: { candidates: [{ activity: { activity_id: 'ACT-MON', title: 'Workshop CTDL Sáng Thứ 2' }, feasibility: { status: 'FEASIBLE' } }] }
+  };
+  vm.runInContext(`
+    cachedPlanOptions = [
+      { strategy: 'MINIMUM_EFFORT', status: 'READY', projected_total: 80, remaining_total: 0, activity_count: 1, total_duration_hours: 1, utility: 10, result: ${JSON.stringify(samplePlan)} },
+      { strategy: 'BALANCED', status: 'READY', projected_total: 80, remaining_total: 0, activity_count: 1, total_duration_hours: 1, utility: 12, result: ${JSON.stringify(samplePlan)} },
+      { strategy: 'PREFERENCE_FIRST', status: 'READY', projected_total: 80, remaining_total: 0, activity_count: 1, total_duration_hours: 1, utility: 15, result: ${JSON.stringify(samplePlan)} }
+    ];
+    selectCachedPlanOption(1);
+    setPlannerScreenMode('options');
+  `, sandbox);
+  const onOptions = subviewState();
+
+  sandbox.openPlanReviewScreen(1);
+  const onReview = subviewState();
+
+  // Confirm without contract -> stays preview (unconfirmed)
+  const confirmNoContract = await sandbox.confirmSelectedPlanViaContract();
+  const afterNoContract = {
+    confirmedFlag: vm.runInContext('currentPlanConfirmed', sandbox),
+    subview: vm.runInContext('activeScheduleSubview', sandbox),
+  };
+
+  // Register teammate confirmation contract -> returns confirmed: true -> returns to activity calendar with confirmed badge
+  sandbox.window.UniLifePlanReviewContract = {
+    confirmPlan: async () => ({ confirmed: true, status: 'CONFIRMED' })
+  };
+  const confirmWithContract = await sandbox.confirmSelectedPlanViaContract();
+  const afterConfirmed = subviewState();
+  const conflictNoticeHtml = sandbox.document.getElementById('schedulePlanConflictNotice').innerHTML;
+  const conflictNoticeHidden = sandbox.document.getElementById('schedulePlanConflictNotice').classList.contains('hidden');
+
+  // Reload and verify canonical_availability + confirmed state persisted
+  await vm.runInContext("currentStudent = { student_id: '25127333', full_name: 'Task2 Tester', major: 'CNTT' }; applyCurrentStudent(currentStudent);", sandbox);
+  sandbox.setProfileScheduleTab('schedule');
+  const afterReload = subviewState();
+  const canonicalAvailability = sandbox.plannerAvailabilityPayload();
+
+  console.log(JSON.stringify({
+    fetchAfterSwitchToPlan,
+    onProfile,
+    onScheduleEmpty,
+    onAvailability,
+    afterSaveAvailability,
+    onOptions,
+    onReview,
+    confirmNoContract,
+    afterNoContract,
+    confirmWithContract: { confirmed: confirmWithContract.confirmed },
+    afterConfirmed,
+    conflictNoticeHidden,
+    conflictNoticeHasActivity: conflictNoticeHtml.includes('Workshop CTDL Sáng Thứ 2'),
+    afterReload,
+    canonicalAvailability,
+  }));
+})();
+"""
+    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    res = json.loads(raw)
+
+    assert res["fetchAfterSwitchToPlan"] == 0
+    assert res["onProfile"]["profileHidden"] is False
+    assert res["onProfile"]["scheduleHidden"] is True
+
+    assert res["onScheduleEmpty"]["profileHidden"] is True
+    assert res["onScheduleEmpty"]["scheduleHidden"] is False
+    assert res["onScheduleEmpty"]["visibleSubviews"] == ["scheduleActivityCalendarSubview"]
+    assert res["onScheduleEmpty"]["emptyVisible"] is True
+    assert res["onScheduleEmpty"]["activeVisible"] is False
+
+    assert res["onAvailability"]["visibleSubviews"] == ["profileAvailabilitySubview"]
+    assert res["afterSaveAvailability"]["visibleSubviews"] == ["scheduleActivityCalendarSubview"]
+
+    assert res["onOptions"]["visibleSubviews"] == ["smartPlanSection"]
+    assert res["onReview"]["visibleSubviews"] == ["planReviewScreen"]
+
+    assert res["confirmNoContract"]["confirmed"] is False
+    assert res["afterNoContract"] == {"confirmedFlag": False, "subview": "review"}
+
+    assert res["confirmWithContract"]["confirmed"] is True
+    assert res["afterConfirmed"]["visibleSubviews"] == ["scheduleActivityCalendarSubview"]
+    assert res["afterConfirmed"]["activeVisible"] is True
+    assert "đã xác nhận" in res["afterConfirmed"]["confirmBadgeText"]
+
+    # Real saved busy block (Mon 09:00-11:00) conflicts with ACT-MON (Mon 09:30-10:30) without overwriting plan
+    assert res["conflictNoticeHidden"] is False
+    assert res["conflictNoticeHasActivity"] is True
+
+    # Reload preserves confirmed plan and SP3 availability excludes Mon 09:00-11:00
+    assert res["afterReload"]["visibleSubviews"] == ["scheduleActivityCalendarSubview"]
+    assert res["afterReload"]["activeVisible"] is True
+    assert "đã xác nhận" in res["afterReload"]["confirmBadgeText"]
+
+    # Verify saved canonical_availability actually removes Mon 09:00-11:00 in Python SP3 resolve_availability
+    resolved = resolve_availability(
+        res["canonicalAvailability"],
+        window_start="2026-11-09T00:00:00+07:00",
+        window_end="2026-11-09T23:59:59+07:00",
+    )
+    mon_slots = [
+        (iv["start"], iv["end"])
+        for iv in resolved["available_intervals"]
+        if iv["start"].startswith("2026-11-09")
+    ]
+    assert mon_slots == [
+        ("2026-11-09T07:00:00+07:00", "2026-11-09T09:00:00+07:00"),
+        ("2026-11-09T11:00:00+07:00", "2026-11-09T21:00:00+07:00"),
+    ]

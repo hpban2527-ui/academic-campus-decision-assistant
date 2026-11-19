@@ -1389,14 +1389,13 @@
         </div>
 
         <!-- ================================================================== -->
-                <!-- WORKSPACE 6: KẾ HOẠCH RÈN LUYỆN SP3 (PLANNER & ĐẶT MỤC TIÊU)       -->
+        <!-- WORKSPACE 6: HỒ SƠ & LỊCH (PROFILE PREFERENCES & ACTIVITY SCHEDULE) -->
         <!-- ================================================================== -->
-        <div id="viewPlan" class="hidden space-y-6">
-          
-          <!-- TOP HERO CONTROL DECK: TIÊU ĐỀ + HÀNH TRÌNH STEPPER + BỘ THIẾT LẬP MỤC TIÊU & LỊCH BẬN -->
-          <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 lg:p-6 space-y-5">
-            
-            <!-- Header Row -->
+        <div id="viewPlan" class="hidden space-y-5">
+          <input id="inputPlanTarget" type="hidden" value="80" />
+
+          <!-- Header + Subpage Navigation -->
+          <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 lg:p-6 space-y-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#1b2537]">
               <div class="flex flex-wrap items-center gap-2.5">
                 <h2 class="text-xl font-extrabold text-white tracking-tight">Hồ sơ & Lịch <span class="dev-only font-mono text-sm text-indigo-300 font-normal">(SP3)</span></h2>
@@ -1423,263 +1422,223 @@
               </div>
             </div>
 
-            <!-- One concise disclosure for students; technical status is developer-only. -->
             <div id="planDisclosure" class="px-3 py-2 rounded-xl bg-[#080d18] border border-slate-700/70 text-xs text-slate-400 flex flex-wrap items-center gap-2">
               <span aria-hidden="true">ℹ</span>
               <span><b class="text-slate-300">Bản đề xuất tham khảo.</b> Điểm chỉ được ghi nhận sau khi nhà trường xác nhận.</span><span id="planDisclosureSource" class="dev-only font-mono text-amber-300">DEMO_ONLY · official_award_verified: false · SYNTHETIC-DEMO</span><span id="planRealSourceNote" class="hidden text-sky-300">Đang dùng kho bài thật (hoạt động từ bài đăng thật, sinh viên giả lập, mốc ngày 01/10/2026).</span>
             </div>
 
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#1b2537] pb-3">
+            <div class="flex flex-wrap items-center justify-between gap-3">
               <div class="inline-flex rounded-xl border border-[#1b2537] bg-[#080d18] p-1" role="tablist" aria-label="Hồ sơ và Lịch">
                 <button id="profileScheduleTabProfile" type="button" role="tab" aria-selected="true" onclick="setProfileScheduleTab('profile')" class="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-extrabold text-white shadow-sm transition">Hồ sơ</button>
                 <button id="profileScheduleTabSchedule" type="button" role="tab" aria-selected="false" onclick="setProfileScheduleTab('schedule')" class="rounded-lg px-4 py-2 text-xs font-bold text-slate-400 transition hover:text-white">Lịch</button>
               </div>
               <div class="flex items-center gap-2">
                 <span id="profileScheduleSaveStatus" class="hidden rounded-full border border-emerald-500/35 bg-emerald-950/40 px-3 py-1 text-[11px] font-bold text-emerald-300">Đã lưu thay đổi</span>
-                <button type="button" onclick="document.getElementById('smartPlanSection')?.scrollIntoView({behavior:'smooth'}) || document.getElementById('personalScheduleSection')?.scrollIntoView({behavior:'smooth'})" class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 px-3.5 py-2 text-xs font-bold text-emerald-200 transition hover:bg-emerald-950/40">Đến Kế hoạch thông minh ↓</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================================================================ -->
+          <!-- SUBPAGE 1: HỒ SƠ (Planning preferences only, manual controls)    -->
+          <!-- ================================================================ -->
+          <section id="profileSchedulePanelProfile" role="tabpanel" aria-labelledby="profileScheduleTabProfile" class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 lg:p-6 space-y-4">
+            <div id="profileScheduleProfileBody"></div>
+          </section>
+
+          <!-- ================================================================ -->
+          <!-- SUBPAGE 2: LỊCH (Mutually exclusive subviews: calendar /         -->
+          <!--   availability / options / review)                               -->
+          <!-- ================================================================ -->
+          <section id="profileSchedulePanelSchedule" role="tabpanel" aria-labelledby="profileScheduleTabSchedule" class="hidden space-y-5">
+
+            <!-- SUBVIEW 2A (DEFAULT): PLANNER ACTIVITY CALENDAR -->
+            <div id="scheduleActivityCalendarSubview" class="space-y-5">
+              <!-- Schedule Toolbar -->
+              <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-4 lg:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="space-y-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h3 class="text-base font-black text-white">Lịch hoạt động kế hoạch</h3>
+                    <span id="planConfirmationBadge" class="hidden rounded-full border border-amber-500/40 bg-amber-950/50 px-2.5 py-0.5 text-[11px] font-bold text-amber-200">Bản xem trước · chưa xác nhận</span>
+                  </div>
+                  <p class="text-xs text-slate-400">Hiển thị các hoạt động đã lập kế hoạch theo mục tiêu ĐRL và khung giờ rảnh của bạn.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                  <button id="btnOpenPersonalAvailability" type="button" onclick="openPersonalAvailabilitySubview()" class="rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-2.5 text-xs font-bold text-slate-200 transition hover:border-indigo-400/60 hover:bg-[#131d31] flex items-center gap-2">
+                    <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span>Lịch bận/rảnh của tôi</span>
+                    <span id="busySlotsBadge" class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/60 text-emerald-300">Tất cả rảnh</span>
+                  </button>
+                  <button id="btnOpenPlanOptions" type="button" onclick="openPlanOptionsSubview()" class="hidden rounded-xl border border-emerald-500/35 bg-emerald-950/25 px-3.5 py-2.5 text-xs font-bold text-emerald-200 transition hover:bg-emerald-950/45">
+                    Xem 3 phương án
+                  </button>
+                  <button id="btnRunPlanner" type="button" onclick="runSp3Planner()" class="py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span id="btnRunPlannerText">Lập kế hoạch mới</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Non-destructive conflict / stale notice -->
+              <div id="schedulePlanConflictNotice" class="hidden rounded-2xl border border-amber-400/40 bg-amber-950/35 p-4 text-xs text-amber-100"></div>
+
+              <!-- Empty State when no plan exists yet -->
+              <div id="plannerEmptyState" class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-10 sm:p-12 text-center space-y-4">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-950/60 text-indigo-400 border border-indigo-500/40 flex items-center justify-center mx-auto text-2xl font-black">📅</div>
+                <div class="space-y-1.5">
+                  <h4 class="text-base font-extrabold text-white">Chưa có lịch hoạt động nào được lập</h4>
+                  <p class="text-sm text-slate-300 max-w-md mx-auto">Bắt đầu lập kế hoạch lần đầu để nhận 3 phương án tối ưu phù hợp với mục tiêu ĐRL và lịch bận/rảnh của bạn.</p>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-3 pt-1">
+                  <button id="btnFirstTimePlan" type="button" onclick="runSp3Planner()" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-extrabold text-white shadow-lg shadow-indigo-600/30 transition hover:bg-indigo-500">Lập kế hoạch lần đầu</button>
+                  <button type="button" onclick="openPersonalAvailabilitySubview()" class="rounded-xl border border-[#2b3a54] bg-[#080d18] px-4 py-2.5 text-xs font-bold text-slate-200 transition hover:border-indigo-400/60 hover:text-white">Thiết lập lịch bận/rảnh của tôi</button>
+                </div>
+              </div>
+
+              <!-- Loading State -->
+              <div id="plannerLoadingState" class="hidden bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-12 text-center space-y-3">
+                <div class="inline-block w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                <p id="plannerLoadingText" class="text-sm font-bold text-white">Đang tối ưu 3 phương án đề xuất...</p>
+              </div>
+
+              <!-- Active Generated Activity Calendar -->
+              <div id="plannerActiveResult" class="hidden space-y-5">
+                <div id="planStaleNotice" class="hidden p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 flex flex-wrap items-center justify-between gap-3">
+                  <span>Hồ sơ hoặc lịch bận vừa thay đổi. Kế hoạch hiện tại vẫn được giữ nguyên — bạn có thể tính lại khi sẵn sàng.</span>
+                  <button type="button" onclick="runSp3Planner()" class="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-extrabold text-slate-950 hover:bg-amber-400">Tính lại kế hoạch</button>
+                </div>
+
+                <!-- Calendar-first planner activity schedule -->
+                <section class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl overflow-hidden" aria-labelledby="planScheduleTitle">
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border-b border-[#1b2537] bg-[#0b101b]">
+                    <div>
+                      <h3 id="planScheduleTitle" class="text-base font-extrabold text-white planner-heading">Lịch trình hoạt động</h3>
+                      <p class="text-xs text-slate-400 planner-copy">Hoạt động được xếp theo giờ rảnh, mục tiêu ĐRL và ưu tiên của bạn.</p>
+                    </div>
+                    <div class="inline-flex self-start sm:self-auto rounded-xl border border-[#2b3a54] bg-[#080d18] p-1">
+                      <button id="planCalendarModeBtn" type="button" onclick="setPlannerResultMode('calendar')" class="plan-view-toggle px-3.5 rounded-lg bg-indigo-600 text-white text-xs font-bold">Lịch</button>
+                      <button id="planListModeBtn" type="button" onclick="setPlannerResultMode('list')" class="plan-view-toggle px-3.5 rounded-lg text-slate-300 text-xs font-bold">Danh sách</button>
+                    </div>
+                  </div>
+
+                  <div id="planCalendarView" class="grid grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_320px]">
+                    <div class="min-w-0 border-b 2xl:border-b-0 2xl:border-r border-[#1b2537]">
+                      <div class="flex items-center justify-between gap-3 p-3 border-b border-[#1b2537]">
+                        <div class="flex items-center gap-2">
+                          <button type="button" onclick="changePlanCalendarWeek(-1)" aria-label="Tuần trước" class="w-10 h-10 rounded-xl border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">‹</button>
+                          <button type="button" onclick="changePlanCalendarWeek(1)" aria-label="Tuần sau" class="w-10 h-10 rounded-xl border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">›</button>
+                        </div>
+                        <strong id="planCalendarWeekLabel" class="text-sm text-white planner-number text-center"></strong>
+                        <span class="hidden sm:inline text-[11px] text-slate-500">07:00–21:00</span>
+                      </div>
+                      <div id="planCalendarGrid" class="overflow-x-auto"></div>
+                      <p class="sm:hidden px-4 pb-3 text-[11px] text-indigo-300">Kéo ngang để xem đủ 7 ngày trong tuần.</p>
+                      <div id="planCalendarLegend" class="flex flex-wrap gap-3 px-4 py-3 border-t border-[#1b2537] text-[11px] text-slate-400"></div>
+                    </div>
+                    <aside class="p-4 bg-[#0b101b]/60">
+                      <div class="flex items-center justify-between gap-2 mb-3">
+                        <h4 class="text-sm font-extrabold text-white">Hoạt động trong kế hoạch</h4>
+                        <span id="planCalendarCount" class="px-2 py-0.5 rounded-full bg-indigo-950/60 text-indigo-300 text-xs font-bold planner-number">0</span>
+                      </div>
+                      <div id="planCalendarActivities" class="space-y-2.5 max-h-[670px] overflow-y-auto pr-1"></div>
+                    </aside>
+                  </div>
+
+                  <!-- Tabbed List Details View -->
+                  <div id="planListView" class="hidden bg-[#0e1524] overflow-hidden">
+                    <div id="planTabBar" class="flex flex-wrap gap-2 p-3 border-b border-[#1b2537] bg-[#0b101b]"></div>
+                    <div class="p-5">
+                      <div id="planPanelSelected" class="space-y-3"></div>
+                      <div id="planPanelAvail" class="hidden"></div>
+                      <div id="planPanelCand" class="hidden"></div>
+                      <div id="planPanelNotes" class="hidden space-y-5"></div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Compact Score Overview Card -->
+                <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 lg:p-6 space-y-5">
+                  <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#1b2537]">
+                    <div class="space-y-1.5">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <span id="planStatusBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">Đã đạt mục tiêu</span>
+                        <span id="planFeasibilityBadge" class="dev-only px-2.5 py-1 rounded-full text-xs font-bold bg-[#162032] text-slate-300 border border-[#223046]">Khả thi: REACHABLE</span>
+                        <span id="planModeBadge" class="dev-only px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">DEMO_ONLY</span>
+                        <span id="planVerifiedBadge" class="dev-only px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-rose-950/60 text-rose-300 border border-rose-500/40">official_award_verified: false</span>
+                      </div>
+                      <h3 class="text-lg font-black text-white tracking-tight">Tổng quan lộ trình điểm rèn luyện <span class="dev-only font-mono text-xs text-slate-500 font-normal">(plan.score_summary)</span></h3>
+                    </div>
+                    <div class="text-right">
+                      <span class="text-xs text-slate-400 block font-medium">Dự kiến đạt được</span>
+                      <div class="text-2xl sm:text-3xl font-black text-indigo-400 mt-0.5 tracking-tight" id="planScoreOverview">60 → 80 / 100đ</div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046]">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Điểm nền hiện có</span>
+                      <span id="planBaselineScoreText" class="text-2xl font-black text-slate-200 mt-1 block">Chưa biết</span>
+                    </div>
+                    <div class="p-4 rounded-xl bg-emerald-950/40 border border-emerald-600/50">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-300 block">Điểm cộng dự kiến</span>
+                      <span id="planGainScoreText" class="text-2xl font-black text-emerald-300 mt-1 block">+0đ</span>
+                    </div>
+                    <div class="p-4 rounded-xl bg-indigo-950/40 border border-indigo-700/50">
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-300 block">Mục tiêu đặt ra</span>
+                      <span id="planTargetScoreText" class="text-2xl font-black text-indigo-300 mt-1 block">80đ</span>
+                    </div>
+                  </div>
+
+                  <div class="pt-1">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400 block mb-2.5">Đóng góp chi tiết theo 5 nhóm tiêu chí (Quy chế ĐRL)</span>
+                    <div id="planCategoryBreakdown" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs"></div>
+                  </div>
+                </div>
+
+                <div id="planPersonalizationCard" class="hidden"></div>
               </div>
             </div>
 
-            <div id="schedulePlanConflictNotice" class="hidden rounded-2xl border border-amber-400/40 bg-amber-950/35 p-4 text-xs text-amber-100"></div>
-
-            <!-- SUBPAGE 1: HỒ SƠ (manual controls matching onboarding) -->
-            <section id="profileSchedulePanelProfile" role="tabpanel" aria-labelledby="profileScheduleTabProfile" class="space-y-4">
-              <div id="profileScheduleProfileBody"></div>
-            </section>
-
-            <!-- SUBPAGE 2: LỊCH (exact shared interactive 15-min busy calendar) -->
-            <section id="profileSchedulePanelSchedule" role="tabpanel" aria-labelledby="profileScheduleTabSchedule" class="hidden space-y-4">
+            <!-- SUBVIEW 2B: PERSONAL AVAILABILITY (Separate dedicated subview) -->
+            <div id="profileAvailabilitySubview" class="hidden bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 lg:p-6 space-y-4" aria-label="Lịch bận rảnh của tôi">
+              <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#1b2537] pb-3">
+                <button id="btnBackToActivityCalendar" type="button" onclick="closePersonalAvailabilitySubview()" class="rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-2 text-xs font-bold text-slate-300 transition hover:border-indigo-400/60 hover:text-white">← Quay lại Lịch hoạt động</button>
+                <button id="btnSaveAndCloseAvailability" type="button" onclick="saveAndClosePersonalAvailability()" class="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-extrabold text-white shadow-md shadow-indigo-600/25 transition hover:bg-indigo-500">Lưu & Quay lại Lịch</button>
+              </div>
               <div id="profileScheduleHeader"></div>
               <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
                 <div id="profileScheduleGrid" class="overflow-x-auto rounded-2xl border border-[#1b2537] bg-[#080d18] p-3"></div>
                 <aside id="profileScheduleSidebar" class="space-y-4"></aside>
               </div>
+            </div>
+
+            <!-- SUBVIEW 2C: FIRST-TIME / RE-PLANNING STEP 1 — 3 STRATEGY OPTIONS -->
+            <section id="smartPlanSection" class="hidden rounded-2xl border border-emerald-500/30 bg-[#0e1524] p-5 shadow-xl space-y-4" aria-label="Chọn 3 phương án kế hoạch">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[#1b2537] pb-3">
+                <div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h3 class="text-base font-black text-white">Kế hoạch thông minh · 3 phương án đề xuất</h3>
+                    <span id="plannerFlowStepBadge" class="rounded-full border border-indigo-400/30 bg-indigo-950/50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-200">Bước 1: Chọn phương án</span>
+                  </div>
+                  <p id="planOptionsMessage" class="mt-1 text-xs text-slate-400">Ba phương án được tính độc lập; chọn một phương án rồi chuyển sang màn hình Rà soát.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <button type="button" onclick="setScheduleSubview('calendar')" class="rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 py-2 text-xs font-bold text-slate-300 hover:text-white">← Quay lại Lịch</button>
+                  <button id="undoCustomPlanButton" type="button" onclick="undoCustomPlan()" class="hidden rounded-xl border border-amber-500/40 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-950/40">Hoàn tác lịch tùy chỉnh</button>
+                  <button id="btnOpenPlanReview" type="button" onclick="openPlanReviewScreen(selectedPlanOptionIndex)" class="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-extrabold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-500">Rà soát phương án đã chọn →</button>
+                </div>
+              </div>
+              <div id="planOptionsSelector" class="grid grid-cols-1 gap-3 lg:grid-cols-3"></div>
             </section>
 
-            <!-- Stepper 3 Bước Hành Trình (Kế hoạch ban đầu -> Khi lịch thay đổi -> Khi bỏ hoạt động) -->
-            <div id="planStepper" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5"></div>
+            <!-- SUBVIEW 2D: STEP 2 — DEDICATED REVIEW & CONFIRM SCREEN -->
+            <section id="planReviewScreen" class="hidden rounded-2xl border border-indigo-500/35 bg-[#0e1524] p-5 shadow-xl space-y-4" aria-label="Rà soát kế hoạch"></section>
 
-            <!-- Horizontal Goal & Schedule Setting Bar -->
-            <div id="personalScheduleSection" class="bg-[#080d18] rounded-xl border border-[#1b2537] p-4 lg:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-              
-              <!-- Left: Target Selector -->
-              <div class="flex flex-wrap items-center gap-3">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 shrink-0">Mục tiêu:</span>
-                <div class="flex items-center gap-2">
-                  <button type="button" onclick="setPlannerPreset(90)" id="presetBtn90" class="px-3 py-1.5 rounded-lg border border-[#223046] bg-[#0e1524] text-xs font-bold text-slate-300 hover:border-indigo-500 hover:bg-indigo-950/40 transition">
-                    Xuất sắc (≥90)
-                  </button>
-                  <button type="button" onclick="setPlannerPreset(80)" id="presetBtn80" class="px-3 py-1.5 rounded-lg border-2 border-indigo-500 bg-indigo-950/60 text-xs font-bold text-indigo-300 shadow-sm shadow-indigo-500/20 transition">
-                    Tốt (≥80)
-                  </button>
-                  <button type="button" onclick="setPlannerPreset(65)" id="presetBtn65" class="px-3 py-1.5 rounded-lg border border-[#223046] bg-[#0e1524] text-xs font-bold text-slate-300 hover:border-indigo-500 hover:bg-indigo-950/40 transition">
-                    Khá (≥65)
-                  </button>
-                </div>
-
-                <!-- Custom Target input -->
-                <div class="flex items-center gap-2 pl-2 border-l border-[#1b2537]">
-                  <input id="inputPlanTarget" type="number" min="0" max="100" value="80" oninput="onPlannerTargetInput(this.value)" class="w-16 px-2.5 py-1.5 rounded-lg bg-[#0e1524] border border-[#223046] text-sm font-extrabold text-white text-center focus:border-indigo-500 outline-none transition" />
-                  <span id="targetEchoBadge" class="text-xs font-extrabold text-indigo-400 font-mono">80 / 100đ</span>
-                </div>
-              </div>
-
-              <!-- Right: Busy Slots Popover Toggle + Action Button -->
-              <div class="flex flex-wrap items-center gap-3 shrink-0">
-                
-                <!-- Popover Toggle for Personal Busy Time -->
-                <div class="relative">
-                  <button type="button" onclick="toggleBusySlotsPopover()" id="btnToggleBusySlots" class="min-h-11 px-3.5 py-2 rounded-xl bg-[#0e1524] hover:bg-[#11192b] border border-[#223046] text-xs font-semibold text-slate-300 flex items-center gap-2 transition">
-                    <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <span>Thiết lập thời gian rảnh</span>
-                    <span id="busySlotsBadge" class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/60 text-emerald-300">Tất cả rảnh</span>
-                    <svg id="busySlotsChevron" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                  </button>
-
-                  <!-- Popover Panel -->
-                  <div id="busySlotsPopover" class="hidden absolute right-0 mt-2 w-[min(92vw,760px)] bg-[#0e1524] rounded-2xl shadow-2xl border border-[#2b3a54] p-4 sm:p-5 z-40 space-y-4">
-                    <div class="flex items-start justify-between gap-4 pb-3 border-b border-[#1b2537]">
-                      <div>
-                        <span class="text-sm font-extrabold text-white block">Lịch rảnh trong tuần</span>
-                        <span class="text-xs text-slate-400 planner-copy">Ô xanh là thời gian có thể tham gia. Bấm vào ô để đánh dấu bận; hệ thống sẽ không xếp hoạt động vào đó.</span>
-                      </div>
-                      <button type="button" onclick="resetAvailabilityPicker()" class="min-h-10 px-3 rounded-lg border border-[#2b3a54] text-xs font-bold text-slate-300 hover:text-white hover:bg-[#162032]">Đặt lại</button>
-                    </div>
-                    <div class="overflow-x-auto pb-1">
-                      <p class="sm:hidden text-[11px] text-indigo-300 mb-2">Kéo ngang để xem đủ 7 ngày.</p>
-                      <div id="availabilityPickerGrid" class="min-w-[650px]"></div>
-                    </div>
-                    <div class="rounded-xl border border-[#223046] bg-[#080d18] p-3 space-y-3"><span class="text-xs font-extrabold text-white">Thêm quy tắc hằng tuần</span><div class="grid grid-cols-2 gap-2 sm:grid-cols-[100px_100px_1fr_1fr_auto]"><select id="profileRuleKind" class="min-h-10 rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 text-xs"><option value="busy">Bận</option><option value="available">Rảnh</option></select><select id="profileRuleWeekday" class="min-h-10 rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 text-xs"><option value="0">Thứ Hai</option><option value="1">Thứ Ba</option><option value="2">Thứ Tư</option><option value="3">Thứ Năm</option><option value="4">Thứ Sáu</option><option value="5">Thứ Bảy</option><option value="6">Chủ nhật</option></select><input id="profileRuleStart" type="time" aria-label="Bắt đầu quy tắc tuần" class="min-h-10 rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 text-xs" /><input id="profileRuleEnd" type="time" aria-label="Kết thúc quy tắc tuần" class="min-h-10 rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 text-xs" /><button type="button" onclick="addProfileWeeklyInterval()" class="min-h-10 rounded-lg bg-sky-600 px-3 text-xs font-bold">Thêm</button></div></div>
-                    <div class="rounded-xl border border-[#223046] bg-[#080d18] p-3 space-y-3">
-                      <div>
-                        <span class="text-xs font-extrabold text-white">Thêm ngoại lệ ngày cụ thể</span>
-                        <span class="text-[11px] text-slate-500 block">Ghi nhận một khoảng bận hoặc rảnh chính xác; ngoại lệ rảnh sẽ thay lịch mặc định của ngày đó.</span>
-                      </div>
-                      <div class="grid grid-cols-1 sm:grid-cols-[110px_1fr_1fr_auto] gap-2 items-end">
-                        <label class="text-[11px] text-slate-400">Loại<select id="customIntervalKind" class="mt-1 w-full min-h-10 rounded-lg bg-[#0e1524] border border-[#2b3a54] px-2.5 text-xs text-white"><option value="busy">Bận</option><option value="available">Rảnh</option></select></label>
-                        <label class="text-[11px] text-slate-400">Bắt đầu<input id="customBusyStart" type="datetime-local" class="mt-1 w-full min-h-10 rounded-lg bg-[#0e1524] border border-[#2b3a54] px-2.5 text-xs text-white" /></label>
-                        <label class="text-[11px] text-slate-400">Kết thúc<input id="customBusyEnd" type="datetime-local" class="mt-1 w-full min-h-10 rounded-lg bg-[#0e1524] border border-[#2b3a54] px-2.5 text-xs text-white" /></label>
-                        <button type="button" onclick="addCustomBusyInterval()" class="min-h-10 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white">Thêm</button>
-                      </div>
-                      <div id="customBusySlotsList" class="flex flex-wrap gap-2"></div>
-                      <div id="assistantAvailableSummary" class="flex flex-wrap gap-2"></div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Action Button -->
-                <button id="btnRunPlanner" onclick="runSp3Planner()" class="py-2.5 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/30 transition flex items-center justify-center gap-2 shrink-0">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                  <span id="btnRunPlannerText">Lập kế hoạch đề xuất <span class="dev-only font-mono text-xs">(SP3)</span></span>
-                </button>
-              </div>
-
-            </div>
-
-          </div>
-
-          <!-- FULL-WIDTH RESULTS CONTAINER -->
-          <div class="space-y-5">
-
-            <!-- Empty State before running -->
-            <div id="plannerEmptyState" class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-12 text-center space-y-3">
-              <div class="w-14 h-14 rounded-2xl bg-indigo-950/60 text-indigo-400 border border-indigo-500/40 flex items-center justify-center mx-auto text-2xl font-black">🎯</div>
-              <h4 class="text-base font-extrabold text-white">Chưa có kế hoạch nào được tạo</h4>
-              <p class="text-sm text-slate-300 max-w-md mx-auto">Chọn mục tiêu bạn mong muốn rồi bấm <b class="text-white">Lập kế hoạch đề xuất</b> để hệ thống tự động tối ưu hóa lộ trình rèn luyện.</p>
-            </div>
-
-            <!-- Loading State -->
-            <div id="plannerLoadingState" class="hidden bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-12 text-center space-y-3">
-              <div class="inline-block w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-              <p id="plannerLoadingText" class="text-sm font-bold text-white">Đang tối ưu lộ trình đề xuất...</p>
-            </div>
-
-            <!-- Active Results Container -->
-            <div id="plannerActiveResult" class="hidden space-y-5">
-              <section id="smartPlanSection" class="rounded-2xl border border-emerald-500/30 bg-[#0e1524] p-5 shadow-xl space-y-4">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[#1b2537] pb-3">
-                  <div>
-                    <div class="flex flex-wrap items-center gap-2">
-                      <h3 class="text-base font-black text-white">Kế hoạch thông minh · 3 phương án đề xuất</h3>
-                      <span id="plannerFlowStepBadge" class="rounded-full border border-indigo-400/30 bg-indigo-950/50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-200">Bước 1: Chọn phương án</span>
-                    </div>
-                    <p id="planOptionsMessage" class="mt-1 text-xs text-slate-400">Ba phương án được tính độc lập; chọn một phương án rồi chuyển sang màn hình Rà soát.</p>
-                  </div>
-                  <div class="flex flex-wrap items-center gap-2">
-                    <button id="undoCustomPlanButton" type="button" onclick="undoCustomPlan()" class="hidden rounded-xl border border-amber-500/40 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-950/40">Hoàn tác lịch tùy chỉnh</button>
-                    <button id="btnOpenPlanReview" type="button" onclick="openPlanReviewScreen(selectedPlanOptionIndex)" class="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-extrabold text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-500">Rà soát phương án đã chọn →</button>
-                  </div>
-                </div>
-                <div id="planOptionsSelector" class="grid grid-cols-1 gap-3 lg:grid-cols-3"></div>
-              </section>
-
-              <!-- Dedicated Review Screen (Wireframe 08; delegates Confirm to Thao Duyen's contract) -->
-              <section id="planReviewScreen" class="hidden rounded-2xl border border-indigo-500/35 bg-[#0e1524] p-5 shadow-xl space-y-4" aria-label="Rà soát kế hoạch"></section>
-
-              <!-- Stale Notice -->
-              <div id="planStaleNotice" class="hidden p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-sm text-amber-200">
-                Bạn vừa đổi mục tiêu hoặc buổi bận. Bấm <b>Cập nhật kế hoạch</b> ở trên để tính toán lại lộ trình mới.
-              </div>
-
-              <!-- Overview Score Card (Full Width) -->
-              <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 lg:p-6 space-y-5">
-                <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#1b2537]">
-                  <div class="space-y-1.5">
-                    <div class="flex flex-wrap items-center gap-2">
-                      <span id="planStatusBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-emerald-950/60 text-emerald-300 border border-emerald-500/40">Đã đạt mục tiêu</span>
-                      <span id="planFeasibilityBadge" class="dev-only px-2.5 py-1 rounded-full text-xs font-bold bg-[#162032] text-slate-300 border border-[#223046]">Khả thi: REACHABLE</span>
-                      <span id="planModeBadge" class="dev-only px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/40">DEMO_ONLY</span>
-                      <span id="planVerifiedBadge" class="dev-only px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-rose-950/60 text-rose-300 border border-rose-500/40">official_award_verified: false</span>
-                    </div>
-                    <h3 class="text-lg font-black text-white tracking-tight">Tổng quan lộ trình điểm rèn luyện <span class="dev-only font-mono text-xs text-slate-500 font-normal">(plan.score_summary)</span></h3>
-                  </div>
-                  <div class="text-right">
-                    <span class="text-xs text-slate-400 block font-medium">Dự kiến đạt được</span>
-                    <div class="text-2xl sm:text-3xl font-black text-indigo-400 mt-0.5 tracking-tight" id="planScoreOverview">60 → 80 / 100đ</div>
-                  </div>
-                </div>
-
-                <!-- 3 Metric Boxes -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div class="p-4 rounded-xl bg-[#080d18] border border-[#223046]">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Điểm nền hiện có</span>
-                    <span id="planBaselineScoreText" class="text-2xl font-black text-slate-200 mt-1 block">60đ</span>
-                  </div>
-                  <div class="p-4 rounded-xl bg-emerald-950/40 border border-emerald-600/50">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-300 block">Điểm cộng dự kiến</span>
-                    <span id="planGainScoreText" class="text-2xl font-black text-emerald-300 mt-1 block">+20đ</span>
-                  </div>
-                  <div class="p-4 rounded-xl bg-indigo-950/40 border border-indigo-700/50">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-300 block">Mục tiêu đặt ra</span>
-                    <span id="planTargetScoreText" class="text-2xl font-black text-indigo-300 mt-1 block">80đ</span>
-                  </div>
-                </div>
-
-                <!-- Category Breakdown 5 Columns -->
-                <div class="pt-1">
-                  <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400 block mb-2.5">Đóng góp chi tiết theo 5 nhóm tiêu chí (Quy chế ĐRL)</span>
-                  <div id="planCategoryBreakdown" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs"></div>
-                </div>
-              </div>
-
-              <!-- What Changed / Next Step Card -->
-              <div id="planPersonalizationCard" class="hidden"></div>
-              <div id="planChangeCard"></div>
-
-              <!-- Calendar-first planner result, matching the way students read a weekly schedule. -->
-              <section class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl overflow-hidden" aria-labelledby="planScheduleTitle">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border-b border-[#1b2537] bg-[#0b101b]">
-                  <div>
-                    <h3 id="planScheduleTitle" class="text-base font-extrabold text-white planner-heading">Lịch trình gợi ý</h3>
-                    <p class="text-xs text-slate-400 planner-copy">Hoạt động được đặt vào lịch theo giờ rảnh, mục tiêu ĐRL và nguyện vọng bạn đã xác nhận.</p>
-                  </div>
-                  <div class="inline-flex self-start sm:self-auto rounded-xl border border-[#2b3a54] bg-[#080d18] p-1">
-                    <button id="planCalendarModeBtn" type="button" onclick="setPlannerResultMode('calendar')" class="plan-view-toggle px-3.5 rounded-lg bg-indigo-600 text-white text-xs font-bold">Lịch</button>
-                    <button id="planListModeBtn" type="button" onclick="setPlannerResultMode('list')" class="plan-view-toggle px-3.5 rounded-lg text-slate-300 text-xs font-bold">Danh sách</button>
-                  </div>
-                </div>
-
-                <div id="planCalendarView" class="grid grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_320px]">
-                  <div class="min-w-0 border-b 2xl:border-b-0 2xl:border-r border-[#1b2537]">
-                    <div class="flex items-center justify-between gap-3 p-3 border-b border-[#1b2537]">
-                      <div class="flex items-center gap-2">
-                        <button type="button" onclick="changePlanCalendarWeek(-1)" aria-label="Tuần trước" class="w-10 h-10 rounded-xl border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">‹</button>
-                        <button type="button" onclick="changePlanCalendarWeek(1)" aria-label="Tuần sau" class="w-10 h-10 rounded-xl border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">›</button>
-                      </div>
-                      <strong id="planCalendarWeekLabel" class="text-sm text-white planner-number text-center"></strong>
-                      <span class="hidden sm:inline text-[11px] text-slate-500">07:00–21:00</span>
-                    </div>
-                    <div id="planCalendarGrid" class="overflow-x-auto"></div>
-                    <p class="sm:hidden px-4 pb-3 text-[11px] text-indigo-300">Kéo ngang để xem đủ 7 ngày trong tuần.</p>
-                    <div id="planCalendarLegend" class="flex flex-wrap gap-3 px-4 py-3 border-t border-[#1b2537] text-[11px] text-slate-400"></div>
-                  </div>
-                  <aside class="p-4 bg-[#0b101b]/60">
-                    <div class="flex items-center justify-between gap-2 mb-3">
-                      <h4 class="text-sm font-extrabold text-white">Hoạt động trong kế hoạch</h4>
-                      <span id="planCalendarCount" class="px-2 py-0.5 rounded-full bg-indigo-950/60 text-indigo-300 text-xs font-bold planner-number">0</span>
-                    </div>
-                    <div id="planCalendarActivities" class="space-y-2.5 max-h-[670px] overflow-y-auto pr-1"></div>
-                  </aside>
-                </div>
-
-              <!-- Full-Width Tabbed Details Container -->
-              <div id="planListView" class="hidden bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl overflow-hidden">
-                <div id="planTabBar" class="flex flex-wrap gap-2 p-3 border-b border-[#1b2537] bg-[#0b101b]"></div>
-                <div class="p-5">
-                  <div id="planPanelSelected" class="space-y-3"></div>
-                  <div id="planPanelAvail" class="hidden"></div>
-                  <div id="planPanelCand" class="hidden"></div>
-                  <div id="planPanelNotes" class="hidden space-y-5"></div>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
+          </section>
 
         </div>
 
-        <div id="viewProfile" class="hidden space-y-6 xl:min-h-[calc(100vh-9rem)] xl:grid xl:grid-rows-[minmax(0,1fr)_minmax(0,2fr)] xl:space-y-0">
+        <div id="viewProfile" class="hidden">
+          <div class="space-y-6 xl:min-h-[calc(100vh-9rem)] xl:grid xl:grid-rows-[minmax(0,1fr)_minmax(0,2fr)] xl:space-y-0">
           <section class="grid grid-cols-1 xl:grid-cols-[minmax(230px,1fr)_2fr] gap-5 rounded-3xl border border-[#1b2537] bg-[#0e1524] p-5 sm:p-7 shadow-xl">
             <div class="flex flex-col items-center justify-center rounded-2xl border border-[#223046] bg-[#080d18] p-6 text-center">
               <div id="profileAvatarDisplay" class="flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl border border-indigo-400/30 bg-indigo-950/50 shadow-lg shadow-indigo-950/30">
@@ -1707,7 +1666,7 @@
                 <label class="text-xs font-semibold text-slate-400">Khoa<input id="profileFaculty" maxlength="100" placeholder="Ví dụ: Khoa Công nghệ Thông tin" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" /></label>
                 <label class="text-xs font-semibold text-slate-400">Khóa tuyển<input id="profileCohort" maxlength="40" placeholder="Ví dụ: 2025" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" /></label>
                 <label class="text-xs font-semibold text-slate-400">Học kỳ lập kế hoạch<select id="profileSemester" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500"><option>HK3 · 2025–2026</option><option>HK1 · 2026–2027</option></select></label>
-                <label class="text-xs font-semibold text-slate-400 sm:col-span-2">Chương trình học<input id="profileProgram" maxlength="120" placeholder="Ví dụ: Chương trình chuẩn" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" /></label>
+                <label class="text-xs font-semibold text-slate-400 sm:col-span-2">Chương trình học<select id="profileProgram" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500"><option value="Chương trình Chuẩn">Chương trình Chuẩn</option><option value="Chương trình Chất lượng cao">Chương trình Chất lượng cao</option></select></label>
               </div>
               <div class="mt-5 rounded-2xl border border-indigo-400/20 bg-indigo-950/20 p-4">
                 <div class="flex items-center justify-between gap-3 text-xs">
@@ -1770,6 +1729,7 @@
               <div class="flex justify-end"><button type="button" onclick="saveProfilePreferences()" class="rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-500">Lưu sở thích</button></div>
             </div>
           </section>
+          </div>
         </div>
 
   </div>
@@ -2549,7 +2509,7 @@
       setValue("profileFaculty", profile.faculty);
       setValue("profileCohort", profile.cohort);
       setValue("profileSemester", profile.semester);
-      setValue("profileProgram", profile.program);
+      setValue("profileProgram", normalizeStudentProgram(profile.program));
       setValue("profileInterestFields", profile.preferences.interest_fields);
       setValue("profileSkills", profile.preferences.skills);
       setValue("profilePersonalGoals", profile.preferences.personal_goals);
@@ -2631,7 +2591,7 @@
       profile.faculty = document.getElementById("profileFaculty").value.trim();
       profile.cohort = document.getElementById("profileCohort").value.trim();
       profile.semester = document.getElementById("profileSemester").value;
-      profile.program = document.getElementById("profileProgram").value.trim();
+      profile.program = normalizeStudentProgram(document.getElementById("profileProgram").value);
       saveLocalProfile(profile);
       localStorage.setItem("unilife_student", JSON.stringify(currentStudent));
       const users = readLocalUsers();
@@ -2766,6 +2726,20 @@
     const LOCAL_USERS_KEY = "unilife_users";
     const CURRENT_USER_KEY = "unilife_current_user";
     const LOCAL_PASSWORD_ITERATIONS = 120000;
+    const STUDENT_PROGRAMS = ["Chương trình Chuẩn", "Chương trình Chất lượng cao"];
+
+    function normalizeStudentProgram(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return STUDENT_PROGRAMS[0];
+      const lower = raw.toLocaleLowerCase("vi");
+      if (/\bclc\b|chất lượng cao|chat luong cao|tiên tiến|tien tien/.test(lower)) {
+        return "Chương trình Chất lượng cao";
+      }
+      if (/chuẩn|chuan|đại trà|dai tra/.test(lower)) {
+        return "Chương trình Chuẩn";
+      }
+      return STUDENT_PROGRAMS.includes(raw) ? raw : STUDENT_PROGRAMS[0];
+    }
 
     function normalizeMssv(value) {
       return String(value || "").trim().toUpperCase();
@@ -2814,7 +2788,7 @@
           preference_patch: { preferred_topics: [], preferred_categories: [], preferred_modes: [], preferred_campuses: [], max_activities: null, weekly_participation_hours: null },
           faculty: "",
           cohort: "",
-          program: "",
+          program: "Chương trình Chuẩn",
           semester: "HK1 · 2026–2027",
           avatar_data_url: "",
           score_history: [],
@@ -2865,6 +2839,7 @@
         profile: {
           ...defaults.profile,
           ...savedProfile,
+          program: normalizeStudentProgram(savedProfile.program),
           drl_target: targetScore,
           profile: { ...defaults.profile.profile, ...(savedProfile.profile || {}) },
           weekly_intervals: Array.isArray(savedProfile.weekly_intervals) ? savedProfile.weekly_intervals : [],
@@ -3096,17 +3071,127 @@
     }
 
     let activeProfileScheduleTab = "profile";
+    let activeScheduleSubview = "calendar";
+    let currentPlanConfirmed = false;
     let profileScheduleTopicQuery = "";
 
-    function setProfileScheduleTab(tab) {
+    function updatePlanConfirmationBadge() {
+      const badge = document.getElementById("planConfirmationBadge");
+      const optionsBtn = document.getElementById("btnOpenPlanOptions");
+      if (optionsBtn) {
+        const hasOptions = Array.isArray(cachedPlanOptions) && cachedPlanOptions.length > 0;
+        optionsBtn.classList.toggle("hidden", !hasOptions);
+      }
+      if (!badge) return;
+      if (!currentPlannerData) {
+        badge.classList.add("hidden");
+        return;
+      }
+      badge.classList.remove("hidden");
+      if (currentPlanConfirmed) {
+        badge.textContent = "✓ Kế hoạch đã xác nhận";
+        badge.className = "rounded-full border border-emerald-500/45 bg-emerald-950/50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-200";
+      } else {
+        badge.textContent = "Bản xem trước · chưa xác nhận";
+        badge.className = "rounded-full border border-amber-500/40 bg-amber-950/50 px-2.5 py-0.5 text-[11px] font-bold text-amber-200";
+      }
+    }
+
+    function setScheduleSubview(mode) {
+      const allowed = ["calendar", "availability", "options", "review"];
+      activeScheduleSubview = allowed.includes(mode) ? mode : "calendar";
+      const subviews = {
+        calendar: document.getElementById("scheduleActivityCalendarSubview"),
+        availability: document.getElementById("profileAvailabilitySubview"),
+        options: document.getElementById("smartPlanSection"),
+        review: document.getElementById("planReviewScreen")
+      };
+      Object.entries(subviews).forEach(([key, el]) => {
+        if (!el) return;
+        const hidden = key !== activeScheduleSubview;
+        el.classList.toggle("hidden", hidden);
+        el.hidden = hidden;
+      });
+      if (activeScheduleSubview === "calendar") {
+        updatePlanConfirmationBadge();
+        renderSchedulePlanConflictNotice();
+        if (currentPlannerData) {
+          showPlanPanels("active");
+          renderSp3PlanResult();
+        } else {
+          showPlanPanels("empty");
+        }
+      } else if (activeScheduleSubview === "availability") {
+        renderProfileScheduleTab();
+      } else if (activeScheduleSubview === "options") {
+        plannerScreenMode = "options";
+        const badge = document.getElementById("plannerFlowStepBadge");
+        if (badge) badge.textContent = "Bước 1: Chọn phương án";
+        renderPlanOptionsSelector();
+      } else if (activeScheduleSubview === "review") {
+        plannerScreenMode = "review";
+        const badge = document.getElementById("plannerFlowStepBadge");
+        if (badge) badge.textContent = "Bước 2: Rà soát & Xác nhận";
+        renderPlanReviewScreen();
+      }
+    }
+
+    function openPersonalAvailabilitySubview() {
+      if (activeProfileScheduleTab !== "schedule") {
+        setProfileScheduleTab("schedule", "availability");
+        return;
+      }
+      setScheduleSubview("availability");
+    }
+
+    function closePersonalAvailabilitySubview() {
+      setScheduleSubview("calendar");
+    }
+
+    function saveAndClosePersonalAvailability() {
+      if (currentProfileDraft) {
+        syncBusyScheduleAndIntervals(currentProfileDraft);
+        const conflicts = detectPlanBusyConflicts();
+        if (conflicts.length && (planStages.first || currentPlannerData)) {
+          markPlanStale();
+        }
+        persistCurrentUserData();
+        const badge = document.getElementById("profileScheduleSaveStatus");
+        if (badge) {
+          badge.classList.remove("hidden");
+          badge.textContent = "✓ Đã lưu lịch bận/rảnh";
+        }
+      }
+      setScheduleSubview("calendar");
+    }
+
+    function openPlanOptionsSubview() {
+      if (!Array.isArray(cachedPlanOptions) || !cachedPlanOptions.length) {
+        runSp3Planner();
+        return;
+      }
+      if (activeProfileScheduleTab !== "schedule") {
+        setProfileScheduleTab("schedule", "options");
+        return;
+      }
+      setScheduleSubview("options");
+    }
+
+    function setProfileScheduleTab(tab, initialSubview = "calendar") {
       activeProfileScheduleTab = tab === "schedule" ? "schedule" : "profile";
       const tabProfile = document.getElementById("profileScheduleTabProfile");
       const tabSchedule = document.getElementById("profileScheduleTabSchedule");
       const panelProfile = document.getElementById("profileSchedulePanelProfile");
       const panelSchedule = document.getElementById("profileSchedulePanelSchedule");
       const isSchedule = activeProfileScheduleTab === "schedule";
-      if (panelProfile) panelProfile.classList.toggle("hidden", isSchedule);
-      if (panelSchedule) panelSchedule.classList.toggle("hidden", !isSchedule);
+      if (panelProfile) {
+        panelProfile.classList.toggle("hidden", isSchedule);
+        panelProfile.hidden = isSchedule;
+      }
+      if (panelSchedule) {
+        panelSchedule.classList.toggle("hidden", !isSchedule);
+        panelSchedule.hidden = !isSchedule;
+      }
       if (tabProfile) {
         tabProfile.setAttribute("aria-selected", String(!isSchedule));
         tabProfile.className = !isSchedule
@@ -3119,8 +3204,12 @@
           ? "rounded-lg bg-indigo-600 px-4 py-2 text-xs font-extrabold text-white shadow-sm transition"
           : "rounded-lg px-4 py-2 text-xs font-bold text-slate-400 transition hover:text-white";
       }
-      if (isSchedule) renderProfileScheduleTab();
-      else renderProfileScheduleProfilePanel();
+      if (isSchedule) {
+        renderProfileScheduleTab();
+        setScheduleSubview(initialSubview || "calendar");
+      } else {
+        renderProfileScheduleProfilePanel();
+      }
     }
 
     function inferProfileModeChoice() {
@@ -3217,7 +3306,7 @@
       const fullName = document.getElementById("psFullName")?.value.trim();
       const faculty = document.getElementById("psFaculty")?.value.trim() ?? currentProfileDraft.faculty ?? "";
       const cohort = document.getElementById("psCohort")?.value.trim() ?? currentProfileDraft.cohort ?? "";
-      const program = document.getElementById("psProgram")?.value.trim() ?? currentProfileDraft.program ?? "";
+      const program = normalizeStudentProgram(document.getElementById("psProgram")?.value ?? currentProfileDraft.program);
       const semester = document.getElementById("psSemester")?.value || currentProfileDraft.semester || "HK1 · 2026–2027";
       const rawTarget = document.getElementById("psDrlTarget")?.value;
       const targetScore = normalizeDrlTarget(rawTarget, normalizeDrlTarget(currentProfileDraft.drl_target, 80));
@@ -3293,7 +3382,7 @@
               <label class="text-xs font-bold text-slate-300">MSSV<input id="psStudentId" value="${escapeHTML(mssvVal)}" readonly class="mt-1.5 w-full rounded-xl border border-[#1b2537] bg-[#070b14] px-3 py-2 text-xs font-mono text-slate-400 outline-none" /></label>
               <label class="text-xs font-bold text-slate-300">Khoa<input id="psFaculty" value="${escapeHTML(currentProfileDraft.faculty || "")}" maxlength="100" placeholder="Ví dụ: Khoa Công nghệ Thông tin" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
               <label class="text-xs font-bold text-slate-300">Khóa tuyển<input id="psCohort" value="${escapeHTML(currentProfileDraft.cohort || "")}" maxlength="40" placeholder="Ví dụ: 2025" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
-              <label class="text-xs font-bold text-slate-300">Chương trình đào tạo<input id="psProgram" value="${escapeHTML(currentProfileDraft.program || "")}" maxlength="120" placeholder="Ví dụ: Chương trình chuẩn" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
+              <label class="text-xs font-bold text-slate-300">Chương trình đào tạo<select id="psProgram" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500">${STUDENT_PROGRAMS.map(p => `<option value="${escapeHTML(p)}" ${p === normalizeStudentProgram(currentProfileDraft.program) ? "selected" : ""}>${escapeHTML(p)}</option>`).join("")}</select></label>
               <label class="text-xs font-bold text-slate-300">Học kỳ lập kế hoạch<select id="psSemester" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500">${semesters.map(s => `<option ${s === (currentProfileDraft.semester || "HK1 · 2026–2027") ? "selected" : ""}>${escapeHTML(s)}</option>`).join("")}</select></label>
             </div>
           </div>
@@ -3433,15 +3522,15 @@
             <b class="text-amber-200">Lịch bận mới trùng với kế hoạch hiện tại (${conflicts.length} hoạt động):</b>
             <span class="block mt-1 text-amber-100/90">${names}. Kế hoạch cũ vẫn được giữ nguyên — bạn có thể tính lại khi sẵn sàng.</span>
           </div>
-          <button type="button" onclick="document.getElementById('btnRunPlanner')?.scrollIntoView({behavior:'smooth'});document.getElementById('btnRunPlanner')?.focus();" class="shrink-0 rounded-xl bg-amber-500 px-3.5 py-2 text-xs font-extrabold text-slate-950 transition hover:bg-amber-400">Xem & tính lại kế hoạch</button>
+          <button type="button" onclick="runSp3Planner()" class="shrink-0 rounded-xl bg-amber-500 px-3.5 py-2 text-xs font-extrabold text-slate-950 transition hover:bg-amber-400">Tính lại kế hoạch</button>
         </div>`;
         return;
       }
       if (planInputsDirty) {
         box.classList.remove("hidden");
         box.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3">
-          <div><b class="text-amber-200">Hồ sơ hoặc lịch vừa thay đổi.</b> Kế hoạch hiện tại chưa bị ghi đè — bấm <b>Cập nhật kế hoạch</b> ở dưới để tính lại lộ trình mới.</div>
-          <button type="button" onclick="document.getElementById('btnRunPlanner')?.scrollIntoView({behavior:'smooth'});" class="shrink-0 rounded-xl border border-amber-400/50 bg-amber-500/20 px-3.5 py-2 text-xs font-bold text-amber-200 hover:bg-amber-500/30">Đến nút Cập nhật</button>
+          <div><b class="text-amber-200">Hồ sơ hoặc lịch vừa thay đổi.</b> Kế hoạch hiện tại chưa bị ghi đè — bấm <b>Tính lại kế hoạch</b> để cập nhật lộ trình mới.</div>
+          <button type="button" onclick="runSp3Planner()" class="shrink-0 rounded-xl border border-amber-400/50 bg-amber-500/20 px-3.5 py-2 text-xs font-bold text-amber-200 hover:bg-amber-500/30">Tính lại kế hoạch</button>
         </div>`;
         return;
       }
@@ -3869,6 +3958,7 @@
         current_stage: currentPlanStage,
         cached_plan_options: JSON.parse(JSON.stringify(cachedPlanOptions)),
         selected_plan_option: selectedPlanOptionIndex,
+        plan_confirmed: Boolean(currentPlanConfirmed),
         custom_plan_backup: customPlanBackup ? JSON.parse(JSON.stringify(customPlanBackup)) : null
       };
       saved.updated_at = new Date().toISOString();
@@ -4048,6 +4138,7 @@
       if (!onboardingDraft) return;
       if (field === "full_name") onboardingDraft.full_name = value;
       else if (field === "student_id") onboardingDraft.student_id = value;
+      else if (field === "program") onboardingDraft.profile.program = normalizeStudentProgram(value);
       else onboardingDraft.profile[field] = value;
       persistOnboardingDraft();
     }
@@ -4206,7 +4297,7 @@
                   <input value="${escapeHTML(onboardingDraft.profile.cohort)}" maxlength="40" oninput="updateOnboardingProfileField('cohort', this.value)" placeholder="Ví dụ: 2025" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
                 </label>
                 <label class="text-xs font-bold text-slate-300">Chương trình đào tạo
-                  <input value="${escapeHTML(onboardingDraft.profile.program)}" maxlength="120" oninput="updateOnboardingProfileField('program', this.value)" placeholder="Ví dụ: Chương trình chuẩn" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+                  <select id="onboardingProgram" onchange="updateOnboardingProfileField('program', this.value)" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">${STUDENT_PROGRAMS.map(value => `<option value="${escapeHTML(value)}" ${value === normalizeStudentProgram(onboardingDraft.profile.program) ? "selected" : ""}>${escapeHTML(value)}</option>`).join("")}</select>
                 </label>
                 <label class="text-xs font-bold text-slate-300">Học kỳ lập kế hoạch
                   <select onchange="updateOnboardingProfileField('semester', this.value)" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">${semesters.map(value => `<option ${value === onboardingDraft.profile.semester ? "selected" : ""}>${escapeHTML(value)}</option>`).join("")}</select>
@@ -5305,6 +5396,7 @@
 
     function completeOnboarding() {
       const profile = onboardingDraft.profile;
+      profile.program = normalizeStudentProgram(profile.program);
       profile.goal.target_score = normalizeDrlTarget(profile.goal?.target_score, 80);
       profile.drl_target = profile.goal.target_score;
       profile.preferences = {
@@ -5340,7 +5432,7 @@
       applyCurrentStudent(currentStudent);
       document.getElementById("onboardingModal").classList.add("hidden");
       document.getElementById("welcomeModal").classList.remove("hidden");
-      showWorkspace("profile");
+      showWorkspace("dashboard");
       window.clearTimeout(welcomeTimeout);
       welcomeTimeout = window.setTimeout(finishWelcome, 4000);
     }
@@ -5349,7 +5441,8 @@
       window.clearTimeout(welcomeTimeout);
       document.getElementById("welcomeModal").classList.add("hidden");
       renderStudentProfile();
-      switchTab("profile");
+      renderWorkspaceOverview();
+      switchTab("dashboard");
     }
 
     async function startLocalSession(user) {
@@ -5588,6 +5681,7 @@
       currentPlannerData = planStages[currentPlanStage];
       cachedPlanOptions = Array.isArray(planner.cached_plan_options) ? planner.cached_plan_options : [];
       selectedPlanOptionIndex = Number.isInteger(planner.selected_plan_option) ? planner.selected_plan_option : 0;
+      currentPlanConfirmed = Boolean(planner.plan_confirmed);
       customPlanBackup = planner.custom_plan_backup || null;
       planInputsDirty = false;
       planStageError = "";
@@ -5597,6 +5691,7 @@
       } else {
         showPlanPanels("empty");
       }
+      updatePlanConfirmationBadge();
       renderWorkspaceOverview();
       renderPlanOptionsSelector();
     }
@@ -5901,8 +5996,10 @@
         const selectedButton = t === tab
           ? (buttonIds.includes(activeTaskButton) ? activeTaskButton : 'tabBtn' + capitalize(t))
           : null;
-        if (t === tab) view.classList.remove('hidden');
-        else view.classList.add('hidden');
+        if (view) {
+          view.classList.toggle('hidden', t !== tab);
+          view.hidden = t !== tab;
+        }
         buttonIds.forEach(id => {
           const btn = document.getElementById(id);
           if (!btn) return;
@@ -5923,9 +6020,8 @@
       if (tab === 'profile') {
         renderStudentProfile();
       }
-      if (tab === 'plan' && !currentPlannerData) {
-        // Auto-run first plan with default 80 on first view for seamless experience
-        runSp3Planner();
+      if (tab === 'plan') {
+        renderProfileWorkspace();
       }
       if (tab === 'calculator') {
         const target = action === 'tracker'
@@ -6032,9 +6128,12 @@
       SP3_SOURCE = value === 'real' ? 'real' : 'synthetic';
       try { localStorage.setItem('sp3Source', SP3_SOURCE); } catch (e) { /* storage unavailable */ }
       planStages.first = null; planStages.replan = null; planStages.whatif = null;
+      currentPlannerData = null; currentPlanConfirmed = false; cachedPlanOptions = [];
       currentPlanStage = 'first'; planStageError = ''; planInputsDirty = false;
       showPlanPanels('empty');
-      setPlanButtonLabel(confirmedPreference ? 'Lập kế hoạch cá nhân hóa' : 'Lập kế hoạch đề xuất');
+      updatePlanConfirmationBadge();
+      if (activeProfileScheduleTab === 'schedule') setScheduleSubview('calendar');
+      setPlanButtonLabel('Lập kế hoạch mới');
       syncSp3SourceUi();
       persistCurrentUserData();
       loadActivitiesFromApi();
@@ -7090,9 +7189,11 @@
       planStages.replan = null;
       planStages.whatif = null;
       currentPlannerData = null;
+      currentPlanConfirmed = false;
       currentPlanStage = 'first';
       showPlanPanels('empty');
-      setPlanButtonLabel('Lập kế hoạch đề xuất');
+      updatePlanConfirmationBadge();
+      setPlanButtonLabel('Lập kế hoạch mới');
       document.getElementById('preferenceReview')?.classList.add('hidden');
       document.getElementById('preferenceConfirmedBadge')?.classList.add('hidden');
       document.getElementById('btnDeleteSavedPreference')?.classList.add('hidden');
@@ -7239,15 +7340,9 @@
 
     function setPlannerScreenMode(mode) {
       plannerScreenMode = mode === 'review' ? 'review' : 'options';
-      const optionsEl = document.getElementById('smartPlanSection');
-      const reviewEl = document.getElementById('planReviewScreen');
-      const badge = document.getElementById('plannerFlowStepBadge');
-      if (optionsEl) optionsEl.classList.toggle('hidden', plannerScreenMode === 'review');
-      if (reviewEl) reviewEl.classList.toggle('hidden', plannerScreenMode !== 'review');
-      if (badge) badge.textContent = plannerScreenMode === 'review' ? 'Bước 2: Rà soát & Xác nhận' : 'Bước 1: Chọn phương án';
+      setScheduleSubview(plannerScreenMode);
       if (plannerScreenMode === 'review') {
-        renderPlanReviewScreen();
-        reviewEl?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+        document.getElementById('planReviewScreen')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
       }
     }
 
@@ -7352,11 +7447,17 @@
         });
         const persisted = Boolean(result && (result.confirmed === true || result.persisted === true || result.status === 'CONFIRMED'));
         if (!persisted) {
+          currentPlanConfirmed = false;
           const reason = result?.error || result?.message || 'Module xác nhận chưa xác nhận lưu kế hoạch.';
           if (status) status.textContent = `Chưa thể xác nhận kế hoạch: ${reason}`;
+          updatePlanConfirmationBadge();
           return { confirmed: false, reason };
         }
+        currentPlanConfirmed = true;
         if (status) status.textContent = '✓ Kế hoạch đã được xác nhận và lưu thành công.';
+        persistCurrentUserData();
+        updatePlanConfirmationBadge();
+        setScheduleSubview('calendar');
         return { confirmed: true, result };
       } catch (error) {
         const message = error?.message || 'Lỗi khi xác nhận kế hoạch.';
@@ -7380,12 +7481,14 @@
       if (!option?.result) return;
       selectedPlanOptionIndex = index;
       currentPlannerData = JSON.parse(JSON.stringify(option.result));
+      currentPlanConfirmed = false;
       planStages.first = currentPlannerData;
       currentPlanStage = 'first';
       customPlanBackup = null;
       document.getElementById('undoCustomPlanButton')?.classList.add('hidden');
       renderPlanOptionsSelector();
       renderSp3PlanResult();
+      updatePlanConfirmationBadge();
       persistCurrentUserData();
     }
 
@@ -7442,13 +7545,18 @@
       }
 
       const loadingText = document.getElementById('plannerLoadingText');
-      if (loadingText) loadingText.innerText = 'Đang tối ưu lộ trình đề xuất...';
+      if (loadingText) loadingText.innerText = 'Đang tối ưu 3 phương án đề xuất...';
+      if (activeProfileScheduleTab !== 'schedule') setProfileScheduleTab('schedule', 'calendar');
+      else setScheduleSubview('calendar');
       showPlanPanels('loading');
       if (btn) btn.disabled = true;
       setPlanButtonLabel('Đang tối ưu lộ trình...');
 
       try {
         let data;
+        if (!confirmedPreference && currentProfileDraft) {
+          syncConfirmedPreferenceFromProfile('onboarding');
+        }
         if (confirmedPreference) {
           const optionPayload = await fetchPersonalizedSp3Options(targetTotal, busyIntervals, confirmedPreference);
           cachedPlanOptions = optionPayload.options || [];
@@ -7471,6 +7579,7 @@
         planStages.replan = null;
         planStages.whatif = null;
         currentPlannerData = data;
+        currentPlanConfirmed = false;
         currentPlanStage = 'first';
         currentPlanTab = 'selected';
         activePlanPreference = confirmedPreference ? JSON.parse(JSON.stringify(confirmedPreference)) : null;
@@ -7478,7 +7587,9 @@
         planStageError = '';
         renderSp3PlanResult();
         renderPlanOptionsSelector();
-        setPlannerScreenMode('options');
+        updatePlanConfirmationBadge();
+        if (cachedPlanOptions.length > 0) setPlannerScreenMode('options');
+        else setScheduleSubview('calendar');
         persistCurrentUserData();
       } catch (err) {
         if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
@@ -7616,29 +7727,7 @@
     }
 
     function renderPlanStepper() {
-      const el = document.getElementById('planStepper');
-      if (!el) return;
-      const steps = [
-        { key: 'first', n: 1, title: 'Kế hoạch ban đầu', done: !!planStages.first, locked: false },
-        { key: 'replan', n: 2, title: 'Khi lịch của bạn thay đổi', done: !!planStages.replan, locked: false },
-        { key: 'whatif', n: 3, title: 'Khi bạn bỏ một hoạt động', done: !!planStages.whatif, locked: !planStages.replan }
-      ];
-      el.innerHTML = steps.map(s => {
-        const active = s.key === currentPlanStage;
-        const cls = active
-          ? 'border-indigo-500 bg-indigo-950/60 text-white shadow-[0_0_12px_rgba(99,102,241,0.25)]'
-          : (s.locked ? 'border-[#1b2537] bg-[#0b101b] text-slate-500 cursor-not-allowed' : 'border-[#223046] bg-[#0e1524] text-slate-200 hover:border-indigo-500/60');
-        const state = active ? 'Đang xem' : (s.done ? 'Đã xem — bấm để xem lại' : (s.locked ? 'Hoàn thành bước 2 trước' : 'Bấm để thử'));
-        const dot = s.done && !active ? 'bg-emerald-600 text-white' : (active ? 'bg-indigo-600 text-white' : 'bg-[#162032] text-slate-400');
-        return `
-          <button type="button" ${s.locked ? 'disabled' : ''} onclick="gotoPlanStage('${s.key}')" class="text-left px-4 py-3 rounded-xl border transition flex items-center gap-3 ${cls}">
-            <span class="w-7 h-7 rounded-full ${dot} text-xs font-black flex items-center justify-center shrink-0">${s.done && !active ? '✓' : s.n}</span>
-            <span class="min-w-0">
-              <span class="block text-sm font-bold leading-tight">${s.title}</span>
-              <span class="block text-xs ${active ? 'text-indigo-300' : 'text-slate-400'} mt-0.5">${state}</span>
-            </span>
-          </button>`;
-      }).join('');
+      // Demo 3-stage scenario stepper removed from ordinary user views.
     }
 
     function renderPlanPersonalizationCard(data, titles) {
@@ -7674,131 +7763,8 @@
       </div>`;
     }
 
-    function renderPlanChangeCard(data, prevData, titles) {
-      const el = document.getElementById('planChangeCard');
-      if (!el) return;
-      const plan = data.plan || {};
-      const cardCls = 'bg-[#0e1524] rounded-2xl border shadow-xl p-5 space-y-3';
-      const btnPrimary = 'px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition';
-      const btnGhost = 'px-4 py-2.5 rounded-xl bg-[#080d18] hover:bg-[#162032] border border-[#223046] text-slate-200 text-sm font-bold transition';
-      const errorHtml = planStageError
-        ? `<div class="p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-sm text-rose-300">Không thể thực hiện: ${escapeHTML(planStageError)}</div>`
-        : '';
-
-      if (currentPlanStage === 'first') {
-        el.innerHTML = `
-          <div class="${cardCls} border-indigo-500/30">
-            ${errorHtml}
-            <div class="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h4 class="text-base font-extrabold text-white">Lịch của bạn có thể thay đổi?</h4>
-                <p class="text-sm text-slate-300 mt-1">Thử một tình huống đổi lịch mẫu để xem hệ thống xếp lại kế hoạch.</p>
-              </div>
-              <button type="button" onclick="gotoPlanStage('replan')" class="${btnPrimary}">Mô phỏng thay đổi lịch →</button>
-            </div>
-          </div>`;
-        return;
-      }
-
-      const diff = diffPlans((prevData.plan || {}), plan);
-      const tag = (cls, label) => `<span class="px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 ${cls}">${label}</span>`;
-      const row = (tagHtml, ids) => ids.length === 0 ? '' : `
-        <div class="flex items-start gap-3 text-sm text-slate-300">
-          ${tagHtml}
-          <span class="min-w-0">${ids.map(id => planActivityTitleHtml(titles, id)).join(', ')}</span>
-        </div>`;
-      const removedReason = id => {
-        const ex = (plan.excluded_candidates || []).find(e => e.activity_id === id);
-        return ex ? planExcludeReason(ex) : '';
-      };
-
-      if (currentPlanStage === 'replan') {
-        const comparison = plan.score_comparison || {};
-        const prevFree = (prevData.availability || {}).available_intervals || [];
-        const newFree = (data.availability || {}).available_intervals || [];
-        const fmtRange = r => `${formatPlanDate(new Date(r[0]).toISOString())} → ${formatPlanDate(new Date(r[1]).toISOString())}`;
-        const becameBusy = subtractIntervals(prevFree, newFree).map(fmtRange);
-        const becameFree = subtractIntervals(newFree, prevFree).map(fmtRange);
-        const scheduleLines = [
-          becameBusy.length ? `<div class="flex items-start gap-3 text-sm text-slate-300">${tag('bg-rose-950/60 text-rose-300 border-rose-500/40', 'Bận thêm')}<span class="min-w-0 text-white font-semibold">${becameBusy.map(escapeHTML).join('; ')}</span></div>` : '',
-          becameFree.length ? `<div class="flex items-start gap-3 text-sm text-slate-300">${tag('bg-emerald-950/60 text-emerald-300 border-emerald-500/40', 'Rảnh thêm')}<span class="min-w-0 text-white font-semibold">${becameFree.map(escapeHTML).join('; ')}</span></div>` : ''
-        ].join('');
-        const removedLines = diff.removed.map(id => {
-          const reason = removedReason(id);
-          return `<div class="flex items-start gap-3 text-sm text-slate-300">
-              ${tag('bg-rose-950/60 text-rose-300 border-rose-500/40', 'Bị loại')}
-              <span class="min-w-0">${planActivityTitleHtml(titles, id)}${reason ? ` <span class="text-slate-400">— ${escapeHTML(reason)}</span>` : ''}</span>
-            </div>`;
-        }).join('');
-        const keepOldScore = comparison.previous_projected_total;
-        const newScore = comparison.new_projected_total ?? (plan.score_summary || {}).projected_total;
-        const scoreLine = (keepOldScore != null && keepOldScore !== newScore)
-          ? `Nếu giữ nguyên kế hoạch cũ trong lịch mới, bạn chỉ đạt <b class="text-white">${keepOldScore}đ</b>. Kế hoạch mới giúp bạn đạt <b class="text-emerald-300">${newScore}đ</b>.`
-          : `Điểm dự kiến sau khi xếp lại: <b class="text-white">${newScore}đ</b>.`;
-        const skipSelected = (plan.selected_activities || []).some(a => a.activity_id === currentWhatIfSkipId());
-
-        el.innerHTML = `
-          <div class="${cardCls} border-amber-500/30">
-            ${errorHtml}
-            <div>
-              <h4 class="text-base font-extrabold text-white">Tình huống mẫu: lịch rảnh thay đổi</h4>
-              <p class="text-sm text-slate-300 mt-1">Đây là tình huống giả lập để minh họa cách thuật toán xếp lại kế hoạch:</p>
-            </div>
-            <div class="space-y-2">${scheduleLines || '<div class="text-sm text-slate-300">Không có thay đổi về khung giờ rảnh.</div>'}</div>
-            <p class="text-sm text-slate-300">Hệ thống đã xếp lại kế hoạch của bạn:</p>
-            <div class="space-y-2">
-              ${removedLines}
-              ${row(tag('bg-emerald-950/60 text-emerald-300 border-emerald-500/40', 'Thêm mới'), diff.added)}
-              ${row(tag('bg-sky-950/60 text-sky-300 border-sky-500/40', 'Đổi giờ'), diff.moved)}
-              ${diff.removed.length + diff.added.length + diff.moved.length === 0 ? '<div class="text-sm text-slate-300">Kế hoạch của bạn không bị ảnh hưởng.</div>' : ''}
-            </div>
-            <div class="text-sm text-slate-300">${scoreLine}</div>
-            <div class="flex flex-wrap items-center gap-2 pt-1">
-              ${skipSelected ? `<button type="button" onclick="gotoPlanStage('whatif')" class="${btnPrimary}">Thử bỏ “${escapeHTML(titles[currentWhatIfSkipId()] || currentWhatIfSkipId())}” →</button>` : ''}
-              <button type="button" onclick="gotoPlanStage('first')" class="${btnGhost}">← Xem lại kế hoạch ban đầu</button>
-            </div>
-          </div>`;
-        return;
-      }
-
-      // what-if stage
-      const summary = plan.score_summary || {};
-      const prevSummary = (prevData.plan || {}).score_summary || {};
-      const catChanges = ['C1', 'C2', 'C3', 'C4', 'C5'].map(cid => {
-        const before = (prevSummary.projected_by_category || {})[cid] ?? 0;
-        const after = (summary.projected_by_category || {})[cid] ?? 0;
-        return { cid, before, after, delta: after - before };
-      }).filter(c => c.delta !== 0);
-      const missing = Object.entries(summary.remaining_by_category || {}).filter(([, v]) => v > 0);
-      const skippedTitle = titles[currentWhatIfSkipId()] || currentWhatIfSkipId();
-      const verdict = missing.length > 0
-        ? `<div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-sm text-amber-200">
-             Nếu bỏ hoạt động này, <b>${missing.map(([cid, v]) => `${PLAN_CAT_LABELS[cid] || cid} (${PLAN_CAT_FULL[cid] || ''}) còn thiếu ${v}đ`).join('; ')}</b> so với mục tiêu ${plan.feasibility_conclusion === 'PROVEN_UNREACHABLE' ? ' — và trong khung giờ rảnh hiện có không còn hoạt động nào khác để bù' : ''}.
-           </div>`
-        : `<div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-sm text-emerald-200">Dù bỏ hoạt động này, bạn vẫn đạt mục tiêu nhờ các hoạt động thay thế bên dưới.</div>`;
-
-      el.innerHTML = `
-        <div class="${cardCls} border-rose-500/30">
-          ${errorHtml}
-          <div>
-            <h4 class="text-base font-extrabold text-white">Giả định: bạn bỏ “${escapeHTML(skippedTitle)}”</h4>
-            <p class="text-sm text-slate-300 mt-1">Đây là kết quả nếu bạn không thể tham gia hoạt động này:</p>
-          </div>
-          <div class="space-y-2">
-            ${row(tag('bg-rose-950/60 text-rose-300 border-rose-500/40', 'Bạn bỏ'), diff.removed)}
-            ${row(tag('bg-emerald-950/60 text-emerald-300 border-emerald-500/40', 'Thay thế bằng'), diff.added)}
-            ${row(tag('bg-sky-950/60 text-sky-300 border-sky-500/40', 'Đổi giờ'), diff.moved)}
-          </div>
-          ${catChanges.length ? `<div class="flex flex-wrap gap-2">${catChanges.map(c => `
-            <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${c.delta > 0 ? 'bg-emerald-950/40 text-emerald-300 border-emerald-600/50' : 'bg-rose-950/40 text-rose-300 border-rose-600/50'}">
-              ${PLAN_CAT_LABELS[c.cid]}: ${c.before} → ${c.after}đ (${c.delta > 0 ? '+' : ''}${c.delta}đ)
-            </span>`).join('')}</div>` : ''}
-          ${verdict}
-          <div class="flex flex-wrap items-center gap-2 pt-1">
-            <button type="button" onclick="gotoPlanStage('replan')" class="${btnGhost}">← Quay lại bước 2</button>
-            <button type="button" onclick="gotoPlanStage('first')" class="${btnGhost}">Xem lại kế hoạch ban đầu</button>
-          </div>
-        </div>`;
+    function renderPlanChangeCard() {
+      // Sample replan / what-if scenario cards removed from ordinary user views.
     }
 
     const PLAN_EVENT_COLORS = [
@@ -8101,7 +8067,7 @@
       const stale = document.getElementById('planStaleNotice');
       if (stale) stale.classList.toggle('hidden', !planInputsDirty);
 
-      renderPlanStepper();
+      updatePlanConfirmationBadge();
       renderPlanPersonalizationCard(data, titles);
 
       // Summary header
@@ -8125,9 +8091,10 @@
       const projTotal = summary.projected_total ?? 0;
       const gainTotal = summary.gain_total ?? (projTotal - baseTotal);
       const reqTarget = data.requested_total_target ?? 80;
+      const baselineHonest = formatPlanBaselineHonest(data);
       const setText = (id, v) => { const n = document.getElementById(id); if (n) n.innerText = v; };
-      setText('planScoreOverview', `${baseTotal} → ${projTotal} / 100đ`);
-      setText('planBaselineScoreText', `${baseTotal}đ`);
+      setText('planScoreOverview', `${projTotal} / 100đ`);
+      setText('planBaselineScoreText', baselineHonest);
       setText('planGainScoreText', `+${gainTotal}đ`);
       setText('planTargetScoreText', `${reqTarget}đ`);
 
@@ -8155,9 +8122,6 @@
             </div>`;
         }).join('');
       }
-
-      // What changed / next action
-      renderPlanChangeCard(data, prevData, titles);
 
       // Gather data for the tabs
       const acts = plan.selected_activities || [];
