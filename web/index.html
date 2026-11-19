@@ -1863,11 +1863,14 @@
     let currentProfileDraft = { profile: {}, drl_target: 80, weekly_intervals: [], exceptions: [], preference_patch: {} };
     let pendingProfileProposal = null;
     let profileAssistantConversation = [];
+    const profileAssistantRequestCache = new Map();
     let onboardingStep = 1;
     let cachedPlanOptions = [];
+    let planOptionsMessageText = "";
     let selectedPlanOptionIndex = 0;
     let customPlanBackup = null;
     let pendingSwapPreview = null;
+    let calendarPreviewChange = null;
 
     // Category metadata only. Current scores are loaded from /api/scores, whose
     // baseline is calculated by SP2 from rules marked default_awarded.
@@ -2603,11 +2606,26 @@
 
     function changeOnboardingStep(direction) {
       saveOnboardingStep();
-      onboardingStep = Math.max(1, Math.min(3, onboardingStep + direction));
+      const nextStep = Math.max(1, Math.min(3, onboardingStep + direction));
+      if (nextStep !== onboardingStep) resetOnboardingAssistantState();
+      onboardingStep = nextStep;
       const data = readLocalUserData(currentStudent.student_id);
       data.onboarding_step = onboardingStep;
+      data.profile_assistant_history = [];
       localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
       renderOnboardingStep();
+    }
+
+    function resetOnboardingAssistantState() {
+      const input = document.getElementById("onboardingAiInput");
+      const preview = document.getElementById("onboardingAiPreview");
+      if (input) input.value = "";
+      if (preview) {
+        preview.innerHTML = "";
+        preview.classList.add("hidden");
+      }
+      pendingProfileProposal = null;
+      profileAssistantConversation = [];
     }
 
     function renderOnboardingStep() {
@@ -2773,43 +2791,110 @@
       const studentId = currentStudent?.student_id;
       const requestGeneration = plannerRequestGeneration;
       preview.classList.remove("hidden");
-      preview.textContent = "Đang phân tích bằng Ollama…";
+      preview.textContent = "Đang phân tích yêu cầu…";
       try {
-        const response = await fetch(`${API_BASE}/api/profile-assistant/interpret`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message, draft: currentProfileDraft, conversation: profileAssistantConversation }) });
-        const data = await response.json().catch(() => ({}));
+        const requestBody = { message, draft: currentProfileDraft, conversation: profileAssistantConversation };
+        if (source === "onboarding") requestBody.onboarding_step = onboardingStep;
+        const cacheKey = `${studentId || ''}|${source}|${onboardingStep}|${message}|${JSON.stringify(currentProfileDraft)}`;
+        let data = profileAssistantRequestCache.get(cacheKey);
+        if (!data) {
+          const response = await fetch(`${API_BASE}/api/profile-assistant/interpret`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(requestBody) });
+          data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.detail?.message || data.detail || "AI chưa sẵn sàng; hãy chỉnh thủ công.");
+          profileAssistantRequestCache.set(cacheKey, data);
+        }
         if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
-        if (!response.ok) throw new Error(data.detail?.message || data.detail || "AI chưa sẵn sàng; hãy chỉnh thủ công.");
         profileAssistantConversation.push({ role: "user", content: message });
         if (data.questions?.length && !data.changes?.length) {
-          profileAssistantConversation.push({ role: "assistant", content: data.questions.join(" ") });
-          preview.innerHTML = `<b>Cần làm rõ:</b> ${escapeHTML(data.questions.join(" "))}`;
+          profileAssistantConversation.push({ role: "assistant", content: data.questions[0] });
+          preview.innerHTML = `<b>Cần làm rõ:</b> ${escapeHTML(data.questions[0])}`;
           return;
         }
-        pendingProfileProposal = { source, draft: data.proposed_draft, changes: data.changes || [] };
-        profileAssistantConversation.push({ role: "assistant", content: `Đề xuất ${pendingProfileProposal.changes.length} thay đổi; đang chờ xác nhận.` });
-        preview.innerHTML = `<div class="space-y-3"><b class="text-amber-200">Thay đổi đề xuất (chưa lưu)</b>${pendingProfileProposal.changes.map((change, index) => `<label class="block rounded-lg border border-[#2b3a54] p-2"><span class="font-bold text-slate-200">${escapeHTML(change.field)}</span><span class="mt-1 block text-slate-500">Cũ: ${escapeHTML(JSON.stringify(change.old))}</span><span class="mt-1 block text-emerald-300">Mới (có thể sửa trước khi xác nhận):</span><textarea rows="2" onchange="editPendingProfileChange(${index}, this)" class="mt-1 w-full rounded-md border border-[#33445f] bg-[#080d18] p-2 text-emerald-200">${escapeHTML(JSON.stringify(change.new))}</textarea></label>`).join("")}<button type="button" onclick="confirmProfileProposal()" class="rounded-lg bg-emerald-600 px-3 py-2 font-bold text-white">Xác nhận thay đổi</button></div>`;
+        pendingProfileProposal = { source, draft: data.proposed_draft, baseDraft: JSON.parse(JSON.stringify(currentProfileDraft)), changes: data.changes || [], question: data.questions?.[0] || null };
+        profileAssistantConversation.push({ role: "assistant", content: pendingProfileProposal.question || `Đề xuất ${pendingProfileProposal.changes.length} thay đổi; đang chờ xác nhận.` });
+        preview.innerHTML = renderProfileProposalChanges(data.latency_ms);
       } catch (error) {
         preview.innerHTML = `<span class="text-rose-300">${escapeHTML(error.message)} Dữ liệu chưa thay đổi; bạn vẫn có thể nhập thủ công.</span>`;
       }
     }
 
-    function editPendingProfileChange(index, input) {
-      if (!pendingProfileProposal?.changes?.[index]) return;
-      try {
-        const value = JSON.parse(input.value);
-        const change = pendingProfileProposal.changes[index];
-        change.new = value;
-        if (change.field.startsWith("profile.")) {
-          pendingProfileProposal.draft.profile[change.field.slice(8)] = value;
-        } else {
-          pendingProfileProposal.draft[change.field] = value;
+    function profileChangeLabel(field) {
+      return ({ "profile.full_name": "Họ và tên", "profile.class_name": "Lớp", "profile.major": "Ngành", drl_target: "Mục tiêu ĐRL", weekly_intervals: "Lịch tuần", exceptions: "Ngoại lệ", preference_patch: "Sở thích" })[field] || field;
+    }
+
+    function renderProfileProposalChanges(latencyMs) {
+      const weekdayOptions = AVAILABILITY_DAYS.map((day, value) => `<option value="${value}">${day}</option>`).join("");
+      const cards = pendingProfileProposal.changes.map((change, index) => {
+        const label = profileChangeLabel(change.field);
+        if (change.field.startsWith("profile.")) return `<label class="block rounded-lg border border-[#2b3a54] p-3"><span class="font-bold">${label}</span><input value="${escapeHTML(change.new || '')}" oninput="editProfileProposalScalar(${index}, this.value)" class="mt-2 w-full rounded-lg border border-[#33445f] bg-[#080d18] px-3 py-2" /></label>`;
+        if (change.field === "drl_target") return `<label class="block rounded-lg border border-[#2b3a54] p-3"><span class="font-bold">${label}</span><div class="mt-1 text-slate-500">${change.old ?? 'chưa đặt'} →</div><input type="number" min="0" max="100" value="${change.new}" oninput="editProfileProposalScalar(${index}, Number(this.value))" class="mt-2 w-full rounded-lg border border-[#33445f] bg-[#080d18] px-3 py-2" /></label>`;
+        if (change.field === "weekly_intervals" && (change.new || change.old)) {
+          const item = change.new || change.old;
+          return `<article class="rounded-lg border border-[#2b3a54] p-3"><div class="flex items-center justify-between"><b>${change.new ? 'Thêm/sửa lịch tuần' : 'Xóa lịch tuần'}</b><button type="button" onclick="discardProfileProposalChange(${index})" class="text-rose-300">Bỏ đề xuất</button></div><div class="mt-2 grid grid-cols-2 gap-2"><select ${change.new ? '' : 'disabled'} onchange="editProfileProposalInterval(${index},'kind',this.value)" class="rounded-lg bg-[#080d18] p-2"><option value="busy" ${item.kind === 'busy' ? 'selected' : ''}>Bận</option><option value="available" ${item.kind === 'available' ? 'selected' : ''}>Rảnh</option></select><select ${change.new ? '' : 'disabled'} onchange="editProfileProposalInterval(${index},'weekday',Number(this.value))" class="rounded-lg bg-[#080d18] p-2">${weekdayOptions.replace(`value="${item.weekday}"`, `value="${item.weekday}" selected`)}</select><input ${change.new ? '' : 'disabled'} type="time" value="${item.start}" onchange="editProfileProposalInterval(${index},'start',this.value)" class="rounded-lg bg-[#080d18] p-2"/><input ${change.new ? '' : 'disabled'} type="time" value="${item.end}" onchange="editProfileProposalInterval(${index},'end',this.value)" class="rounded-lg bg-[#080d18] p-2"/></div><div class="mt-2 text-[11px] text-slate-500">Lặp hằng tuần</div></article>`;
         }
-        input.classList.remove("border-rose-500");
-        input.dataset.invalid = "false";
-      } catch (error) {
-        input.classList.add("border-rose-500");
-        input.dataset.invalid = "true";
-      }
+        if (change.field === "exceptions" && (change.new || change.old)) {
+          const item = change.new || change.old;
+          return `<article class="rounded-lg border border-[#2b3a54] p-3"><div class="flex items-center justify-between"><b>${change.new ? 'Thêm/sửa ngoại lệ' : 'Xóa ngoại lệ'}</b><button type="button" onclick="discardProfileProposalChange(${index})" class="text-rose-300">Bỏ đề xuất</button></div><div class="mt-2 grid grid-cols-2 gap-2"><input ${change.new ? '' : 'disabled'} type="date" value="${item.date}" onchange="editProfileProposalException(${index},'date',this.value)" class="rounded-lg bg-[#080d18] p-2"/><select ${change.new ? '' : 'disabled'} onchange="editProfileProposalException(${index},'kind',this.value)" class="rounded-lg bg-[#080d18] p-2"><option value="busy" ${item.kind === 'busy' ? 'selected' : ''}>Bận</option><option value="available" ${item.kind === 'available' ? 'selected' : ''}>Rảnh</option></select><input ${change.new ? '' : 'disabled'} type="time" value="${item.start}" onchange="editProfileProposalException(${index},'start',this.value)" class="rounded-lg bg-[#080d18] p-2"/><input ${change.new ? '' : 'disabled'} type="time" value="${item.end}" onchange="editProfileProposalException(${index},'end',this.value)" class="rounded-lg bg-[#080d18] p-2"/></div></article>`;
+        }
+        if (change.field === "preference_patch") {
+          const preferenceLabels = { preferred_topics: 'Chủ đề', preferred_categories: 'Nhóm ĐRL', preferred_modes: 'Hình thức', preferred_campuses: 'Cơ sở', max_activities: 'Tối đa hoạt động', weekly_participation_hours: 'Giờ tối đa/tuần' };
+          return `<article class="rounded-lg border border-[#2b3a54] p-3"><b>Sở thích và giới hạn</b>${Object.entries(change.new || {}).map(([key, value]) => `<label class="mt-2 block text-slate-400">${escapeHTML(preferenceLabels[key] || key)}<input value="${escapeHTML(Array.isArray(value) ? value.join(', ') : (value ?? ''))}" onchange="editProfileProposalPreference(${index},'${key}',this.value)" class="mt-1 w-full rounded-lg border border-[#33445f] bg-[#080d18] px-3 py-2 text-white"/></label>`).join('')}</article>`;
+        }
+        return `<article class="rounded-lg border border-[#2b3a54] p-3"><b>${escapeHTML(label)}</b><p class="mt-1 text-slate-300">Thay đổi đã được kiểm tra; có thể xác nhận hoặc hủy.</p></article>`;
+      }).join("");
+      const question = pendingProfileProposal.question ? `<p class="rounded-lg border border-indigo-500/30 bg-indigo-950/20 p-2 text-indigo-200"><b>Cần làm rõ tiếp:</b> ${escapeHTML(pendingProfileProposal.question)}</p>` : '';
+      return `<div class="space-y-3"><div class="flex justify-between gap-2"><b class="text-amber-200">Thay đổi đề xuất (chưa lưu)</b><span class="text-slate-500">${Number(latencyMs || 0)} ms</span></div>${cards}${question}<div class="flex gap-2"><button type="button" onclick="confirmProfileProposal()" class="rounded-lg bg-emerald-600 px-3 py-2 font-bold text-white">Xác nhận</button><button type="button" onclick="cancelProfileProposal()" class="rounded-lg border border-[#33445f] px-3 py-2 font-bold">Hủy</button></div></div>`;
+    }
+
+    function editProfileProposalScalar(index, value) {
+      const change = pendingProfileProposal?.changes?.[index];
+      if (!change) return;
+      change.new = value;
+      if (change.field.startsWith("profile.")) pendingProfileProposal.draft.profile[change.field.slice(8)] = value;
+      else pendingProfileProposal.draft[change.field] = value;
+    }
+
+    function editProfileProposalInterval(index, key, value) {
+      const change = pendingProfileProposal?.changes?.[index];
+      if (!change?.new) return;
+      const previous = { ...change.new };
+      change.new[key] = value;
+      const target = (pendingProfileProposal.draft.weekly_intervals || []).find(item => item.weekday === previous.weekday && item.start === previous.start && item.end === previous.end && item.kind === previous.kind);
+      if (target) target[key] = value;
+    }
+
+    function editProfileProposalPreference(index, key, rawValue) {
+      const change = pendingProfileProposal?.changes?.[index];
+      if (!change) return;
+      const listFields = new Set(['preferred_topics', 'preferred_categories', 'preferred_modes', 'preferred_campuses']);
+      const value = listFields.has(key) ? rawValue.split(',').map(item => item.trim()).filter(Boolean) : (rawValue === '' ? null : Number(rawValue));
+      change.new[key] = value;
+      pendingProfileProposal.draft.preference_patch[key] = value;
+    }
+
+    function editProfileProposalException(index, key, value) {
+      const change = pendingProfileProposal?.changes?.[index];
+      if (!change?.new) return;
+      const previous = { ...change.new };
+      change.new[key] = value;
+      const target = (pendingProfileProposal.draft.exceptions || []).find(item => item.date === previous.date && item.start === previous.start && item.end === previous.end && item.kind === previous.kind);
+      if (target) target[key] = value;
+    }
+
+    function discardProfileProposalChange(index) {
+      const change = pendingProfileProposal?.changes?.[index];
+      if (!change) return;
+      if (change.field === 'weekly_intervals') pendingProfileProposal.draft.weekly_intervals = JSON.parse(JSON.stringify(pendingProfileProposal.baseDraft.weekly_intervals || []));
+      if (change.field === 'exceptions') pendingProfileProposal.draft.exceptions = JSON.parse(JSON.stringify(pendingProfileProposal.baseDraft.exceptions || []));
+      pendingProfileProposal.changes.splice(index, 1);
+      const preview = document.getElementById(pendingProfileProposal.source === "onboarding" ? "onboardingAiPreview" : "profileAiPreview");
+      if (preview) preview.innerHTML = renderProfileProposalChanges();
+    }
+
+    function cancelProfileProposal() {
+      const preview = document.getElementById(pendingProfileProposal?.source === "onboarding" ? "onboardingAiPreview" : "profileAiPreview");
+      pendingProfileProposal = null;
+      if (preview) preview.innerHTML = '<span class="text-slate-400">Đã hủy đề xuất; hồ sơ chưa thay đổi.</span>';
     }
 
     function validatePendingProfileDraft(draft) {
@@ -2842,10 +2927,11 @@
       }
       const source = pendingProfileProposal.source;
       const changes = pendingProfileProposal.changes || [];
+      const followupQuestion = pendingProfileProposal.question;
       currentProfileDraft = JSON.parse(JSON.stringify(pendingProfileProposal.draft));
       currentProfileDraft.weekly_intervals = (currentProfileDraft.weekly_intervals || []).map(item => ({ ...item, confirmed: true }));
       currentProfileDraft.exceptions = (currentProfileDraft.exceptions || []).map(item => ({ ...item, confirmed: true }));
-      if (preview) preview.innerHTML = '<span class="text-emerald-300 font-bold">Đã xác nhận thay đổi.</span>';
+      if (preview) preview.innerHTML = `<span class="text-emerald-300 font-bold">Đã xác nhận thay đổi.</span>${followupQuestion ? `<p class="mt-2 text-indigo-200"><b>Cần làm rõ tiếp:</b> ${escapeHTML(followupQuestion)}</p>` : ''}`;
       pendingProfileProposal = null;
       renderOnboardingIntervals();
       if (source === "onboarding") hydrateOnboardingFormFromDraft();
@@ -4548,8 +4634,8 @@
       const message = document.getElementById('planOptionsMessage');
       if (!box) return;
       const labels = { MINIMUM_EFFORT: 'Ít thời gian', BALANCED: 'Cân bằng', PREFERENCE_FIRST: 'Theo sở thích' };
-      box.innerHTML = cachedPlanOptions.map((option, index) => `<button type="button" onclick="selectCachedPlanOption(${index})" class="rounded-xl border p-3 text-left ${index === selectedPlanOptionIndex ? 'border-emerald-400 bg-emerald-950/30' : 'border-[#2b3a54] bg-[#080d18]'}"><span class="block text-sm font-extrabold text-white">${labels[option.strategy] || option.strategy}</span><span class="mt-1 block text-[11px] text-slate-400">${option.projected_total ?? '—'}đ · ${option.activity_count} hoạt động · ${Math.round((option.duration_minutes || 0) / 60 * 10) / 10} giờ · phù hợp ${option.utility}</span><span class="text-[11px] ${option.target_met ? 'text-emerald-300' : 'text-amber-300'}">${option.target_met ? 'Đạt mục tiêu' : 'Chưa đạt đủ mục tiêu'}</span></button>`).join('');
-      if (message) message.textContent = cachedPlanOptions.length < 3 ? 'Một số chiến lược cho cùng lịch khả thi nên đã được gộp; chuyển phương án không tính lại.' : 'Ba phương án đã lưu; chuyển tức thì không tính lại.';
+      box.innerHTML = cachedPlanOptions.map((option, index) => `<button type="button" onclick="selectCachedPlanOption(${index})" class="rounded-xl border p-3 text-left ${index === selectedPlanOptionIndex ? 'border-emerald-400 bg-emerald-950/30' : 'border-[#2b3a54] bg-[#080d18]'}"><span class="block text-sm font-extrabold text-white">${labels[option.strategy] || option.strategy}</span><span class="mt-1 block text-[11px] text-slate-400">${option.projected_total ?? '—'}đ · thiếu ${option.target_shortfall ?? '—'}đ · ${option.activity_count} hoạt động · ${Math.round((option.duration_minutes || 0) / 60 * 10) / 10} giờ · phù hợp ${option.utility}</span><span class="text-[11px] ${option.target_met ? 'text-emerald-300' : 'text-amber-300'}">${option.target_met ? 'Đạt mục tiêu' : 'Chưa đạt đủ mục tiêu'}</span></button>`).join('');
+      if (message) message.textContent = planOptionsMessageText || (cachedPlanOptions.length === 3 ? 'Ba phương án đã lưu; chuyển tức thì không tính lại.' : `${cachedPlanOptions.length} phương án khác nhau đã lưu; chuyển không tính lại.`);
     }
 
     function selectCachedPlanOption(index) {
@@ -4629,11 +4715,13 @@
         if (confirmedPreference) {
           const optionPayload = await fetchPersonalizedSp3Options(targetTotal, busyIntervals, confirmedPreference);
           cachedPlanOptions = optionPayload.options || [];
+          planOptionsMessageText = optionPayload.message || "";
           selectedPlanOptionIndex = Math.max(0, cachedPlanOptions.findIndex(option => option.strategy === confirmedPreference.strategy));
           data = cachedPlanOptions[selectedPlanOptionIndex]?.result;
           if (!data) throw new Error('Không có phương án khả thi sau khi áp dụng các ràng buộc.');
         } else {
           cachedPlanOptions = [];
+          planOptionsMessageText = "";
           selectedPlanOptionIndex = 0;
           data = await fetchSp3Plan('first_plan', targetTotal, busyIntervals);
         }
@@ -5018,10 +5106,16 @@
       lastCalendarTitles = titles || {};
       const plan = data.plan || {};
       const acts = plan.selected_activities || [];
-      const blocks = acts.flatMap((item, activityIndex) => (item.scheduled_blocks || []).map(block => ({
+      let blocks = acts.flatMap((item, activityIndex) => (item.scheduled_blocks || []).map(block => ({
         ...block, activityIndex, activity: item
       })));
-      const weeks = [...new Set(blocks.map(block => planWeekStart(block.start)))].sort();
+      if (calendarPreviewChange?.result === data) {
+        const removed = new Set(calendarPreviewChange.dropped_activity_ids || []);
+        blocks = blocks.concat((currentPlannerData?.plan?.selected_activities || []).filter(item => removed.has(item.activity_id)).flatMap((item, activityIndex) => (item.scheduled_blocks || []).map(block => ({ ...block, activityIndex, activity: item, previewRemoved: true }))));
+      }
+      const openBlocks = data.availability?.available_intervals || [];
+      const busyBlocks = collectBusyIntervals();
+      const weeks = [...new Set([...blocks, ...openBlocks, ...busyBlocks].map(block => planWeekStart(block.start)))].sort();
       if (!weeks.length) weeks.push(planWeekStart(AVAILABILITY_DEFAULT_WEEK_START));
       if (!preserveWeek || !weeks.includes(planCalendarWeekStart)) planCalendarWeekStart = weeks[0];
 
@@ -5043,22 +5137,36 @@
         }).join('');
         const dayColumns = AVAILABILITY_DAYS.map((_, dayIndex) => {
           const date = addDaysToIsoDate(planCalendarWeekStart, dayIndex);
-          const events = blocks.filter(block => block.start.slice(0, 10) === date).map(block => {
+          const position = block => {
             const start = new Date(block.start);
             const end = new Date(block.end);
             const startMinutes = start.getHours() * 60 + start.getMinutes();
             const endMinutes = end.getHours() * 60 + end.getMinutes();
-            const top = Math.max(0, ((startMinutes - 420) / 60) * 48);
-            const height = Math.max(30, ((Math.min(endMinutes, 1260) - Math.max(startMinutes, 420)) / 60) * 48);
+            return { top: Math.max(0, ((startMinutes - 420) / 60) * 48), height: Math.max(8, ((Math.min(endMinutes, 1260) - Math.max(startMinutes, 420)) / 60) * 48) };
+          };
+          const openSlots = openBlocks.filter(block => block.start.slice(0, 10) === date).map(block => {
+            const style = position(block);
+            return `<button type="button" onclick="openAvailableCalendarSlot('${block.start}','${block.end}')" aria-label="Khung giờ rảnh" class="absolute inset-x-1 rounded-md border border-emerald-700/30 bg-emerald-950/20 hover:bg-emerald-900/35" style="top:${style.top}px;height:${style.height}px;z-index:1"></button>`;
+          }).join('');
+          const busySlots = busyBlocks.filter(block => block.start.slice(0, 10) === date).map(block => {
+            const style = position(block);
+            return `<button type="button" onclick="openBusyCalendarSlot('${block.start}','${block.end}')" aria-label="Khung giờ bận" class="absolute inset-x-1 rounded-md border border-slate-500/40 bg-slate-700/55 hover:bg-slate-600/60" style="top:${style.top}px;height:${style.height}px;z-index:2"><span class="text-[9px] font-bold text-slate-200">BẬN</span></button>`;
+          }).join('');
+          const events = blocks.filter(block => block.start.slice(0, 10) === date).map(block => {
+            const start = new Date(block.start);
+            const end = new Date(block.end);
+            const style = position(block);
             const color = PLAN_EVENT_COLORS[block.activityIndex % PLAN_EVENT_COLORS.length];
             const title = block.activity.title || titles[block.activity.activity_id] || block.activity.activity_id;
             const time = `${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}–${String(end.getHours()).padStart(2, '0')}:${String(end.getMinutes()).padStart(2, '0')}`;
-            return `<button type="button" title="${escapeHTML(title)} · ${time}" onclick="setPlannerResultMode('list')" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white" style="top:${top}px;height:${height}px;background:${color.bg};border-left:3px solid ${color.border}">
-              <span class="block text-[10px] font-extrabold leading-tight line-clamp-2">${escapeHTML(title)}</span>
+            const previewAdded = calendarPreviewChange?.result === data && (calendarPreviewChange.added_activity_ids || []).includes(block.activity.activity_id);
+            const previewStyle = block.previewRemoved ? 'background:rgba(127,29,29,.55);border:2px dashed #fb7185;opacity:.75' : previewAdded ? 'background:rgba(6,95,70,.95);border:2px solid #34d399' : `background:${color.bg};border-left:3px solid ${color.border}`;
+            return `<button type="button" title="${escapeHTML(title)} · ${time}" onclick="openPlannedActivityDetails(activityFromToken('${activityToken(block.activity.activity_id)}'))" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white" style="top:${style.top}px;height:${Math.max(30, style.height)}px;${previewStyle};z-index:3">
+              <span class="block text-[9px] font-black">${block.previewRemoved ? 'BỎ' : previewAdded ? 'THÊM' : 'PLANNED'}</span><span class="block text-[10px] font-extrabold leading-tight line-clamp-2">${escapeHTML(title)}</span>
               <span class="block mt-1 text-[9px] text-white/75 planner-number">${time}</span>
             </button>`;
           }).join('');
-          return `<div class="plan-calendar-day relative border-l border-[#1b2537]">${events}</div>`;
+          return `<div class="plan-calendar-day relative border-l border-[#1b2537]" style="background:repeating-linear-gradient(135deg,#080d18,#080d18 10px,#0b111e 10px,#0b111e 20px)">${openSlots}${busySlots}${events}</div>`;
         }).join('');
         grid.innerHTML = `<div class="plan-calendar-board"><div class="grid bg-[#0b101b] border-b border-[#1b2537]" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div></div>${dayHeaders}</div><div class="grid" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div class="relative h-[672px] bg-[#080d18]">${hourLabels}</div>${dayColumns}</div></div>`;
       }
@@ -5075,14 +5183,90 @@
           return `<article class="rounded-xl border border-[#223046] bg-[#080d18] p-3" style="border-left:3px solid ${color.border}">
             <div class="flex items-start justify-between gap-2"><h5 class="text-xs font-extrabold text-white leading-snug planner-copy">${escapeHTML(title)}</h5>${gain ? `<span class="px-2 py-0.5 rounded-md bg-indigo-950/70 text-indigo-300 text-[10px] font-extrabold shrink-0 planner-number">+${gain}đ</span>` : ''}</div>
             <div class="mt-2 space-y-1 text-[11px] text-slate-400">${firstBlock ? `<div class="planner-number">◷ ${escapeHTML(formatPlanTimeRange(firstBlock.start, firstBlock.end))}</div>` : '<div>Thời gian linh hoạt</div>'}${categories ? `<div class="text-slate-500">${escapeHTML(categories)}</div>` : ''}</div>
-            <button type="button" onclick="openActivityAlternatives(activityFromToken('${activityToken(item.activity_id)}'))" class="mt-2 text-[11px] font-bold text-indigo-300 hover:text-indigo-200">Xem hoạt động thay thế</button>
+            <button type="button" onclick="openPlannedActivityDetails(activityFromToken('${activityToken(item.activity_id)}'))" class="mt-2 text-[11px] font-bold text-indigo-300 hover:text-indigo-200">Chi tiết và tùy chỉnh</button>
           </article>`;
         }).join('') : '<div class="rounded-xl border border-dashed border-[#2b3a54] p-5 text-center text-xs text-slate-500">Không cần thêm hoạt động để đạt mục tiêu hiện tại.</div>';
       }
 
       const legend = document.getElementById('planCalendarLegend');
-      if (legend) legend.innerHTML = `<span class="inline-flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-indigo-500"></i>Hoạt động đã xếp</span><span class="inline-flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-slate-600"></i>Khung nền trống chưa có hoạt động</span>${weeks.length > 1 ? `<span class="ml-auto text-indigo-300 planner-number">${weeks.indexOf(planCalendarWeekStart) + 1}/${weeks.length} tuần có hoạt động</span>` : ''}`;
+      if (legend) legend.innerHTML = `<span class="inline-flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-indigo-500"></i>PLANNED · đã xếp</span><span class="inline-flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-emerald-900"></i>OPEN · rảnh đã xác nhận</span><span class="inline-flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-full bg-slate-600"></i>BUSY · bận</span><span class="inline-flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded border border-slate-700"></i>UNKNOWN/OUTSIDE</span>${weeks.length > 1 ? `<span class="ml-auto text-indigo-300 planner-number">${weeks.indexOf(planCalendarWeekStart) + 1}/${weeks.length} tuần</span>` : ''}`;
       setPlannerResultMode(plannerResultMode);
+    }
+
+    function openPlannedActivityDetails(activityId) {
+      const modal = document.getElementById('smartSwapModal');
+      const content = document.getElementById('smartSwapContent');
+      const item = (currentPlannerData?.plan?.selected_activities || []).find(row => row.activity_id === activityId);
+      if (!modal || !content || !item) return;
+      const title = item.title || planTitleMap(currentPlannerData)[activityId] || activityId;
+      const schedule = (item.scheduled_blocks || []).map(block => formatPlanTimeRange(block.start, block.end)).join('; ');
+      const realWarning = SP3_SOURCE === 'real' ? '<p class="text-xs text-amber-300">Nguồn thật hiện chỉ hỗ trợ xem và đổi phương án đã tính; chỉnh từng hoạt động chưa có hợp đồng backend an toàn.</p>' : '';
+      content.innerHTML = `<article class="space-y-3"><div><h4 class="font-extrabold text-white">${escapeHTML(title)}</h4><p class="mt-1 text-xs text-slate-400">${escapeHTML(schedule || 'Thời gian linh hoạt')}</p></div>${realWarning}<div class="flex flex-wrap gap-2"><button type="button" ${SP3_SOURCE === 'real' ? 'disabled' : ''} onclick="openActivityAlternatives(activityFromToken('${activityToken(activityId)}'))" class="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold disabled:opacity-40">Thay hoạt động</button><button type="button" ${SP3_SOURCE === 'real' ? 'disabled' : ''} onclick="previewCalendarActivityChange('remove',activityFromToken('${activityToken(activityId)}'))" class="rounded-lg border border-rose-500/40 px-3 py-2 text-xs font-bold text-rose-200 disabled:opacity-40">Thử bỏ hoạt động</button></div></article>`;
+      modal.classList.remove('hidden');
+    }
+
+    function openAvailableCalendarSlot(start, end) {
+      const modal = document.getElementById('smartSwapModal');
+      const content = document.getElementById('smartSwapContent');
+      if (!modal || !content || !currentPlannerData) return;
+      if (SP3_SOURCE === 'real') {
+        content.innerHTML = '<p class="text-amber-200">Thêm trực tiếp vào khung rảnh chưa được hỗ trợ an toàn cho nguồn thật. Bạn vẫn có thể chuyển giữa các phương án đã tính.</p>';
+        modal.classList.remove('hidden');
+        return;
+      }
+      const selected = new Set((currentPlannerData.plan?.selected_activities || []).map(item => item.activity_id));
+      const candidates = (currentPlannerData.feasibility?.candidates || []).filter(row => {
+        const fixed = row.schedule?.fixed_blocks?.[0];
+        return row.feasibility?.status === 'FEASIBLE' && fixed && fixed.start >= start && fixed.end <= end && !selected.has(row.activity?.activity_id);
+      });
+      content.innerHTML = `<div class="space-y-3"><div><b class="text-white">Khung rảnh ${escapeHTML(formatPlanTimeRange(start, end))}</b><p class="text-xs text-slate-400">Chỉ hiển thị hoạt động cố định vừa khung; SP3 sẽ kiểm tra lại toàn bộ kế hoạch.</p></div>${candidates.length ? candidates.map(row => `<button type="button" onclick="previewCalendarActivityChange('add',activityFromToken('${activityToken(row.activity.activity_id)}'))" class="block w-full rounded-lg border border-[#33445f] p-3 text-left hover:bg-[#162032]"><b>${escapeHTML(row.activity.title || row.activity.activity_id)}</b><span class="mt-1 block text-xs text-slate-400">${escapeHTML(formatPlanTimeRange(row.schedule.fixed_blocks[0].start, row.schedule.fixed_blocks[0].end))}</span></button>`).join('') : '<p class="rounded-lg border border-dashed border-[#33445f] p-4 text-sm text-slate-500">Không có hoạt động đủ điều kiện vừa khung này.</p>'}</div>`;
+      modal.classList.remove('hidden');
+    }
+
+    function openBusyCalendarSlot(start, end) {
+      const modal = document.getElementById('smartSwapModal');
+      const content = document.getElementById('smartSwapContent');
+      if (!modal || !content) return;
+      content.innerHTML = `<div class="space-y-3"><div><b class="text-white">Khung bận ${escapeHTML(formatPlanTimeRange(start, end))}</b><p class="mt-1 text-xs text-amber-300">Thay đổi lịch bận có thể làm kế hoạch hiện tại hết hiệu lực và sẽ cần SP3 tính lại.</p></div><div class="flex gap-2"><button type="button" onclick="document.getElementById('smartSwapModal').classList.add('hidden');document.getElementById('btnToggleBusySlots')?.click()" class="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold">Chỉnh lịch</button><button type="button" onclick="confirmBusyCalendarRemoval('${start}','${end}')" class="rounded-lg border border-rose-500/40 px-3 py-2 text-xs font-bold text-rose-200">Xóa và tính lại</button></div></div>`;
+      modal.classList.remove('hidden');
+    }
+
+    async function confirmBusyCalendarRemoval(start, end) {
+      const date = start.slice(0, 10);
+      const startTime = start.slice(11, 16);
+      const endTime = end.slice(11, 16);
+      const weekday = (() => { const day = new Date(start).getDay(); return day === 0 ? 6 : day - 1; })();
+      customBusyIntervals = customBusyIntervals.filter(item => item.start !== start || item.end !== end);
+      currentProfileDraft.exceptions = (currentProfileDraft.exceptions || []).filter(item => !(item.kind === 'busy' && item.date === date && item.start === startTime && item.end === endTime));
+      currentProfileDraft.weekly_intervals = (currentProfileDraft.weekly_intervals || []).filter(item => !(item.kind === 'busy' && Number(item.weekday) === weekday && item.start === startTime && item.end === endTime));
+      [...unavailableAvailabilitySlots].forEach(key => {
+        const [slotDate, periodKey] = key.split('|');
+        const period = AVAILABILITY_PERIODS.find(item => item.key === periodKey);
+        if (slotDate === date && period?.start === startTime && period?.end === endTime) unavailableAvailabilitySlots.delete(key);
+      });
+      document.getElementById('smartSwapModal')?.classList.add('hidden');
+      markPlanStale();
+      persistCurrentUserData();
+      await runSp3Planner();
+    }
+
+    async function previewCalendarActivityChange(kind, activityId) {
+      const content = document.getElementById('smartSwapContent');
+      if (!content || !confirmedPreference || !currentPlannerData) return;
+      content.innerHTML = '<p>Đang kiểm tra khả thi và tính lại toàn bộ kế hoạch…</p>';
+      try {
+        const response = await fetch(`${API_BASE}/api/sp3/personalized/${kind}-preview${sp3Query()}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ confirmed_profile: true, preference: plannerPreferencePayload(confirmedPreference), base_result: currentPlannerData, activity_id: activityId }) });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.detail || 'Không thể tạo bản xem trước.');
+        pendingSwapPreview = data;
+        calendarPreviewChange = data;
+        renderPlanCalendar(data.result, planTitleMap(data.result), true);
+        content.innerHTML = `<div class="space-y-3"><div class="grid gap-3 sm:grid-cols-2"><div class="rounded-xl border border-[#2b3a54] p-3"><b>Trước</b><div class="mt-2 text-xs">${data.before.projected_total ?? '—'}đ · thiếu ${data.before.target_shortfall ?? '—'}đ · ${data.before.duration_minutes} phút</div></div><div class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3"><b>Sau</b><div class="mt-2 text-xs">${data.after.projected_total ?? '—'}đ · thiếu ${data.after.target_shortfall ?? '—'}đ · ${data.after.duration_minutes} phút</div></div></div><p class="text-xs text-slate-400">Bỏ: ${escapeHTML(data.dropped_activity_ids.join(', ')) || '—'} · Thêm: ${escapeHTML(data.added_activity_ids.join(', ')) || '—'}</p><button type="button" onclick="applySmartSwapPreview()" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold">Xác nhận Lịch tùy chỉnh</button></div>`;
+      } catch (error) {
+        calendarPreviewChange = null;
+        renderPlanCalendar(currentPlannerData, planTitleMap(currentPlannerData), true);
+        content.innerHTML = `<p class="text-rose-300">${escapeHTML(error.message)}</p><p class="mt-2 text-xs text-slate-500">Không có thay đổi nào được áp dụng.</p>`;
+      }
     }
 
     function openActivityAlternatives(activityId) {
@@ -5121,8 +5305,12 @@
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.detail || 'Không thể tạo bản xem trước thay thế.');
         pendingSwapPreview = data;
-        content.innerHTML = `<div class="grid gap-3 sm:grid-cols-2"><div class="rounded-xl border border-[#2b3a54] p-3"><b>Trước</b><div class="mt-2 text-xs">${data.before.projected_total ?? '—'}đ · ${data.before.activity_count} hoạt động · ${data.before.duration_minutes} phút</div></div><div class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3"><b>Sau</b><div class="mt-2 text-xs">${data.after.projected_total ?? '—'}đ · ${data.after.activity_count} hoạt động · ${data.after.duration_minutes} phút</div></div></div><p class="text-xs text-slate-400">Bỏ: ${escapeHTML(data.dropped_activity_ids.join(', ')) || '—'} · Thêm: ${escapeHTML(data.added_activity_ids.join(', ')) || '—'}</p><button type="button" onclick="applySmartSwapPreview()" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white">Xác nhận lưu Lịch tùy chỉnh</button>`;
+        calendarPreviewChange = data;
+        renderPlanCalendar(data.result, planTitleMap(data.result), true);
+        content.innerHTML = `<div class="grid gap-3 sm:grid-cols-2"><div class="rounded-xl border border-[#2b3a54] p-3"><b>Trước</b><div class="mt-2 text-xs">${data.before.projected_total ?? '—'}đ · thiếu ${data.before.target_shortfall ?? '—'}đ · ${data.before.activity_count} hoạt động · ${data.before.duration_minutes} phút</div></div><div class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3"><b>Sau</b><div class="mt-2 text-xs">${data.after.projected_total ?? '—'}đ · thiếu ${data.after.target_shortfall ?? '—'}đ · ${data.after.activity_count} hoạt động · ${data.after.duration_minutes} phút</div></div></div><p class="text-xs text-slate-400">Bỏ: ${escapeHTML(data.dropped_activity_ids.join(', ')) || '—'} · Thêm: ${escapeHTML(data.added_activity_ids.join(', ')) || '—'}</p><button type="button" onclick="applySmartSwapPreview()" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white">Xác nhận lưu Lịch tùy chỉnh</button>`;
       } catch (error) {
+        calendarPreviewChange = null;
+        renderPlanCalendar(currentPlannerData, planTitleMap(currentPlannerData), true);
         content.innerHTML = `<p class="text-rose-300">${escapeHTML(error.message)}</p><p class="mt-2 text-xs text-slate-500">Không có thay đổi nào được áp dụng.</p>`;
       }
     }
@@ -5135,6 +5323,7 @@
       planStages.first = currentPlannerData;
       currentPlanStage = 'first';
       pendingSwapPreview = null;
+      calendarPreviewChange = null;
       document.getElementById('smartSwapModal')?.classList.add('hidden');
       document.getElementById('undoCustomPlanButton')?.classList.remove('hidden');
       renderSp3PlanResult();

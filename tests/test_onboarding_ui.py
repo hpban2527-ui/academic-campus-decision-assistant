@@ -15,8 +15,12 @@ def test_dashboard_assistant_is_replaced_by_one_time_onboarding_and_profile_edit
     assert 'id="onboardingScores"' not in HTML
     assert "Bước 1 / 3" in HTML
     assert "hydrateOnboardingFormFromDraft" in HTML
-    assert "editPendingProfileChange" in HTML
+    assert "editProfileProposalInterval" in HTML
     assert 'id="onboardingAiChips"' in HTML
+    assert "resetOnboardingAssistantState" in HTML
+    assert "requestBody.onboarding_step = onboardingStep" in HTML
+    assert "JSON.stringify(change.new)" not in HTML
+    assert "renderProfileProposalChanges" in HTML
 
 
 def test_profile_schedule_workspace_and_local_migration_are_present() -> None:
@@ -40,8 +44,14 @@ def test_plan_option_cache_and_swap_controls_are_real_handlers() -> None:
     assert "weeklyHours * 60" in HTML
     assert "cachedPlanOptions" in HTML
     assert "selectCachedPlanOption" in HTML
-    assert "Xem hoạt động thay thế" in HTML
+    assert "Chi tiết và tùy chỉnh" in HTML
     assert "previewSmartSwap" in HTML
     assert "undoCustomPlan" in HTML
     assert "Smart Swap chưa được hỗ trợ an toàn cho nguồn hoạt động thật" in HTML
+    for marker in ("PLANNED · đã xếp", "OPEN · rảnh đã xác nhận", "BUSY · bận", "UNKNOWN/OUTSIDE"):
+        assert marker in HTML
+    for handler in ("openPlannedActivityDetails", "openAvailableCalendarSlot", "openBusyCalendarSlot", "previewCalendarActivityChange"):
+        assert f"function {handler}" in HTML
+    assert "/api/sp3/personalized/${kind}-preview" in HTML
+    assert "calendarPreviewChange" in HTML
 

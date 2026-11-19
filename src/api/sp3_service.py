@@ -464,6 +464,7 @@ def personalized_plan_options(
                 "strategy": strategy,
                 "signature": signature,
                 "projected_total": score.get("projected_total"),
+                "target_shortfall": score.get("remaining_total"),
                 "target_met": score.get("remaining_total") == 0 if score else False,
                 "activity_count": len(plan.get("selected_activities", [])),
                 "duration_minutes": _plan_minutes(plan),
@@ -479,7 +480,7 @@ def personalized_plan_options(
         "message": (
             None
             if len(options) == len(attempted)
-            else "Mot so chien luoc tao cung mot lich kha thi nen da duoc gop lai."
+            else f"Chỉ có {len(options)} lịch khả thi khác nhau; các chiến lược trùng lịch đã được gộp."
         ),
     }
 
@@ -490,11 +491,34 @@ def preview_personalized_swap(
     remove_activity_id: str,
     add_activity_id: str,
 ) -> dict:
-    """Preview a safe replacement through SP3 whole-plan scoring.
+    """Preview a safe replacement through SP3 whole-plan scoring."""
+    return _preview_personalized_change(preference, base_result, remove_activity_id, add_activity_id)
 
-    SP3's current public contract supports excluding A but not forcing B. The
-    preview succeeds only when the validated replan naturally selects B; it
-    otherwise fails closed and asks for a future force-include contract.
+
+def preview_personalized_addition(
+    preference: StudentPreference, base_result: dict, add_activity_id: str,
+) -> dict:
+    """Preview adding one fixed-time activity while keeping unaffected selections."""
+    return _preview_personalized_change(preference, base_result, None, add_activity_id)
+
+
+def preview_personalized_removal(
+    preference: StudentPreference, base_result: dict, remove_activity_id: str,
+) -> dict:
+    """Preview removing one activity and let SP3 safely fill any resulting gap."""
+    return _preview_personalized_change(preference, base_result, remove_activity_id, None)
+
+
+def _preview_personalized_change(
+    preference: StudentPreference,
+    base_result: dict,
+    remove_activity_id: str | None,
+    add_activity_id: str | None,
+) -> dict:
+    """Validate a calendar edit by rebuilding and independently checking the whole plan.
+
+    Fixed additions are seeded as a previous plan and protected with KEEP_TIME;
+    flexible additions fail closed because SP3 v0.2 has no force-include block.
     """
 
     if not isinstance(base_result, dict):
@@ -515,26 +539,29 @@ def preview_personalized_swap(
     ):
         raise ValueError("base_result plan rows are invalid or too large")
 
-    if remove_activity_id == add_activity_id:
+    if remove_activity_id is None and add_activity_id is None:
+        raise ValueError("calendar change must add or remove an activity")
+    if remove_activity_id is not None and remove_activity_id == add_activity_id:
         raise ValueError("replacement activity must be different")
     selected = {
         item.get("activity_id")
         for item in base_result.get("plan", {}).get("selected_activities", [])
     }
-    if remove_activity_id not in selected:
+    if remove_activity_id is not None and remove_activity_id not in selected:
         raise ValueError("activity to remove is not selected")
-    if add_activity_id in selected:
+    if add_activity_id is not None and add_activity_id in selected:
         raise ValueError("replacement activity is already selected")
     candidates = {
         item.get("activity", {}).get("activity_id"): item
         for item in base_result.get("feasibility", {}).get("candidates", [])
     }
-    candidate = candidates.get(add_activity_id)
-    if not candidate:
-        raise ValueError("replacement activity is not in the eligible catalog")
-    feasibility = candidate.get("feasibility", {})
-    if feasibility.get("status") != "FEASIBLE":
-        raise ValueError("replacement activity is not feasible")
+    candidate = candidates.get(add_activity_id) if add_activity_id is not None else None
+    if add_activity_id is not None:
+        if not candidate:
+            raise ValueError("replacement activity is not in the eligible catalog")
+        feasibility = candidate.get("feasibility", {})
+        if feasibility.get("status") != "FEASIBLE":
+            raise ValueError("replacement activity is not feasible")
     target_total = base_result.get("requested_total_target", 80)
     if isinstance(target_total, bool) or not isinstance(target_total, int) or not 0 <= target_total <= 100:
         raise ValueError("base_result requested_total_target is invalid")
@@ -553,19 +580,22 @@ def preview_personalized_swap(
     }
     if not selected <= set(by_id):
         raise ValueError("base_result contains activities outside the eligible catalog")
-    replacement = by_id.get(add_activity_id)
-    if replacement is None:
-        raise ValueError("replacement activity is outside the eligible catalog")
-    schedule = replacement.get("schedule") or {}
-    if schedule.get("type") != "FIXED" or not schedule.get("fixed_blocks"):
-        raise ValueError("SP3 v0.2 needs a force-include contract for flexible replacements")
+    schedule = None
+    if add_activity_id is not None:
+        replacement = by_id.get(add_activity_id)
+        if replacement is None:
+            raise ValueError("replacement activity is outside the eligible catalog")
+        schedule = replacement.get("schedule") or {}
+        if schedule.get("type") != "FIXED" or not schedule.get("fixed_blocks"):
+            raise ValueError("SP3 v0.2 needs a force-include contract for flexible replacements")
 
     seeded = [
         {"activity_id": item["activity_id"], "scheduled_blocks": deepcopy(item.get("scheduled_blocks", []))}
         for item in base_result["plan"].get("selected_activities", [])
-        if item["activity_id"] != remove_activity_id
+        if remove_activity_id is None or item["activity_id"] != remove_activity_id
     ]
-    seeded.append({"activity_id": add_activity_id, "scheduled_blocks": deepcopy(schedule["fixed_blocks"])})
+    if add_activity_id is not None and schedule is not None:
+        seeded.append({"activity_id": add_activity_id, "scheduled_blocks": deepcopy(schedule["fixed_blocks"])})
     seeded.sort(key=lambda item: item["activity_id"])
     # build_based_on fields come from the fresh plan output and are safer than
     # reconstructing the upstream version tuple here.
@@ -583,7 +613,7 @@ def preview_personalized_swap(
         activity_id = candidate_row["activity"]["activity_id"]
         original_candidate = candidates.get(activity_id)
         originally_feasible = original_candidate and original_candidate.get("feasibility", {}).get("status") == "FEASIBLE"
-        if activity_id == remove_activity_id or not originally_feasible:
+        if (remove_activity_id is not None and activity_id == remove_activity_id) or not originally_feasible:
             candidate_row["participation"]["progress"] = "CANCELLED"
     preview_plan = build_plan(
         planner_input,
@@ -593,12 +623,12 @@ def preview_personalized_swap(
     )
     violations = check_plan(planner_input, preview_plan, score_callback, input_snapshot=deepcopy(planner_input))
     if violations:
-        raise ValueError("replacement failed SP3 independent validation")
+        raise ValueError("calendar change failed SP3 independent validation")
     if preview_plan.get("keep_conflicts"):
-        raise ValueError("replacement conflicts with an unaffected activity or hard limit")
-    preview = {**internal, "plan": preview_plan, "scenario": "personalized_smart_swap"}
+        raise ValueError("calendar change conflicts with an unaffected activity or hard limit")
+    preview = {**internal, "plan": preview_plan, "scenario": "personalized_calendar_change"}
     after_ids = {item["activity_id"] for item in preview_plan.get("selected_activities", [])}
-    if add_activity_id not in after_ids:
+    if add_activity_id is not None and add_activity_id not in after_ids:
         raise ValueError(
             "SP3 cannot safely force this replacement; choose an alternative selected by the validated replan"
         )
@@ -612,11 +642,13 @@ def preview_personalized_swap(
         "add_activity_id": add_activity_id,
         "before": {
             "projected_total": before_summary.get("projected_total"),
+            "target_shortfall": before_summary.get("remaining_total"),
             "activity_count": len(before_ids),
             "duration_minutes": _plan_minutes(base_result["plan"]),
         },
         "after": {
             "projected_total": after_summary.get("projected_total"),
+            "target_shortfall": after_summary.get("remaining_total"),
             "activity_count": len(after_ids),
             "duration_minutes": _plan_minutes(preview["plan"]),
         },

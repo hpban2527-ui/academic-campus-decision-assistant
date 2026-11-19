@@ -260,40 +260,77 @@ def merge_profile_extraction(
             new, field = merged.drl_target, "drl_target"
         elif action.action == "upsert_weekly_interval":
             interval = WeeklyProfileInterval.model_validate(action.value)
-            old = [item.model_dump(mode="json") for item in merged.weekly_intervals]
+            before = [item.model_dump(mode="json") for item in merged.weekly_intervals]
+            replaced: list[dict[str, Any]] = []
             if action.operation == "replace":
                 expected = _match_dict(action.match) or {"kind": interval.kind, "weekday": interval.weekday}
+                replaced = [item.model_dump(mode="json") for item in merged.weekly_intervals if _matches(item, expected)]
                 merged.weekly_intervals = [item for item in merged.weekly_intervals if not _matches(item, expected)]
             if interval not in merged.weekly_intervals:
                 merged.weekly_intervals.append(interval)
-            new = [item.model_dump(mode="json") for item in merged.weekly_intervals]
+            after = [item.model_dump(mode="json") for item in merged.weekly_intervals]
+            old = replaced[0] if len(replaced) == 1 else (replaced or None)
+            new = interval.model_dump(mode="json")
+            if before == after:
+                old = new
             field = "weekly_intervals"
         elif action.action == "remove_weekly_interval":
             expected = _match_dict(action.match)
-            old = [item.model_dump(mode="json") for item in merged.weekly_intervals]
+            removed = [item.model_dump(mode="json") for item in merged.weekly_intervals if _matches(item, expected)]
             merged.weekly_intervals = [item for item in merged.weekly_intervals if not _matches(item, expected)]
-            new, field = [item.model_dump(mode="json") for item in merged.weekly_intervals], "weekly_intervals"
+            old = removed[0] if len(removed) == 1 else (removed or None)
+            new, field = None, "weekly_intervals"
+            if not removed:
+                old = new
         elif action.action == "upsert_exception":
             exception = DateException.model_validate(action.value)
-            old = [item.model_dump(mode="json") for item in merged.exceptions]
+            before = [item.model_dump(mode="json") for item in merged.exceptions]
+            replaced = []
             if action.operation == "replace":
+                replaced = [item.model_dump(mode="json") for item in merged.exceptions if item.date == exception.date]
                 merged.exceptions = [item for item in merged.exceptions if item.date != exception.date]
             if exception not in merged.exceptions:
                 merged.exceptions.append(exception)
-            new, field = [item.model_dump(mode="json") for item in merged.exceptions], "exceptions"
+            after = [item.model_dump(mode="json") for item in merged.exceptions]
+            old = replaced[0] if len(replaced) == 1 else (replaced or None)
+            new, field = exception.model_dump(mode="json"), "exceptions"
+            if before == after:
+                old = new
         elif action.action == "remove_exception":
             expected = _match_dict(action.match)
-            old = [item.model_dump(mode="json") for item in merged.exceptions]
+            removed = [item.model_dump(mode="json") for item in merged.exceptions if _matches(item, expected)]
             merged.exceptions = [item for item in merged.exceptions if not _matches(item, expected)]
-            new, field = [item.model_dump(mode="json") for item in merged.exceptions], "exceptions"
+            old = removed[0] if len(removed) == 1 else (removed or None)
+            new, field = None, "exceptions"
+            if not removed:
+                old = new
         elif action.action == "update_preferences":
             old = merged.preference_patch.model_dump(mode="json")
             patch = _patch_dict(action.value if isinstance(action.value, BaseModel) else None)
             unknown = set(patch) - set(PreferencePatch.model_fields)
             if unknown:
                 raise ValueError("preference patch contains unsupported fields")
-            merged.preference_patch = PreferencePatch.model_validate({**old, **deepcopy(patch)})
-            new, field = merged.preference_patch.model_dump(mode="json"), "preference_patch"
+            updated = deepcopy(old)
+            if action.operation == "add":
+                for key, value in patch.items():
+                    if isinstance(value, list):
+                        updated[key] = list(dict.fromkeys([*updated.get(key, []), *value]))
+                    else:
+                        updated[key] = value
+            elif action.operation == "remove":
+                for key, value in patch.items():
+                    if isinstance(value, list):
+                        updated[key] = [item for item in updated.get(key, []) if item not in value]
+                    else:
+                        updated[key] = None
+            else:
+                updated.update(deepcopy(patch))
+            merged.preference_patch = PreferencePatch.model_validate(updated)
+            current_new = merged.preference_patch.model_dump(mode="json")
+            changed_keys = [key for key in patch if old.get(key) != current_new.get(key)]
+            old = {key: old.get(key) for key in changed_keys}
+            new = {key: current_new.get(key) for key in changed_keys}
+            field = "preference_patch"
         elif action.action == "update_profile_field":
             patch = _patch_dict(action.value if isinstance(action.value, BaseModel) else None)
             if len(patch) != 1 or not set(patch) <= set(EditableProfile.model_fields):
@@ -340,11 +377,37 @@ Return at most one clarification question, for the single missing fact needed ne
 def deterministic_profile_extraction(
     text: str,
     conversation: list[dict[str, str]] | None = None,
+    current: ProfileAssistantDraft | dict[str, Any] | None = None,
 ) -> ProfileExtraction | None:
-    """Conservative fallback for explicit DRL goals and weekly time statements."""
+    """Conservative fast path for explicit Vietnamese profile statements."""
 
     normalized = _fold_vi(text)
+    if conversation and _fallback_weekday(normalized) is None and _fallback_date(normalized) is None:
+        previous = next((turn.get("content", "") for turn in reversed(conversation) if turn.get("role") == "user"), "")
+        if previous and (_fallback_times(normalized) or normalized in {"hang tuan", "moi tuan", "tuan nao cung vay"}):
+            previous_folded = _fold_vi(previous)
+            if _fallback_weekday(previous_folded) is not None or _fallback_date(previous_folded) is not None:
+                text = f"{previous}; {text}"
+                normalized = _fold_vi(text)
     actions: list[ProfilePatchAction] = []
+    draft = (
+        current if isinstance(current, ProfileAssistantDraft)
+        else ProfileAssistantDraft.model_validate(current or {})
+    )
+    profile_patterns = {
+        "full_name": r"(?i)\b(?:mình|minh|tôi|toi|em)\s+(?:tên|ten)\s+([^,;]+)",
+        "class_name": r"(?i)\b(?:lớp|lop)\s+([\w.-]{2,32})",
+        "major": r"(?i)\b(?:ngành|nganh)\s+([^,;]+)",
+    }
+    for field, pattern in profile_patterns.items():
+        match = re.search(pattern, text)
+        if match:
+            value = match.group(1).strip()
+            actions.append(ProfilePatchAction(
+                action="update_profile_field", operation="set",
+                value={field: value}, source_text=text.strip(),
+            ))
+
     goal = re.search(r"(?:muc\s*tieu|drl|diem\s*ren\s*luyen)[^\d]{0,30}(\d{1,3})\b", normalized)
     if goal:
         value = int(goal.group(1))
@@ -353,48 +416,118 @@ def deterministic_profile_extraction(
                 action="update_drl_goal", operation="set", value=value, source_text=text.strip()
             ))
 
-    weekday = _fallback_weekday(normalized)
-    schedule_words = re.search(r"\b(?:ban|ranh|hoc|lich|t[2-7]|cn|thu|hang\s*tuan)\b", normalized)
-    remove = bool(re.search(r"\b(?:xoa|bo|huy)\b", normalized))
-    replace = bool(re.search(r"\b(?:thay|doi|chuyen)\b", normalized))
-    if weekday is not None and remove:
-        actions.append(ProfilePatchAction(
-            action="remove_weekly_interval",
-            operation="remove",
-            match={"weekday": weekday},
-            source_text=text.strip(),
-        ))
-    elif weekday is not None and schedule_words:
-        times = _fallback_times(normalized)
-        if len(times) >= 2:
+    clarification: str | None = None
+    schedule_clauses = [item.strip() for item in re.split(r"[;\n]+|,\s*(?=(?:t[2-7]|thứ|thu|cn|chủ nhật|chu nhat)\b)", text) if item.strip()]
+    for clause in schedule_clauses:
+        folded_clause = _fold_vi(clause)
+        weekday = _fallback_weekday(folded_clause)
+        exception_date = _fallback_date(folded_clause)
+        schedule_words = re.search(r"\b(?:ban|ranh|hoc|lich|t[2-7]|cn|thu|hang\s*tuan)\b", folded_clause)
+        if (weekday is None and exception_date is None) or not schedule_words:
+            continue
+        remove = bool(re.search(r"\b(?:xoa|bo|huy)\b", folded_clause))
+        replace = bool(re.search(r"\b(?:thay|doi|chuyen)\b", folded_clause))
+        kind = "busy" if re.search(r"\b(?:khong\s*ranh|ban|hoc|ket)\b", folded_clause) else "available"
+        times = _fallback_times(folded_clause)
+        if exception_date is not None:
+            if remove:
+                actions.append(ProfilePatchAction(
+                    action="remove_exception", operation="remove",
+                    match={"date": exception_date, "kind": kind}, source_text=clause,
+                ))
+                continue
+            if len(times) < 2:
+                clarification = clarification or "Ngoại lệ đó bắt đầu và kết thúc lúc mấy giờ?"
+                continue
             if times[0] >= times[1]:
-                return ProfileExtraction(actions=actions, questions=["Giờ bắt đầu phải trước giờ kết thúc; bạn muốn khung giờ nào?"])
-            kind = "busy" if re.search(r"\b(?:khong\s*ranh|ban|hoc|kẹt|ket)\b", normalized) else "available"
+                clarification = clarification or "Giờ bắt đầu phải trước giờ kết thúc; bạn muốn khung giờ nào?"
+                continue
             actions.append(ProfilePatchAction(
-                action="upsert_weekly_interval",
-                operation="replace" if replace else "add",
+                action="upsert_exception", operation="replace" if replace else "add",
                 value={
-                    "kind": kind,
-                    "weekday": weekday,
-                    "start": times[0],
-                    "end": times[1],
-                    "recurrence": "weekly",
-                    "source": "ai",
-                    "confirmed": False,
-                },
-                match={"weekday": weekday, "kind": kind} if replace else None,
-                source_text=text.strip(),
+                    "date": exception_date, "kind": kind, "start": times[0], "end": times[1],
+                    "source": "ai", "confirmed": False,
+                }, source_text=clause,
             ))
-        elif not actions:
-            return ProfileExtraction(actions=[], questions=["Bạn bận hoặc rảnh từ mấy giờ đến mấy giờ?"])
+            continue
+        if remove:
+            actions.append(ProfilePatchAction(
+                action="remove_weekly_interval", operation="remove",
+                match={"weekday": weekday, "kind": kind}, source_text=clause,
+            ))
+            continue
+        if len(times) < 2:
+            clarification = clarification or "Bạn bận hoặc rảnh từ mấy giờ đến mấy giờ?"
+            continue
+        if times[0] >= times[1]:
+            clarification = clarification or "Giờ bắt đầu phải trước giờ kết thúc; bạn muốn khung giờ nào?"
+            continue
+        actions.append(ProfilePatchAction(
+            action="upsert_weekly_interval", operation="replace" if replace else "add",
+            value={
+                "kind": kind, "weekday": weekday, "start": times[0], "end": times[1],
+                "recurrence": "weekly", "source": "ai", "confirmed": False,
+            },
+            match={"weekday": weekday, "kind": kind} if replace else None,
+            source_text=clause,
+        ))
+
+    preference_value: dict[str, Any] = {}
+    topic_terms = {
+        "volunteer": ("tinh nguyen", "cong dong"),
+        "artificial_intelligence": ("tri tue nhan tao", " ai "),
+        "computer_science": ("khoa hoc may tinh", "cong nghe thong tin", "cntt"),
+        "soft_skills": ("ky nang mem",), "sports": ("the thao",),
+        "culture": ("van hoa", "van nghe"), "research": ("nghien cuu",),
+        "environment": ("moi truong",), "career": ("nghe nghiep", "viec lam"),
+    }
+    preference_scope = " ".join(
+        clause for clause in re.split(r"[;,\n]+", normalized)
+        if re.search(r"\b(?:thich|uu\s*tien|quan\s*tam|muon\s*tham\s*gia)\b", clause)
+    )
+    padded = f" {preference_scope} "
+    topics = [topic for topic, terms in topic_terms.items() if any(term in padded for term in terms)]
+    if topics:
+        preference_value["preferred_topics"] = topics
+    categories = [f"C{value}" for value in re.findall(r"\b(?:c|muc|nhom)\s*([1-5])\b", normalized)]
+    if categories:
+        preference_value["preferred_categories"] = list(dict.fromkeys(categories))
+    modes = [mode for mode, terms in {
+        "online": ("online", "truc tuyen"), "offline": ("offline", "truc tiep"),
+        "hybrid": ("hybrid", "ket hop"),
+    }.items() if any(term in normalized for term in terms)]
+    if modes:
+        preference_value["preferred_modes"] = modes
+    campuses = []
+    if re.search(r"\b(?:nvc|nguyen van cu)\b", normalized):
+        campuses.append("NVC")
+    if re.search(r"\b(?:dong hoa|di an|khu do thi dhqg)\b", normalized):
+        campuses.append("DONG_HOA")
+    if campuses:
+        preference_value["preferred_campuses"] = campuses
+    max_activities = re.search(r"\b(?:toi da|khong qua|gioi han)\D{0,20}(\d{1,2})\s*(?:hoat dong|su kien)\b", normalized)
+    if max_activities and 1 <= int(max_activities.group(1)) <= 20:
+        preference_value["max_activities"] = int(max_activities.group(1))
+    weekly_hours = re.search(r"\b(?:toi da|khong qua|gioi han)\D{0,20}(\d+(?:[.,]\d+)?)\s*(?:gio|tieng)\s*(?:moi|mot|/)\s*tuan\b", normalized)
+    if weekly_hours:
+        value = float(weekly_hours.group(1).replace(",", "."))
+        if 0.5 <= value <= 168:
+            preference_value["weekly_participation_hours"] = value
+    if preference_value:
+        actions.append(ProfilePatchAction(
+            action="update_preferences", operation="add",
+            value=preference_value, source_text=text.strip(),
+        ))
 
     if actions:
-        return ProfileExtraction(actions=actions, questions=[])
+        return ProfileExtraction(actions=actions, questions=[clarification] if clarification else [])
+    if clarification:
+        return ProfileExtraction(actions=[], questions=[clarification])
     # A short recurrence answer may complete the preceding user statement.
     if normalized in {"hang tuan", "moi tuan", "tuan nao cung vay"} and conversation:
         previous = next((turn.get("content", "") for turn in reversed(conversation) if turn.get("role") == "user"), "")
         if previous:
-            return deterministic_profile_extraction(f"{previous} hang tuan", [])
+            return deterministic_profile_extraction(f"{previous} hang tuan", [], draft)
     return None
 
 
@@ -420,6 +553,21 @@ def _fallback_times(text: str) -> list[str]:
     for match in re.finditer(r"(?<!\w)([01]?\d|2[0-3])\s*(?:h|g|:)([0-5]\d)?", text):
         values.append(f"{int(match.group(1)):02d}:{int(match.group(2) or 0):02d}")
     return values
+
+
+def _fallback_date(text: str) -> str | None:
+    iso = re.search(r"\b(20\d{2})-(0?[1-9]|1[0-2])-([0-2]?\d|3[01])\b", text)
+    if iso:
+        value = f"{int(iso.group(1)):04d}-{int(iso.group(2)):02d}-{int(iso.group(3)):02d}"
+    else:
+        local = re.search(r"\b([0-2]?\d|3[01])/(0?[1-9]|1[0-2])/(20\d{2})\b", text)
+        if not local:
+            return None
+        value = f"{int(local.group(3)):04d}-{int(local.group(2)):02d}-{int(local.group(1)):02d}"
+    try:
+        return DateValue.fromisoformat(value).isoformat()
+    except ValueError:
+        return None
 
 
 __all__ = [

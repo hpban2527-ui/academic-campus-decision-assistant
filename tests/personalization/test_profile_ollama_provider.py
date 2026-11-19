@@ -28,6 +28,51 @@ def test_profile_interpret_uses_ollama_schema_and_validates_actions() -> None:
     assert result.actions[0].action == "update_drl_goal"
 
 
+def test_profile_interpret_splits_grouped_profile_fields_from_small_model() -> None:
+    content = (
+        '{"actions":[{"action":"update_profile_field","operation":"set",'
+        '"value":{"class":"24CNTT1","major":"Khoa hoc may tinh"},'
+        '"match":null,"source_text":"lop va nganh"}],"questions":[]}'
+    )
+    provider = OllamaPreferenceProvider(
+        client=httpx.Client(
+            transport=httpx.MockTransport(
+                lambda request: httpx.Response(200, json={"message": {"content": content}})
+            )
+        )
+    )
+
+    result = provider.interpret_profile("lop 24CNTT1, nganh Khoa hoc may tinh", {}, [])
+
+    assert [action.value.model_dump(exclude_unset=True) for action in result.actions] == [
+        {"class_name": "24CNTT1"},
+        {"major": "Khoa hoc may tinh"},
+    ]
+
+
+def test_profile_interpret_discards_unknown_grouped_field_but_keeps_supported_patch() -> None:
+    content = (
+        '{"actions":[{"action":"update_profile_field","operation":"set",'
+        '"value":{"school":"lop 24CNTT1","major":"Khoa hoc may tinh"},'
+        '"match":null,"source_text":"lop va nganh"}],"questions":[]}'
+    )
+    provider = OllamaPreferenceProvider(
+        client=httpx.Client(
+            transport=httpx.MockTransport(
+                lambda request: httpx.Response(200, json={"message": {"content": content}})
+            )
+        )
+    )
+
+    result = provider.interpret_profile("lop 24CNTT1, nganh Khoa hoc may tinh", {}, [])
+
+    patches = [action.value.model_dump(exclude_unset=True) for action in result.actions]
+    assert {tuple(patch.items()) for patch in patches} == {
+        (("class_name", "24CNTT1"),),
+        (("major", "Khoa hoc may tinh"),),
+    }
+
+
 def test_profile_interpret_surfaces_timeout_and_malformed_response() -> None:
     def timeout_handler(request: httpx.Request) -> httpx.Response:
         raise httpx.ReadTimeout("slow", request=request)

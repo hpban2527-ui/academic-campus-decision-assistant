@@ -12,6 +12,7 @@ class FakeProfileProvider:
 
     def interpret_profile(self, text, current_profile, conversation):
         assert current_profile["drl_target"] == 80
+        assert conversation[-1]["content"] == "ACTIVE_ONBOARDING_STEP=3"
         return ProfileExtraction(
             actions=[
                 ProfilePatchAction(
@@ -28,7 +29,7 @@ def test_profile_assistant_api_returns_diff_without_persisting(monkeypatch) -> N
     monkeypatch.setattr(server, "_get_preference_provider", lambda: FakeProfileProvider())
     response = TestClient(server.app).post(
         "/api/profile-assistant/interpret",
-        json={"message": "Doi muc tieu thanh 90", "draft": {"drl_target": 80}, "conversation": []},
+        json={"message": "Hãy giúp mình cập nhật mục tiêu", "draft": {"drl_target": 80}, "conversation": [], "onboarding_step": 3},
     )
 
     assert response.status_code == 200, response.text
@@ -38,6 +39,26 @@ def test_profile_assistant_api_returns_diff_without_persisting(monkeypatch) -> N
     assert payload["changes"][0]["old"] == 80
     assert payload["changes"][0]["new"] == 90
     assert payload["provider"] == "ollama"
+    assert payload["latency_ms"] >= 0
+
+
+def test_profile_assistant_clear_vietnamese_uses_validated_fast_path(monkeypatch) -> None:
+    class ProviderMustNotRun:
+        provider_name = "ollama"
+        model = "mock-model"
+
+        def interpret_profile(self, *args, **kwargs):
+            raise AssertionError("clear input should not call Ollama")
+
+    monkeypatch.setattr(server, "_get_preference_provider", lambda: ProviderMustNotRun())
+    response = TestClient(server.app).post(
+        "/api/profile-assistant/interpret",
+        json={"message": "Mục tiêu ĐRL 90", "draft": {"drl_target": 80}, "conversation": [], "onboarding_step": 3},
+    )
+
+    assert response.status_code == 200, response.text
+    assert response.json()["provider"] == "deterministic-fast-path"
+    assert response.json()["proposed_draft"]["drl_target"] == 90
 
 
 def test_plan_options_endpoint_returns_deduplicated_cache_payload(valid_preference_payload) -> None:

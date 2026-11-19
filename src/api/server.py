@@ -545,6 +545,7 @@ class ProfileAssistantInterpretRequest(BaseModel):
     message: str = Field(min_length=1, max_length=2_000)
     draft: dict[str, Any] = Field(default_factory=dict)
     conversation: list["ProfileConversationTurn"] = Field(default_factory=list, max_length=20)
+    onboarding_step: Literal[1, 2, 3] | None = None
 
 
 class ProfileConversationTurn(BaseModel):
@@ -1487,35 +1488,38 @@ def interpret_profile_assistant(req: ProfileAssistantInterpretRequest):
         provider = _get_preference_provider()
     except (ValueError, TypeError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    started = perf_counter()
     provider_name = provider.provider_name
     model = provider.model
     fallback_used = False
-    try:
-        extraction = provider.interpret_profile(
-            req.message,
-            current.model_dump(mode="json"),
-            [turn.model_dump() for turn in req.conversation],
-        )
+    conversation = [turn.model_dump() for turn in req.conversation]
+    if req.onboarding_step is not None:
+        conversation.append({"role": "assistant", "content": f"ACTIVE_ONBOARDING_STEP={req.onboarding_step}"})
+    extraction = deterministic_profile_extraction(req.message, conversation, current)
+    if extraction is not None:
+        provider_name, model = "deterministic-fast-path", None
         proposed, changes = merge_profile_extraction(current, extraction)
-    except (PreferenceProviderUnavailable, PreferenceProviderInvalidResponse) as exc:
-        extraction = deterministic_profile_extraction(
-            req.message,
-            [turn.model_dump() for turn in req.conversation],
-        )
-        if extraction is None:
+    else:
+        try:
+            extraction = provider.interpret_profile(
+                req.message,
+                current.model_dump(mode="json"),
+                conversation,
+            )
+            proposed, changes = merge_profile_extraction(current, extraction)
+        except (PreferenceProviderUnavailable, PreferenceProviderInvalidResponse) as exc:
             status_code = 503 if isinstance(exc, PreferenceProviderUnavailable) else 502
             detail = _preference_error_detail(exc)
             detail["message"] += " Hãy nói rõ một thay đổi, trả lời câu hỏi làm rõ, hoặc nhập thủ công."
             raise HTTPException(status_code=status_code, detail=detail) from exc
-        provider_name, model, fallback_used = "deterministic-fallback", None, True
-        proposed, changes = merge_profile_extraction(current, extraction)
-    except (ValueError, TypeError) as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
     return {
         "status": "CLARIFICATION" if extraction.questions and not changes else "PREVIEW",
         "provider": provider_name,
         "model": model,
         "fallback_used": fallback_used,
+        "latency_ms": round((perf_counter() - started) * 1000),
         "requires_confirmation": True,
         "proposed_draft": proposed.model_dump(mode="json"),
         "changes": [item.model_dump(mode="json") for item in changes],
@@ -1672,6 +1676,8 @@ def lead_data_audit():
 # Serve Frontend static files if web directory exists
 from api.sp3_service import (
     demo_plan as _sp3_demo_plan,
+    preview_personalized_addition as _sp3_preview_addition,
+    preview_personalized_removal as _sp3_preview_removal,
     personalized_plan_options as _sp3_personalized_options,
     personalized_demo_plan as _sp3_personalized_plan,
     preview_personalized_swap as _sp3_preview_swap,
@@ -1778,6 +1784,14 @@ class SmartSwapRequest(BaseModel):
     add_activity_id: str = Field(min_length=1, max_length=100)
 
 
+class CalendarActivityChangeRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+    confirmed_profile: Literal[True]
+    preference: StudentPreference
+    base_result: dict[str, Any]
+    activity_id: str = Field(min_length=1, max_length=100)
+
+
 @app.post("/api/sp3/personalized/swap-preview")
 def preview_sp3_smart_swap(req: SmartSwapRequest, source: str = "synthetic"):
     """Preview a whole-plan rescored swap; never persists or applies it."""
@@ -1791,6 +1805,30 @@ def preview_sp3_smart_swap(req: SmartSwapRequest, source: str = "synthetic"):
             req.remove_activity_id,
             req.add_activity_id,
         )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/sp3/personalized/add-preview")
+def preview_sp3_addition(req: CalendarActivityChangeRequest, source: str = "synthetic"):
+    """Preview a fixed-time calendar addition through whole-plan SP3 validation."""
+
+    if _sp3_source(source) != "synthetic":
+        raise HTTPException(status_code=422, detail="calendar additions are not yet available for source=real")
+    try:
+        return _sp3_preview_addition(req.preference, req.base_result, req.activity_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/sp3/personalized/remove-preview")
+def preview_sp3_removal(req: CalendarActivityChangeRequest, source: str = "synthetic"):
+    """Preview an activity removal and SP3 replan without persisting it."""
+
+    if _sp3_source(source) != "synthetic":
+        raise HTTPException(status_code=422, detail="calendar removals are not yet available for source=real")
+    try:
+        return _sp3_preview_removal(req.preference, req.base_result, req.activity_id)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 

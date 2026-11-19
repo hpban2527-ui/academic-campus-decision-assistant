@@ -152,13 +152,25 @@ class OllamaPreferenceProvider:
     ) -> ProfileExtraction:
         """Extract strict profile PATCH actions through the real Ollama provider."""
 
-        context = json.dumps(current_profile, ensure_ascii=False, sort_keys=True)
-        history = json.dumps(conversation[-8:], ensure_ascii=False)
+        active_step = next((
+            turn.get("content", "").split("=", 1)[1]
+            for turn in reversed(conversation)
+            if turn.get("content", "").startswith("ACTIVE_ONBOARDING_STEP=")
+        ), None)
+        step_fields = {
+            "1": ("profile",),
+            "2": ("weekly_intervals", "exceptions"),
+            "3": ("drl_target", "preference_patch"),
+        }
+        relevant = step_fields.get(active_step, tuple(current_profile))
+        compact_profile = {key: current_profile.get(key) for key in relevant if key in current_profile}
+        context = json.dumps(compact_profile, ensure_ascii=False, sort_keys=True)
+        history = json.dumps(conversation[-6:], ensure_ascii=False)
         messages = [
             {"role": "system", "content": PROFILE_EXTRACTION_PROMPT},
             {
                 "role": "user",
-                "content": f"current profile: {context}\nconversation: {history}\nnew message: {text}",
+                "content": f"active step: {active_step or 'profile edit'}\ncurrent profile: {context}\nconversation: {history}\nnew message: {text}",
             },
         ]
         request_body = {
@@ -192,7 +204,7 @@ class OllamaPreferenceProvider:
             try:
                 extraction = _validate_profile_content(_extract_content(response))
                 extraction = _ground_profile_extraction(text, extraction)
-                return _supplement_clear_actions(text, conversation, extraction)
+                return _supplement_clear_actions(text, conversation, current_profile, extraction)
             except ValidationError as exc:
                 last_error = PreferenceProviderInvalidResponse(
                     "AI_INVALID_SCHEMA",
@@ -306,11 +318,29 @@ def _validate_profile_content(content: str) -> ProfileExtraction:
     payload = json.loads(content)
     actions = payload.get("actions") if isinstance(payload, dict) else None
     if isinstance(actions, list):
+        normalized_actions: list[Any] = []
         for action in actions:
             if not isinstance(action, dict):
+                normalized_actions.append(action)
                 continue
             name = action.get("action")
             operation = action.get("operation")
+            value = action.get("value")
+            if name == "update_profile_field" and isinstance(value, dict):
+                aliases = {"class": "class_name"}
+                allowed_fields = {"full_name", "class_name", "major"}
+                normalized_value = {
+                    aliases.get(key, key): item
+                    for key, item in value.items()
+                    if aliases.get(key, key) in allowed_fields
+                }
+                if normalized_value:
+                    # Ignore model-invented profile keys (for example `school`);
+                    # deterministic grounding can still recover explicit supported
+                    # fields from the user's text after this payload validates.
+                    for field, item in normalized_value.items():
+                        normalized_actions.append({**action, "value": {field: item}})
+                    continue
             if name not in {"remove_weekly_interval", "remove_exception"} and not (
                 name == "upsert_weekly_interval" and operation == "replace"
             ):
@@ -318,13 +348,15 @@ def _validate_profile_content(content: str) -> ProfileExtraction:
                 # `match`. Match has no meaning for these actions, so dropping it
                 # cannot broaden or fabricate the requested change.
                 action["match"] = None
+            normalized_actions.append(action)
+        payload["actions"] = normalized_actions
     return ProfileExtraction.model_validate(payload)
 
 
 def _ground_profile_extraction(user_text: str, extraction: ProfileExtraction) -> ProfileExtraction:
     """Ground audit text and unambiguous weekday mentions in the user's words."""
 
-    payload = extraction.model_dump(mode="json")
+    payload = extraction.model_dump(mode="json", exclude_unset=True)
     whole_message_days = _mentioned_weekdays(user_text)
     for index, action in enumerate(payload["actions"]):
         action["source_text"] = user_text.strip()[:500]
@@ -340,18 +372,30 @@ def _ground_profile_extraction(user_text: str, extraction: ProfileExtraction) ->
 def _supplement_clear_actions(
     user_text: str,
     conversation: list[dict[str, str]],
+    current_profile: dict[str, Any],
     extraction: ProfileExtraction,
 ) -> ProfileExtraction:
     """Add only high-confidence deterministic actions the model omitted."""
 
-    deterministic = deterministic_profile_extraction(user_text, conversation)
+    deterministic = deterministic_profile_extraction(user_text, conversation, current_profile)
     if deterministic is None or not deterministic.actions:
         return extraction
-    existing = {action.action for action in extraction.actions}
-    additions = [action for action in deterministic.actions if action.action not in existing]
+    existing = {_profile_action_identity(action) for action in extraction.actions}
+    additions = [action for action in deterministic.actions if _profile_action_identity(action) not in existing]
     if not additions:
         return extraction
     return ProfileExtraction(actions=[*extraction.actions, *additions], questions=[])
+
+
+def _profile_action_identity(action: Any) -> tuple[Any, ...]:
+    value = action.value.model_dump(mode="json", exclude_unset=True) if hasattr(action.value, "model_dump") else action.value
+    if action.action == "update_profile_field" and isinstance(value, dict):
+        return (action.action, *sorted(value))
+    if action.action == "update_preferences" and isinstance(value, dict):
+        return (action.action, *sorted(value))
+    if action.action in {"upsert_weekly_interval", "upsert_exception"} and isinstance(value, dict):
+        return (action.action, value.get("date"), value.get("weekday"), value.get("kind"), value.get("start"), value.get("end"))
+    return (action.action,)
 
 
 def _mentioned_weekdays(text: str) -> set[int]:

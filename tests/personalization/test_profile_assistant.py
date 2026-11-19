@@ -175,3 +175,41 @@ def test_deterministic_fallback_asks_one_question_when_time_is_missing() -> None
     assert extraction.actions == []
     assert len(extraction.questions) == 1
 
+
+def test_deterministic_extraction_handles_profile_and_preferences_without_erasing_existing() -> None:
+    current = ProfileAssistantDraft.model_validate({
+        "profile": {"full_name": "", "class_name": "", "major": ""},
+        "preference_patch": {"preferred_topics": ["sports"], "preferred_modes": ["offline"]},
+    })
+    extraction = deterministic_profile_extraction(
+        "Mình tên Nguyễn Minh An, lớp 24CNTT1, ngành Khoa học máy tính; thích tình nguyện và online, ưu tiên C4, tối đa 4 hoạt động",
+        current=current,
+    )
+
+    assert extraction is not None
+    merged, changes = merge_profile_extraction(current, extraction)
+    assert merged.profile.model_dump() == {
+        "full_name": "Nguyễn Minh An", "class_name": "24CNTT1", "major": "Khoa học máy tính"
+    }
+    assert merged.preference_patch.preferred_topics == ["sports", "volunteer"]
+    assert merged.preference_patch.preferred_modes == ["offline", "online"]
+    assert merged.preference_patch.preferred_categories == ["C4"]
+    assert merged.preference_patch.max_activities == 4
+    assert {change.field for change in changes} >= {
+        "profile.full_name", "profile.class_name", "profile.major", "preference_patch"
+    }
+
+
+def test_deterministic_extraction_handles_multiple_weekly_intervals() -> None:
+    extraction = deterministic_profile_extraction(
+        "T2 mình bận 7h30 đến 11h; thứ 4 rảnh 18h-20h; T6 bận 13:00 đến 16:30 hàng tuần"
+    )
+
+    assert extraction is not None
+    intervals = [action.value for action in extraction.actions if action.action == "upsert_weekly_interval"]
+    assert [(item.weekday, item.kind, item.start, item.end) for item in intervals] == [
+        (0, "busy", "07:30", "11:00"),
+        (2, "available", "18:00", "20:00"),
+        (4, "busy", "13:00", "16:30"),
+    ]
+

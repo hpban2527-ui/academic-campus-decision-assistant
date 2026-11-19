@@ -385,6 +385,7 @@ def real_plan_options(
         options.append({
             "strategy": strategy, "signature": signature,
             "projected_total": score.get("projected_total"),
+            "target_shortfall": score.get("remaining_total"),
             "target_met": score.get("remaining_total") == 0 if score else False,
             "activity_count": len(plan.get("selected_activities", [])),
             "duration_minutes": _plan_minutes(plan),
@@ -393,6 +394,6 @@ def real_plan_options(
         })
     return {
         "options": options, "attempted": attempted, "deduplicated": len(attempted) - len(options),
-        "message": None if len(options) == len(attempted) else "Một số chiến lược tạo cùng lịch nên đã được gộp.",
+        "message": None if len(options) == len(attempted) else f"Chỉ có {len(options)} lịch khả thi khác nhau; các chiến lược trùng lịch đã được gộp.",
         "source": "real",
     }
