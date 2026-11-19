@@ -312,6 +312,7 @@ def build_plan(
     max_flexible_per_set: int = MAX_FLEXIBLE_PER_SET,
     preference_utility: PreferenceUtility | None = None,
     personalization_strategy: str = "BALANCED",
+    search_method: str = "auto",
 ) -> dict[str, Any]:
     """Return the section-10 planner_output for ``planner_input``.
 
@@ -333,6 +334,8 @@ def build_plan(
         raise TypeError("preference_utility must be callable")
     if personalization_strategy not in {"MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"}:
         raise ValueError("personalization_strategy is not supported")
+    if search_method not in {"auto", "exact", "greedy", "beam_v1", "guided_v2"}:
+        raise ValueError("search_method is not supported")
     _validate_envelope(planner_input)
     try:
         plan = _parse_input(planner_input)
@@ -343,8 +346,9 @@ def build_plan(
         return _keep_conflict_output(plan, conflicts)
 
     extra = tuple(c for c in plan.candidates if plan.eligible(c) and c.activity_id not in plan.kept)
-    use_guided = len(extra) > 12
-    scheduling = _Scheduling(plan, max_flexible_per_set, fast_flexible=use_guided)
+    effective_method = ("guided_v2" if len(extra) > 12 else "exact") if search_method == "auto" else search_method
+    use_fast_flexible = effective_method != "exact"
+    scheduling = _Scheduling(plan, max_flexible_per_set, fast_flexible=use_fast_flexible)
     scorer = _Scorer(plan, score_plan)
     flags = _SearchFlags()
     try:
@@ -361,7 +365,13 @@ def build_plan(
         )
         if plan.previous is None and base.meets_targets:
             return _already_met_output(plan, base, scheduling)
-        search = _guided_search if use_guided else _search
+        search_dispatch = {
+            "exact": _search,
+            "greedy": _greedy_search,
+            "beam_v1": _guided_search,
+            "guided_v2": _guided_search_v2,
+        }
+        search = search_dispatch[effective_method]
         outcome = search(
             plan,
             extra,
@@ -922,6 +932,451 @@ def _guided_search(
                 if result is not None:
                     next_beam[subset] = result
         beam = sorted(next_beam.values(), key=lambda ev: ev.rank)[:12]
+
+    return _SearchOutcome(best, _SearchStop.BUDGET, met_size)
+
+
+def _greedy_search(
+    plan: _PlannerInput,
+    extra: tuple[_Candidate, ...],
+    base: _Evaluation,
+    scorer: _Scorer,
+    scheduling: _Scheduling,
+    flags: _SearchFlags,
+    max_evaluations: int,
+    preference_utility: PreferenceUtility | None = None,
+    personalization_strategy: str = "BALANCED",
+) -> _SearchOutcome:
+    """Baseline single-pass greedy construction for benchmark comparison."""
+    budget = min(max_evaluations, 260)
+    pool = _select_working_pool(plan, extra, 40)
+    max_added = min(
+        len(pool),
+        10 if plan.limits.max_activities is None else max(0, plan.limits.max_activities - len(plan.kept)),
+    )
+    if max_added <= 0:
+        return _SearchOutcome(base, _SearchStop.BUDGET)
+    kept = set(plan.kept)
+    options = tuple(c for c in pool if not any(frozenset((c.activity_id, k)) in plan.conflicts for k in kept))
+    best = base
+    met_size: int | None = len(base.activity_ids) if base.meets_targets else None
+    seen: dict[tuple[str, ...], _Evaluation] = {base.activity_ids: base}
+
+    def evaluate(subset: tuple[str, ...]) -> _Evaluation | None:
+        nonlocal best, met_size
+        if subset in seen:
+            return seen[subset]
+        if scorer.evaluated >= budget:
+            return None
+        if plan.limits.max_duration_minutes is not None:
+            minutes = math.fsum(plan.by_id[a].minutes for a in subset)
+            if minutes > plan.limits.max_duration_minutes + ABS_TOLERANCE:
+                return None
+        schedule = scheduling(subset)
+        if schedule.status is ScheduleStatus.UNDETERMINED:
+            flags.undetermined_sizes.add(len(subset))
+            return None
+        if schedule.status is not ScheduleStatus.SCHEDULED:
+            return None
+        result = _evaluate(
+            plan, scorer, subset, schedule, preference_utility, personalization_strategy,
+        )
+        flags.not_minimal |= not schedule.time_changes_minimal
+        seen[subset] = result
+        if result.rank < best.rank:
+            best = result
+        if result.meets_targets and (met_size is None or len(subset) < met_size):
+            met_size = len(subset)
+        return result
+
+    singles: list[tuple[_Candidate, _Evaluation]] = []
+    for candidate in options:
+        if scorer.evaluated >= budget:
+            break
+        found = evaluate(tuple(sorted((*plan.kept, candidate.activity_id))))
+        if found is not None:
+            singles.append((candidate, found))
+    if not singles:
+        return _SearchOutcome(best, _SearchStop.BUDGET, met_size)
+    singles.sort(key=lambda pair: pair[1].rank)
+    solo = {c.activity_id: ev for c, ev in singles}
+    current = singles[0][1]
+    ordered = [c for c, _ in singles]
+    for _ in range(max_added - 1):
+        if scorer.evaluated >= budget:
+            break
+        if current.meets_targets and personalization_strategy != "PREFERENCE_FIRST":
+            break
+        chosen = set(current.activity_ids)
+        after = current.result["category_after"]
+        next_candidates = sorted(
+            (
+                c for c in ordered
+                if c.activity_id not in chosen
+                and not any(frozenset((c.activity_id, a)) in plan.conflicts for a in chosen)
+            ),
+            key=lambda c: (
+                -math.fsum(
+                    min(max(0.0, float(solo[c.activity_id].result["category_gain"].get(cat, 0))),
+                        remaining_gap(target, after[cat]))
+                    for cat, target in plan.goals.category_targets
+                ),
+                -float(solo[c.activity_id].result["total_gain"]),
+                c.minutes,
+                c.activity_id,
+            ),
+        )
+        improved = None
+        for candidate in next_candidates[:5]:
+            result = evaluate(tuple(sorted((*current.activity_ids, candidate.activity_id))))
+            if result is not None and result.rank < current.rank:
+                improved = result
+                break
+        if improved is None:
+            break
+        current = improved
+    return _SearchOutcome(best, _SearchStop.BUDGET, met_size)
+
+
+def _select_working_pool_v2(
+    plan: _PlannerInput,
+    extra: tuple[_Candidate, ...],
+    cap: int,
+    personalization_strategy: str,
+) -> tuple[_Candidate, ...]:
+    """Strategy- and replan-aware stratified pool selection across domains and modes."""
+    def sort_key(c: _Candidate) -> tuple[Any, ...]:
+        not_retained = c.activity_id not in plan.retained
+        pref = -len(_preference_matches(plan.preferences, c))
+        if personalization_strategy == "MINIMUM_EFFORT":
+            return (not_retained, c.minutes, pref, c.activity_id)
+        return (not_retained, pref, c.minutes, c.activity_id)
+
+    ranked = sorted(extra, key=sort_key)
+    if len(ranked) <= cap:
+        return tuple(ranked)
+    buckets: dict[tuple[str, str], list[_Candidate]] = {}
+    for candidate in ranked:
+        buckets.setdefault((candidate.domain or "", candidate.mode), []).append(candidate)
+    picked = [c for c in ranked if c.activity_id in plan.retained][:cap]
+    seen = {c.activity_id for c in picked}
+    offsets = {key: 0 for key in buckets}
+    while len(picked) < cap:
+        added = False
+        for key in sorted(buckets):
+            group = buckets[key]
+            index = offsets[key]
+            while index < len(group) and group[index].activity_id in seen:
+                index += 1
+            if index < len(group):
+                picked.append(group[index])
+                seen.add(group[index].activity_id)
+                index += 1
+                added = True
+            offsets[key] = index
+            if len(picked) >= cap:
+                break
+        if not added:
+            break
+    return tuple(picked)
+
+
+def _guided_search_v2(
+    plan: _PlannerInput,
+    extra: tuple[_Candidate, ...],
+    base: _Evaluation,
+    scorer: _Scorer,
+    scheduling: _Scheduling,
+    flags: _SearchFlags,
+    max_evaluations: int,
+    preference_utility: PreferenceUtility | None = None,
+    personalization_strategy: str = "BALANCED",
+) -> _SearchOutcome:
+    """Category-, replan-, and personalization-aware guided search with 1-swap local refinement."""
+    budget = 400 if max_evaluations == DEFAULT_MAX_EVALUATIONS else max_evaluations
+    pool_cap = min(len(extra), 60, max(20, budget // 2))
+    pool = _select_working_pool_v2(plan, extra, pool_cap, personalization_strategy)
+    max_added = min(
+        len(pool),
+        12 if plan.limits.max_activities is None else max(0, plan.limits.max_activities - len(plan.kept)),
+    )
+    if max_added <= 0:
+        return _SearchOutcome(base, _SearchStop.BUDGET)
+    kept = set(plan.kept)
+    options = tuple(c for c in pool if not any(frozenset((c.activity_id, k)) in plan.conflicts for k in kept))
+    best = base
+    met_size: int | None = len(base.activity_ids) if base.meets_targets else None
+    seen: dict[tuple[str, ...], _Evaluation] = {base.activity_ids: base}
+
+    def evaluate(subset: tuple[str, ...]) -> _Evaluation | None:
+        nonlocal best, met_size
+        if subset in seen:
+            return seen[subset]
+        if scorer.evaluated >= budget:
+            return None
+        if plan.limits.max_activities is not None and len(subset) > plan.limits.max_activities:
+            return None
+        if plan.limits.max_duration_minutes is not None:
+            minutes = math.fsum(plan.by_id[a].minutes for a in subset)
+            if minutes > plan.limits.max_duration_minutes + ABS_TOLERANCE:
+                return None
+        schedule = scheduling(subset)
+        if schedule.status is ScheduleStatus.UNDETERMINED:
+            flags.undetermined_sizes.add(len(subset))
+            return None
+        if schedule.status is not ScheduleStatus.SCHEDULED:
+            return None
+        result = _evaluate(
+            plan, scorer, subset, schedule, preference_utility, personalization_strategy,
+        )
+        flags.not_minimal |= not schedule.time_changes_minimal
+        seen[subset] = result
+        if result.rank < best.rank:
+            best = result
+        if result.meets_targets and (met_size is None or len(subset) < met_size):
+            met_size = len(subset)
+        return result
+
+    # Phase 2: Singleton pass
+    singles: list[tuple[_Candidate, _Evaluation]] = []
+    for candidate in options:
+        if scorer.evaluated >= budget:
+            break
+        subset = tuple(sorted((*plan.kept, candidate.activity_id)))
+        found = evaluate(subset)
+        if found is not None:
+            singles.append((candidate, found))
+    if not singles:
+        return _SearchOutcome(best, _SearchStop.BUDGET, met_size)
+
+    singles.sort(key=lambda pair: pair[1].rank)
+    ordered = [candidate for candidate, _ in singles]
+    solo = {candidate.activity_id: ev for candidate, ev in singles}
+    cand_by_id = {candidate.activity_id: candidate for candidate in ordered}
+
+    # Index top candidates per target category so secondary categories are never starved.
+    cat_top: dict[str, list[_Candidate]] = {}
+    for category, _ in plan.goals.category_targets:
+        matching = [
+            (float(solo[c.activity_id].result["category_gain"].get(category, 0)), solo[c.activity_id].rank, c)
+            for c in ordered
+            if float(solo[c.activity_id].result["category_gain"].get(category, 0)) > 0
+        ]
+        matching.sort(key=lambda item: (-item[0], item[1]))
+        cat_top[category] = [item[2] for item in matching[:6]]
+
+    # Build category-, replan-, and strategy-diverse expansion pool.
+    expansion_ids: list[str] = []
+    expansion_seen: set[str] = set()
+
+    def _add_exp(candidate: _Candidate) -> None:
+        if candidate.activity_id not in expansion_seen:
+            expansion_seen.add(candidate.activity_id)
+            expansion_ids.append(candidate.activity_id)
+
+    for candidate in ordered:
+        if candidate.activity_id in plan.retained:
+            _add_exp(candidate)
+    for category, _ in plan.goals.category_targets:
+        for candidate in cat_top.get(category, ())[:5]:
+            _add_exp(candidate)
+        if personalization_strategy == "MINIMUM_EFFORT":
+            # Also include shortest-duration candidates that contribute to this category.
+            shortest_cat = sorted(
+                (
+                    c for c in ordered
+                    if float(solo[c.activity_id].result["category_gain"].get(category, 0)) > 0
+                ),
+                key=lambda c: (c.minutes, solo[c.activity_id].rank),
+            )
+            for candidate in shortest_cat[:4]:
+                _add_exp(candidate)
+        elif personalization_strategy == "PREFERENCE_FIRST":
+            # Also include highest-utility candidates (rank[4] is -utility in PREFERENCE_FIRST).
+            best_pref_cat = sorted(
+                (
+                    c for c in ordered
+                    if float(solo[c.activity_id].result["category_gain"].get(category, 0)) > 0
+                ),
+                key=lambda c: (solo[c.activity_id].rank[4], solo[c.activity_id].rank),
+            )
+            for candidate in best_pref_cat[:4]:
+                _add_exp(candidate)
+    if personalization_strategy == "MINIMUM_EFFORT":
+        for candidate in sorted(ordered, key=lambda c: (c.minutes, solo[c.activity_id].rank))[:10]:
+            _add_exp(candidate)
+    elif personalization_strategy == "PREFERENCE_FIRST":
+        for candidate in sorted(ordered, key=lambda c: (solo[c.activity_id].rank[4], solo[c.activity_id].rank))[:12]:
+            _add_exp(candidate)
+    for candidate in ordered[:24]:
+        _add_exp(candidate)
+    expansion_pool = [cand_by_id[aid] for aid in expansion_ids]
+
+    def priority(candidate: _Candidate, current: _Evaluation) -> tuple[Any, ...]:
+        ev = solo[candidate.activity_id]
+        gained = ev.result["category_gain"]
+        after = current.result["category_after"]
+        useful = math.fsum(
+            min(max(0.0, float(gained.get(category, 0))),
+                remaining_gap(target, after[category]))
+            for category, target in plan.goals.category_targets
+        )
+        points = float(ev.result["total_gain"])
+        not_retained = 0 if (plan.previous is not None and candidate.activity_id in plan.retained) else 1
+        if plan.previous is not None:
+            if current.meets_targets:
+                return (not_retained, -useful, -points, ev.rank)
+            return (-useful, not_retained, -points, ev.rank)
+        if personalization_strategy == "MINIMUM_EFFORT":
+            return (-useful, candidate.minutes, -points, ev.rank)
+        if personalization_strategy == "PREFERENCE_FIRST":
+            if current.meets_targets:
+                return (ev.rank[4], -useful, -points, ev.rank)
+            return (-useful, ev.rank[4], -points, ev.rank)
+        return (-useful, -points, ev.rank)
+
+    # Phase 3: Replan- and strategy-aware greedy rollouts
+    seeds: list[_Evaluation] = []
+    seed_ids: set[tuple[str, ...]] = set()
+
+    def _add_seed(ev: _Evaluation | None) -> None:
+        if ev is not None and ev.activity_ids not in seed_ids:
+            seed_ids.add(ev.activity_ids)
+            seeds.append(ev)
+
+    # During replan, immediately test keeping all still-eligible retained activities together.
+    if plan.previous is not None and plan.retained:
+        retained_eligible = [c.activity_id for c in ordered if c.activity_id in plan.retained]
+        if retained_eligible:
+            ret_subset = tuple(sorted((*plan.kept, *retained_eligible)))
+            if not any(
+                frozenset((a, b)) in plan.conflicts
+                for i, a in enumerate(ret_subset)
+                for b in ret_subset[i + 1:]
+            ):
+                _add_seed(evaluate(ret_subset))
+
+    # Diverse seeds: top per target category + top overall singletons.
+    for category, _ in plan.goals.category_targets:
+        if cat_top.get(category):
+            _add_seed(solo[cat_top[category][0].activity_id])
+    for _, ev in singles[:8]:
+        _add_seed(ev)
+
+    for seed in seeds[:10]:
+        current = seed
+        for _ in range(max_added - 1):
+            if scorer.evaluated >= budget:
+                break
+            if current.meets_targets and plan.previous is None and personalization_strategy != "PREFERENCE_FIRST":
+                break
+            chosen = set(current.activity_ids)
+            next_candidates = sorted(
+                (
+                    c for c in expansion_pool
+                    if c.activity_id not in chosen
+                    and not any(frozenset((c.activity_id, a)) in plan.conflicts for a in chosen)
+                ),
+                key=lambda c: priority(c, current),
+            )
+            best_step: _Evaluation | None = None
+            for candidate in next_candidates[:4]:
+                subset = tuple(sorted((*current.activity_ids, candidate.activity_id)))
+                result = evaluate(subset)
+                if result is not None and result.rank < current.rank:
+                    if best_step is None or result.rank < best_step.rank:
+                        best_step = result
+            if best_step is None:
+                break
+            current = best_step
+
+    # Phase 4: Category-diverse Beam Search
+    prune_dominated = plan.previous is None and personalization_strategy != "PREFERENCE_FIRST"
+    beam_budget = int(budget * 0.85)
+    beam = [ev for _, ev in singles[:12]]
+    for size in range(2, max_added + 1):
+        if scorer.evaluated >= beam_budget or not beam:
+            break
+        if prune_dominated and met_size is not None and len(plan.kept) + size > met_size:
+            break
+        next_beam: dict[tuple[str, ...], _Evaluation] = {}
+        for parent in beam:
+            if scorer.evaluated >= beam_budget:
+                break
+            chosen = set(parent.activity_ids)
+            # Prioritize candidates that cover parent's remaining gaps, then expansion_pool order.
+            parent_candidates = sorted(
+                (
+                    c for c in expansion_pool
+                    if c.activity_id not in chosen
+                    and not any(frozenset((c.activity_id, a)) in plan.conflicts for a in chosen)
+                ),
+                key=lambda c: priority(c, parent),
+            )[:16]
+            for candidate in parent_candidates:
+                if scorer.evaluated >= beam_budget:
+                    break
+                subset = tuple(sorted((*parent.activity_ids, candidate.activity_id)))
+                result = evaluate(subset)
+                if result is not None:
+                    next_beam[subset] = result
+        beam = sorted(next_beam.values(), key=lambda ev: ev.rank)[:12]
+
+    # Phase 5: Deterministic 1-Prune, 1-Swap, and 1-Add Local Search refinement
+    for _ in range(2):
+        if scorer.evaluated >= budget:
+            break
+        improved_local = False
+        current = best
+        removable = [aid for aid in current.activity_ids if aid not in kept]
+
+        # 5a. Try removing one redundant activity
+        for aid in removable:
+            if scorer.evaluated >= budget:
+                break
+            reduced = tuple(x for x in current.activity_ids if x != aid)
+            res = evaluate(reduced)
+            if res is not None and res.rank < best.rank:
+                improved_local = True
+
+        # 5b. Try 1-for-1 swaps from the expansion pool
+        current = best
+        removable = [aid for aid in current.activity_ids if aid not in kept]
+        chosen_set = set(current.activity_ids)
+        swap_pool = [c for c in expansion_pool if c.activity_id not in chosen_set][:20]
+        for aid in removable:
+            if scorer.evaluated >= budget:
+                break
+            without_a = [x for x in current.activity_ids if x != aid]
+            for cand in swap_pool:
+                if scorer.evaluated >= budget:
+                    break
+                if any(frozenset((cand.activity_id, x)) in plan.conflicts for x in without_a):
+                    continue
+                swapped = tuple(sorted((*without_a, cand.activity_id)))
+                res = evaluate(swapped)
+                if res is not None and res.rank < best.rank:
+                    improved_local = True
+
+        # 5c. Try 1-Add (beneficial for PREFERENCE_FIRST, replan retention, or partial plans)
+        if (not best.meets_targets or plan.previous is not None or personalization_strategy == "PREFERENCE_FIRST"):
+            current = best
+            if len(current.activity_ids) - len(plan.kept) < max_added:
+                chosen_set = set(current.activity_ids)
+                for cand in expansion_pool[:16]:
+                    if scorer.evaluated >= budget:
+                        break
+                    if cand.activity_id in chosen_set:
+                        continue
+                    if any(frozenset((cand.activity_id, x)) in plan.conflicts for x in chosen_set):
+                        continue
+                    added = tuple(sorted((*current.activity_ids, cand.activity_id)))
+                    res = evaluate(added)
+                    if res is not None and res.rank < best.rank:
+                        improved_local = True
+
+        if not improved_local:
+            break
 
     return _SearchOutcome(best, _SearchStop.BUDGET, met_size)
 
