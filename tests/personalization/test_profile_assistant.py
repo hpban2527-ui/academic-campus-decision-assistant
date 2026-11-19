@@ -213,3 +213,159 @@ def test_deterministic_extraction_handles_multiple_weekly_intervals() -> None:
         (4, "busy", "13:00", "16:30"),
     ]
 
+
+@pytest.mark.parametrize(("message", "expected"), [
+    ("Giam muc tieu xuong 65", 65),
+    ("Doi muc tieu thanh 75 diem", 75),
+    ("Muc tieu DRL cua minh la 85", 85),
+    ("Toi can 90 diem DRL", 90),
+    ("Tui muon dat 95 diem ren luyen", 95),
+    ("Nang diem ren luyen mong muon len 98", 98),
+    ("Muc tieu diem ren luyen la 100", 100),
+])
+def test_drl_goal_generalizes_to_valid_integer_phrasings(message, expected) -> None:
+    extraction = deterministic_profile_extraction(message)
+    assert extraction is not None
+    assert next(action.value for action in extraction.actions if action.action == "update_drl_goal") == expected
+
+
+def test_standalone_goal_requires_clear_conversation_context() -> None:
+    assert deterministic_profile_extraction("75") is None
+    extraction = deterministic_profile_extraction(
+        "75",
+        [{"role": "assistant", "content": "Ban muon dat bao nhieu diem DRL?"}],
+    )
+    assert extraction is not None
+    assert extraction.actions[0].value == 75
+
+
+def test_invalid_drl_goal_asks_for_clarification() -> None:
+    extraction = deterministic_profile_extraction("Muc tieu DRL cua minh la 105")
+    assert extraction is not None
+    assert extraction.actions == []
+    assert len(extraction.questions) == 1
+
+
+def test_all_supported_interest_domains_are_recognized() -> None:
+    extraction = deterministic_profile_extraction(
+        "Thich toan, vat ly, hoa hoc, sinh hoc, lap trinh, tieng Nhat, tai chinh, AI, "
+        "cong nghe, nghien cuu khoa hoc, ky nang mem, nghe nghiep, tinh nguyen, moi truong, "
+        "nghe thuat, the thao, suc khoe, an toan va giao duc cong dan"
+    )
+    assert extraction is not None
+    preference = next(action.value for action in extraction.actions if action.action == "update_preferences")
+    assert set(preference.preferred_topics) == {
+        "mathematics", "physics", "chemistry", "biology", "computer_science",
+        "foreign_language", "economics_finance", "artificial_intelligence", "technology",
+        "research", "soft_skills", "career", "volunteer", "environment", "culture",
+        "sports", "health", "safety", "civic_education",
+    }
+
+
+def test_negative_and_edit_operations_do_not_create_positive_preferences() -> None:
+    current = ProfileAssistantDraft.model_validate({
+        "preference_patch": {"preferred_topics": ["mathematics", "sports", "artificial_intelligence"]}
+    })
+    extraction = deterministic_profile_extraction(
+        "Bo the thao khoi danh sach, them hoa hoc vao so thich",
+        current=current,
+    )
+    assert extraction is not None
+    merged, _ = merge_profile_extraction(current, extraction)
+    assert merged.preference_patch.preferred_topics == ["mathematics", "artificial_intelligence", "chemistry"]
+
+    negative = deterministic_profile_extraction("Toi khong con thich AI nua", current=current)
+    assert negative is not None
+    merged, _ = merge_profile_extraction(current, negative)
+    assert "artificial_intelligence" not in merged.preference_patch.preferred_topics
+
+    replaced = deterministic_profile_extraction("Doi so thich tu toan sang vat ly", current=current)
+    assert replaced is not None
+    merged, _ = merge_profile_extraction(current, replaced)
+    assert merged.preference_patch.preferred_topics == ["sports", "artificial_intelligence", "physics"]
+
+
+def test_soft_negative_and_hard_inability_are_not_promoted_to_positive() -> None:
+    for message in ("It uu tien the thao", "Khong the tham gia the thao"):
+        extraction = deterministic_profile_extraction(message)
+        assert extraction is not None
+        assert not any(
+            action.action == "update_preferences"
+            and "sports" in (action.value.preferred_topics or [])
+            and action.operation == "add"
+            for action in extraction.actions
+        )
+        assert extraction.questions
+
+
+def test_multi_intent_mixed_positive_and_negative_topics_with_drl_goal() -> None:
+    current = ProfileAssistantDraft.model_validate({
+        "drl_target": 80,
+        "preference_patch": {"preferred_topics": ["sports", "mathematics"]},
+    })
+    extraction = deterministic_profile_extraction(
+        "Tui muốn đạt 95 điểm rèn luyện, thích hóa học, tiếng Nhật và không thích thể thao.",
+        current=current,
+    )
+    assert extraction is not None
+    assert not extraction.questions
+    merged, _ = merge_profile_extraction(current, extraction)
+    assert merged.drl_target == 95
+    assert set(merged.preference_patch.preferred_topics) == {
+        "mathematics", "chemistry", "foreign_language",
+    }
+
+
+@pytest.mark.parametrize(("message", "expected_topics"), [
+    ("Thích vật lý, hóa học và sinh học.", {"physics", "chemistry", "biology"}),
+    ("Quan tâm tiếng Nhật và tiếng Anh.", {"foreign_language"}),
+    ("Thích lập trình, bảo mật và công nghệ.", {"computer_science", "safety", "technology"}),
+    ("Muốn tham gia hoạt động sức khỏe.", {"health"}),
+    ("Thích thiết kế, vẽ và nghệ thuật.", {"culture"}),
+    ("Thích hoạt động về tài chính, đầu tư.", {"economics_finance"}),
+    ("Quan tâm các cuộc thi nghiên cứu khoa học.", {"research"}),
+])
+def test_natural_vietnamese_topic_synonyms_and_descriptions(message, expected_topics) -> None:
+    extraction = deterministic_profile_extraction(message)
+    assert extraction is not None
+    assert not extraction.questions
+    merged, _ = merge_profile_extraction(ProfileAssistantDraft(), extraction)
+    assert set(merged.preference_patch.preferred_topics) == expected_topics
+
+
+def test_conditional_and_concession_mode_campus_preferences() -> None:
+    cond = deterministic_profile_extraction("Nếu phải tham gia trực tiếp thì ưu tiên NVC.")
+    assert cond is not None
+    assert not cond.questions
+    merged_cond, _ = merge_profile_extraction(ProfileAssistantDraft(), cond)
+    assert merged_cond.preference_patch.preferred_campuses == ["NVC"]
+    assert merged_cond.preference_patch.preferred_modes == []
+
+    conc = deterministic_profile_extraction("Thích online nhưng offline cũng được.")
+    assert conc is not None
+    assert not conc.questions
+    merged_conc, _ = merge_profile_extraction(ProfileAssistantDraft(), conc)
+    assert merged_conc.preference_patch.preferred_modes == ["online"]
+
+
+def test_unresolved_interest_in_comma_list_or_standalone_requests_clarification() -> None:
+    for msg in (
+        "Mục tiêu ĐRL 95, thích hóa học, thiên văn",
+        "Mục tiêu ĐRL 95, thích thiên văn",
+    ):
+        extraction = deterministic_profile_extraction(msg)
+        assert extraction is not None
+        assert extraction.questions
+
+
+def test_relative_dates_use_fixed_simulation_clock() -> None:
+    extraction = deterministic_profile_extraction(
+        "Ngày mai mình bận 8h đến 10h; thứ 5 tuần này rảnh 14h-16h"
+    )
+    assert extraction is not None
+    merged, _ = merge_profile_extraction(ProfileAssistantDraft(), extraction)
+    assert [(str(item.date), item.kind, item.start, item.end) for item in merged.exceptions] == [
+        ("2026-11-10", "busy", "08:00", "10:00"),
+        ("2026-11-12", "available", "14:00", "16:00"),
+    ]
+

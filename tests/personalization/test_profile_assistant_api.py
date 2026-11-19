@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 import api.server as server
 from personalization.profile_assistant import ProfileExtraction, ProfilePatchAction
+from personalization.providers.base import PreferenceProviderUnavailable
 
 
 class FakeProfileProvider:
@@ -73,7 +74,6 @@ def test_profile_assistant_keeps_all_explicit_multi_intents(monkeypatch) -> None
     response = TestClient(server.app).post(
         "/api/profile-assistant/interpret",
         json={
-            "message": "Tui muá»‘n Ä‘áº¡t 100 Ä‘iá»ƒm rÃ¨n luyá»‡n, Æ°u tiÃªn má»¥c 4, online, Nguyá»…n VÄƒn Cá»«, thÃ­ch ToÃ¡n, AI vÃ  kinh táº¿.",
             "message": "Tui mu\u1ed1n \u0111\u1ea1t 100 \u0111i\u1ec3m r\u00e8n luy\u1ec7n, \u01b0u ti\u00ean m\u1ee5c 4, online, Nguy\u1ec5n V\u0103n C\u1eeb, th\u00edch To\u00e1n, AI v\u00e0 kinh t\u1ebf.",
             "draft": {"drl_target": 80},
             "conversation": [],
@@ -90,6 +90,60 @@ def test_profile_assistant_keeps_all_explicit_multi_intents(monkeypatch) -> None
     assert draft["preference_patch"]["preferred_categories"] == ["C4"]
     assert draft["preference_patch"]["preferred_modes"] == ["online"]
     assert draft["preference_patch"]["preferred_campuses"] == ["NVC"]
+
+
+def test_partial_fast_path_merges_grounded_actions_with_ollama_clarification(monkeypatch) -> None:
+    class ClarifyingProvider:
+        provider_name = "ollama"
+        model = "mock-model"
+
+        def interpret_profile(self, text, current_profile, conversation):
+            return ProfileExtraction(actions=[], questions=["Ban muon noi ro so thich thien van nao?"])
+
+    monkeypatch.setattr(server, "_get_preference_provider", lambda: ClarifyingProvider())
+    response = TestClient(server.app).post(
+        "/api/profile-assistant/interpret",
+        json={
+            "message": "Muc tieu DRL 95, thich hoa hoc va thien van",
+            "draft": {"drl_target": 80},
+            "conversation": [],
+            "onboarding_step": 3,
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["provider"] == "ollama"
+    assert payload["proposed_draft"]["drl_target"] == 95
+    assert payload["proposed_draft"]["preference_patch"]["preferred_topics"] == ["chemistry"]
+    assert payload["questions"] == ["Ban muon noi ro so thich thien van nao?"]
+
+
+def test_partial_fast_path_survives_unavailable_ollama_without_fake_success(monkeypatch) -> None:
+    class UnavailableProvider:
+        provider_name = "ollama"
+        model = "mock-model"
+
+        def interpret_profile(self, *args, **kwargs):
+            raise PreferenceProviderUnavailable("AI_UNAVAILABLE", "Ollama unavailable")
+
+    monkeypatch.setattr(server, "_get_preference_provider", lambda: UnavailableProvider())
+    response = TestClient(server.app).post(
+        "/api/profile-assistant/interpret",
+        json={
+            "message": "Muc tieu DRL 95, thich hoa hoc va thien van",
+            "draft": {"drl_target": 80},
+            "conversation": [],
+            "onboarding_step": 3,
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["provider"] == "deterministic-fallback"
+    assert payload["fallback_used"] is True
+    assert payload["proposed_draft"]["drl_target"] == 95
+    assert payload["questions"]
 
 
 def test_plan_options_endpoint_returns_three_cacheable_cards(valid_preference_payload) -> None:

@@ -31,8 +31,9 @@ def test_three_strategies_are_computed_independently(valid_preference_payload) -
         "BALANCED",
         "PREFERENCE_FIRST",
     }
-    signatures = [item["signature"] for item in result["options"]]
-    assert len(signatures) == len(set(signatures))
+    assert [item["strategy"] for item in result["options"]] == [
+        "MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST",
+    ]
     assert all(item["plan"]["selected_activities"] is not None for item in result["options"])
     assert all("target_shortfall" in item for item in result["options"])
 
@@ -48,6 +49,8 @@ def test_identical_strategy_results_still_return_three_cards(valid_preference_pa
     assert [item["status"] for item in result["options"]] == ["READY", "READY", "READY"]
     assert result["options"][1]["duplicate_of"] == "MINIMUM_EFFORT"
     assert result["options"][2]["duplicate_of"] == "MINIMUM_EFFORT"
+    assert result["deduplicated"] == 0
+    assert result["message"] is None
 
 
 def test_one_strategy_failure_does_not_abort_other_cards(valid_preference_payload, monkeypatch) -> None:
@@ -55,7 +58,7 @@ def test_one_strategy_failure_does_not_abort_other_cards(valid_preference_payloa
 
     def fail_balanced(preference, **kwargs):
         if preference.strategy.value == "BALANCED":
-            raise ValueError("balanced fixture is infeasible")
+            raise RuntimeError("SP3 independent personalized-plan check failed.")
         return original(preference, **kwargs)
 
     monkeypatch.setattr(sp3_service, "personalized_demo_plan", fail_balanced)
@@ -63,7 +66,7 @@ def test_one_strategy_failure_does_not_abort_other_cards(valid_preference_payloa
 
     assert len(result["options"]) == 3
     assert [item["status"] for item in result["options"]] == ["READY", "FAILED", "READY"]
-    assert result["options"][1]["error"] == "balanced fixture is infeasible"
+    assert result["options"][1]["error"] == "SP3 independent personalized-plan check failed."
 
 
 def test_swap_preview_rejects_unselected_or_same_activity(valid_preference_payload) -> None:
@@ -178,31 +181,35 @@ def test_real_source_options_use_real_planner_and_canonical_weekly_availability(
     assert all(option["result"]["availability"]["apply_scope"] == "SEMESTER_WEEKLY" for option in payload["options"])
 
 
-def test_real_source_smart_swap_is_explicitly_unsupported(valid_preference_payload) -> None:
-    response = TestClient(app).post(
+def test_real_source_smart_swap_and_null_addition_removal_are_supported(valid_preference_payload) -> None:
+    preference = _preference(valid_preference_payload)
+    from api.sp3_real import real_plan_options
+
+    real_base = real_plan_options(preference, target_total=80)["options"][0]["result"]
+    selected = [item["activity_id"] for item in real_base["plan"]["selected_activities"]]
+    assert selected
+
+    removed = preview_personalized_swap(
+        preference,
+        real_base,
+        selected[0],
+        None,
+        source="real",
+    )
+    assert removed["status"] == "PREVIEW"
+    assert selected[0] in removed["dropped_activity_ids"]
+    assert removed["result"]["data_source"] == "SP1-STORE-V2"
+
+    invalid = TestClient(app).post(
         "/api/sp3/personalized/swap-preview?source=real",
         json={
             "confirmed_profile": True,
             "preference": valid_preference_payload,
             "base_result": {},
             "remove_activity_id": "A",
-            "add_activity_id": "B",
+            "add_activity_id": None,
         },
     )
-
-    assert response.status_code == 422
-    assert "not yet available for source=real" in response.json()["detail"]
-
-    for endpoint in ("add-preview", "remove-preview"):
-        unsupported = TestClient(app).post(
-            f"/api/sp3/personalized/{endpoint}?source=real",
-            json={
-                "confirmed_profile": True,
-                "preference": valid_preference_payload,
-                "base_result": {},
-                "activity_id": "A",
-            },
-        )
-        assert unsupported.status_code == 422
-        assert "source=real" in unsupported.json()["detail"]
+    assert invalid.status_code == 422
+    assert "plan and feasibility" in invalid.json()["detail"]
 

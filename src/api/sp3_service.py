@@ -258,15 +258,23 @@ def personalized_demo_plan(
         stored = fixture["steps"][name]
         feasibility_request = deepcopy(stored["feasibility_request"])
         context = feasibility_request["context"]
-        active_availability_request = deepcopy(
-            availability_request if availability_request is not None else stored["availability_request"]
-        )
-        active_availability_request["busy_intervals"].extend(custom_busy or [])
-        availability = resolve_availability(
-            active_availability_request,
-            window_start=context["window_start"],
-            window_end=context["window_end"],
-        )
+        if (
+            isinstance(availability_request, dict)
+            and "available_intervals" in availability_request
+            and "calendar_version" in availability_request
+            and "weekly_blocks" not in availability_request
+        ):
+            availability = deepcopy(availability_request)
+        else:
+            active_availability_request = deepcopy(
+                availability_request if availability_request is not None else stored["availability_request"]
+            )
+            active_availability_request["busy_intervals"].extend(custom_busy or [])
+            availability = resolve_availability(
+                active_availability_request,
+                window_start=context["window_start"],
+                window_end=context["window_end"],
+            )
         feasibility_request["available_intervals"] = availability["available_intervals"]
         feasibility_request["context"]["calendar_version"] = availability["calendar_version"]
         feasibility = assess_feasibility(
@@ -453,7 +461,7 @@ def personalized_plan_options(
                 busy_intervals=busy_intervals,
                 availability_request=availability_request,
             )
-        except (KeyError, TypeError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError, RuntimeError) as exc:
             attempted.append({"strategy": strategy, "status": "FAILED", "error": str(exc)})
             options.append({"strategy": strategy, "status": "FAILED", "error": str(exc), "result": None})
             continue
@@ -479,14 +487,15 @@ def personalized_plan_options(
                 "result": result,
             }
         )
+    ready_count = sum(1 for item in options if item.get("status") == "READY")
     return {
         "options": options,
         "attempted": attempted,
-        "deduplicated": len(attempted) - len(options),
+        "deduplicated": 0,
         "message": (
             None
-            if len(options) == len(attempted)
-            else f"Chỉ có {len(options)} lịch khả thi khác nhau; các chiến lược trùng lịch đã được gộp."
+            if ready_count
+            else "Không có chiến lược nào tạo được lịch hợp lệ với dữ liệu hiện tại."
         ),
     }
 
@@ -494,25 +503,27 @@ def personalized_plan_options(
 def preview_personalized_swap(
     preference: StudentPreference,
     base_result: dict,
-    remove_activity_id: str,
-    add_activity_id: str,
+    remove_activity_id: str | None,
+    add_activity_id: str | None = None,
+    *,
+    source: str = "synthetic",
 ) -> dict:
     """Preview a safe replacement through SP3 whole-plan scoring."""
-    return _preview_personalized_change(preference, base_result, remove_activity_id, add_activity_id)
+    return _preview_personalized_change(preference, base_result, remove_activity_id, add_activity_id, source=source)
 
 
 def preview_personalized_addition(
-    preference: StudentPreference, base_result: dict, add_activity_id: str,
+    preference: StudentPreference, base_result: dict, add_activity_id: str, *, source: str = "synthetic",
 ) -> dict:
     """Preview adding one fixed-time activity while keeping unaffected selections."""
-    return _preview_personalized_change(preference, base_result, None, add_activity_id)
+    return _preview_personalized_change(preference, base_result, None, add_activity_id, source=source)
 
 
 def preview_personalized_removal(
-    preference: StudentPreference, base_result: dict, remove_activity_id: str,
+    preference: StudentPreference, base_result: dict, remove_activity_id: str, *, source: str = "synthetic",
 ) -> dict:
     """Preview removing one activity and let SP3 safely fill any resulting gap."""
-    return _preview_personalized_change(preference, base_result, remove_activity_id, None)
+    return _preview_personalized_change(preference, base_result, remove_activity_id, None, source=source)
 
 
 def _preview_personalized_change(
@@ -520,6 +531,8 @@ def _preview_personalized_change(
     base_result: dict,
     remove_activity_id: str | None,
     add_activity_id: str | None,
+    *,
+    source: str = "synthetic",
 ) -> dict:
     """Validate a calendar edit by rebuilding and independently checking the whole plan.
 
@@ -540,7 +553,7 @@ def _preview_personalized_change(
         or len(selected_rows) > 20
         or not all(isinstance(item, dict) for item in selected_rows)
         or not isinstance(candidate_rows, list)
-        or len(candidate_rows) > 200
+        or len(candidate_rows) > 500
         or not all(isinstance(item, dict) for item in candidate_rows)
     ):
         raise ValueError("base_result plan rows are invalid or too large")
@@ -571,12 +584,26 @@ def _preview_personalized_change(
     target_total = base_result.get("requested_total_target", 80)
     if isinstance(target_total, bool) or not isinstance(target_total, int) or not 0 <= target_total <= 100:
         raise ValueError("base_result requested_total_target is invalid")
-    internal = personalized_demo_plan(
-        preference,
-        scenario="first_plan",
-        target_total=target_total,
-        include_internal=True,
-    )
+    base_availability = base_result.get("availability") if isinstance(base_result.get("availability"), dict) else None
+    use_real = source == "real" or base_result.get("data_source") == "SP1-STORE-V2"
+    if use_real:
+        from api.sp3_real import real_plan
+
+        internal = real_plan(
+            "first_plan",
+            target_total=target_total,
+            preference=preference,
+            availability_request=base_availability,
+            include_internal=True,
+        )
+    else:
+        internal = personalized_demo_plan(
+            preference,
+            scenario="first_plan",
+            target_total=target_total,
+            availability_request=base_availability,
+            include_internal=True,
+        )
     planner_input = internal.pop("_planner_input")
     engine = internal.pop("_engine")
     score_callback = internal.pop("_score_callback")

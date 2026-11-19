@@ -1724,8 +1724,8 @@
             </section>
             <section class="onboarding-step hidden space-y-4" data-onboarding-step="3">
               <div><h2 class="text-xl font-extrabold">3. Mục tiêu & sở thích</h2><p class="mt-1 text-sm text-slate-400">Kiểm tra lần cuối trước khi lưu hồ sơ và dùng cho Planner.</p></div>
-              <div class="grid gap-4 sm:grid-cols-2"><label class="text-xs font-bold text-slate-300">Mục tiêu ĐRL<input id="onboardingTarget" type="number" min="0" max="100" value="80" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Tối đa hoạt động<input id="onboardingMaxActivities" type="number" min="1" max="20" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Giờ tham gia tối đa/tuần<input id="onboardingWeeklyHours" type="number" min="0.5" max="168" step="0.5" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Nhóm ưu tiên<select id="onboardingCategories" multiple class="mt-1.5 min-h-28 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-2"><option value="C1">C1 · Học tập</option><option value="C2">C2 · Nội quy</option><option value="C3">C3 · Văn hóa</option><option value="C4">C4 · Cộng đồng</option><option value="C5">C5 · Cán bộ/CLB</option></select></label><label class="text-xs font-bold text-slate-300 sm:col-span-2">Sở thích hoạt động<input id="onboardingInterests" placeholder="Ví dụ: tình nguyện, AI" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label></div>
-              <fieldset class="rounded-xl border border-[#2b3a54] p-3"><legend class="px-1 text-xs font-bold text-slate-300">Hình thức và cơ sở ưu tiên</legend><div class="flex flex-wrap gap-4 text-xs text-slate-300"><label><input type="checkbox" name="onboardingMode" value="online" class="mr-1" />Online</label><label><input type="checkbox" name="onboardingMode" value="offline" class="mr-1" />Trực tiếp</label><label><input type="checkbox" name="onboardingMode" value="hybrid" class="mr-1" />Kết hợp</label><label><input type="checkbox" name="onboardingCampus" value="NVC" class="mr-1" />Nguyễn Văn Cừ</label><label><input type="checkbox" name="onboardingCampus" value="DONG_HOA" class="mr-1" />Đông Hòa</label><label><input type="checkbox" name="onboardingCampus" value="ONLINE" class="mr-1" />Online</label></div></fieldset><div id="onboardingReview" class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 text-sm text-slate-300"></div>
+              <div class="grid gap-4 sm:grid-cols-2"><label class="text-xs font-bold text-slate-300">Mục tiêu ĐRL<input id="onboardingTarget" type="number" min="0" max="100" value="80" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Nhóm ưu tiên<select id="onboardingCategories" multiple class="mt-1.5 min-h-28 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-2"><option value="C1">C1 · Học tập</option><option value="C2">C2 · Nội quy</option><option value="C3">C3 · Văn hóa</option><option value="C4">C4 · Cộng đồng</option><option value="C5">C5 · Cán bộ/CLB</option></select></label><label class="text-xs font-bold text-slate-300 sm:col-span-2">Sở thích hoạt động<input id="onboardingInterests" placeholder="Ví dụ: tình nguyện, AI" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label></div>
+              <fieldset class="rounded-xl border border-[#2b3a54] p-3"><legend class="px-1 text-xs font-bold text-slate-300">Hình thức và cơ sở ưu tiên</legend><div class="flex flex-wrap gap-4 text-xs text-slate-300"><label><input type="checkbox" name="onboardingMode" value="online" class="mr-1" />Online</label><label><input type="checkbox" name="onboardingMode" value="offline" class="mr-1" />Trực tiếp</label><label><input type="checkbox" name="onboardingMode" value="hybrid" class="mr-1" />Kết hợp</label><label><input type="checkbox" name="onboardingCampus" value="NVC" class="mr-1" />Nguyễn Văn Cừ</label><label><input type="checkbox" name="onboardingCampus" value="DONG_HOA" class="mr-1" />Đông Hòa</label></div></fieldset><div id="onboardingReview" class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 text-sm text-slate-300"></div>
             </section>
             <div class="mt-7 flex items-center justify-between border-t border-[#223046] pt-5"><button id="onboardingBack" type="button" onclick="changeOnboardingStep(-1)" class="rounded-xl border border-[#2b3a54] px-4 py-2.5 text-sm font-bold text-slate-300">Quay lại</button><button id="onboardingNext" type="button" onclick="changeOnboardingStep(1)" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-extrabold">Tiếp tục</button><button id="onboardingComplete" type="button" onclick="completeOnboarding()" class="hidden rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-extrabold">Xác nhận và lưu</button></div>
           </main>
@@ -2546,8 +2546,10 @@
       document.getElementById("onboardingClass").value = currentProfileDraft.profile.class_name || "";
       document.getElementById("onboardingMajor").value = currentProfileDraft.profile.major || "";
       document.getElementById("onboardingTarget").value = currentProfileDraft.drl_target ?? 80;
-      document.getElementById("onboardingMaxActivities").value = currentProfileDraft.preference_patch?.max_activities || "";
-      document.getElementById("onboardingWeeklyHours").value = currentProfileDraft.preference_patch?.weekly_participation_hours || "";
+      const maxActEl = document.getElementById("onboardingMaxActivities");
+      if (maxActEl) maxActEl.value = currentProfileDraft.preference_patch?.max_activities || "";
+      const weeklyHoursEl = document.getElementById("onboardingWeeklyHours");
+      if (weeklyHoursEl) weeklyHoursEl.value = currentProfileDraft.preference_patch?.weekly_participation_hours || "";
       document.getElementById("onboardingInterests").value = (currentProfileDraft.preference_patch?.preferred_topics || []).join(", ");
       const categories = new Set(currentProfileDraft.preference_patch?.preferred_categories || []);
       [...document.getElementById("onboardingCategories").options].forEach(option => { option.selected = categories.has(option.value); });
@@ -2592,14 +2594,25 @@
         class_name: document.getElementById("onboardingClass").value.trim(),
         major: document.getElementById("onboardingMajor").value.trim()
       };
-      currentProfileDraft.drl_target = Math.max(0, Math.min(100, Number(document.getElementById("onboardingTarget").value || 80)));
+      const targetEl = document.getElementById("onboardingTarget");
+      if (targetEl && targetEl.value !== "") {
+        currentProfileDraft.drl_target = Math.max(0, Math.min(100, Number(targetEl.value)));
+      }
       currentProfileDraft.preference_patch = currentProfileDraft.preference_patch || {};
-      currentProfileDraft.preference_patch.max_activities = Number(document.getElementById("onboardingMaxActivities").value) || null;
-      currentProfileDraft.preference_patch.weekly_participation_hours = Number(document.getElementById("onboardingWeeklyHours").value) || null;
+      const maxActEl = document.getElementById("onboardingMaxActivities");
+      if (maxActEl) {
+        currentProfileDraft.preference_patch.max_activities = Number(maxActEl.value) || null;
+      }
+      const weeklyHoursEl = document.getElementById("onboardingWeeklyHours");
+      if (weeklyHoursEl) {
+        currentProfileDraft.preference_patch.weekly_participation_hours = Number(weeklyHoursEl.value) || null;
+      }
       currentProfileDraft.preference_patch.preferred_topics = document.getElementById("onboardingInterests").value.split(",").map(value => value.trim()).filter(Boolean);
       currentProfileDraft.preference_patch.preferred_categories = [...document.getElementById("onboardingCategories").selectedOptions].map(option => option.value);
       currentProfileDraft.preference_patch.preferred_modes = [...document.querySelectorAll('input[name="onboardingMode"]:checked')].map(input => input.value);
-      currentProfileDraft.preference_patch.preferred_campuses = [...document.querySelectorAll('input[name="onboardingCampus"]:checked')].map(input => input.value);
+      const preservedCampuses = (currentProfileDraft.preference_patch.preferred_campuses || []).filter(c => c === "ONLINE" || c === "OTHER");
+      const checkedCampuses = [...document.querySelectorAll('input[name="onboardingCampus"]:checked')].map(input => input.value);
+      currentProfileDraft.preference_patch.preferred_campuses = [...new Set([...checkedCampuses, ...preservedCampuses])];
       const data = readLocalUserData(currentStudent.student_id);
       data.onboarding_status = "IN_PROGRESS";
       data.onboarding_step = onboardingStep;
@@ -2937,11 +2950,18 @@
       if (preview) preview.innerHTML = `<span class="text-emerald-300 font-bold">Đã xác nhận thay đổi.</span>${followupQuestion ? `<p class="mt-2 text-indigo-200"><b>Cần làm rõ tiếp:</b> ${escapeHTML(followupQuestion)}</p>` : ''}`;
       pendingProfileProposal = null;
       renderOnboardingIntervals();
-      if (source === "onboarding") hydrateOnboardingFormFromDraft();
+      hydrateOnboardingFormFromDraft();
       renderProfileWorkspace();
-      if (source === "profile" && changes.some(change => change.field === "preference_patch")) {
+      if (Number.isFinite(Number(currentProfileDraft.drl_target))) {
+        const plannerTarget = document.getElementById("inputPlanTarget");
+        const targetBadge = document.getElementById("targetEchoBadge");
+        if (plannerTarget) plannerTarget.value = currentProfileDraft.drl_target;
+        if (targetBadge) targetBadge.textContent = `${currentProfileDraft.drl_target} / 100đ`;
+      }
+      if (changes.some(change => change.field === "preference_patch")) {
         syncConfirmedPreferenceFromProfile();
       }
+      renderAvailabilityPicker();
       markPlanStale();
       persistCurrentUserData();
     }
@@ -4034,9 +4054,18 @@
       return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
     }
 
+    function isAvailabilityCellBusy(date, period, activeBusyIntervals) {
+      const key = `${date}|${period.key}`;
+      if (unavailableAvailabilitySlots.has(key)) return true;
+      const cellStart = `${date}T${period.start}:00+07:00`;
+      const cellEnd = `${date}T${period.end}:00+07:00`;
+      return (activeBusyIntervals || []).some(item => item.start < cellEnd && item.end > cellStart);
+    }
+
     function renderAvailabilityPicker() {
       const grid = document.getElementById('availabilityPickerGrid');
       if (!grid) return;
+      const activeBusyIntervals = collectBusyIntervals();
       const headers = AVAILABILITY_DAYS.map((label, dayIndex) => {
         const date = addDaysToIsoDate(availabilityWeekStart, dayIndex);
         return `<div class="text-center py-2"><span class="block text-xs font-extrabold text-slate-200">${label}</span><span class="text-[10px] text-slate-500 planner-number">${date.slice(8, 10)}/${date.slice(5, 7)}</span></div>`;
@@ -4045,7 +4074,7 @@
         const cells = AVAILABILITY_DAYS.map((label, dayIndex) => {
           const date = addDaysToIsoDate(availabilityWeekStart, dayIndex);
           const key = `${date}|${period.key}`;
-          const free = !unavailableAvailabilitySlots.has(key);
+          const free = !isAvailabilityCellBusy(date, period, activeBusyIntervals);
           return `<button type="button" data-free="${free}" aria-pressed="${!free}" aria-label="${label} ${period.label}: ${free ? 'rảnh' : 'bận'}" onclick="toggleAvailabilitySlot('${key}')" class="availability-cell rounded-xl border px-2 py-2 text-center text-[11px] font-bold">
             <span class="block">${free ? 'Rảnh' : 'Bận'}</span><span class="block mt-0.5 text-[9px] opacity-70">${period.time}</span>
           </button>`;
@@ -4161,7 +4190,9 @@
     function updateBusySlotsBadge() {
       const badge = document.getElementById('busySlotsBadge');
       if (!badge) return;
-      const count = unavailableAvailabilitySlots.size + customBusyIntervals.length;
+      const weeklyBusyCount = (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'busy').length;
+      const exceptionBusyCount = (currentProfileDraft.exceptions || []).filter(item => item.kind === 'busy').length;
+      const count = unavailableAvailabilitySlots.size + customBusyIntervals.length + weeklyBusyCount + exceptionBusyCount;
       badge.innerText = count ? `${count} khung bận` : 'Tất cả rảnh';
       if (count > 0) {
         badge.className = "px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950/70 text-amber-300 border border-amber-500/30";
@@ -4193,7 +4224,7 @@
       });
       intervals.push(...expandWeeklyProfileIntervals(
         (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'busy'),
-        '2026-11-09',
+        '2026-10-01',
         '2027-03-31'
       ));
       (currentProfileDraft.exceptions || []).filter(item => item.kind === 'busy').forEach(item => intervals.push({ start: `${item.date}T${item.start}:00+07:00`, end: `${item.date}T${item.end}:00+07:00`, source: 'profile_exception' }));
@@ -4632,29 +4663,28 @@
       return data;
     }
 
-    function renderPlanOptionsSelectorBase() {
+    function renderPlanOptionsSelector() {
       const box = document.getElementById('planOptionsSelector');
       const message = document.getElementById('planOptionsMessage');
       if (!box) return;
-      const labels = { MINIMUM_EFFORT: 'Ít thời gian', BALANCED: 'Cân bằng', PREFERENCE_FIRST: 'Theo sở thích' };
-      box.innerHTML = cachedPlanOptions.map((option, index) => `<button type="button" onclick="selectCachedPlanOption(${index})" class="rounded-xl border p-3 text-left ${index === selectedPlanOptionIndex ? 'border-emerald-400 bg-emerald-950/30' : 'border-[#2b3a54] bg-[#080d18]'}"><span class="block text-sm font-extrabold text-white">${labels[option.strategy] || option.strategy}</span><span class="mt-1 block text-[11px] text-slate-400">${option.projected_total ?? '—'}đ · thiếu ${option.target_shortfall ?? '—'}đ · ${option.activity_count} hoạt động · ${Math.round((option.duration_minutes || 0) / 60 * 10) / 10} giờ · phù hợp ${option.utility}</span><span class="text-[11px] ${option.target_met ? 'text-emerald-300' : 'text-amber-300'}">${option.target_met ? 'Đạt mục tiêu' : 'Chưa đạt đủ mục tiêu'}</span></button>`).join('');
-      if (message) message.textContent = planOptionsMessageText || (cachedPlanOptions.length === 3 ? 'Ba phương án đã lưu; chuyển tức thì không tính lại.' : `${cachedPlanOptions.length} phương án khác nhau đã lưu; chuyển không tính lại.`);
+      const labels = { MINIMUM_EFFORT: '\u00cdt th\u1eddi gian', BALANCED: 'C\u00e2n b\u1eb1ng', PREFERENCE_FIRST: 'Theo s\u1edf th\u00edch' };
+      box.innerHTML = cachedPlanOptions.map((option, index) => {
+        const title = escapeHTML(labels[option.strategy] || option.strategy);
+        if (option.status === 'FAILED' || !option.result) {
+          return `<button type="button" disabled class="rounded-xl border border-rose-500/30 bg-rose-950/20 p-3 text-left opacity-80"><span class="block text-sm font-extrabold text-white">${title}</span><span class="mt-1 block text-[11px] text-rose-300">Kh\u00f4ng th\u1ec3 t\u1ea1o ph\u01b0\u01a1ng \u00e1n: ${escapeHTML(option.error || 'd\u1eef li\u1ec7u l\u1ecbch kh\u00f4ng h\u1ee3p l\u1ec7')}</span></button>`;
+        }
+        const duplicate = option.duplicate_of ? `<span class="mt-1 block text-[11px] text-slate-500">Tr\u00f9ng l\u1ecbch v\u1edbi ph\u01b0\u01a1ng \u00e1n ${escapeHTML(labels[option.duplicate_of] || option.duplicate_of)}</span>` : '';
+        return `<button type="button" onclick="selectCachedPlanOption(${index})" class="rounded-xl border p-3 text-left ${index === selectedPlanOptionIndex ? 'border-emerald-400 bg-emerald-950/30' : 'border-[#2b3a54] bg-[#080d18]'}"><span class="block text-sm font-extrabold text-white">${title}</span><span class="mt-1 block text-[11px] text-slate-400">${option.projected_total ?? '\u2014'}\u0111 \u00b7 thi\u1ebfu ${option.target_shortfall ?? '\u2014'}\u0111 \u00b7 ${option.activity_count} ho\u1ea1t \u0111\u1ed9ng \u00b7 ${Math.round((option.duration_minutes || 0) / 6) / 10} gi\u1edd \u00b7 ph\u00f9 h\u1ee3p ${option.utility}</span><span class="text-[11px] ${option.target_met ? 'text-emerald-300' : 'text-amber-300'}">${option.target_met ? '\u0110\u1ea1t m\u1ee5c ti\u00eau' : 'Ch\u01b0a \u0111\u1ea1t \u0111\u1ee7 m\u1ee5c ti\u00eau'}</span>${duplicate}</button>`;
+      }).join('');
+      if (message) message.textContent = planOptionsMessageText || 'Ba ph\u01b0\u01a1ng \u00e1n \u0111\u00e3 l\u01b0u; chuy\u1ec3n t\u1ee9c th\u00ec kh\u00f4ng t\u00ednh l\u1ea1i.';
     }
 
-    function renderPlanOptionsSelector() {
-      renderPlanOptionsSelectorBase();
-      const box = document.getElementById('planOptionsSelector');
-      const labels = { MINIMUM_EFFORT: 'Ãt thá»i gian', BALANCED: 'CÃ¢n báº±ng', PREFERENCE_FIRST: 'Theo sá»Ÿ thÃ­ch' };
-      cachedPlanOptions.forEach((option, index) => {
-        const card = box?.children[index];
-        if (!card) return;
-        if (option.status === 'FAILED') {
-          card.disabled = true;
-          card.innerHTML = `<span class="block text-sm font-extrabold text-white">${labels[option.strategy] || option.strategy}</span><span class="mt-1 block text-[11px] text-rose-300">KhÃ´ng thá»ƒ táº¡o phÆ°Æ¡ng Ã¡n nÃ y: ${escapeHTML(option.error || 'dá»¯ liá»‡u lá»‹ch khÃ´ng há»£p lá»‡')}</span>`;
-        } else if (option.duplicate_of) {
-          card.insertAdjacentHTML('beforeend', `<span class="mt-1 block text-[11px] text-slate-500">TrÃ¹ng lá»‹ch vá»›i phÆ°Æ¡ng Ã¡n ${escapeHTML(labels[option.duplicate_of] || option.duplicate_of)}</span>`);
-        }
-      });
+    function initialReadyPlanOptionIndex(options, preferredStrategy) {
+      const preferred = options.findIndex(option =>
+        option.strategy === preferredStrategy && option.status === 'READY' && option.result
+      );
+      if (preferred >= 0) return preferred;
+      return options.findIndex(option => option.status === 'READY' && option.result);
     }
 
     function selectCachedPlanOption(index) {
@@ -4735,9 +4765,13 @@
           const optionPayload = await fetchPersonalizedSp3Options(targetTotal, busyIntervals, confirmedPreference);
           cachedPlanOptions = optionPayload.options || [];
           planOptionsMessageText = optionPayload.message || "";
-          selectedPlanOptionIndex = Math.max(0, cachedPlanOptions.findIndex(option => option.strategy === confirmedPreference.strategy));
-          data = cachedPlanOptions[selectedPlanOptionIndex]?.result;
-          if (!data) throw new Error('Không có phương án khả thi sau khi áp dụng các ràng buộc.');
+          selectedPlanOptionIndex = initialReadyPlanOptionIndex(cachedPlanOptions, confirmedPreference.strategy);
+          data = selectedPlanOptionIndex >= 0 ? cachedPlanOptions[selectedPlanOptionIndex]?.result : null;
+          if (!data) {
+            renderPlanOptionsSelector();
+            const failedReasons = cachedPlanOptions.map(option => option.error).filter(Boolean);
+            throw new Error(failedReasons[0] || optionPayload.message || 'Không có phương án khả thi sau khi áp dụng các ràng buộc.');
+          }
         } else {
           cachedPlanOptions = [];
           planOptionsMessageText = "";

@@ -21,6 +21,11 @@ def test_dashboard_assistant_is_replaced_by_one_time_onboarding_and_profile_edit
     assert "requestBody.onboarding_step = onboardingStep" in HTML
     assert "JSON.stringify(change.new)" not in HTML
     assert "renderProfileProposalChanges" in HTML
+    assert 'id="onboardingMaxActivities"' not in HTML
+    assert 'id="onboardingWeeklyHours"' not in HTML
+    assert 'name="onboardingCampus" value="ONLINE"' not in HTML
+    assert "function isAvailabilityCellBusy" in HTML
+    assert "renderPlanOptionsSelectorBase" not in HTML
 
 
 def test_profile_schedule_workspace_and_local_migration_are_present() -> None:
@@ -44,6 +49,8 @@ def test_plan_option_cache_and_swap_controls_are_real_handlers() -> None:
     assert "weeklyHours * 60" in HTML
     assert "cachedPlanOptions" in HTML
     assert "selectCachedPlanOption" in HTML
+    assert "function initialReadyPlanOptionIndex(options, preferredStrategy)" in HTML
+    assert "option.status === 'READY' && option.result" in HTML
     assert "Chi tiết và tùy chỉnh" in HTML
     assert "previewSmartSwap" in HTML
     assert "undoCustomPlan" in HTML
