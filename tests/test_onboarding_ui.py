@@ -8,22 +8,21 @@ HTML = (Path(__file__).resolve().parents[1] / "web" / "index.html").read_text(en
 
 def test_dashboard_assistant_is_replaced_by_one_time_onboarding_and_profile_editor() -> None:
     assert 'id="unilifeAssistant"' not in HTML
-    assert 'id="onboardingWizard"' in HTML
+    assert 'id="onboardingModal"' in HTML
+    assert 'id="onboardingWizard"' not in HTML
     assert "NOT_STARTED" in HTML and "IN_PROGRESS" in HTML and "COMPLETED" in HTML
     assert "AI chỉnh sửa hồ sơ" in HTML
     assert "/api/profile-assistant/interpret" in HTML
     assert 'id="onboardingScores"' not in HTML
     assert "Bước 1 / 3" in HTML
-    assert "hydrateOnboardingFormFromDraft" in HTML
+    assert "hydrateOnboardingFormFromDraft" not in HTML
+    assert "resetOnboardingAssistantState" not in HTML
+    assert "mapTopicInputsToTopicIds" in HTML
+    assert "mapPriorityInputsToCategories" in HTML
+    assert "syncBusyScheduleAndIntervals" in HTML
     assert "editProfileProposalInterval" in HTML
-    assert 'id="onboardingAiChips"' in HTML
-    assert "resetOnboardingAssistantState" in HTML
-    assert "requestBody.onboarding_step = onboardingStep" in HTML
     assert "JSON.stringify(change.new)" not in HTML
     assert "renderProfileProposalChanges" in HTML
-    assert 'id="onboardingMaxActivities"' not in HTML
-    assert 'id="onboardingWeeklyHours"' not in HTML
-    assert 'name="onboardingCampus" value="ONLINE"' not in HTML
     assert "function isAvailabilityCellBusy" in HTML
     assert "renderPlanOptionsSelectorBase" not in HTML
 

@@ -1805,39 +1805,6 @@
   <!-- ======================================================================== -->
   <!-- MODAL: ĐĂNG NHẬP / ĐĂNG KÝ TÀI KHOẢN CỤC BỘ                           -->
   <!-- ======================================================================== -->
-  <div id="onboardingWizard" class="hidden fixed inset-0 z-[120] overflow-y-auto bg-[#080d18] text-white" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
-    <div class="min-h-full px-4 py-8 sm:px-8">
-      <div class="mx-auto max-w-6xl space-y-6">
-        <header class="flex flex-col gap-4 border-b border-[#223046] pb-6 sm:flex-row sm:items-center sm:justify-between">
-          <div><p class="text-xs font-bold uppercase tracking-[.2em] text-indigo-300">UniLife AI · thiết lập một lần</p><h1 id="onboardingTitle" class="mt-2 text-2xl font-black">Tạo hồ sơ học kỳ của bạn</h1><p class="mt-2 text-sm text-slate-400">Dữ liệu được lưu cho tài khoản này trong trình duyệt hiện tại.</p></div>
-          <div id="onboardingProgress" class="text-sm font-bold text-indigo-300">Bước 1 / 3</div>
-        </header>
-        <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-          <main class="rounded-3xl border border-[#223046] bg-[#0e1524] p-5 sm:p-7">
-            <section class="onboarding-step space-y-4" data-onboarding-step="1">
-              <div><h2 class="text-xl font-extrabold">1. Thông tin</h2><p class="mt-1 text-sm text-slate-400">Bạn có thể bổ sung hoặc chỉnh sửa sau.</p></div>
-              <div class="grid gap-4 sm:grid-cols-2"><label class="text-xs font-bold text-slate-300 sm:col-span-2">Họ và tên<input id="onboardingFullName" maxlength="100" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3 text-sm text-white" /></label><label class="text-xs font-bold text-slate-300">Lớp<input id="onboardingClass" maxlength="64" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3 text-sm text-white" /></label><label class="text-xs font-bold text-slate-300">Ngành<input id="onboardingMajor" maxlength="100" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3 text-sm text-white" /></label></div>
-            </section>
-            <section class="onboarding-step hidden space-y-4" data-onboarding-step="2">
-              <div><h2 class="text-xl font-extrabold">2. Lịch bận</h2><p class="mt-1 text-sm text-slate-400">Thêm một lịch lặp hằng tuần; các ngoại lệ có thể chỉnh ở Lịch cá nhân.</p></div>
-              <div class="grid gap-3 sm:grid-cols-4"><label class="text-xs text-slate-300">Loại<select id="onboardingIntervalKind" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 py-3"><option value="busy">Bận</option><option value="available">Rảnh rõ ràng</option></select></label><label class="text-xs text-slate-300">Thứ<select id="onboardingWeekday" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 py-3"><option value="0">Thứ Hai</option><option value="1">Thứ Ba</option><option value="2">Thứ Tư</option><option value="3">Thứ Năm</option><option value="4">Thứ Sáu</option><option value="5">Thứ Bảy</option><option value="6">Chủ nhật</option></select></label><label class="text-xs text-slate-300">Từ<input id="onboardingStart" type="time" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 py-3" /></label><label class="text-xs text-slate-300">Đến<input id="onboardingEnd" type="time" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3 py-3" /></label></div>
-              <button type="button" onclick="addOnboardingInterval()" class="rounded-xl border border-indigo-500/40 px-4 py-2 text-sm font-bold text-indigo-200">Thêm vào lịch tuần</button><div id="onboardingIntervals" class="space-y-2"></div>
-            </section>
-            <section class="onboarding-step hidden space-y-4" data-onboarding-step="3">
-              <div><h2 class="text-xl font-extrabold">3. Mục tiêu & sở thích</h2><p class="mt-1 text-sm text-slate-400">Kiểm tra lần cuối trước khi lưu hồ sơ và dùng cho Planner.</p></div>
-              <div class="grid gap-4 sm:grid-cols-2"><label class="text-xs font-bold text-slate-300">Mục tiêu ĐRL<input id="onboardingTarget" type="number" min="0" max="100" value="80" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Nhóm ưu tiên<select id="onboardingCategories" multiple class="mt-1.5 min-h-28 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-2"><option value="C1">C1 · Học tập</option><option value="C2">C2 · Nội quy</option><option value="C3">C3 · Văn hóa</option><option value="C4">C4 · Cộng đồng</option><option value="C5">C5 · Cán bộ/CLB</option></select></label><label class="text-xs font-bold text-slate-300 sm:col-span-2">Sở thích hoạt động<input id="onboardingInterests" placeholder="Ví dụ: tình nguyện, AI" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label></div>
-              <fieldset class="rounded-xl border border-[#2b3a54] p-3"><legend class="px-1 text-xs font-bold text-slate-300">Hình thức và cơ sở ưu tiên</legend><div class="flex flex-wrap gap-4 text-xs text-slate-300"><label><input type="checkbox" name="onboardingMode" value="online" class="mr-1" />Online</label><label><input type="checkbox" name="onboardingMode" value="offline" class="mr-1" />Trực tiếp</label><label><input type="checkbox" name="onboardingMode" value="hybrid" class="mr-1" />Kết hợp</label><label><input type="checkbox" name="onboardingCampus" value="NVC" class="mr-1" />Nguyễn Văn Cừ</label><label><input type="checkbox" name="onboardingCampus" value="DONG_HOA" class="mr-1" />Đông Hòa</label></div></fieldset><div id="onboardingReview" class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 text-sm text-slate-300"></div>
-            </section>
-            <div class="mt-7 flex items-center justify-between border-t border-[#223046] pt-5"><button id="onboardingBack" type="button" onclick="changeOnboardingStep(-1)" class="rounded-xl border border-[#2b3a54] px-4 py-2.5 text-sm font-bold text-slate-300">Quay lại</button><button id="onboardingNext" type="button" onclick="changeOnboardingStep(1)" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-extrabold">Tiếp tục</button><button id="onboardingComplete" type="button" onclick="completeOnboardingWizard()" class="hidden rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-extrabold">Xác nhận và lưu</button></div>
-          </main>
-          <aside class="rounded-3xl border border-indigo-500/30 bg-indigo-950/20 p-5">
-            <h2 class="font-extrabold">AI hỗ trợ điền hồ sơ</h2><p class="mt-1 text-xs text-slate-400">Phạm vi: hồ sơ, lịch tuần, mục tiêu ĐRL và sở thích. Đề xuất chỉ được áp dụng sau khi bạn xác nhận.</p><div id="onboardingAiChips" class="mt-3 flex flex-wrap gap-2"></div><div id="onboardingAiMessages" class="mt-3 min-h-24 max-h-56 space-y-2 overflow-y-auto rounded-xl border border-[#223046] bg-[#080d18] p-3 text-xs"><p class="text-slate-300">Chọn ví dụ hoặc mô tả một thay đổi. Nếu thiếu dữ kiện, AI sẽ hỏi từng câu.</p></div><form class="mt-3 space-y-2" onsubmit="submitProfileAssistantMessage(event, 'onboarding')"><textarea id="onboardingAiInput" maxlength="2000" rows="3" class="w-full rounded-xl border border-[#2b3a54] bg-[#080d18] p-3 text-sm" placeholder="Mình muốn đạt 95 điểm, thứ Hai học 7h30–17h30..."></textarea><button class="w-full rounded-xl bg-violet-600 py-2.5 text-sm font-bold">Phân tích bằng AI</button></form><div id="onboardingAiPreview" class="mt-3 hidden rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs"></div>
-          </aside>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div id="smartSwapModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4" onclick="if(event.target===this)this.classList.add('hidden')"><div class="w-full max-w-2xl rounded-2xl border border-[#2b3a54] bg-[#0e1524] p-5"><div class="flex items-center justify-between"><h2 class="text-lg font-extrabold text-white">Hoạt động thay thế</h2><button onclick="document.getElementById('smartSwapModal').classList.add('hidden')" class="text-slate-400">✕</button></div><div id="smartSwapContent" class="mt-4 space-y-3 text-sm text-slate-300"></div></div></div>
 
   <div id="loginModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onclick="if (event.target === this) closeLoginModal()">
@@ -2707,6 +2674,10 @@
         favorite_activities: document.getElementById("profileFavoriteActivities").value.trim()
       };
       saveLocalProfile(profile);
+      currentProfileDraft = JSON.parse(JSON.stringify(readLocalUserData(currentStudent.student_id).profile));
+      syncConfirmedPreferenceFromProfile();
+      markPlanStale();
+      persistCurrentUserData();
       window.alert("Sở thích đã được lưu vào hồ sơ của bạn.");
     }
 
@@ -2954,217 +2925,132 @@
       return migrateLocalUserData(mssv, saved);
     }
 
-    function hydrateOnboardingFormFromDraft() {
-      document.getElementById("onboardingFullName").value = currentProfileDraft.profile.full_name || currentStudent?.full_name || "";
-      document.getElementById("onboardingClass").value = currentProfileDraft.profile.class_name || "";
-      document.getElementById("onboardingMajor").value = currentProfileDraft.profile.major || "";
-      document.getElementById("onboardingTarget").value = currentProfileDraft.drl_target ?? 80;
-      const maxActEl = document.getElementById("onboardingMaxActivities");
-      if (maxActEl) maxActEl.value = currentProfileDraft.preference_patch?.max_activities || "";
-      const weeklyHoursEl = document.getElementById("onboardingWeeklyHours");
-      if (weeklyHoursEl) weeklyHoursEl.value = currentProfileDraft.preference_patch?.weekly_participation_hours || "";
-      document.getElementById("onboardingInterests").value = (currentProfileDraft.preference_patch?.preferred_topics || []).join(", ");
-      const categories = new Set(currentProfileDraft.preference_patch?.preferred_categories || []);
-      [...document.getElementById("onboardingCategories").options].forEach(option => { option.selected = categories.has(option.value); });
-      const modes = new Set(currentProfileDraft.preference_patch?.preferred_modes || []);
-      document.querySelectorAll('input[name="onboardingMode"]').forEach(input => { input.checked = modes.has(input.value); });
-      const campuses = new Set(currentProfileDraft.preference_patch?.preferred_campuses || []);
-      document.querySelectorAll('input[name="onboardingCampus"]').forEach(input => { input.checked = campuses.has(input.value); });
-    }
-
     function maybeStartOnboarding() {
       if (!currentStudent?.student_id) return false;
       const data = readLocalUserData(currentStudent.student_id);
       if (data.onboarding_status === "COMPLETED" && data.profile?.completed_onboarding !== false) return false;
-      if (document.getElementById("onboardingModal")) {
-        beginOnboarding(currentStudent);
-        return true;
-      }
-      data.onboarding_status = "IN_PROGRESS";
-      onboardingStep = Math.max(1, Math.min(3, Number(data.onboarding_step || 1)));
-      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
-      hydrateOnboardingFormFromDraft();
-      renderOnboardingIntervals();
-      renderOnboardingWizardStep();
-      document.getElementById("onboardingWizard").classList.remove("hidden");
+      beginOnboarding(currentStudent);
       return true;
     }
 
-    function renderOnboardingScores(scoreSources = {}) {
-      const box = document.getElementById("onboardingScores");
-      if (!box) return;
-      box.innerHTML = Object.keys(DEFAULT_SCORES_TEMPLATE).map(category => {
-        const profileScore = currentProfileDraft.scores?.[category];
-        const storedValue = profileScore ? profileScore.value : scoreSources[category]?.value;
-        const rawValue = Number(storedValue);
-        const value = storedValue !== null && storedValue !== '' && Number.isFinite(rawValue) ? Math.max(0, Math.min(DEFAULT_SCORES_TEMPLATE[category].max, rawValue)) : '';
-        const proposedSource = profileScore ? profileScore.source : scoreSources[category]?.source;
-        const source = ['unknown', 'self_reported', 'confirmed'].includes(proposedSource) ? proposedSource : 'unknown';
-        return `<div class="rounded-xl border border-[#2b3a54] bg-[#080d18] p-3"><label class="text-xs font-bold text-slate-300">${category}<input id="onboardingScore${category}" type="number" min="0" max="${DEFAULT_SCORES_TEMPLATE[category].max}" value="${value}" class="mt-1.5 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-2" /></label><select id="onboardingScoreSource${category}" class="mt-2 w-full rounded-lg border border-[#2b3a54] bg-[#0e1524] px-2 py-2 text-xs"><option value="unknown">Chưa biết</option><option value="self_reported" ${source === 'self_reported' ? 'selected' : ''}>Tự khai</option><option value="confirmed" ${source === 'confirmed' ? 'selected' : ''}>Đã xác nhận</option></select></div>`;
-      }).join("");
-    }
+    const CANONICAL_TOPIC_MAP = [
+      ["mathematics", ["mathematics", "toán học", "toán", "toan hoc", "toan", "giải tích", "đại số", "xác suất", "thống kê"]],
+      ["physics", ["physics", "vật lý", "vật lí", "vat ly", "vat li", "cơ học", "quang học"]],
+      ["chemistry", ["chemistry", "hóa học", "hoa hoc", "môn hóa", "ngành hóa"]],
+      ["biology", ["biology", "sinh học", "sinh hoc", "công nghệ sinh học", "vi sinh"]],
+      ["computer_science", ["computer_science", "khoa học máy tính", "công nghệ thông tin", "lập trình", "tin học", "cntt", "phần mềm", "coding", "code", "lap trinh", "tin hoc", "khoa hoc may tinh", "cong nghe thong tin"]],
+      ["foreign_language", ["foreign_language", "ngoại ngữ", "tiếng anh", "tiếng nhật", "tiếng hàn", "tiếng trung", "tiếng pháp", "tiếng đức", "ngoai ngu", "tieng anh", "tieng nhat", "tieng han", "ielts", "toeic", "jlpt"]],
+      ["economics_finance", ["economics_finance", "kinh tế", "tài chính", "đầu tư", "chứng khoán", "kinh te", "tai chinh", "dau tu", "khởi nghiệp", "kinh doanh"]],
+      ["artificial_intelligence", ["artificial_intelligence", "trí tuệ nhân tạo", "tri tue nhan tao", "machine learning", "học máy", "deep learning", "ai"]],
+      ["technology", ["technology", "công nghệ", "cong nghe", "robot", "robotics", "iot", "kỹ thuật", "điện tử", "phần cứng"]],
+      ["research", ["research", "nghiên cứu khoa học", "nghiên cứu", "học thuật", "nghien cuu", "hoc thuat", "nckh", "seminar"]],
+      ["soft_skills", ["soft_skills", "kỹ năng mềm", "ky nang mem", "giao tiếp", "thuyết trình", "làm việc nhóm", "lãnh đạo", "giao tiep", "thuyet trinh"]],
+      ["career", ["career", "nghề nghiệp", "hướng nghiệp", "việc làm", "thực tập", "tuyển dụng", "nghe nghiep", "viec lam", "thuc tap"]],
+      ["volunteer", ["volunteer", "tình nguyện", "cộng đồng", "thiện nguyện", "hiến máu", "tinh nguyen", "cong dong", "hien mau"]],
+      ["environment", ["environment", "môi trường", "sống xanh", "biến đổi khí hậu", "tái chế", "moi truong", "song xanh"]],
+      ["culture", ["culture", "văn hóa", "văn nghệ", "nghệ thuật", "thiết kế", "vẽ tranh", "vẽ", "hội họa", "âm nhạc", "van hoa", "van nghe", "nghe thuat", "thiet ke"]],
+      ["sports", ["sports", "thể thao", "thể dục", "bóng đá", "cầu lông", "bơi lội", "chạy bộ", "the thao", "the duc"]],
+      ["health", ["health", "sức khỏe", "y tế", "dinh dưỡng", "tâm lý", "suc khoe", "y te", "dinh duong"]],
+      ["safety", ["safety", "an toàn", "phòng cháy", "pccc", "sơ cứu", "bảo mật", "an ninh mạng", "an toan", "bao mat", "phong chay"]],
+      ["civic_education", ["civic_education", "giáo dục công dân", "pháp luật", "chính trị", "đoàn hội", "giao duc cong dan", "phap luat", "chinh tri"]]
+    ];
 
-    function saveOnboardingStep() {
-      if (!currentStudent?.student_id) return;
-      currentProfileDraft.profile = {
-        full_name: document.getElementById("onboardingFullName").value.trim(),
-        class_name: document.getElementById("onboardingClass").value.trim(),
-        major: document.getElementById("onboardingMajor").value.trim()
-      };
-      const targetEl = document.getElementById("onboardingTarget");
-      if (targetEl && targetEl.value !== "") {
-        currentProfileDraft.drl_target = Math.max(0, Math.min(100, Number(targetEl.value)));
-      }
-      currentProfileDraft.preference_patch = currentProfileDraft.preference_patch || {};
-      const maxActEl = document.getElementById("onboardingMaxActivities");
-      if (maxActEl) {
-        currentProfileDraft.preference_patch.max_activities = Number(maxActEl.value) || null;
-      }
-      const weeklyHoursEl = document.getElementById("onboardingWeeklyHours");
-      if (weeklyHoursEl) {
-        currentProfileDraft.preference_patch.weekly_participation_hours = Number(weeklyHoursEl.value) || null;
-      }
-      currentProfileDraft.preference_patch.preferred_topics = document.getElementById("onboardingInterests").value.split(",").map(value => value.trim()).filter(Boolean);
-      currentProfileDraft.preference_patch.preferred_categories = [...document.getElementById("onboardingCategories").selectedOptions].map(option => option.value);
-      currentProfileDraft.preference_patch.preferred_modes = [...document.querySelectorAll('input[name="onboardingMode"]:checked')].map(input => input.value);
-      const preservedCampuses = (currentProfileDraft.preference_patch.preferred_campuses || []).filter(c => c === "ONLINE" || c === "OTHER");
-      const checkedCampuses = [...document.querySelectorAll('input[name="onboardingCampus"]:checked')].map(input => input.value);
-      currentProfileDraft.preference_patch.preferred_campuses = [...new Set([...checkedCampuses, ...preservedCampuses])];
-      const data = readLocalUserData(currentStudent.student_id);
-      data.onboarding_status = "IN_PROGRESS";
-      data.onboarding_step = onboardingStep;
-      data.profile = { ...data.profile, ...JSON.parse(JSON.stringify(currentProfileDraft)) };
-      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
-    }
-
-    function changeOnboardingStep(direction) {
-      saveOnboardingStep();
-      const nextStep = Math.max(1, Math.min(3, onboardingStep + direction));
-      if (nextStep !== onboardingStep) resetOnboardingAssistantState();
-      onboardingStep = nextStep;
-      const data = readLocalUserData(currentStudent.student_id);
-      data.onboarding_step = onboardingStep;
-      data.profile_assistant_history = [];
-      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
-      renderOnboardingWizardStep();
-    }
-
-    function resetOnboardingAssistantState() {
-      const input = document.getElementById("onboardingAiInput");
-      const preview = document.getElementById("onboardingAiPreview");
-      if (input) input.value = "";
-      if (preview) {
-        preview.innerHTML = "";
-        preview.classList.add("hidden");
-      }
-      pendingProfileProposal = null;
-      profileAssistantConversation = [];
-    }
-
-    function renderOnboardingWizardStep() {
-      document.querySelectorAll(".onboarding-step").forEach(section => section.classList.toggle("hidden", Number(section.dataset.onboardingStep) !== onboardingStep));
-      document.getElementById("onboardingProgress").textContent = `Bước ${onboardingStep} / 3`;
-      document.getElementById("onboardingBack").classList.toggle("invisible", onboardingStep === 1);
-      document.getElementById("onboardingNext").classList.toggle("hidden", onboardingStep === 3);
-      document.getElementById("onboardingComplete").classList.toggle("hidden", onboardingStep !== 3);
-      renderOnboardingAiChips();
-      if (onboardingStep === 3) {
-        const patch = currentProfileDraft.preference_patch || {};
-        const preferences = [...(patch.preferred_topics || []), ...(patch.preferred_categories || []), ...(patch.preferred_modes || []), ...(patch.preferred_campuses || [])];
-        document.getElementById("onboardingReview").innerHTML = `<b>${escapeHTML(currentProfileDraft.profile.full_name || "Chưa có tên")}</b><br>Mục tiêu: ${Number(document.getElementById("onboardingTarget").value || 80)} điểm · ${currentProfileDraft.weekly_intervals.length} quy tắc tuần · ${(currentProfileDraft.exceptions || []).length} ngoại lệ.<br><span class="text-slate-400">Ưu tiên: ${escapeHTML(preferences.join(", ") || "chưa chọn")}. Mọi giá trị AI đề xuất đều cần được xác nhận trước khi lưu.</span>`;
-      }
-    }
-
-    function setProfileAssistantExample(text) {
-      const input = document.getElementById("onboardingAiInput");
-      if (!input) return;
-      input.value = text;
-      input.focus();
-    }
-
-    function renderOnboardingAiChips() {
-      const box = document.getElementById("onboardingAiChips");
-      if (!box) return;
-      const examples = onboardingStep === 1
-        ? ["Mình tên Nguyễn An, học lớp 24CNTT1", "Ngành của mình là Khoa học máy tính"]
-        : onboardingStep === 2
-          ? ["T2 hằng tuần mình bận 7h30 đến 11h", "Xóa lịch bận thứ Sáu"]
-          : ["Mục tiêu ĐRL của mình là 90", "Mình ưu tiên tình nguyện và hoạt động online"];
-      box.innerHTML = examples.map(text => `<button type="button" onclick="setProfileAssistantExample('${text.replace(/'/g, "\\'")}')" class="rounded-full border border-indigo-500/40 bg-indigo-950/30 px-3 py-1.5 text-[11px] font-bold text-indigo-200 hover:bg-indigo-900/40">${escapeHTML(text)}</button>`).join("");
-    }
-
-    function addOnboardingInterval() {
-      const start = document.getElementById("onboardingStart").value;
-      const end = document.getElementById("onboardingEnd").value;
-      if (!start || !end || start >= end) return;
-      currentProfileDraft.weekly_intervals.push({ kind: document.getElementById("onboardingIntervalKind").value, weekday: Number(document.getElementById("onboardingWeekday").value), start, end, recurrence: "weekly", source: "manual", confirmed: false });
-      renderOnboardingIntervals();
-    }
-
-    function renderOnboardingIntervals() {
-      const box = document.getElementById("onboardingIntervals");
-      if (!box) return;
-      box.innerHTML = currentProfileDraft.weekly_intervals.map((item, index) => `<div class="flex items-center justify-between rounded-lg border border-[#2b3a54] px-3 py-2 text-xs"><span>${item.kind === 'busy' ? 'Bận' : 'Rảnh'} · ${AVAILABILITY_DAYS[item.weekday]} · ${item.start}–${item.end} · hằng tuần</span><button type="button" onclick="currentProfileDraft.weekly_intervals.splice(${index},1);renderOnboardingIntervals()" class="text-rose-300">Xóa</button></div>`).join("") || '<p class="text-xs text-slate-500">Chưa thêm lịch tuần; bạn có thể bỏ qua và nhập thủ công sau.</p>';
-    }
-
-    async function completeOnboardingWizard() {
-      saveOnboardingStep();
-      if (!currentProfileDraft.profile.full_name) return;
-      currentProfileDraft.weekly_intervals = (currentProfileDraft.weekly_intervals || []).map(item => ({ ...item, confirmed: true }));
-      currentProfileDraft.exceptions = (currentProfileDraft.exceptions || []).map(item => ({ ...item, confirmed: true }));
-      const data = readLocalUserData(currentStudent.student_id);
-      data.profile = { ...data.profile, ...JSON.parse(JSON.stringify(currentProfileDraft)), completed_onboarding: true, onboarding_started: false };
-      data.onboarding_status = "COMPLETED";
-      data.onboarding_step = 3;
-      data.canonical_availability = buildCanonicalAvailability();
-      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
-      await persistOnboardingPreference();
-      currentStudent.full_name = currentProfileDraft.profile.full_name;
-      document.getElementById("onboardingWizard").classList.add("hidden");
-      renderProfileWorkspace();
-      await applyCurrentStudent(currentStudent);
-      showWorkspace("plan");
-    }
-
-    async function persistOnboardingPreference() {
-      const patch = currentProfileDraft.preference_patch || {};
-      const pieces = [];
-      if ((patch.preferred_topics || []).length) pieces.push(`Mình thích ${(patch.preferred_topics || []).join(', ')}`);
-      if ((patch.preferred_modes || []).length) pieces.push(`ưu tiên ${(patch.preferred_modes || []).join(', ')}`);
-      if ((patch.preferred_categories || []).length) pieces.push(`ưu tiên nhóm ${(patch.preferred_categories || []).join(', ')}`);
-      if ((patch.preferred_campuses || []).length) pieces.push(`ưu tiên cơ sở ${(patch.preferred_campuses || []).join(', ')}`);
-      if (patch.max_activities) pieces.push(`tối đa ${patch.max_activities} hoạt động`);
-      if (!currentStudent?.student_id) return;
-      let resolvedPreference = {
-        topic_preferences: [],
-        category_priorities: (patch.preferred_categories || []).map(category_id => ({ category_id, weight: 5 })),
-        campus_preferences: (patch.preferred_campuses || []).map(campus_id => ({ campus_id, weight: 5 })),
-        mode_preferences: (patch.preferred_modes || []).map(mode => ({ mode, weight: 5 })),
-        time_preferences: [],
-        limits: { max_activities: patch.max_activities || null, max_duration_minutes: null, max_fee: null },
-        hard_exclusions: { campus_ids: [], modes: [], time_slots: [] },
-        strategy: "BALANCED"
-      };
-      try {
-        if (pieces.length) {
-          const interpreted = await fetch(`${API_BASE}/api/preferences/interpret`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: pieces.join('; ') }) });
-          const payload = await interpreted.json();
-          if (!interpreted.ok || !payload.preference) throw new Error(payload.detail?.message || 'AI không thể chuẩn hóa nguyện vọng.');
-          resolvedPreference = payload.preference;
+    function mapTopicInputsToTopicIds(items) {
+      const rawList = (Array.isArray(items) ? items : [items])
+        .flatMap(item => String(item || "").split(/[,;\n]+/))
+        .map(item => item.trim().toLocaleLowerCase("vi"))
+        .filter(Boolean);
+      const result = [];
+      rawList.forEach(token => {
+        for (const [topicId, keywords] of CANONICAL_TOPIC_MAP) {
+          if (keywords.some(kw => token === kw || token.includes(kw))) {
+            if (!result.includes(topicId)) result.push(topicId);
+          }
         }
-      } catch (error) {
-        const preview = document.getElementById("onboardingAiPreview");
-        if (preview) {
-          preview.classList.remove("hidden");
-          preview.innerHTML = `<span class="text-amber-300">${escapeHTML(error.message)} Các lựa chọn cấu trúc vẫn được lưu cục bộ; sở thích văn bản có thể chỉnh lại sau.</span>`;
-        }
+      });
+      return result;
+    }
+
+    function mapPriorityInputsToCategories(items) {
+      const rawList = (Array.isArray(items) ? items : [items])
+        .flatMap(item => String(item || "").split(/[,;\n]+/))
+        .map(item => item.trim().toLocaleLowerCase("vi"))
+        .filter(Boolean);
+      const result = [];
+      const add = cid => { if (!result.includes(cid)) result.push(cid); };
+      rawList.forEach(token => {
+        if (/^c[1-5]$/i.test(token)) add(token.toUpperCase());
+        const m = token.match(/(?:mục|muc|nhóm|nhom|c)\s*([1-5])/i);
+        if (m) add(`C${m[1]}`);
+        if (/học thuật|nghiên cứu|học tập|kỹ năng|nghề nghiệp|hoc thuat|nghien cuu|hoc tap/.test(token)) add("C1");
+        if (/nội quy|quy chế|noi quy|quy che/.test(token)) add("C2");
+        if (/thể thao|văn nghệ|văn hóa|chính trị|the thao|van nghe|van hoa/.test(token)) add("C3");
+        if (/tình nguyện|cộng đồng|hiến máu|tinh nguyen|cong dong/.test(token)) add("C4");
+        if (/cán bộ|clb|đoàn hội|can bo/.test(token)) add("C5");
+      });
+      return result;
+    }
+
+    function mapFormatInputToModes(formatText, existingModes = []) {
+      const modes = [];
+      const add = m => { if (["online", "offline", "hybrid"].includes(m) && !modes.includes(m)) modes.push(m); };
+      (Array.isArray(existingModes) ? existingModes : []).forEach(add);
+      const text = String(formatText || "").toLocaleLowerCase("vi");
+      if (/trực tuyến|online|truc tuyen/.test(text)) add("online");
+      if (/trực tiếp|offline|truc tiep/.test(text)) add("offline");
+      if (/kết hợp|hybrid|ket hop/.test(text)) add("hybrid");
+      return modes;
+    }
+
+    function syncBusyScheduleAndIntervals(profile) {
+      if (!profile || typeof profile !== "object") return;
+      profile.busy_schedule = profile.busy_schedule || { applies_to_semester: false, week_start: AVAILABILITY_DEFAULT_WEEK_START, slots: [] };
+      const schedule = profile.busy_schedule;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(schedule.week_start || "")) {
+        schedule.week_start = AVAILABILITY_DEFAULT_WEEK_START;
       }
-      confirmedPreference = JSON.parse(JSON.stringify(resolvedPreference));
-      preferenceDraft = JSON.parse(JSON.stringify(resolvedPreference));
-      persistCurrentUserData();
-      try {
-        await fetch(`${API_BASE}/api/preferences/confirmed`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ student_id: currentStudent.student_id, confirmed: true, preference: resolvedPreference, source_text: pieces.join('; ') || null }) });
-      } catch (_) { /* The browser-local confirmed preference remains available. */ }
+      profile.weekly_intervals = Array.isArray(profile.weekly_intervals) ? profile.weekly_intervals : [];
+      profile.exceptions = Array.isArray(profile.exceptions) ? profile.exceptions : [];
+      const slots = Array.isArray(schedule.slots) ? schedule.slots : [];
+      slots.forEach(slot => {
+        const parts = String(slot).split("|");
+        if (parts.length !== 3) return;
+        const isDate = /^\d{4}-\d{2}-\d{2}$/.test(parts[1]);
+        const dayIndex = isDate ? onboardingWeekdayIndex(parts[1]) : Number(parts[1]);
+        const period = AVAILABILITY_PERIODS.find(item => item.key === parts[2]);
+        if (!Number.isInteger(dayIndex) || dayIndex < 0 || dayIndex > 6 || !period) return;
+        if (schedule.applies_to_semester) {
+          const exists = profile.weekly_intervals.some(item =>
+            item.kind === "busy" && Number(item.weekday) === dayIndex && item.start === period.start && item.end === period.end
+          );
+          if (!exists) {
+            profile.weekly_intervals.push({
+              kind: "busy",
+              weekday: dayIndex,
+              start: period.start,
+              end: period.end,
+              recurrence: "weekly",
+              source: "manual",
+              confirmed: true
+            });
+          }
+        } else {
+          const date = isDate ? parts[1] : addDaysToIsoDate(schedule.week_start, dayIndex);
+          const exists = profile.exceptions.some(item =>
+            item.kind === "busy" && item.date === date && item.start === period.start && item.end === period.end
+          );
+          if (!exists) {
+            profile.exceptions.push({
+              date,
+              kind: "busy",
+              start: period.start,
+              end: period.end,
+              source: "manual",
+              confirmed: true
+            });
+          }
+        }
+      });
     }
 
     function renderProfileWorkspace() {
@@ -3188,6 +3074,7 @@
     function updateProfileManual() {
       currentProfileDraft.profile = { full_name: document.getElementById("profileFullName")?.value.trim() || "", class_name: document.getElementById("profileClass")?.value.trim() || "", major: document.getElementById("profileMajor")?.value.trim() || "" };
       currentProfileDraft.drl_target = Math.max(0, Math.min(100, Number(document.getElementById("profileDrlTarget")?.value || 80)));
+      currentProfileDraft.goal = { ...(currentProfileDraft.goal || {}), target_score: currentProfileDraft.drl_target };
       currentProfileDraft.preference_patch = currentProfileDraft.preference_patch || {};
       const weeklyHours = Number(document.getElementById("profileWeeklyHours")?.value);
       currentProfileDraft.preference_patch.weekly_participation_hours = Number.isFinite(weeklyHours) && weeklyHours > 0 ? weeklyHours : null;
@@ -3197,6 +3084,7 @@
       if (targetBadge) targetBadge.textContent = `${currentProfileDraft.drl_target} / 100đ`;
       markPlanStale();
       persistCurrentUserData();
+      renderStudentProfile();
     }
 
     function renderConfirmedPreferenceSummary() {
@@ -3366,10 +3254,9 @@
       currentProfileDraft.exceptions = (currentProfileDraft.exceptions || []).map(item => ({ ...item, confirmed: true }));
       if (preview) preview.innerHTML = `<span class="text-emerald-300 font-bold">Đã xác nhận thay đổi.</span>${followupQuestion ? `<p class="mt-2 text-indigo-200"><b>Cần làm rõ tiếp:</b> ${escapeHTML(followupQuestion)}</p>` : ''}`;
       pendingProfileProposal = null;
-      renderOnboardingIntervals();
-      hydrateOnboardingFormFromDraft();
-      renderProfileWorkspace();
+      currentProfileDraft.goal = currentProfileDraft.goal || { natural_text: "", target_score: 80, priorities: [], format: "", topics: [] };
       if (Number.isFinite(Number(currentProfileDraft.drl_target))) {
+        currentProfileDraft.goal.target_score = Number(currentProfileDraft.drl_target);
         const plannerTarget = document.getElementById("inputPlanTarget");
         const targetBadge = document.getElementById("targetEchoBadge");
         if (plannerTarget) plannerTarget.value = currentProfileDraft.drl_target;
@@ -3378,32 +3265,74 @@
       if (changes.some(change => change.field === "preference_patch")) {
         syncConfirmedPreferenceFromProfile();
       }
+      renderProfileWorkspace();
+      renderStudentProfile();
       renderAvailabilityPicker();
       markPlanStale();
       persistCurrentUserData();
     }
 
     function syncConfirmedPreferenceFromProfile() {
-      const patch = currentProfileDraft.preference_patch || {};
-      const allowedTopics = new Set(["mathematics", "physics", "chemistry", "biology", "computer_science", "foreign_language", "economics_finance", "artificial_intelligence", "technology", "research", "soft_skills", "career", "volunteer", "environment", "culture", "sports", "health", "safety", "civic_education"]);
+      currentProfileDraft.preference_patch = currentProfileDraft.preference_patch || {
+        preferred_topics: [], preferred_categories: [], preferred_modes: [], preferred_campuses: [], max_activities: null, weekly_participation_hours: null
+      };
+      const patch = currentProfileDraft.preference_patch;
+      const goal = currentProfileDraft.goal || {};
+      const prefs = currentProfileDraft.preferences || {};
+      const targetScore = Number.isFinite(Number(goal.target_score))
+        ? Math.max(0, Math.min(100, Number(goal.target_score)))
+        : (Number.isFinite(Number(currentProfileDraft.drl_target)) ? Math.max(0, Math.min(100, Number(currentProfileDraft.drl_target))) : 80);
+      currentProfileDraft.drl_target = targetScore;
+      currentProfileDraft.goal = { ...goal, target_score: targetScore };
+      const plannerTarget = document.getElementById("inputPlanTarget");
+      const targetBadge = document.getElementById("targetEchoBadge");
+      const profileTarget = document.getElementById("profileDrlTarget");
+      if (plannerTarget) plannerTarget.value = targetScore;
+      if (targetBadge) targetBadge.textContent = `${targetScore} / 100đ`;
+      if (profileTarget) profileTarget.value = targetScore;
+
+      const topicIds = mapTopicInputsToTopicIds([
+        ...(patch.preferred_topics || []),
+        ...(goal.topics || []),
+        prefs.interest_fields || ""
+      ]);
+      const categoryIds = mapPriorityInputsToCategories([
+        ...(patch.preferred_categories || []),
+        ...(goal.priorities || []),
+        prefs.favorite_activities || ""
+      ]);
+      const modeIds = mapFormatInputToModes(goal.format, patch.preferred_modes);
+      const campusIds = (patch.preferred_campuses || []).filter(c => ["NVC", "DONG_HOA", "ONLINE", "OTHER"].includes(c));
+      patch.preferred_topics = topicIds;
+      patch.preferred_categories = categoryIds;
+      patch.preferred_modes = modeIds;
+      patch.preferred_campuses = campusIds;
+      if ((!Array.isArray(goal.topics) || !goal.topics.length) && topicIds.length) {
+        currentProfileDraft.goal.topics = topicIds.map(id => PREF_LABELS[id] || id);
+      }
+      if ((!Array.isArray(goal.priorities) || !goal.priorities.length) && categoryIds.length) {
+        currentProfileDraft.goal.priorities = categoryIds.map(id => PLAN_CAT_FULL[id] || id);
+      }
+
       const base = confirmedPreference ? JSON.parse(JSON.stringify(confirmedPreference)) : {
         topic_preferences: [], category_priorities: [], campus_preferences: [], mode_preferences: [], time_preferences: [],
         limits: { max_activities: null, max_duration_minutes: null, max_fee: null },
         hard_exclusions: { campus_ids: [], modes: [], time_slots: [] }, strategy: "BALANCED"
       };
-      base.topic_preferences = (patch.preferred_topics || []).filter(topic => allowedTopics.has(topic)).map(topic_id => ({ topic_id, weight: 5 }));
-      base.category_priorities = (patch.preferred_categories || []).map(category_id => ({ category_id, weight: 5 }));
-      base.campus_preferences = (patch.preferred_campuses || []).map(campus_id => ({ campus_id, weight: 5 }));
-      base.mode_preferences = (patch.preferred_modes || []).map(mode => ({ mode, weight: 5 }));
+      base.topic_preferences = topicIds.map(topic_id => ({ topic_id, weight: 5 }));
+      base.category_priorities = categoryIds.map(category_id => ({ category_id, weight: 5 }));
+      base.campus_preferences = campusIds.map(campus_id => ({ campus_id, weight: 5 }));
+      base.mode_preferences = modeIds.map(mode => ({ mode, weight: 5 }));
       base.limits = base.limits || { max_activities: null, max_duration_minutes: null, max_fee: null };
       base.limits.max_activities = patch.max_activities || null;
       confirmedPreference = base;
       preferenceDraft = JSON.parse(JSON.stringify(base));
       renderConfirmedPreferenceSummary();
+      updatePreferenceConfirmButton();
       if (currentStudent?.student_id) {
         fetch(`${API_BASE}/api/preferences/confirmed`, {
           method: "PUT", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student_id: currentStudent.student_id, confirmed: true, preference: base, source_text: "AI chỉnh sửa hồ sơ đã được người dùng xác nhận" })
+          body: JSON.stringify({ student_id: currentStudent.student_id, confirmed: true, preference: base, source_text: goal.natural_text || "Thiết lập hồ sơ đã được người dùng xác nhận" })
         }).catch(() => {});
       }
     }
@@ -3413,28 +3342,31 @@
       if (!mssv) return;
       const saved = readLocalUserData(mssv);
       const targetInput = document.getElementById("inputPlanTarget");
-      const target = targetInput ? Number(targetInput.value) : Number(saved.planner.target_total || 80);
+      const draftTarget = Number(currentProfileDraft?.drl_target ?? currentProfileDraft?.goal?.target_score);
+      const target = Number.isFinite(draftTarget) ? draftTarget : (targetInput ? Number(targetInput.value) : Number(saved.planner.target_total || 80));
       const normalizedTarget = Number.isFinite(target) ? Math.max(0, Math.min(100, target)) : 80;
+      syncBusyScheduleAndIntervals(currentProfileDraft);
       saved.category_scores = JSON.parse(JSON.stringify(studentCategoryScores));
       saved.default_baseline_total = Number(defaultBaselineTotal || 0);
       saved.saved_activities = JSON.parse(JSON.stringify(savedActivitiesForStudent || []));
       saved.profile = {
         ...saved.profile,
         ...JSON.parse(JSON.stringify(currentProfileDraft)),
-        drl_target: Number.isFinite(Number(currentProfileDraft.drl_target)) ? Number(currentProfileDraft.drl_target) : normalizedTarget,
+        drl_target: normalizedTarget,
         profile: { ...(saved.profile?.profile || {}), ...(currentProfileDraft.profile || {}) },
-        faculty: saved.profile?.faculty ?? currentProfileDraft.faculty ?? "",
-        cohort: saved.profile?.cohort ?? currentProfileDraft.cohort ?? "",
-        program: saved.profile?.program ?? currentProfileDraft.program ?? "",
-        semester: saved.profile?.semester ?? currentProfileDraft.semester ?? "HK1 · 2026–2027",
-        avatar_data_url: saved.profile?.avatar_data_url ?? currentProfileDraft.avatar_data_url ?? "",
-        score_history: Array.isArray(saved.profile?.score_history) ? saved.profile.score_history : [],
-        preferences: { ...(saved.profile?.preferences || {}) },
+        faculty: currentProfileDraft.faculty ?? saved.profile?.faculty ?? "",
+        cohort: currentProfileDraft.cohort ?? saved.profile?.cohort ?? "",
+        program: currentProfileDraft.program ?? saved.profile?.program ?? "",
+        semester: currentProfileDraft.semester ?? saved.profile?.semester ?? "HK1 · 2026–2027",
+        avatar_data_url: currentProfileDraft.avatar_data_url ?? saved.profile?.avatar_data_url ?? "",
+        score_history: Array.isArray(currentProfileDraft.score_history) ? currentProfileDraft.score_history : (Array.isArray(saved.profile?.score_history) ? saved.profile.score_history : []),
+        preferences: { ...(saved.profile?.preferences || {}), ...(currentProfileDraft.preferences || {}) },
         goal: {
           ...(saved.profile?.goal || {}),
-          target_score: Number.isFinite(Number(currentProfileDraft.drl_target)) ? Number(currentProfileDraft.drl_target) : normalizedTarget
+          ...(currentProfileDraft.goal || {}),
+          target_score: normalizedTarget
         },
-        busy_schedule: saved.profile?.busy_schedule || { applies_to_semester: false, slots: [] }
+        busy_schedule: currentProfileDraft.busy_schedule || saved.profile?.busy_schedule || { applies_to_semester: false, week_start: AVAILABILITY_DEFAULT_WEEK_START, slots: [] }
       };
       saved.profile_assistant_history = JSON.parse(JSON.stringify(profileAssistantConversation.slice(-20)));
       saved.confirmed_preference = confirmedPreference ? JSON.parse(JSON.stringify(confirmedPreference)) : null;
@@ -3955,6 +3887,7 @@
       };
       profile.completed_onboarding = true;
       profile.onboarding_started = false;
+      syncBusyScheduleAndIntervals(profile);
       currentStudent.student_id = onboardingDraft.student_id;
       currentStudent.full_name = onboardingDraft.full_name.trim();
       localStorage.setItem("unilife_student", JSON.stringify(currentStudent));
@@ -3963,8 +3896,12 @@
       const data = readLocalUserData(currentStudent.student_id);
       data.onboarding_status = "COMPLETED";
       data.onboarding_step = 3;
-      data.planner.target_total = profile.goal.target_score || data.planner.target_total;
+      data.planner.target_total = profile.goal.target_score;
       localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      currentProfileDraft = JSON.parse(JSON.stringify(data.profile));
+      restoreOnboardingBusySchedule(currentProfileDraft.busy_schedule, data);
+      syncConfirmedPreferenceFromProfile();
+      persistCurrentUserData();
       const users = readLocalUsers();
       const account = users.find(user => normalizeMssv(user.student_id) === normalizeMssv(currentStudent.student_id));
       if (account) {
@@ -3972,7 +3909,6 @@
         account.major = profile.faculty || account.major;
         localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
       }
-      persistOnboardingDraft();
       applyCurrentStudent(currentStudent);
       document.getElementById("onboardingModal").classList.add("hidden");
       document.getElementById("welcomeModal").classList.remove("hidden");
@@ -4021,7 +3957,7 @@
       profileAssistantConversation = [];
       cachedPlanOptions = [];
       currentPlannerData = null;
-      document.getElementById("onboardingWizard")?.classList.add("hidden");
+      document.getElementById("onboardingModal")?.classList.add("hidden");
       document.getElementById("userDropdown")?.classList.add("hidden");
       document.getElementById("workspaceApp")?.classList.add("hidden");
       const landing = document.getElementById("landingPage");
@@ -4165,8 +4101,23 @@
         renderConfirmedPreferenceSummary();
         updatePreferenceConfirmButton();
       }
+      syncBusyScheduleAndIntervals(currentProfileDraft);
+      const hasProfilePreferenceData = Boolean(
+        (currentProfileDraft.goal?.topics || []).length ||
+        (currentProfileDraft.goal?.priorities || []).length ||
+        currentProfileDraft.goal?.format ||
+        currentProfileDraft.preferences?.interest_fields ||
+        currentProfileDraft.preferences?.favorite_activities ||
+        (currentProfileDraft.preference_patch?.preferred_topics || []).length ||
+        (currentProfileDraft.preference_patch?.preferred_categories || []).length ||
+        (currentProfileDraft.preference_patch?.preferred_modes || []).length ||
+        (currentProfileDraft.preference_patch?.preferred_campuses || []).length
+      );
+      if (!confirmedPreference && hasProfilePreferenceData) {
+        syncConfirmedPreferenceFromProfile();
+      }
       restoreLocalPlannerState(accountData);
-      restoreOnboardingBusySchedule(accountData.profile.busy_schedule, accountData);
+      restoreOnboardingBusySchedule(currentProfileDraft.busy_schedule, accountData);
       renderProfileWorkspace();
       renderStudentProfile();
     }
@@ -4592,7 +4543,10 @@
       num = Math.max(0, Math.min(100, num));
       const badge = document.getElementById('targetEchoBadge');
       if (badge) badge.innerText = `${num} / 100đ`;
-      if (currentProfileDraft) currentProfileDraft.drl_target = num;
+      if (currentProfileDraft) {
+        currentProfileDraft.drl_target = num;
+        currentProfileDraft.goal = { ...(currentProfileDraft.goal || {}), target_score: num };
+      }
       const profileTarget = document.getElementById('profileDrlTarget');
       if (profileTarget) profileTarget.value = num;
       if (currentStudent?.student_id) {
@@ -5188,7 +5142,14 @@
         '2027-03-31'
       ));
       (currentProfileDraft.exceptions || []).filter(item => item.kind === 'busy').forEach(item => intervals.push({ start: `${item.date}T${item.start}:00+07:00`, end: `${item.date}T${item.end}:00+07:00`, source: 'profile_exception' }));
-      return intervals.sort((a, b) => a.start.localeCompare(b.start));
+      const seen = new Set();
+      const deduped = intervals.filter(item => {
+        const key = `${item.start}|${item.end}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      return deduped.sort((a, b) => a.start.localeCompare(b.start));
     }
 
     function expandWeeklyProfileIntervals(rules, fromDate, untilDate) {
