@@ -156,6 +156,145 @@ def visible(page: Cdp, element_id: str) -> bool:
     return bool(page.js(f"(() => {{ const el = document.getElementById({json.dumps(element_id)}); return !!el && !el.classList.contains('hidden'); }})()"))
 
 
+PREFERENCE = {
+    "topic_preferences": [{"topic_id": "mathematics", "weight": 5}, {"topic_id": "artificial_intelligence", "weight": 4}],
+    "category_priorities": [{"category_id": "C4", "weight": 5}],
+    "campus_preferences": [{"campus_id": "NVC", "weight": 5}],
+    "mode_preferences": [{"mode": "online", "weight": 5}],
+    "time_preferences": [{"time_slot": "weekday_evening", "weight": 4}],
+    "limits": {"max_activities": 4, "max_duration_minutes": 600, "max_fee": 200000},
+    "hard_exclusions": {"campus_ids": [], "modes": [], "time_slots": []},
+    "strategy": "BALANCED",
+}
+
+
+def stored_plan(page: Cdp) -> dict:
+    return json.loads(page.js("JSON.stringify(readLocalUserData(currentStudent.student_id).confirmed_plan)"))
+
+
+def review_flow(page: Cdp) -> None:
+    """register -> plan -> Review -> Doi -> Neu bo (preview) -> Bo -> Xac nhan -> dashboard -> busy change ->
+    banner -> replan -> diff -> confirm -> dashboard updated."""
+    register(page, "Review tester", "RVW2028")
+    page.js(f"confirmedPreference = {json.dumps(PREFERENCE)}; preferenceDraft = confirmedPreference;")
+    page.js("switchTab('plan')")
+    page.wait("!!planStages.first && cachedPlanOptions.length > 0", 40)
+    assert visible(page, "confirmPlanBar")
+    assert page.js("document.getElementById('btnOpenReview').innerText.trim()") == "Review kế hoạch"
+
+    # Review screen: rows, summary, 0 violations.
+    page.js("document.getElementById('btnOpenReview').click()")
+    assert visible(page, "planReviewScreen")
+    rows = page.js("document.querySelectorAll('#prvList article').length")
+    assert rows >= 3, rows
+    summary = page.js("document.getElementById('prvPanel').innerText")
+    assert "Đạt mục tiêu" in summary and "0 vi phạm" in summary, summary
+    page.shot("review_1_open")
+
+    # Doi: alternatives in the right panel, choose one, the row is marked and can be undone.
+    first_title = page.js("prvActivities(prvDraft.result)[0].title")
+    page.js("document.querySelector('#prvList article button[onclick^=\"prvLoadAlternatives\"]').click()")
+    page.wait("prvDraft.panel.mode === 'alternatives' && !prvDraft.panel.loading")
+    panel = page.js("document.getElementById('prvPanel').innerText")
+    assert "Đang thay" in panel and first_title in panel and "Xem thêm" in panel, panel
+    assert page.js("document.querySelectorAll('#prvPanel button[onclick^=\"prvApplyAlternative\"]').length") == 3
+    page.shot("review_2_alternatives")
+    chosen = page.js("prvDraft.panel.data.items[0].title")
+    page.js("document.querySelector('#prvPanel button[onclick^=\"prvApplyAlternative\"]').click()")
+    listing = page.js("document.getElementById('prvList').innerText")
+    titles = page.js("prvActivities(prvDraft.result).map(a => a.title)")
+    assert chosen in titles and first_title not in titles, titles
+    assert "Đã đổi" in listing and "Hoàn tác" in listing, listing
+    assert page.js("prvDraft.panel.mode") == "summary"
+
+    # Neu bo is only a preview.
+    steps = page.js("prvDraft.steps.length")
+    page.js("document.querySelector('#prvList article button[onclick*=\"whatif\"]').click()")
+    page.wait("prvDraft.inline && !prvDraft.inline.loading")
+    assert "chỉ xem thử" in page.js("document.getElementById('prvList').innerText")
+    assert page.js("prvDraft.steps.length") == steps, "Neu bo must not change the draft"
+    page.js("prvCloseInline()")
+
+    # Bo: preview, confirm, then the activity is gone and the summary comes from the response.
+    before_ids = page.js("prvActivities(prvDraft.result).map(a => a.activity_id)")
+    page.js("document.querySelector('#prvList article button[onclick*=\"remove\"]').click()")
+    page.wait("prvDraft.inline && !prvDraft.inline.loading")
+    assert "Xác nhận bỏ" in page.js("document.getElementById('prvList').innerText")
+    assert page.js("prvDraft.result.plan.selected_activities.length") == len(before_ids), "preview must not apply"
+    page.shot("review_3_remove_preview")
+    page.js("prvApplyInline()")
+    after_ids = page.js("prvActivities(prvDraft.result).map(a => a.activity_id)")
+    assert len(after_ids) == len(before_ids) - 1 and set(after_ids) < set(before_ids)
+    page.shot("review_4_after_remove")
+    draft_ids = sorted(after_ids)
+
+    # Xac nhan: the first confirmation goes straight to the dashboard (nothing to compare with).
+    page.js("document.querySelector('#prvPanel button[onclick=\"prvConfirm()\"]').click()")
+    page.wait("document.getElementById('planReviewScreen').classList.contains('hidden') "
+              "&& !document.getElementById('cpdContent').classList.contains('hidden')")
+    plan = stored_plan(page)
+    assert sorted(item["activity_id"] for item in plan["activities"]) == draft_ids
+    assert plan["option_label"].endswith("đã chỉnh")
+    agenda = page.js("document.getElementById('cpdCalendar').innerText")
+    for item in plan["activities"]:
+        assert item["title"] in agenda, item["title"]
+
+    # Change the busy schedule: the plan is flagged as affected.
+    page.js("""(() => { customBusyIntervals.push({ start: '2026-11-09T08:00:00+07:00', end: '2026-11-09T12:00:00+07:00' });
+      persistCurrentUserData(); renderConfirmedPlanDashboard(); })()""")
+    assert visible(page, "cpdBannerInvalid")
+    assert "Kế hoạch bị ảnh hưởng" in page.js("document.getElementById('cpdBannerInvalid').innerText")
+    page.shot("review_5_invalidated")
+
+    # Replan with the new busy time: the new plan is offered, the old one stays until confirmed.
+    page.js("switchTab('plan')")
+    page.js("runSp3Planner()")
+    page.wait("!!planStages.first && !document.getElementById('btnRunPlanner').disabled")
+    assert visible(page, "confirmPlanBar")
+    assert stored_plan(page)["plan_version"] == plan["plan_version"], "replanning must not overwrite the confirmed plan"
+    new_plan = json.loads(page.js("JSON.stringify(planStages.first.plan)"))
+    page.js("document.getElementById('btnConfirmPlan').click()")
+    assert visible(page, "planDiffModal")
+    diff = page.js("document.getElementById('planDiffBody').innerText")
+    old_total = plan["score_summary"]["projected_total"]
+    new_total = new_plan["score_summary"]["projected_total"]
+    assert f"{old_total}đ → {new_total}đ" in diff, diff
+    for label in ("Thêm mới", "Bị bỏ", "Đổi giờ", "Giữ nguyên"):
+        assert label in diff, label
+    counts = []
+    for label in ("Thêm mới", "Đổi giờ", "Giữ nguyên"):
+        heading = page.js(f"document.querySelector('[data-diff=\"{label}\"] h4').innerText")
+        counts.append(int(heading.split("(")[1].rstrip(")")))
+    assert sum(counts) == len(new_plan["selected_activities"]), (counts, diff)
+    page.shot("review_6_diff")
+    page.js("document.getElementById('btnConfirmDiff').click()")
+    page.wait("!document.getElementById('viewDashboard').classList.contains('hidden')")
+    updated = stored_plan(page)
+    assert updated["plan_version"] == new_plan["plan_version"]
+    assert not visible(page, "cpdBannerPending") and not visible(page, "cpdBannerInvalid")
+    agenda = page.js("document.getElementById('cpdCalendar').innerText")
+    for item in updated["activities"]:
+        assert item["title"] in agenda, item["title"]
+    page.shot("review_7_dashboard_updated")
+
+
+def real_source_clock(page: Cdp) -> None:
+    """The dashboard's "Hom nay" follows the confirmed plan's source: the real store's demo date is 2026-10-01."""
+    register(page, "Real clock", "RVW2030")
+    page.js("""(async () => {
+      const response = await fetch('/api/sp3/demo/plan?source=real', { method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario: 'first_plan', total_target: 80, busy_intervals: [] }) });
+      confirmConfirmedPlan(await response.json(), 'Kho thật');
+      switchTab('dashboard');
+    })()""")
+    header = page.js("document.getElementById('cpdToday').innerText")
+    assert "01/10/2026" in header, header
+    agenda = page.js("document.getElementById('cpdCalendar').innerText")
+    # Every real activity starts more than a week after that date, so today's agenda is empty.
+    assert "Hoạt động gần nhất diễn ra vào" in agenda and "25/10/2026" in agenda, agenda
+    page.shot("review_8_real_clock")
+
+
 def main() -> int:
     browser = find_browser()
     if browser is None:
@@ -268,13 +407,24 @@ def main() -> int:
         assert "Thời gian tổ chức" in detail and "Quyền lợi ĐRL" in detail
         page.shot("8_activity_detail")
 
-        # 8. Confirming again replaces the plan and clears both banners.
+        # 8. Confirming again shows what changes first, then replaces the plan and clears both banners.
         page.js("switchTab('plan')")
         page.js("document.getElementById('btnConfirmPlan').click()")
+        assert visible(page, "planDiffModal"), "a diff must be shown before replacing a confirmed plan"
+        page.js("document.getElementById('btnConfirmDiff').click()")
         page.wait("!document.getElementById('viewDashboard').classList.contains('hidden')")
+        assert not visible(page, "planDiffModal")
         assert not visible(page, "cpdBannerPending") and not visible(page, "cpdBannerInvalid")
 
-        # 9. Another account has its own (empty) dashboard.
+        # 9. Review flow with a confirmed preference, then the real store's demo clock.
+        page.js("logoutLocalAccount()")
+        page.js("showWorkspace()")
+        review_flow(page)
+        page.js("logoutLocalAccount()")
+        page.js("showWorkspace()")
+        real_source_clock(page)
+
+        # 10. Another account has its own (empty) dashboard.
         page.js("logoutLocalAccount()")
         page.js("showWorkspace()")
         register(page, "Nguoi dung thu hai", "RVW2027")

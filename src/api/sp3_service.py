@@ -490,6 +490,10 @@ def preview_personalized_swap(
     base_result: dict,
     remove_activity_id: str,
     add_activity_id: str | None,
+    # REVIEW-DASH START
+    # REVIEW-DASH: availability pass-through (needs Ngoc review)
+    availability_request: dict | None = None,
+    # REVIEW-DASH END
 ) -> dict:
     """Preview a safe replacement through SP3 whole-plan scoring.
 
@@ -502,7 +506,9 @@ def preview_personalized_swap(
 
     # REVIEW-DASH START
     if add_activity_id is None:
-        return remove_planned_activity(preference, base_result, remove_activity_id)
+        return remove_planned_activity(
+            preference, base_result, remove_activity_id, availability_request=availability_request,
+        )
     # REVIEW-DASH END
 
     if not isinstance(base_result, dict):
@@ -551,6 +557,8 @@ def preview_personalized_swap(
         scenario="first_plan",
         target_total=target_total,
         include_internal=True,
+        # REVIEW-DASH: availability pass-through (needs Ngoc review)
+        availability_request=availability_request,
     )
     planner_input = internal.pop("_planner_input")
     engine = internal.pop("_engine")
@@ -667,7 +675,12 @@ class _ReviewContext:
     internal: dict
 
 
-def _review_context(preference: StudentPreference, base_result: dict, remove_activity_id: str) -> _ReviewContext:
+def _review_context(
+    preference: StudentPreference,
+    base_result: dict,
+    remove_activity_id: str,
+    availability_request: dict | None = None,
+) -> _ReviewContext:
     """Validate a client-held base result and rebuild trusted planner state for it."""
     if not isinstance(base_result, dict):
         raise ValueError("base_result must be an object")
@@ -692,8 +705,10 @@ def _review_context(preference: StudentPreference, base_result: dict, remove_act
     target_total = base_result.get("requested_total_target", 80)
     if isinstance(target_total, bool) or not isinstance(target_total, int) or not 0 <= target_total <= 100:
         raise ValueError("base_result requested_total_target is invalid")
+    # The student's own availability (same schema as /personalized/plan); None = the fixture default.
     internal = personalized_demo_plan(
         preference, scenario="first_plan", target_total=target_total, include_internal=True,
+        availability_request=availability_request,
     )
     planner_input = internal.pop("_planner_input")
     engine = internal.pop("_engine")
@@ -779,11 +794,17 @@ def _review_preview(
         "warnings": [] if state["target_met"] else ["BELOW_TARGET"],
         "dropped_activity_ids": sorted(context.selected_ids - after_ids),
         "added_activity_ids": sorted(after_ids - context.selected_ids),
-        "result": {**context.internal, "plan": plan, "scenario": scenario},
+        # Every plan reaching this point passed check_plan (a violation raises), so the count is 0.
+        "result": {**context.internal, "plan": plan, "scenario": scenario, "checker_violations": 0},
     }
 
 
-def remove_planned_activity(preference: StudentPreference, base_result: dict, remove_activity_id: str) -> dict:
+def remove_planned_activity(
+    preference: StudentPreference,
+    base_result: dict,
+    remove_activity_id: str,
+    availability_request: dict | None = None,
+) -> dict:
     """Remove one activity and re-score the rest; nothing replaces it.
 
     Every remaining activity is KEEP_TIME and the activity count is capped at the
@@ -791,7 +812,7 @@ def remove_planned_activity(preference: StudentPreference, base_result: dict, re
     compensating activity. The result may be below the target: that is reported
     through ``target_met=False`` and ``warnings=["BELOW_TARGET"]``, not as an error.
     """
-    context = _review_context(preference, base_result, remove_activity_id)
+    context = _review_context(preference, base_result, remove_activity_id, availability_request)
     remaining = [item for item in context.selected_rows if item["activity_id"] != remove_activity_id]
     planner_input = _seed_previous_plan(context, remaining)
     _cancel(planner_input, remove_activity_id)
@@ -810,13 +831,18 @@ def remove_planned_activity(preference: StudentPreference, base_result: dict, re
     )
 
 
-def what_if_skip_planned_activity(preference: StudentPreference, base_result: dict, skip_activity_id: str) -> dict:
+def what_if_skip_planned_activity(
+    preference: StudentPreference,
+    base_result: dict,
+    skip_activity_id: str,
+    availability_request: dict | None = None,
+) -> dict:
     """Preview the plan if ``skip_activity_id`` is skipped; nothing is applied.
 
     ``what_if_skip`` runs with a KEEP_TIME request for every remaining selected
     activity, so SP3 only adds compensating activities and never moves the others.
     """
-    context = _review_context(preference, base_result, skip_activity_id)
+    context = _review_context(preference, base_result, skip_activity_id, availability_request)
     planner_input = _seed_previous_plan(context, context.selected_rows)
     # The skipped activity keeps its previous block but is no longer a keep request.
     planner_input["keep_requests"] = [
@@ -885,6 +911,7 @@ def list_swap_alternatives(
     base_result: dict,
     remove_activity_id: str,
     limit: int = REVIEW_DEFAULT_LIMIT,
+    availability_request: dict | None = None,
 ) -> dict:
     """List valid replacements for ``remove_activity_id``, best first.
 
@@ -898,7 +925,7 @@ def list_swap_alternatives(
     """
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= REVIEW_MAX_LIMIT:
         raise ValueError(f"limit must be an integer from 1 to {REVIEW_MAX_LIMIT}")
-    context = _review_context(preference, base_result, remove_activity_id)
+    context = _review_context(preference, base_result, remove_activity_id, availability_request)
     base_projected = context.base_summary.get("projected_total")
     if isinstance(base_projected, bool) or not isinstance(base_projected, (int, float)):
         raise ValueError("base_result has no projected total")
@@ -927,7 +954,10 @@ def list_swap_alternatives(
             reject(activity_id, "INCOMPLETE_INFO", "Incomplete planning information: " + missing + ".")
             continue
         try:
-            preview = preview_personalized_swap(preference, base_result, remove_activity_id, activity_id)
+            preview = preview_personalized_swap(
+                preference, base_result, remove_activity_id, activity_id,
+                availability_request=availability_request,
+            )
         except ValueError as exc:
             reject(activity_id, "SWAP_REJECTED", str(exc))
             continue
@@ -945,6 +975,7 @@ def list_swap_alternatives(
         if entry is None or goal is None or not goal.get("category_id"):
             reject(activity_id, "INCOMPLETE_INFO", "Incomplete planning information: no scored criterion.")
             continue
+        preview["result"]["checker_violations"] = 0  # preview_personalized_swap raises on any violation
         valid.append(_alternative_item(context, row, entry, goal, preview, remove_activity_id))
 
     valid.sort(key=lambda item: (

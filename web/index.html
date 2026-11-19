@@ -1630,7 +1630,10 @@
               <!-- REVIEW-DASH START -->
               <div id="confirmPlanBar" class="hidden flex flex-col gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-950/10 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <p id="confirmPlanHint" class="text-xs text-slate-300">Chốt kế hoạch để xem lịch trên trang chủ. Bạn vẫn có thể lập lại kế hoạch mà không mất kế hoạch đã chốt.</p>
-                <button id="btnConfirmPlan" type="button" onclick="confirmCurrentPlanFromUi()" class="shrink-0 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-500">Xác nhận kế hoạch</button>
+                <div class="flex shrink-0 flex-wrap gap-2">
+                  <button id="btnOpenReview" type="button" onclick="openPlanReviewFromUi()" class="rounded-xl border border-indigo-500/50 px-5 py-2.5 text-sm font-extrabold text-indigo-200 hover:bg-indigo-950/50">Review kế hoạch</button>
+                  <button id="btnConfirmPlan" type="button" onclick="confirmCurrentPlanFromUi()" class="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-500">Xác nhận kế hoạch</button>
+                </div>
               </div>
               <!-- REVIEW-DASH END -->
 
@@ -1778,6 +1781,38 @@
       </div>
     </div>
   </div>
+
+  <!-- REVIEW-DASH START -->
+  <div id="planReviewScreen" class="hidden fixed inset-0 z-[105] overflow-y-auto bg-[#080c14]" role="dialog" aria-modal="true" aria-labelledby="prvTitle">
+    <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-[.22em] text-indigo-300">REVIEW KẾ HOẠCH</p>
+          <h2 id="prvTitle" class="mt-1 text-xl font-extrabold text-white">Xem lại và chỉnh kế hoạch</h2>
+          <p id="prvSubtitle" class="mt-1 text-xs text-slate-400"></p>
+        </div>
+        <button type="button" onclick="closePlanReview()" class="rounded-lg border border-[#2b3a54] px-3 py-2 text-xs font-bold text-slate-200 hover:bg-[#162032]">✕ Đóng</button>
+      </div>
+      <div class="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+        <div id="prvList"></div>
+        <aside id="prvPanel" class="lg:sticky lg:top-4"></aside>
+      </div>
+    </div>
+  </div>
+  <!-- REVIEW-DASH END -->
+
+  <!-- REVIEW-DASH START -->
+  <div id="planDiffModal" class="hidden fixed inset-0 z-[108] flex items-center justify-center bg-black/70 p-4" role="dialog" aria-modal="true" aria-labelledby="planDiffTitle">
+    <div class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-[#2b3a54] bg-[#0e1524] p-5">
+      <h2 id="planDiffTitle" class="text-lg font-extrabold text-white">Thay kế hoạch đã chốt?</h2>
+      <div id="planDiffBody" class="mt-3"></div>
+      <div class="mt-4 flex flex-wrap justify-end gap-2">
+        <button type="button" onclick="cpdConfirmDiffCancel()" class="rounded-xl border border-[#2b3a54] px-4 py-2 text-sm font-bold text-slate-200 hover:bg-[#162032]">Giữ kế hoạch cũ</button>
+        <button id="btnConfirmDiff" type="button" onclick="cpdConfirmDiffAccept()" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-extrabold text-white hover:bg-emerald-500">Xác nhận kế hoạch mới</button>
+      </div>
+    </div>
+  </div>
+  <!-- REVIEW-DASH END -->
 
   <div id="smartSwapModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/70 p-4" onclick="if(event.target===this)this.classList.add('hidden')"><div class="w-full max-w-2xl rounded-2xl border border-[#2b3a54] bg-[#0e1524] p-5"><div class="flex items-center justify-between"><h2 class="text-lg font-extrabold text-white">Hoạt động thay thế</h2><button onclick="document.getElementById('smartSwapModal').classList.add('hidden')" class="text-slate-400">✕</button></div><div id="smartSwapContent" class="mt-4 space-y-3 text-sm text-slate-300"></div></div></div>
 
@@ -1969,24 +2004,25 @@
       }
     }
 
-    // Writes confirmed_plan from an engine result (the object the planner endpoints return) and nothing else.
-    function confirmConfirmedPlan(result, optionLabel) {
-      const mssv = currentStudent?.student_id;
-      if (!mssv) throw new Error('Hãy đăng nhập trước khi xác nhận kế hoạch.');
+    // True for the object the planner endpoints return: a scored plan with a plan version and demo clock.
+    function cpdIsEngineResult(result) {
       const plan = result && result.plan;
-      const fromEngine = plan && typeof plan === 'object'
+      return Boolean(plan) && typeof plan === 'object'
         && Array.isArray(plan.selected_activities)
         && Boolean(plan.score_summary)
         && /^sp3plan-[0-9a-f]{16}$/.test(String(plan.plan_version || ''))
         && Boolean(plan.context && cpdVn(plan.context.as_of))
-        && CPD_ACTIVE_STATUSES.includes(plan.status);
-      if (!fromEngine) throw new Error('Chỉ có thể xác nhận một kế hoạch do hệ thống lập kế hoạch tạo ra.');
-      const target = Number(result.requested_total_target);
-      if (!Number.isFinite(target) || target < 0 || target > 100) throw new Error('Kế hoạch này thiếu mục tiêu điểm hợp lệ.');
+        && CPD_ACTIVE_STATUSES.includes(plan.status)
+        && Number.isFinite(Number(result.requested_total_target))
+        && Number(result.requested_total_target) >= 0 && Number(result.requested_total_target) <= 100;
+    }
 
+    // The planned activities of an engine result in the shape stored under confirmed_plan.activities.
+    function cpdActivitiesFromResult(result) {
+      const plan = result.plan;
       const catalog = new Map((result.feasibility?.candidates || []).map(entry => [entry.activity?.activity_id, entry.activity || {}]));
       const breakdown = new Map((result.personalization?.selected_breakdown || []).map(row => [row.activity_id, row]));
-      const activities = plan.selected_activities.map(item => {
+      return plan.selected_activities.map(item => {
         const activity = catalog.get(item.activity_id) || {};
         const goal = (item.reasons || []).find(reason => reason.code === 'GOAL_CONTRIBUTION' && reason.category_id);
         const campus = (breakdown.get(item.activity_id)?.matches || []).find(match => match.dimension === 'campus');
@@ -2005,6 +2041,16 @@
           source_url: activity.source?.URL_post || null
         };
       });
+    }
+
+    // Writes confirmed_plan from an engine result (the object the planner endpoints return) and nothing else.
+    function confirmConfirmedPlan(result, optionLabel) {
+      const mssv = currentStudent?.student_id;
+      if (!mssv) throw new Error('Hãy đăng nhập trước khi xác nhận kế hoạch.');
+      if (!cpdIsEngineResult(result)) throw new Error('Chỉ có thể xác nhận một kế hoạch do hệ thống lập kế hoạch tạo ra.');
+      const plan = result.plan;
+      const target = Number(result.requested_total_target);
+      const activities = cpdActivitiesFromResult(result);
       const confirmed = {
         plan_version: plan.plan_version,
         based_on: JSON.parse(JSON.stringify(plan.based_on || {})),
@@ -2058,11 +2104,77 @@
       const hint = document.getElementById('confirmPlanHint');
       try {
         const data = planStages[currentPlanStage];
-        confirmConfirmedPlan(data, cpdOptionLabel(data));
-        switchTab('dashboard');
+        cpdRequestConfirm(data, cpdOptionLabel(data), () => switchTab('dashboard'));
       } catch (error) {
         if (hint) hint.textContent = error.message || 'Không thể xác nhận kế hoạch.';
       }
+    }
+
+    // ---- confirming over an existing confirmed plan: show what changes first ----
+    var cpdPendingConfirm = null;
+
+    // Confirms at once when nothing is confirmed yet; otherwise opens the diff and waits for the student.
+    // `done` runs after the plan was stored.
+    function cpdRequestConfirm(result, label, done) {
+      if (!cpdIsEngineResult(result)) throw new Error('Chỉ có thể xác nhận một kế hoạch do hệ thống lập kế hoạch tạo ra.');
+      const state = reviewDashReadState();
+      if (!state || !state.plan) {
+        confirmConfirmedPlan(result, label);
+        if (done) done();
+        return;
+      }
+      cpdPendingConfirm = { result, label, done };
+      cpdRenderDiff(state.plan, result);
+      document.getElementById('planDiffModal')?.classList.remove('hidden');
+    }
+
+    // Set differences between the confirmed activities and the new result; both totals are engine outputs.
+    function cpdPlanDiff(oldPlan, result) {
+      const signature = activity => (activity.scheduled_blocks || []).map(block => `${block.start}|${block.end}`).join(';');
+      const next = cpdActivitiesFromResult(result);
+      const before = new Map((oldPlan.activities || []).map(activity => [activity.activity_id, activity]));
+      const after = new Map(next.map(activity => [activity.activity_id, activity]));
+      return {
+        added: next.filter(activity => !before.has(activity.activity_id)),
+        removed: (oldPlan.activities || []).filter(activity => !after.has(activity.activity_id)),
+        moved: next.filter(activity => before.has(activity.activity_id) && signature(before.get(activity.activity_id)) !== signature(activity)),
+        unchanged: next.filter(activity => before.has(activity.activity_id) && signature(before.get(activity.activity_id)) === signature(activity)),
+        totalBefore: oldPlan.score_summary ? oldPlan.score_summary.projected_total : null,
+        totalAfter: result.plan.score_summary.projected_total
+      };
+    }
+
+    function cpdRenderDiff(oldPlan, result) {
+      const body = document.getElementById('planDiffBody');
+      if (!body) return;
+      const diff = cpdPlanDiff(oldPlan, result);
+      const total = value => (typeof value === 'number' && Number.isFinite(value) ? `${value}đ` : '—');
+      const group = (label, tone, items) => `<div data-diff="${label}"><h4 class="text-xs font-extrabold ${tone}">${label} (${items.length})</h4>${items.length
+        ? `<ul class="mt-1 space-y-1 text-xs text-slate-200">${items.map(item => `<li>${escapeHTML(item.title)}</li>`).join('')}</ul>`
+        : '<p class="mt-1 text-xs text-slate-500">Không có</p>'}</div>`;
+      body.innerHTML = `<p class="text-sm text-slate-300">Kế hoạch mới sẽ thay thế kế hoạch bạn đã chốt${oldPlan.option_label ? ` (${escapeHTML(oldPlan.option_label)})` : ''}.</p>
+        <p class="mt-3 text-lg font-black text-white planner-number">Tổng điểm dự kiến: ${escapeHTML(total(diff.totalBefore))} → ${escapeHTML(total(diff.totalAfter))}</p>
+        <div class="mt-3 grid gap-3 sm:grid-cols-2">${group('Thêm mới', 'text-emerald-300', diff.added)}${group('Bị bỏ', 'text-rose-300', diff.removed)}${group('Đổi giờ', 'text-sky-300', diff.moved)}${group('Giữ nguyên', 'text-slate-300', diff.unchanged)}</div>
+        <p id="planDiffError" class="mt-3 text-xs text-rose-300"></p>`;
+    }
+
+    function cpdConfirmDiffAccept() {
+      const pending = cpdPendingConfirm;
+      if (!pending) return;
+      try {
+        confirmConfirmedPlan(pending.result, pending.label);
+        cpdPendingConfirm = null;
+        document.getElementById('planDiffModal')?.classList.add('hidden');
+        if (pending.done) pending.done();
+      } catch (error) {
+        const box = document.getElementById('planDiffError');
+        if (box) box.textContent = error.message || 'Không thể xác nhận kế hoạch.';
+      }
+    }
+
+    function cpdConfirmDiffCancel() {
+      cpdPendingConfirm = null;
+      document.getElementById('planDiffModal')?.classList.add('hidden');
     }
 
     // ---- dashboard rendering ----
@@ -2326,13 +2438,18 @@
         box.innerHTML = '';
         return;
       }
+      box.classList.remove('hidden');
+      box.innerHTML = cpdDetailHtml(activity, 'closeConfirmedPlanDetail()');
+    }
+
+    // Activity detail (time, place, deadline, points, evidence), shared by the dashboard and the review screen.
+    function cpdDetailHtml(activity, closeCall) {
       const times = (activity.scheduled_blocks || []).map(block => formatPlanTimeRange(block.start, block.end)).join(' | ');
       const points = cpdPointsText(activity);
       const link = /^https?:\/\//i.test(String(activity.source_url || ''))
         ? `<a href="${escapeHTML(activity.source_url)}" target="_blank" rel="noopener noreferrer" class="font-bold text-cyan-300 hover:text-cyan-200">Xem bài đăng gốc ↗</a>` : '';
-      box.classList.remove('hidden');
-      box.innerHTML = `<div class="rounded-2xl border border-indigo-500/40 bg-[#0c1220] p-4 text-xs space-y-2.5">
-        <div class="flex items-start justify-between gap-3"><h3 class="text-sm font-extrabold text-white">${escapeHTML(activity.title)}</h3><button type="button" onclick="closeConfirmedPlanDetail()" aria-label="Đóng chi tiết" class="text-slate-400 hover:text-white">✕</button></div>
+      return `<div class="rounded-2xl border border-indigo-500/40 bg-[#0c1220] p-4 text-xs space-y-2.5">
+        <div class="flex items-start justify-between gap-3"><h3 class="text-sm font-extrabold text-white">${escapeHTML(activity.title)}</h3><button type="button" onclick="${closeCall}" aria-label="Đóng chi tiết" class="text-slate-400 hover:text-white">✕</button></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300">
           <div><b class="text-slate-400">Thời gian tổ chức:</b> <span class="text-white font-medium">${escapeHTML(times || 'Thời gian linh hoạt')}</span></div>
           <div><b class="text-slate-400">Địa điểm / Hình thức:</b> <span class="text-white font-medium">${escapeHTML(cpdPlaceText(activity))}</span></div>
@@ -2385,6 +2502,467 @@
           : (cpdView === 'month' ? cpdRenderMonth(plan, today) : cpdRenderToday(plan, today));
       }
       cpdRenderDetail(plan);
+    }
+    // REVIEW-DASH END
+  </script>
+  <!-- REVIEW-DASH END -->
+  <!-- REVIEW-DASH START -->
+  <script>
+    // REVIEW-DASH START
+    // Plan review screen (synthetic source).
+    //
+    //   openPlanReview(result, optionLabel)
+    //     result       an engine result object: what /api/sp3/personalized/options returns in options[i].result,
+    //                  or /personalized/plan, or the `result` of a swap / remove / what-if preview.
+    //     optionLabel  short Vietnamese label of the option ("Cân bằng", "Ít thời gian", ...), kept on confirm.
+    //   The screen edits a private draft (result + undo steps) and only calls confirmConfirmedPlan() on confirm.
+    //   Every number it shows is read from engine output; it compares two outputs (before/after) but never
+    //   computes a score. Layout: activity list on the left, ONE panel on the right (summary, alternatives or
+    //   detail) that stacks under the list on narrow screens.
+    var prvDraft = null;
+    var prvSeq = 0;
+    var PRV_CRITERIA = ['C1', 'C2', 'C3', 'C4', 'C5'];
+    var PRV_ALT_VISIBLE = 3;
+    var PRV_ALT_LIMIT = 10;
+    var PRV_DIMENSIONS = { topic: 'Chủ đề', category: 'Mục ĐRL', campus: 'Cơ sở', mode: 'Hình thức', time: 'Thời gian' };
+
+    function openPlanReview(result, optionLabel) {
+      if (!cpdIsEngineResult(result)) {
+        alert('Chỉ có thể review một kế hoạch do hệ thống lập kế hoạch tạo ra.');
+        return false;
+      }
+      const copy = JSON.parse(JSON.stringify(result));
+      prvDraft = {
+        original: copy,
+        result: JSON.parse(JSON.stringify(copy)),
+        optionLabel: optionLabel || 'Kế hoạch đề xuất',
+        steps: [],
+        panel: { mode: 'summary' },
+        inline: null,
+        busy: false,
+        nextStep: 1
+      };
+      prvSeq += 1;
+      document.getElementById('planReviewScreen')?.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      prvRender();
+      return true;
+    }
+
+    function closePlanReview() {
+      prvSeq += 1;
+      prvDraft = null;
+      document.getElementById('planReviewScreen')?.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    // ---- reading engine output ----
+    function prvActivities(result) {
+      return cpdActivitiesFromResult(result).sort((left, right) => {
+        const a = (left.scheduled_blocks[0] || {}).start || '9999';
+        const b = (right.scheduled_blocks[0] || {}).start || '9999';
+        return a.localeCompare(b) || left.activity_id.localeCompare(right.activity_id);
+      });
+    }
+
+    function prvTitles(result) {
+      const map = {};
+      (result.feasibility?.candidates || []).forEach(entry => {
+        if (entry.activity) map[entry.activity.activity_id] = entry.activity.title || entry.activity.activity_id;
+      });
+      return map;
+    }
+
+    function prvSummary(result) {
+      const plan = result.plan;
+      const summary = plan.score_summary || {};
+      const selected = new Set(plan.selected_activities.map(item => item.activity_id));
+      const mandatory = (result.feasibility?.candidates || []).filter(entry => entry.activity?.mandatory === true
+        && entry.feasibility?.status === 'FEASIBLE' && entry.participation?.progress === 'NOT_STARTED'
+        && !selected.has(entry.activity.activity_id)).map(entry => entry.activity.title || entry.activity.activity_id);
+      return {
+        baseline: summary.baseline_total,
+        projected: summary.projected_total,
+        gain: summary.gain_total,
+        target: Number(result.requested_total_target),
+        remaining: summary.remaining_total,
+        byBaseline: summary.baseline_by_category || {},
+        byProjected: summary.projected_by_category || {},
+        byRemaining: summary.remaining_by_category || {},
+        met: summary.remaining_total === 0,
+        // Every result the API returns passed the independent SP3 check; review results also carry the count.
+        violations: Number.isFinite(result.checker_violations) ? result.checker_violations : 0,
+        mandatoryPending: mandatory,
+        pendingConfirmation: (plan.pending_confirmation || []).length
+      };
+    }
+
+    function prvWhen(activity) {
+      const first = activity.scheduled_blocks[0];
+      const start = first && cpdVn(first.start);
+      const end = first && cpdVn(first.end);
+      if (!start || !end) return 'Thời gian linh hoạt';
+      const day = AVAILABILITY_DAYS[(cpdWeekday(start.date) + 6) % 7];
+      const more = activity.scheduled_blocks.length > 1 ? ` (+${activity.scheduled_blocks.length - 1} buổi)` : '';
+      return `${day} ${cpdShort(start.date)} · ${start.time}–${end.time}${more}`;
+    }
+
+    function prvPrimaryMatch(matches) {
+      const best = (matches || []).slice().sort((a, b) => b.weight - a.weight)[0];
+      if (!best) return '';
+      return `${PRV_DIMENSIONS[best.dimension] || best.dimension}: ${PREF_LABELS[best.value] || best.value}`;
+    }
+
+    function prvTotalText(value) {
+      return typeof value === 'number' && Number.isFinite(value) ? `${value}đ` : '—';
+    }
+
+    // ---- rendering ----
+    function prvRender() {
+      if (!prvDraft) return;
+      const result = prvDraft.result;
+      const activities = prvActivities(result);
+      const summary = prvSummary(result);
+      const subtitle = document.getElementById('prvSubtitle');
+      if (subtitle) subtitle.textContent = `${prvDraft.optionLabel} · ${activities.length} hoạt động`;
+      const list = document.getElementById('prvList');
+      if (list) list.innerHTML = prvListHtml(activities, summary);
+      const panel = document.getElementById('prvPanel');
+      if (panel) panel.innerHTML = prvPanelHtml(activities, summary);
+    }
+
+    function prvCanEdit() {
+      return Boolean(activePlanPreference || confirmedPreference);
+    }
+
+    function prvListHtml(activities, summary) {
+      const steps = prvDraft.steps;
+      const changedRows = new Map();
+      steps.forEach(step => {
+        if (step.kind === 'swap') {
+          changedRows.set(step.chosenId, { label: 'Đã đổi', stepId: step.id, note: `thay “${step.replacedTitle}”` });
+          step.extraIds.forEach(id => { if (!changedRows.has(id)) changedRows.set(id, { label: 'Thêm kèm', stepId: null, note: '' }); });
+        }
+      });
+      const present = new Set(activities.map(item => item.activity_id));
+      const disabled = prvDraft.busy || !prvCanEdit() ? 'disabled' : '';
+      const rows = activities.map(activity => {
+        const token = activityToken(activity.activity_id);
+        const mark = changedRows.get(activity.activity_id);
+        const points = cpdPointsText(activity);
+        const badges = [
+          mark ? `<span class="rounded-md border border-emerald-500/40 bg-emerald-950/50 px-2 py-0.5 text-[10px] font-bold text-emerald-300">${escapeHTML(mark.label)}${mark.note ? ' ' + escapeHTML(mark.note) : ''}</span>` : '',
+          mark && mark.stepId ? `<button type="button" onclick="prvUndo(${mark.stepId})" class="text-[10px] font-bold text-amber-300 hover:text-amber-200">Hoàn tác</button>` : '',
+          activity.completion_requirements ? `<span title="${escapeHTML(activity.completion_requirements)}" class="rounded-md border border-violet-500/40 bg-violet-950/40 px-2 py-0.5 text-[10px] font-bold text-violet-200">Nhiệm vụ hoàn thành</span>` : '',
+          activity.registration_deadline ? `<span class="rounded-md border border-amber-500/40 bg-amber-950/30 px-2 py-0.5 text-[10px] font-bold text-amber-200">⚑ Hạn đăng ký ${escapeHTML(cpdDeadlineText(activity.registration_deadline))}</span>` : ''
+        ].join('');
+        const button = (label, call, tone) => `<button type="button" ${disabled} onclick="${call}" class="rounded-lg border px-3 py-1.5 text-xs font-bold disabled:opacity-40 ${tone}">${label}</button>`;
+        return `<article class="rounded-xl border border-[#223046] bg-[#080d18] p-3.5">
+          <div class="flex flex-wrap items-start gap-3">
+            <div class="w-32 shrink-0 text-xs font-extrabold leading-snug text-indigo-300 planner-number">${escapeHTML(prvWhen(activity))}</div>
+            <div class="min-w-0 flex-1 basis-48">
+              <button type="button" onclick="prvShowDetail('${token}')" class="text-left text-sm font-extrabold text-white hover:text-cyan-300">${escapeHTML(activity.title)}</button>
+              <div class="mt-1 flex flex-wrap gap-x-3 text-[11px] text-slate-400"><span>${escapeHTML(cpdPlaceText(activity))}</span>${points ? `<span class="font-bold text-emerald-300">${escapeHTML(points)}</span>` : ''}</div>
+              <div class="mt-1.5 flex flex-wrap items-center gap-1.5">${badges}</div>
+            </div>
+            <div class="flex shrink-0 flex-wrap gap-1.5">
+              ${button('Đổi', `prvLoadAlternatives('${token}')`, 'border-indigo-500/50 text-indigo-200 hover:bg-indigo-950/50')}
+              ${button('Nếu bỏ', `prvPreviewRemoval('${token}','whatif')`, 'border-sky-500/50 text-sky-200 hover:bg-sky-950/50')}
+              ${button('Bỏ', `prvPreviewRemoval('${token}','remove')`, 'border-rose-500/50 text-rose-200 hover:bg-rose-950/40')}
+            </div>
+          </div>
+          ${prvInlineHtml(activity.activity_id, summary)}
+        </article>`;
+      }).join('');
+      const removed = steps.filter(step => step.kind === 'remove' && !present.has(step.removedId)).map(step => `<div class="flex items-center justify-between gap-3 rounded-xl border border-dashed border-rose-500/40 bg-rose-950/20 px-3.5 py-2.5 text-xs text-rose-200"><span>Đã bỏ: <b>${escapeHTML(step.removedTitle)}</b></span><button type="button" onclick="prvUndo(${step.id})" class="font-bold text-amber-300 hover:text-amber-200">Hoàn tác</button></div>`).join('');
+      const hint = prvCanEdit() ? '' : '<p class="rounded-xl border border-amber-500/40 bg-amber-950/30 p-3 text-xs text-amber-200">Hãy xác nhận hồ sơ sở thích để đổi hoặc bỏ hoạt động. Bạn vẫn có thể xác nhận kế hoạch này.</p>';
+      return `<div class="space-y-3">${hint}${rows || '<p class="rounded-xl border border-dashed border-[#2b3a54] p-5 text-center text-sm text-slate-400">Kế hoạch hiện không có hoạt động nào.</p>'}${removed}</div>`;
+    }
+
+    function prvInlineHtml(activityId) {
+      const inline = prvDraft.inline;
+      if (!inline || inline.activityId !== activityId) return '';
+      const close = '<button type="button" onclick="prvCloseInline()" class="text-xs font-bold text-slate-300 hover:text-white">Đóng</button>';
+      if (inline.loading) {
+        return `<div class="mt-3 rounded-lg border border-[#2b3a54] bg-[#0c1220] p-3 text-xs text-slate-300">Đang tính lại toàn bộ kế hoạch…</div>`;
+      }
+      if (inline.error) {
+        return `<div class="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-rose-500/40 bg-rose-950/30 p-3 text-xs text-rose-200"><span>${escapeHTML(inline.error)} Kế hoạch hiện tại vẫn giữ nguyên.</span><span class="flex gap-3"><button type="button" onclick="prvPreviewRemoval('${activityToken(activityId)}','${inline.kind}')" class="font-bold text-cyan-300">Thử lại</button>${close}</span></div>`;
+      }
+      const data = inline.data;
+      const titles = prvTitles(data.result);
+      const added = (data.added_activity_ids || []).map(id => escapeHTML(titles[id] || id)).join(', ');
+      const warn = data.target_met ? '' : '<p class="mt-2 font-bold text-amber-300">Chưa đạt mục tiêu: còn thiếu ' + escapeHTML(prvTotalText(data.remaining_total)) + '.</p>';
+      const heading = inline.kind === 'whatif' ? 'Nếu bỏ hoạt động này (chỉ xem thử, chưa áp dụng)' : 'Bỏ hoạt động này (không có hoạt động thay thế tự động)';
+      const actions = inline.kind === 'remove'
+        ? `<button type="button" onclick="prvApplyInline()" class="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-rose-500">Xác nhận bỏ</button><button type="button" onclick="prvCloseInline()" class="rounded-lg border border-[#2b3a54] px-3 py-1.5 text-xs font-bold text-slate-200">Huỷ</button>`
+        : close;
+      return `<div class="mt-3 rounded-lg border border-sky-500/30 bg-[#0c1220] p-3 text-xs text-slate-300">
+        <p class="font-extrabold text-white">${heading}</p>
+        <p class="mt-1.5">Tổng điểm dự kiến: <b class="text-white">${escapeHTML(prvTotalText(data.before.projected_total))}</b> → <b class="${data.target_met ? 'text-emerald-300' : 'text-amber-300'}">${escapeHTML(prvTotalText(data.projected_total))}</b> (mục tiêu ${escapeHTML(prvTotalText(data.target_total))})</p>
+        ${added ? `<p class="mt-1">Hoạt động bù thêm: <b class="text-white">${added}</b></p>` : (inline.kind === 'whatif' ? '<p class="mt-1">Không cần thêm hoạt động bù.</p>' : '')}
+        ${warn}
+        <div class="mt-2.5 flex flex-wrap gap-2">${actions}</div>
+      </div>`;
+    }
+
+    function prvPanelHtml(activities, summary) {
+      const panel = prvDraft.panel;
+      if (panel.mode === 'alternatives') return prvAlternativesHtml(activities);
+      if (panel.mode === 'detail') {
+        const activity = activities.find(item => item.activity_id === panel.activityId);
+        return activity ? cpdDetailHtml(activity, 'prvClosePanel()') : prvSummaryHtml(summary);
+      }
+      return prvSummaryHtml(summary);
+    }
+
+    function prvSummaryHtml(summary) {
+      const state = summary.met
+        ? '<span class="rounded-full border border-emerald-500/40 bg-emerald-950/60 px-3 py-1 text-xs font-bold text-emerald-300">Đạt mục tiêu</span>'
+        : '<span class="rounded-full border border-amber-500/40 bg-amber-950/60 px-3 py-1 text-xs font-bold text-amber-300">Chưa đạt mục tiêu</span>';
+      const bars = PRV_CRITERIA.map(id => {
+        const cap = DEFAULT_SCORES_TEMPLATE[id].max;
+        const base = Number(summary.byBaseline[id] ?? 0);
+        const projected = Number(summary.byProjected[id] ?? base);
+        const lacking = Number(summary.byRemaining[id] ?? 0);
+        const width = value => `${Math.max(0, Math.min(100, (value / cap) * 100))}%`;
+        return `<div><div class="flex items-center justify-between text-[11px]"><span class="font-bold text-slate-200">${escapeHTML(PLAN_CAT_LABELS[id] || id)}</span><span class="text-slate-400 planner-number">${base} → <b class="text-white">${projected}</b> / ${cap}đ${projected >= cap ? ' · chạm trần' : ''}${lacking > 0 ? ` <span class="font-bold text-amber-300">· thiếu ${lacking}đ</span>` : ''}</span></div>
+          <div class="mt-1 flex h-2 overflow-hidden rounded-full bg-[#080d18]"><div class="h-full bg-slate-400" style="width:${width(base)}"></div><div class="h-full bg-emerald-400" style="width:${width(Math.max(0, projected - base))}"></div></div></div>`;
+      }).join('');
+      const violation = summary.violations > 0
+        ? `<p class="font-bold text-rose-300">Kiểm tra độc lập SP3: ${summary.violations} vi phạm — chưa thể xác nhận.</p>`
+        : '<p class="text-slate-300">Kiểm tra độc lập SP3: <b class="text-emerald-300">0 vi phạm</b></p>';
+      const mandatory = summary.mandatoryPending.length
+        ? `<p class="font-bold text-amber-300">Mục bắt buộc chưa xếp: ${summary.mandatoryPending.map(escapeHTML).join(', ')}</p>`
+        : '<p class="text-slate-300">Mục bắt buộc chưa xếp: <b class="text-white">không có</b></p>';
+      const pending = summary.pendingConfirmation ? `<p class="text-slate-300">Hoạt động đã hoàn thành chờ xác nhận điểm: <b class="text-white">${summary.pendingConfirmation}</b></p>` : '';
+      const warning = !summary.met && summary.violations === 0
+        ? '<p class="text-[11px] text-amber-200">Kế hoạch này chưa đạt mục tiêu điểm. Bạn vẫn có thể xác nhận.</p>' : '';
+      const changed = prvDraft.steps.length > 0;
+      return `<section class="space-y-4 rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 sm:p-5" aria-label="Tóm tắt kế hoạch">
+        <div class="flex flex-wrap items-center justify-between gap-2"><h3 class="text-sm font-extrabold text-white">Tóm tắt kế hoạch</h3>${state}</div>
+        <p class="text-2xl font-black text-white planner-number">${escapeHTML(prvTotalText(summary.baseline))} → ${escapeHTML(prvTotalText(summary.projected))} <span class="text-sm font-bold text-slate-500">/ mục tiêu ${escapeHTML(prvTotalText(summary.target))}</span></p>
+        ${!summary.met && typeof summary.remaining === 'number' ? `<p class="text-xs font-bold text-amber-300">Còn thiếu ${summary.remaining}đ so với mục tiêu.</p>` : ''}
+        <div class="space-y-2.5">${bars}</div>
+        <div class="space-y-1 text-xs">${violation}${mandatory}${pending}</div>
+        <div class="space-y-2">
+          <button type="button" ${summary.violations > 0 || prvDraft.busy ? 'disabled' : ''} onclick="prvConfirm()" class="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-500 disabled:opacity-40">Xác nhận kế hoạch</button>
+          ${warning}
+          <button type="button" ${changed ? '' : 'disabled'} onclick="prvRestoreOriginal()" class="w-full rounded-xl border border-[#2b3a54] px-4 py-2 text-xs font-bold text-slate-200 hover:bg-[#162032] disabled:opacity-40">Khôi phục phương án gốc</button>
+          <p id="prvConfirmError" class="text-xs text-rose-300"></p>
+        </div>
+      </section>`;
+    }
+
+    function prvAlternativesHtml(activities) {
+      const panel = prvDraft.panel;
+      const old = activities.find(item => item.activity_id === panel.activityId);
+      const oldText = old ? `${escapeHTML(old.title)} · ${escapeHTML(prvWhen(old))}${cpdPointsText(old) ? ' · ' + escapeHTML(cpdPointsText(old)) : ''}` : escapeHTML(panel.title || '');
+      const header = `<div class="flex items-start justify-between gap-3"><div><h3 class="text-sm font-extrabold text-white">Đang thay</h3><p class="mt-1 text-xs text-slate-300">${oldText}</p></div><button type="button" onclick="prvClosePanel()" aria-label="Đóng" class="text-slate-400 hover:text-white">✕</button></div>`;
+      let body;
+      if (panel.loading) {
+        body = '<p class="text-xs text-slate-300">Đang tìm hoạt động thay thế và tính lại toàn bộ kế hoạch…</p>';
+      } else if (panel.error) {
+        body = `<div class="space-y-2 rounded-lg border border-rose-500/40 bg-rose-950/30 p-3 text-xs text-rose-200"><p>${escapeHTML(panel.error)} Kế hoạch hiện tại vẫn giữ nguyên.</p><button type="button" onclick="prvLoadAlternatives('${activityToken(panel.activityId)}')" class="font-bold text-cyan-300">Thử lại</button></div>`;
+      } else if (!panel.data.items.length) {
+        body = '<p class="rounded-lg border border-dashed border-[#2b3a54] p-4 text-center text-xs text-slate-300">Không có hoạt động thay thế giữ được mục tiêu</p>';
+      } else {
+        const items = panel.data.items;
+        const shown = panel.showAll ? items : items.slice(0, PRV_ALT_VISIBLE);
+        const cards = shown.map((item, index) => {
+          const chip = prvPrimaryMatch(item.preference.matches);
+          const extra = (item.extra_added_activity_ids || []).length ? ` · kéo theo ${item.extra_added_activity_ids.length} hoạt động bù` : '';
+          const place = item.mode === 'online' ? 'Trực tuyến' : (item.location || (item.campus ? (PREF_LABELS[item.campus] || item.campus) : 'Tại cơ sở trường'));
+          const first = item.scheduled_blocks[0];
+          const when = first ? prvWhen({ scheduled_blocks: item.scheduled_blocks }) : 'Thời gian linh hoạt';
+          return `<article class="rounded-xl border border-[#223046] bg-[#080d18] p-3">
+            <div class="flex items-start justify-between gap-2"><div class="min-w-0"><p class="text-sm font-extrabold text-white">${escapeHTML(item.title)}</p>
+              <p class="mt-0.5 text-[11px] text-slate-400">${escapeHTML(when)} · <span class="font-bold text-emerald-300">+${escapeHTML(item.effective_gain)}đ · ${escapeHTML(PLAN_CAT_LABELS[item.criterion] || item.criterion)}</span></p>
+              <p class="mt-0.5 text-[11px] text-slate-400">${escapeHTML(place)} · tổng điểm sau khi đổi ${escapeHTML(prvTotalText(item.projected_total))}${escapeHTML(extra)}</p>
+              ${chip ? `<span class="mt-1.5 inline-block rounded-md border border-indigo-500/30 bg-indigo-950/60 px-2 py-0.5 text-[10px] font-bold text-indigo-200">${escapeHTML(chip)}</span>` : ''}</div>
+              <button type="button" onclick="prvApplyAlternative(${panel.data.items.indexOf(item)})" class="shrink-0 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-500">Chọn</button></div>
+          </article>`;
+        }).join('');
+        const more = !panel.showAll && items.length > PRV_ALT_VISIBLE
+          ? `<button type="button" onclick="prvShowAllAlternatives()" class="text-xs font-bold text-cyan-300 hover:text-cyan-200">Xem thêm (${items.length - PRV_ALT_VISIBLE})</button>` : '';
+        body = `<div class="space-y-2.5">${cards}</div>${more}`;
+      }
+      return `<section class="space-y-3 rounded-2xl border border-indigo-500/40 bg-[#0e1524] p-4 sm:p-5" aria-label="Hoạt động thay thế">${header}${body}</section>`;
+    }
+
+    // ---- panel and inline state ----
+    function prvClosePanel() {
+      if (!prvDraft) return;
+      prvSeq += 1;
+      prvDraft.panel = { mode: 'summary' };
+      prvDraft.busy = false;
+      prvRender();
+    }
+
+    function prvShowDetail(token) {
+      if (!prvDraft) return;
+      prvDraft.panel = { mode: 'detail', activityId: activityFromToken(token) };
+      prvRender();
+    }
+
+    function prvShowAllAlternatives() {
+      if (prvDraft && prvDraft.panel.mode === 'alternatives') {
+        prvDraft.panel.showAll = true;
+        prvRender();
+      }
+    }
+
+    function prvCloseInline() {
+      if (!prvDraft) return;
+      prvSeq += 1;
+      prvDraft.inline = null;
+      prvDraft.busy = false;
+      prvRender();
+    }
+
+    // POST one review call with the student's own preference and availability, as the planner screen does.
+    async function prvPost(path, extra) {
+      const preference = activePlanPreference || confirmedPreference;
+      if (!preference) throw new Error('Hãy xác nhận hồ sơ sở thích trước khi thay đổi kế hoạch.');
+      const response = await fetch(`${API_BASE}${path}${sp3Query()}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          confirmed_profile: true,
+          preference: plannerPreferencePayload(preference),
+          base_result: prvDraft.result,
+          availability: plannerAvailabilityPayload(),
+          ...extra
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : `Máy chủ phản hồi mã ${response.status}.`);
+      return data;
+    }
+
+    async function prvLoadAlternatives(token) {
+      if (!prvDraft) return;
+      const activityId = activityFromToken(token);
+      const draft = prvDraft;
+      const ticket = ++prvSeq;
+      draft.inline = null;
+      draft.busy = true;
+      draft.panel = { mode: 'alternatives', activityId, loading: true, error: null, data: null, showAll: false };
+      prvRender();
+      try {
+        const data = await prvPost('/api/sp3/personalized/alternatives', { remove_activity_id: activityId, limit: PRV_ALT_LIMIT });
+        if (ticket !== prvSeq || prvDraft !== draft) return;
+        draft.panel = { mode: 'alternatives', activityId, loading: false, error: null, data, showAll: false };
+      } catch (error) {
+        if (ticket !== prvSeq || prvDraft !== draft) return;
+        draft.panel = { mode: 'alternatives', activityId, loading: false, error: error.message || 'Không thể tải hoạt động thay thế.', data: null, showAll: false };
+      }
+      draft.busy = false;
+      prvRender();
+    }
+
+    function prvPushStep(step) {
+      step.id = prvDraft.nextStep++;
+      step.before = prvDraft.result;
+      prvDraft.steps.push(step);
+    }
+
+    function prvApplyAlternative(index) {
+      const panel = prvDraft && prvDraft.panel;
+      const item = panel && panel.mode === 'alternatives' && panel.data && panel.data.items[index];
+      if (!item) return;
+      const titles = prvTitles(prvDraft.result);
+      const before = new Set(prvDraft.result.plan.selected_activities.map(entry => entry.activity_id));
+      prvPushStep({
+        kind: 'swap',
+        chosenId: item.activity_id,
+        replacedId: panel.activityId,
+        replacedTitle: titles[panel.activityId] || panel.activityId,
+        extraIds: (item.extra_added_activity_ids || []).filter(id => !before.has(id))
+      });
+      // The response is the engine's validated result for the whole plan; the screen adopts it as is.
+      prvDraft.result = JSON.parse(JSON.stringify(item.preview.result));
+      prvDraft.panel = { mode: 'summary' };
+      prvDraft.inline = null;
+      prvRender();
+    }
+
+    async function prvPreviewRemoval(token, kind) {
+      if (!prvDraft) return;
+      const activityId = activityFromToken(token);
+      const draft = prvDraft;
+      const ticket = ++prvSeq;
+      draft.panel = { mode: 'summary' };
+      draft.busy = true;
+      draft.inline = { activityId, kind, loading: true, error: null, data: null };
+      prvRender();
+      try {
+        const data = kind === 'whatif'
+          ? await prvPost('/api/sp3/personalized/what-if-skip', { remove_activity_id: activityId })
+          : await prvPost('/api/sp3/personalized/swap-preview', { remove_activity_id: activityId, add_activity_id: null });
+        if (ticket !== prvSeq || prvDraft !== draft) return;
+        draft.inline = { activityId, kind, loading: false, error: null, data };
+      } catch (error) {
+        if (ticket !== prvSeq || prvDraft !== draft) return;
+        draft.inline = { activityId, kind, loading: false, error: error.message || 'Không thể tính lại kế hoạch.', data: null };
+      }
+      draft.busy = false;
+      prvRender();
+    }
+
+    function prvApplyInline() {
+      const inline = prvDraft && prvDraft.inline;
+      if (!inline || inline.kind !== 'remove' || !inline.data) return;
+      const titles = prvTitles(prvDraft.result);
+      prvPushStep({ kind: 'remove', removedId: inline.activityId, removedTitle: titles[inline.activityId] || inline.activityId });
+      prvDraft.result = JSON.parse(JSON.stringify(inline.data.result));
+      prvDraft.inline = null;
+      prvRender();
+    }
+
+    // Restores the plan as it was before step `stepId`; later steps are dropped with it.
+    function prvUndo(stepId) {
+      if (!prvDraft) return;
+      const index = prvDraft.steps.findIndex(step => step.id === stepId);
+      if (index < 0) return;
+      prvSeq += 1;
+      prvDraft.result = prvDraft.steps[index].before;
+      prvDraft.steps = prvDraft.steps.slice(0, index);
+      prvDraft.inline = null;
+      prvDraft.panel = { mode: 'summary' };
+      prvDraft.busy = false;
+      prvRender();
+    }
+
+    function prvRestoreOriginal() {
+      if (!prvDraft) return;
+      prvSeq += 1;
+      prvDraft.result = JSON.parse(JSON.stringify(prvDraft.original));
+      prvDraft.steps = [];
+      prvDraft.inline = null;
+      prvDraft.panel = { mode: 'summary' };
+      prvDraft.busy = false;
+      prvRender();
+    }
+
+    function prvConfirm() {
+      if (!prvDraft) return;
+      try {
+        if (prvSummary(prvDraft.result).violations > 0) throw new Error('Kế hoạch còn vi phạm nên chưa thể xác nhận.');
+        const label = prvDraft.steps.length ? `${prvDraft.optionLabel} · đã chỉnh` : prvDraft.optionLabel;
+        cpdRequestConfirm(prvDraft.result, label, () => {
+          closePlanReview();
+          switchTab('dashboard');
+        });
+      } catch (error) {
+        const box = document.getElementById('prvConfirmError');
+        if (box) box.textContent = error.message || 'Không thể xác nhận kế hoạch.';
+      }
+    }
+
+    function openPlanReviewFromUi() {
+      const data = planStages[currentPlanStage];
+      openPlanReview(data, cpdOptionLabel(data));
     }
     // REVIEW-DASH END
   </script>

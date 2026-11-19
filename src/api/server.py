@@ -1758,6 +1758,9 @@ class SmartSwapRequest(BaseModel):
     # REVIEW-DASH START
     # Required but nullable: an explicit null removes the activity without a replacement.
     add_activity_id: Optional[str] = Field(min_length=1, max_length=100)
+    # REVIEW-DASH: availability pass-through (needs Ngoc review)
+    # Same field and schema as PersonalizedPlanRequest.availability; omitted = fixture default availability.
+    availability: Optional[dict] = None
     # REVIEW-DASH END
 
 
@@ -1773,6 +1776,8 @@ def preview_sp3_smart_swap(req: SmartSwapRequest, source: str = "synthetic"):
             req.base_result,
             req.remove_activity_id,
             req.add_activity_id,
+            # REVIEW-DASH: availability pass-through (needs Ngoc review)
+            availability_request=req.availability,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -1787,6 +1792,8 @@ class PlanReviewRequest(BaseModel):
     preference: StudentPreference
     base_result: dict[str, Any]
     remove_activity_id: str = Field(min_length=1, max_length=100)
+    # REVIEW-DASH: availability pass-through (needs Ngoc review); same schema as PersonalizedPlanRequest.availability
+    availability: Optional[dict] = None
 
 
 class SwapAlternativesRequest(PlanReviewRequest):
@@ -1805,7 +1812,10 @@ def list_sp3_swap_alternatives(req: SwapAlternativesRequest, source: str = "synt
 
     _sp3_review_backend(source)
     try:
-        return _sp3_list_alternatives(req.preference, req.base_result, req.remove_activity_id, req.limit)
+        return _sp3_list_alternatives(
+            req.preference, req.base_result, req.remove_activity_id, req.limit,
+            availability_request=req.availability,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
@@ -1816,7 +1826,9 @@ def preview_sp3_what_if_skip(req: PlanReviewRequest, source: str = "synthetic"):
 
     _sp3_review_backend(source)
     try:
-        return _sp3_what_if_skip(req.preference, req.base_result, req.remove_activity_id)
+        return _sp3_what_if_skip(
+            req.preference, req.base_result, req.remove_activity_id, availability_request=req.availability,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 # REVIEW-DASH END

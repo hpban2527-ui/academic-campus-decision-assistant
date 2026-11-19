@@ -135,6 +135,74 @@ the UI never reads the system date; `confirmed_plan_basis` holds fingerprints of
   progress block from `score_summary`. The four older overview cards and the semester-progress block stay in
   the page but are hidden, because their numbers come from the calculator and can contradict the planner.
 
+## D13. Student availability in review calls (added 2026-11-19)
+
+`preview_personalized_swap` used to rebuild the plan from the default synthetic availability, so swaps and
+alternatives could place an activity in time the student marked busy. The three review endpoints
+(`swap-preview`, `alternatives`, `what-if-skip`) now accept an optional `availability` object with the same
+field name and schema as `PersonalizedPlanRequest.availability` (canonical `sp3-availability/0.2`: weekly
+blocks, exceptions, busy intervals). It is passed as `availability_request` to `personalized_demo_plan`, which
+is what `/personalized/plan` does. Omitted = the fixture default (previous behaviour). Because the plan is
+rebuilt with the student's availability, an activity in busy time is INFEASIBLE there, so it is filtered from
+alternatives and a swap to it is rejected even if the client's `base_result` still lists it as feasible.
+
+The only edits in Ngoc's code are marked `REVIEW-DASH: availability pass-through (needs Ngoc review)`: the new
+`availability_request` parameter of `preview_personalized_swap` and its forwarding to `personalized_demo_plan`,
+and the `availability` field plus forwarding in `SmartSwapRequest` / the swap-preview handler.
+
+Review results carry `checker_violations` (always 0: a plan that fails the independent check raises instead of
+being returned). Results from other endpoints do not have the field; the UI treats a missing value as 0 for the
+same reason.
+
+## D14. Review screen contract (`openPlanReview`)
+
+`openPlanReview(result, optionLabel)` opens the review screen (`#planReviewScreen`) on a private draft.
+
+- `result`: one engine result, as returned in `options[i].result` of `/personalized/options`, by
+  `/personalized/plan`, or as the `result` of a swap / remove / what-if preview. It must be a scored plan with a
+  `plan_version`, `plan.context.as_of` and `requested_total_target` (`cpdIsEngineResult`); otherwise the call
+  returns `false`. The object is copied; the caller's data is never changed.
+- `optionLabel`: Vietnamese label kept as `confirmed_plan.option_label` (` - da chinh` is appended when the
+  student edited the plan).
+- Ngoc's option cards call the same function. The planner screen's "Review ke hoach" button calls
+  `openPlanReviewFromUi()`, which passes the plan on screen.
+- Layout (kieu A): activity list on the left, one panel on the right: summary, alternatives or activity detail;
+  below the `lg` breakpoint the panel stacks under the list. Rows have Doi / Neu bo / Bo.
+  - Doi: `/alternatives` (limit 10), top 3 with "Xem them (n)" for the rest, one reason chip (the strongest
+    preference match). Choosing adopts the engine's `preview.result` for the whole plan and marks the row
+    "Da doi" with "Hoan tac".
+  - Neu bo: `/what-if-skip`, shown under the row, never applied.
+  - Bo: `/swap-preview` with `add_activity_id: null`, shown under the row; "Xac nhan bo" applies it. A plan below
+    target shows "Chua dat muc tieu" and a warning text; the confirm button stays enabled.
+  - Summary: baseline -> projected vs target, per-criterion bars scaled by the criterion cap
+    (`DEFAULT_SCORES_TEMPLATE`, a display scale), checker violations, mandatory activities not scheduled,
+    "Xac nhan ke hoach" (disabled only when `checker_violations > 0`) and "Khoi phuc phuong an goc".
+- Undo: every applied change is a step holding the previous result; "Hoan tac" restores the state before that
+  step and drops the steps after it.
+- States: loading, API error (the last valid draft is kept; "Thu lai"), no alternatives. Edit buttons are disabled
+  until a preference is confirmed (the review endpoints need one); confirming still works.
+- Confirm calls `confirmConfirmedPlan` and opens the dashboard. The draft lives in memory only; it is not persisted.
+- All requests send `plannerAvailabilityPayload()` (D13) and use `sp3Query()`, so `source=real` shows the API's
+  422 message until `_sp3_review_backend` is switched.
+
+## D15. Confirming over an existing confirmed plan (added 2026-11-19)
+
+Both confirm paths (the "Xac nhan ke hoach" button on the plan result and the review screen) go through
+`cpdRequestConfirm(result, label, done)`. With no confirmed plan it confirms at once. Otherwise it opens
+`#planDiffModal` first: activities added, removed, moved (same activity, different blocks) and unchanged, and the
+projected total before -> after; both totals are engine outputs (`confirmed_plan.score_summary` and the new
+`plan.score_summary`). "Xac nhan ke hoach moi" calls `confirmConfirmedPlan`, which clears `pending_plan_notice`
+and `invalidated` and refreshes the dashboard; "Giu ke hoach cu" leaves everything unchanged. Steps 2 and 3 of the
+planner journey are demo scenarios and offer neither button.
+
+The dashboard's "today" is `confirmed_plan.as_of`, the demo clock of the plan's source: 2026-11-08 for the
+synthetic fixture and 2026-10-01 for the real store (`api.sp3_real.AS_OF`). For the synthetic demo student nothing is
+planned on 2026-11-08 itself; the agenda shows the registration deadlines due that evening and the activities of
+09-12 Nov. For the real store the first planned activity is 2026-10-25, so "Hom nay" shows "next activity on ...".
+
+Browser flow (register, plan, review, swap, remove, confirm, busy change, replan, diff, confirm, real-store clock):
+`scripts/verify_review_dashboard_e2e.py`.
+
 ## Consequences
 
 - Flexible replacements work in swap-preview, alternatives and what-if.

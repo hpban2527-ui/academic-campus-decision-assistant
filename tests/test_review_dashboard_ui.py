@@ -39,12 +39,17 @@ def test_default_local_data_has_the_confirmed_plan_keys() -> None:
 
 
 def test_confirmed_plan_is_written_only_from_an_engine_result() -> None:
+    check = HTML.split("function cpdIsEngineResult", 1)[1].split("function cpdActivitiesFromResult", 1)[0]
+    assert "sp3plan-[0-9a-f]{16}" in check and "CPD_ACTIVE_STATUSES" in check
+    mapping = HTML.split("function cpdActivitiesFromResult", 1)[1].split("function confirmConfirmedPlan", 1)[0]
     body = HTML.split("function confirmConfirmedPlan", 1)[1].split("// ---- review hook", 1)[0]
-    assert "sp3plan-[0-9a-f]{16}" in body and "CPD_ACTIVE_STATUSES" in body
+    assert "if (!cpdIsEngineResult(result)) throw" in body and "cpdActivitiesFromResult(result)" in body
     for field in ("plan_version", "based_on", "confirmed_at", "source", "option_label", "target_total",
-                  "score_summary", "activities", "activity_id", "criterion", "effective_gain", "mode", "campus",
-                  "location", "registration_deadline", "completion_requirements", "scheduled_blocks", "source_url"):
+                  "score_summary", "activities"):
         assert field in body, field
+    for field in ("activity_id", "criterion", "effective_gain", "mode", "campus", "location",
+                  "registration_deadline", "completion_requirements", "scheduled_blocks", "source_url"):
+        assert field in mapping, field
     assert "pending_plan_notice = false" in body
 
 
@@ -90,6 +95,47 @@ def test_dashboard_reads_the_busy_schedule_without_writing_it() -> None:
 def test_legacy_overview_numbers_are_hidden_by_the_dashboard() -> None:
     body = HTML.split("function cpdRender()", 1)[1]
     assert "overviewDrlScore" in body and "overviewSemesterBar" in body and "classList.add('hidden')" in body
+
+
+def _review_script() -> str:
+    return HTML.split("function openPlanReview(", 1)[1].split("function openPlanReviewFromUi", 1)[0]
+
+
+def test_review_screen_entry_and_layout() -> None:
+    assert "function openPlanReview(result, optionLabel)" in HTML
+    assert 'id="planReviewScreen"' in HTML and 'id="prvList"' in HTML and 'id="prvPanel"' in HTML
+    assert "Review kế hoạch" in HTML and 'onclick="openPlanReviewFromUi()"' in HTML
+    # Side panel: stacks under the list below the lg breakpoint, two columns above it.
+    assert "lg:grid-cols-[minmax(0,1fr)_380px]" in HTML
+    body = _review_script()
+    for text in ("Đổi", "Nếu bỏ", "Bỏ", "Nhiệm vụ hoàn thành", "Hạn đăng ký", "Đã đổi", "Hoàn tác",
+                 "Khôi phục phương án gốc", "Xác nhận kế hoạch", "Đạt mục tiêu", "Chưa đạt mục tiêu",
+                 "Xem thêm", "Không có hoạt động thay thế giữ được mục tiêu", "Đang thay", "Thử lại"):
+        assert text in body, text
+
+
+def test_review_calls_use_the_student_availability_and_the_review_endpoints() -> None:
+    body = _review_script()
+    assert "availability: plannerAvailabilityPayload()" in body
+    for path in ("/api/sp3/personalized/alternatives", "/api/sp3/personalized/what-if-skip",
+                 "/api/sp3/personalized/swap-preview"):
+        assert path in body
+    assert "add_activity_id: null" in body  # remove-only
+
+
+def test_review_confirm_is_blocked_only_by_checker_violations() -> None:
+    body = _review_script()
+    assert "summary.violations > 0 || prvDraft.busy" in body
+    # Below target only changes the wording; it never disables the button.
+    assert "!summary.met" in body and "disabled' : ''} onclick=\"prvConfirm()\"" in body
+    assert "cpdRequestConfirm(prvDraft.result" in body  # goes through the diff when a plan is confirmed
+
+
+def test_review_screen_computes_no_scores() -> None:
+    body = _review_script()
+    assert ".reduce(" not in body and "Math.round" not in body
+    # Bar widths scale engine values by the criterion cap; totals are never added up in the UI.
+    assert "projected - base" in body and "summary.byProjected" in body
 
 
 @pytest.mark.skipif(os.environ.get("RUN_BROWSER_E2E") != "1", reason="set RUN_BROWSER_E2E=1 to drive a real browser")

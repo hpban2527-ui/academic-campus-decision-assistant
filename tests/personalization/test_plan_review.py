@@ -419,3 +419,120 @@ def test_what_if_endpoint(valid_preference_payload):
     assert client.post(
         "/api/sp3/personalized/what-if-skip", json=payload, params={"source": "real"}
     ).status_code == 422
+
+
+# Student availability pass-through ---------------------------------------------------
+
+def _availability(busy: list[dict]) -> dict:
+    """Canonical availability, same schema the planner screen sends to /personalized/plan."""
+    return {
+        "availability_version": "sp3-availability/0.2",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "week_start": "2026-11-09",
+        "apply_scope": "SEMESTER_WEEKLY",
+        "weekly_blocks": [
+            {"day_of_week": day, "start_time": "07:00", "end_time": "21:00"}
+            for day in ("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
+        ],
+        "effective_from": "2026-11-09",
+        "effective_until": "2027-03-31",
+        "exceptions": [],
+        "busy_intervals": busy,
+    }
+
+
+# SEM-C is the fixed session Thursday 12/11 14:00-15:00.
+BUSY_DURING_SEM_C = [{"start": "2026-11-12T14:00:00+07:00", "end": "2026-11-12T15:00:00+07:00"}]
+
+
+def test_alternatives_never_offer_an_activity_in_busy_time(valid_preference_payload):
+    preference = _preference(valid_preference_payload)
+    base = _base(preference, "BALANCED")
+    assert "SEM-C" in _ids(list_swap_alternatives(preference, base, "SEM-A", limit=10))
+
+    busy = _availability(BUSY_DURING_SEM_C)
+    result = list_swap_alternatives(preference, base, "SEM-A", limit=10, availability_request=busy)
+
+    assert "SEM-C" not in _ids(result)
+    assert _filtered(result)["SEM-C"] == "NOT_FEASIBLE"
+    assert _ids(result)  # other alternatives remain
+
+
+def test_swap_preview_and_remove_and_what_if_respect_student_busy_time(valid_preference_payload):
+    preference = _preference(valid_preference_payload)
+    base = _base(preference, "BALANCED")
+    busy = _availability(BUSY_DURING_SEM_C)
+
+    # The client's base_result still lists SEM-C as feasible; the rebuilt plan with busy time wins.
+    with pytest.raises(ValueError):
+        preview_personalized_swap(preference, base, "SEM-A", "SEM-C", availability_request=busy)
+    assert preview_personalized_swap(preference, base, "SEM-A", "SEM-C")["status"] == "PREVIEW"
+
+    for result in (
+        remove_planned_activity(preference, base, "QUIZ-L", availability_request=busy),
+        what_if_skip_planned_activity(preference, base, "QUIZ-L", availability_request=busy),
+    ):
+        assert "SEM-C" not in _blocks(result["result"]["plan"])
+        assert "SEM-C" not in result["added_activity_ids"]
+
+
+def test_plan_built_with_busy_time_stays_clear_of_it_through_review(valid_preference_payload):
+    preference = _preference(valid_preference_payload)
+    busy = _availability(BUSY_DURING_SEM_C)
+    options = personalized_plan_options(preference, target_total=80, availability_request=busy)["options"]
+    base = next(option["result"] for option in options if option["strategy"] == "PREFERENCE_FIRST")
+    busy_start, busy_end = (datetime.fromisoformat(BUSY_DURING_SEM_C[0][key]) for key in ("start", "end"))
+
+    def overlaps_busy(plan: dict) -> bool:
+        return any(
+            datetime.fromisoformat(block["start"]) < busy_end and busy_start < datetime.fromisoformat(block["end"])
+            for blocks in _blocks(plan).values() for block in blocks
+        )
+
+    assert not overlaps_busy(base["plan"])
+    for removed in _selected(base):
+        result = list_swap_alternatives(preference, base, removed, limit=10, availability_request=busy)
+        assert all(not overlaps_busy(item["preview"]["result"]["plan"]) for item in result["items"])
+        assert not overlaps_busy(what_if_skip_planned_activity(preference, base, removed, availability_request=busy)["result"]["plan"])
+
+
+def test_review_endpoints_accept_the_same_availability_field(valid_preference_payload):
+    base = _base(_preference(valid_preference_payload), "BALANCED")
+    busy = _availability(BUSY_DURING_SEM_C)
+
+    alternatives = client.post(
+        "/api/sp3/personalized/alternatives",
+        json=_request(valid_preference_payload, base, limit=10, availability=busy),
+    )
+    assert alternatives.status_code == 200, alternatives.text
+    assert "SEM-C" not in [item["activity_id"] for item in alternatives.json()["items"]]
+
+    swap = client.post(
+        "/api/sp3/personalized/swap-preview",
+        json=_request(valid_preference_payload, base, add_activity_id="SEM-C", availability=busy),
+    )
+    assert swap.status_code == 422
+
+    what_if = client.post(
+        "/api/sp3/personalized/what-if-skip",
+        json=_request(valid_preference_payload, base, availability=busy) | {"remove_activity_id": "QUIZ-L"},
+    )
+    assert what_if.status_code == 200, what_if.text
+    assert "SEM-C" not in [item["activity_id"] for item in what_if.json()["result"]["plan"]["selected_activities"]]
+
+    # Omitting the field keeps the previous behaviour.
+    assert client.post(
+        "/api/sp3/personalized/swap-preview", json=_request(valid_preference_payload, base, add_activity_id="SEM-C")
+    ).status_code == 200
+
+
+def test_remove_only_keeps_the_rest_of_the_plan_exactly(valid_preference_payload):
+    preference = _preference(valid_preference_payload)
+    for strategy in ("MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"):
+        base = _base(preference, strategy)
+        for removed in _selected(base):
+            result = remove_planned_activity(preference, base, removed)
+            plan = result["result"]["plan"]
+            assert set(_selected(result["result"])) == set(_selected(base)) - {removed}
+            before = _blocks(base["plan"])
+            assert _blocks(plan) == {k: v for k, v in before.items() if k != removed}
