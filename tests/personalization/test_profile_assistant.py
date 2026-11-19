@@ -8,6 +8,7 @@ from personalization.profile_assistant import (
     ProfileAssistantDraft,
     ProfileExtraction,
     ProfilePatchAction,
+    deterministic_profile_extraction,
     merge_profile_extraction,
 )
 
@@ -138,4 +139,39 @@ def test_score_patch_respects_category_cap() -> None:
 
     with pytest.raises(ValueError, match="configured cap"):
         merge_profile_extraction(ProfileAssistantDraft(), extraction)
+
+
+@pytest.mark.parametrize("message", [
+    "T2 hàng tuần mình không rảnh từ 7h30 đến 11h",
+    "t2 hang tuan minh ban 7:30-11:00",
+])
+def test_deterministic_fallback_understands_vietnamese_weekday_time_and_negation(message) -> None:
+    extraction = deterministic_profile_extraction(message)
+
+    assert extraction is not None
+    interval = extraction.actions[0].value
+    assert interval.weekday == 0
+    assert interval.start == "07:30"
+    assert interval.end == "11:00"
+    assert interval.kind == "busy"
+
+
+def test_deterministic_fallback_completes_clear_multiturn_recurrence() -> None:
+    extraction = deterministic_profile_extraction(
+        "hàng tuần",
+        [{"role": "user", "content": "Thứ 4 mình rảnh 18h đến 20h"},
+         {"role": "assistant", "content": "Lịch này lặp hàng tuần phải không?"}],
+    )
+
+    assert extraction is not None
+    assert extraction.actions[0].value.weekday == 2
+    assert extraction.actions[0].value.kind == "available"
+
+
+def test_deterministic_fallback_asks_one_question_when_time_is_missing() -> None:
+    extraction = deterministic_profile_extraction("T6 hàng tuần mình bận")
+
+    assert extraction is not None
+    assert extraction.actions == []
+    assert len(extraction.questions) == 1
 

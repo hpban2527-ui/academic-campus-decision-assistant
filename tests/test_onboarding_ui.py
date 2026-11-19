@@ -12,6 +12,11 @@ def test_dashboard_assistant_is_replaced_by_one_time_onboarding_and_profile_edit
     assert "NOT_STARTED" in HTML and "IN_PROGRESS" in HTML and "COMPLETED" in HTML
     assert "AI chỉnh sửa hồ sơ" in HTML
     assert "/api/profile-assistant/interpret" in HTML
+    assert 'id="onboardingScores"' not in HTML
+    assert "Bước 1 / 3" in HTML
+    assert "hydrateOnboardingFormFromDraft" in HTML
+    assert "editPendingProfileChange" in HTML
+    assert 'id="onboardingAiChips"' in HTML
 
 
 def test_profile_schedule_workspace_and_local_migration_are_present() -> None:
@@ -38,4 +43,5 @@ def test_plan_option_cache_and_swap_controls_are_real_handlers() -> None:
     assert "Xem hoạt động thay thế" in HTML
     assert "previewSmartSwap" in HTML
     assert "undoCustomPlan" in HTML
+    assert "Smart Swap chưa được hỗ trợ an toàn cho nguồn hoạt động thật" in HTML
 

@@ -3,7 +3,9 @@ from __future__ import annotations
 from copy import deepcopy
 
 import pytest
+from fastapi.testclient import TestClient
 
+from api.server import app
 from api.sp3_service import personalized_plan_options, preview_personalized_swap
 from personalization.models import StudentPreference
 
@@ -83,4 +85,56 @@ def test_swap_preview_rescores_whole_plan_and_preserves_unaffected(valid_prefere
     assert preview["before"]["projected_total"] is not None
     assert preview["after"]["projected_total"] is not None
     assert preview["result"]["plan"]["selected_activities"]
+
+
+def test_real_source_options_use_real_planner_and_canonical_weekly_availability(valid_preference_payload) -> None:
+    availability = {
+        "availability_version": "sp3-availability/0.2",
+        "timezone": "Asia/Ho_Chi_Minh",
+        "week_start": "2026-10-05",
+        "apply_scope": "SEMESTER_WEEKLY",
+        "weekly_blocks": [
+            {"day_of_week": day, "start_time": "07:00", "end_time": "21:00"}
+            for day in ("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
+        ],
+        "effective_from": "2026-10-01",
+        "effective_until": "2026-11-15",
+        "exceptions": [{"date": "2026-10-12", "blocks": []}],
+        "busy_intervals": [],
+    }
+    response = TestClient(app).post(
+        "/api/sp3/personalized/options?source=real",
+        json={
+            "confirmed": True,
+            "preference": valid_preference_payload,
+            "scenario": "first_plan",
+            "total_target": 80,
+            "busy_intervals": [],
+            "availability": availability,
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["source"] == "real"
+    assert len(payload["attempted"]) == 3
+    assert 1 <= len(payload["options"]) <= 3
+    assert all(option["result"]["data_source"] == "SP1-STORE-V2" for option in payload["options"])
+    assert all(option["result"]["availability"]["apply_scope"] == "SEMESTER_WEEKLY" for option in payload["options"])
+
+
+def test_real_source_smart_swap_is_explicitly_unsupported(valid_preference_payload) -> None:
+    response = TestClient(app).post(
+        "/api/sp3/personalized/swap-preview?source=real",
+        json={
+            "confirmed_profile": True,
+            "preference": valid_preference_payload,
+            "base_result": {},
+            "remove_activity_id": "A",
+            "add_activity_id": "B",
+        },
+    )
+
+    assert response.status_code == 422
+    assert "not yet available for source=real" in response.json()["detail"]
 

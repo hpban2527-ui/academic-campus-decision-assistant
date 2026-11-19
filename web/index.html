@@ -1706,7 +1706,7 @@
       <div class="mx-auto max-w-6xl space-y-6">
         <header class="flex flex-col gap-4 border-b border-[#223046] pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div><p class="text-xs font-bold uppercase tracking-[.2em] text-indigo-300">UniLife AI · thiết lập một lần</p><h1 id="onboardingTitle" class="mt-2 text-2xl font-black">Tạo hồ sơ học kỳ của bạn</h1><p class="mt-2 text-sm text-slate-400">Dữ liệu được lưu cho tài khoản này trong trình duyệt hiện tại.</p></div>
-          <div id="onboardingProgress" class="text-sm font-bold text-indigo-300">Bước 1 / 4</div>
+          <div id="onboardingProgress" class="text-sm font-bold text-indigo-300">Bước 1 / 3</div>
         </header>
         <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
           <main class="rounded-3xl border border-[#223046] bg-[#0e1524] p-5 sm:p-7">
@@ -1720,18 +1720,14 @@
               <button type="button" onclick="addOnboardingInterval()" class="rounded-xl border border-indigo-500/40 px-4 py-2 text-sm font-bold text-indigo-200">Thêm vào lịch tuần</button><div id="onboardingIntervals" class="space-y-2"></div>
             </section>
             <section class="onboarding-step hidden space-y-4" data-onboarding-step="3">
-              <div><h2 class="text-xl font-extrabold">3. Điểm hiện có</h2><p class="mt-1 text-sm text-slate-400">Không biết thì để trống. Chọn đúng nguồn để tránh coi điểm tự khai là đã xác nhận.</p></div>
-              <div id="onboardingScores" class="grid gap-3 sm:grid-cols-2"></div>
-            </section>
-            <section class="onboarding-step hidden space-y-4" data-onboarding-step="4">
-              <div><h2 class="text-xl font-extrabold">4. Mục tiêu</h2><p class="mt-1 text-sm text-slate-400">Kiểm tra lần cuối trước khi lưu hồ sơ.</p></div>
+              <div><h2 class="text-xl font-extrabold">3. Mục tiêu & sở thích</h2><p class="mt-1 text-sm text-slate-400">Kiểm tra lần cuối trước khi lưu hồ sơ và dùng cho Planner.</p></div>
               <div class="grid gap-4 sm:grid-cols-2"><label class="text-xs font-bold text-slate-300">Mục tiêu ĐRL<input id="onboardingTarget" type="number" min="0" max="100" value="80" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Tối đa hoạt động<input id="onboardingMaxActivities" type="number" min="1" max="20" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Giờ tham gia tối đa/tuần<input id="onboardingWeeklyHours" type="number" min="0.5" max="168" step="0.5" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label><label class="text-xs font-bold text-slate-300">Nhóm ưu tiên<select id="onboardingCategories" multiple class="mt-1.5 min-h-28 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-2"><option value="C1">C1 · Học tập</option><option value="C2">C2 · Nội quy</option><option value="C3">C3 · Văn hóa</option><option value="C4">C4 · Cộng đồng</option><option value="C5">C5 · Cán bộ/CLB</option></select></label><label class="text-xs font-bold text-slate-300 sm:col-span-2">Sở thích hoạt động<input id="onboardingInterests" placeholder="Ví dụ: tình nguyện, AI" class="mt-1.5 w-full rounded-xl border border-[#2b3a54] bg-[#080d18] px-3.5 py-3" /></label></div>
               <fieldset class="rounded-xl border border-[#2b3a54] p-3"><legend class="px-1 text-xs font-bold text-slate-300">Hình thức và cơ sở ưu tiên</legend><div class="flex flex-wrap gap-4 text-xs text-slate-300"><label><input type="checkbox" name="onboardingMode" value="online" class="mr-1" />Online</label><label><input type="checkbox" name="onboardingMode" value="offline" class="mr-1" />Trực tiếp</label><label><input type="checkbox" name="onboardingMode" value="hybrid" class="mr-1" />Kết hợp</label><label><input type="checkbox" name="onboardingCampus" value="NVC" class="mr-1" />Nguyễn Văn Cừ</label><label><input type="checkbox" name="onboardingCampus" value="DONG_HOA" class="mr-1" />Đông Hòa</label><label><input type="checkbox" name="onboardingCampus" value="ONLINE" class="mr-1" />Online</label></div></fieldset><div id="onboardingReview" class="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-4 text-sm text-slate-300"></div>
             </section>
             <div class="mt-7 flex items-center justify-between border-t border-[#223046] pt-5"><button id="onboardingBack" type="button" onclick="changeOnboardingStep(-1)" class="rounded-xl border border-[#2b3a54] px-4 py-2.5 text-sm font-bold text-slate-300">Quay lại</button><button id="onboardingNext" type="button" onclick="changeOnboardingStep(1)" class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-extrabold">Tiếp tục</button><button id="onboardingComplete" type="button" onclick="completeOnboarding()" class="hidden rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-extrabold">Xác nhận và lưu</button></div>
           </main>
           <aside class="rounded-3xl border border-indigo-500/30 bg-indigo-950/20 p-5">
-            <h2 class="font-extrabold">AI hỗ trợ điền hồ sơ</h2><p class="mt-1 text-xs text-slate-400">AI đề xuất thay đổi; chỉ lưu sau khi bạn xác nhận.</p><div id="onboardingAiMessages" class="mt-4 min-h-32 max-h-64 space-y-2 overflow-y-auto rounded-xl border border-[#223046] bg-[#080d18] p-3 text-xs"><p class="text-slate-300">Hãy mô tả mục tiêu, lịch và sở thích của bạn.</p></div><form class="mt-3 space-y-2" onsubmit="submitProfileAssistantMessage(event, 'onboarding')"><textarea id="onboardingAiInput" maxlength="2000" rows="4" class="w-full rounded-xl border border-[#2b3a54] bg-[#080d18] p-3 text-sm" placeholder="Mình muốn đạt 95 điểm, thứ Hai học 7h30–17h30..."></textarea><button class="w-full rounded-xl bg-violet-600 py-2.5 text-sm font-bold">Phân tích bằng AI</button></form><div id="onboardingAiPreview" class="mt-3 hidden rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs"></div>
+            <h2 class="font-extrabold">AI hỗ trợ điền hồ sơ</h2><p class="mt-1 text-xs text-slate-400">Phạm vi: hồ sơ, lịch tuần, mục tiêu ĐRL và sở thích. Đề xuất chỉ được áp dụng sau khi bạn xác nhận.</p><div id="onboardingAiChips" class="mt-3 flex flex-wrap gap-2"></div><div id="onboardingAiMessages" class="mt-3 min-h-24 max-h-56 space-y-2 overflow-y-auto rounded-xl border border-[#223046] bg-[#080d18] p-3 text-xs"><p class="text-slate-300">Chọn ví dụ hoặc mô tả một thay đổi. Nếu thiếu dữ kiện, AI sẽ hỏi từng câu.</p></div><form class="mt-3 space-y-2" onsubmit="submitProfileAssistantMessage(event, 'onboarding')"><textarea id="onboardingAiInput" maxlength="2000" rows="3" class="w-full rounded-xl border border-[#2b3a54] bg-[#080d18] p-3 text-sm" placeholder="Mình muốn đạt 95 điểm, thứ Hai học 7h30–17h30..."></textarea><button class="w-full rounded-xl bg-violet-600 py-2.5 text-sm font-bold">Phân tích bằng AI</button></form><div id="onboardingAiPreview" class="mt-3 hidden rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-xs"></div>
           </aside>
         </div>
       </div>
@@ -2539,14 +2535,8 @@
       return migrateLocalUserData(mssv, saved);
     }
 
-    function maybeStartOnboarding() {
-      if (!currentStudent?.student_id) return false;
-      const data = readLocalUserData(currentStudent.student_id);
-      if (data.onboarding_status === "COMPLETED") return false;
-      data.onboarding_status = "IN_PROGRESS";
-      onboardingStep = Math.max(1, Math.min(4, Number(data.onboarding_step || 1)));
-      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
-      document.getElementById("onboardingFullName").value = currentProfileDraft.profile.full_name || currentStudent.full_name || "";
+    function hydrateOnboardingFormFromDraft() {
+      document.getElementById("onboardingFullName").value = currentProfileDraft.profile.full_name || currentStudent?.full_name || "";
       document.getElementById("onboardingClass").value = currentProfileDraft.profile.class_name || "";
       document.getElementById("onboardingMajor").value = currentProfileDraft.profile.major || "";
       document.getElementById("onboardingTarget").value = currentProfileDraft.drl_target ?? 80;
@@ -2559,7 +2549,16 @@
       document.querySelectorAll('input[name="onboardingMode"]').forEach(input => { input.checked = modes.has(input.value); });
       const campuses = new Set(currentProfileDraft.preference_patch?.preferred_campuses || []);
       document.querySelectorAll('input[name="onboardingCampus"]').forEach(input => { input.checked = campuses.has(input.value); });
-      renderOnboardingScores(data.score_sources || {});
+    }
+
+    function maybeStartOnboarding() {
+      if (!currentStudent?.student_id) return false;
+      const data = readLocalUserData(currentStudent.student_id);
+      if (data.onboarding_status === "COMPLETED") return false;
+      data.onboarding_status = "IN_PROGRESS";
+      onboardingStep = Math.max(1, Math.min(3, Number(data.onboarding_step || 1)));
+      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      hydrateOnboardingFormFromDraft();
       renderOnboardingIntervals();
       renderOnboardingStep();
       document.getElementById("onboardingWizard").classList.remove("hidden");
@@ -2598,19 +2597,13 @@
       const data = readLocalUserData(currentStudent.student_id);
       data.onboarding_status = "IN_PROGRESS";
       data.onboarding_step = onboardingStep;
-      const scoreSources = Object.fromEntries(Object.keys(DEFAULT_SCORES_TEMPLATE).map(category => {
-        const raw = document.getElementById(`onboardingScore${category}`)?.value;
-        return [category, { value: raw === "" ? null : Number(raw), source: document.getElementById(`onboardingScoreSource${category}`)?.value || "unknown" }];
-      }));
-      currentProfileDraft.scores = JSON.parse(JSON.stringify(scoreSources));
       data.profile = JSON.parse(JSON.stringify(currentProfileDraft));
-      data.score_sources = scoreSources;
       localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
     }
 
     function changeOnboardingStep(direction) {
       saveOnboardingStep();
-      onboardingStep = Math.max(1, Math.min(4, onboardingStep + direction));
+      onboardingStep = Math.max(1, Math.min(3, onboardingStep + direction));
       const data = readLocalUserData(currentStudent.student_id);
       data.onboarding_step = onboardingStep;
       localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
@@ -2619,16 +2612,34 @@
 
     function renderOnboardingStep() {
       document.querySelectorAll(".onboarding-step").forEach(section => section.classList.toggle("hidden", Number(section.dataset.onboardingStep) !== onboardingStep));
-      document.getElementById("onboardingProgress").textContent = `Bước ${onboardingStep} / 4`;
+      document.getElementById("onboardingProgress").textContent = `Bước ${onboardingStep} / 3`;
       document.getElementById("onboardingBack").classList.toggle("invisible", onboardingStep === 1);
-      document.getElementById("onboardingNext").classList.toggle("hidden", onboardingStep === 4);
-      document.getElementById("onboardingComplete").classList.toggle("hidden", onboardingStep !== 4);
-      if (onboardingStep === 4) {
-        const knownScores = Object.values(currentProfileDraft.scores || {}).filter(score => score.value != null && score.source !== "unknown").length;
+      document.getElementById("onboardingNext").classList.toggle("hidden", onboardingStep === 3);
+      document.getElementById("onboardingComplete").classList.toggle("hidden", onboardingStep !== 3);
+      renderOnboardingAiChips();
+      if (onboardingStep === 3) {
         const patch = currentProfileDraft.preference_patch || {};
         const preferences = [...(patch.preferred_topics || []), ...(patch.preferred_categories || []), ...(patch.preferred_modes || []), ...(patch.preferred_campuses || [])];
-        document.getElementById("onboardingReview").innerHTML = `<b>${escapeHTML(currentProfileDraft.profile.full_name || "Chưa có tên")}</b><br>Mục tiêu: ${Number(document.getElementById("onboardingTarget").value || 80)} điểm · ${currentProfileDraft.weekly_intervals.length} quy tắc tuần · ${(currentProfileDraft.exceptions || []).length} ngoại lệ · ${knownScores} nhóm điểm có nguồn.<br><span class="text-slate-400">Ưu tiên: ${escapeHTML(preferences.join(", ") || "chưa chọn")}. Mọi giá trị AI đề xuất đều cần được xác nhận trước khi lưu.</span>`;
+        document.getElementById("onboardingReview").innerHTML = `<b>${escapeHTML(currentProfileDraft.profile.full_name || "Chưa có tên")}</b><br>Mục tiêu: ${Number(document.getElementById("onboardingTarget").value || 80)} điểm · ${currentProfileDraft.weekly_intervals.length} quy tắc tuần · ${(currentProfileDraft.exceptions || []).length} ngoại lệ.<br><span class="text-slate-400">Ưu tiên: ${escapeHTML(preferences.join(", ") || "chưa chọn")}. Mọi giá trị AI đề xuất đều cần được xác nhận trước khi lưu.</span>`;
       }
+    }
+
+    function setProfileAssistantExample(text) {
+      const input = document.getElementById("onboardingAiInput");
+      if (!input) return;
+      input.value = text;
+      input.focus();
+    }
+
+    function renderOnboardingAiChips() {
+      const box = document.getElementById("onboardingAiChips");
+      if (!box) return;
+      const examples = onboardingStep === 1
+        ? ["Mình tên Nguyễn An, học lớp 24CNTT1", "Ngành của mình là Khoa học máy tính"]
+        : onboardingStep === 2
+          ? ["T2 hằng tuần mình bận 7h30 đến 11h", "Xóa lịch bận thứ Sáu"]
+          : ["Mục tiêu ĐRL của mình là 90", "Mình ưu tiên tình nguyện và hoạt động online"];
+      box.innerHTML = examples.map(text => `<button type="button" onclick="setProfileAssistantExample('${text.replace(/'/g, "\\'")}')" class="rounded-full border border-indigo-500/40 bg-indigo-950/30 px-3 py-1.5 text-[11px] font-bold text-indigo-200 hover:bg-indigo-900/40">${escapeHTML(text)}</button>`).join("");
     }
 
     function addOnboardingInterval() {
@@ -2653,7 +2664,7 @@
       const data = readLocalUserData(currentStudent.student_id);
       data.profile = JSON.parse(JSON.stringify(currentProfileDraft));
       data.onboarding_status = "COMPLETED";
-      data.onboarding_step = 4;
+      data.onboarding_step = 3;
       data.canonical_availability = buildCanonicalAvailability();
       localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
       await persistOnboardingPreference();
@@ -2775,24 +2786,69 @@
           return;
         }
         pendingProfileProposal = { source, draft: data.proposed_draft, changes: data.changes || [] };
-        preview.innerHTML = `<div class="space-y-2"><b class="text-amber-200">Thay đổi đề xuất (chưa lưu)</b>${pendingProfileProposal.changes.map(change => `<div>${escapeHTML(change.field)}: <span class="text-slate-500">${escapeHTML(JSON.stringify(change.old))}</span> → <span class="text-emerald-300">${escapeHTML(JSON.stringify(change.new))}</span></div>`).join("")}<button type="button" onclick="confirmProfileProposal()" class="mt-2 rounded-lg bg-emerald-600 px-3 py-2 font-bold text-white">Xác nhận thay đổi</button></div>`;
+        profileAssistantConversation.push({ role: "assistant", content: `Đề xuất ${pendingProfileProposal.changes.length} thay đổi; đang chờ xác nhận.` });
+        preview.innerHTML = `<div class="space-y-3"><b class="text-amber-200">Thay đổi đề xuất (chưa lưu)</b>${pendingProfileProposal.changes.map((change, index) => `<label class="block rounded-lg border border-[#2b3a54] p-2"><span class="font-bold text-slate-200">${escapeHTML(change.field)}</span><span class="mt-1 block text-slate-500">Cũ: ${escapeHTML(JSON.stringify(change.old))}</span><span class="mt-1 block text-emerald-300">Mới (có thể sửa trước khi xác nhận):</span><textarea rows="2" onchange="editPendingProfileChange(${index}, this)" class="mt-1 w-full rounded-md border border-[#33445f] bg-[#080d18] p-2 text-emerald-200">${escapeHTML(JSON.stringify(change.new))}</textarea></label>`).join("")}<button type="button" onclick="confirmProfileProposal()" class="rounded-lg bg-emerald-600 px-3 py-2 font-bold text-white">Xác nhận thay đổi</button></div>`;
       } catch (error) {
         preview.innerHTML = `<span class="text-rose-300">${escapeHTML(error.message)} Dữ liệu chưa thay đổi; bạn vẫn có thể nhập thủ công.</span>`;
       }
     }
 
+    function editPendingProfileChange(index, input) {
+      if (!pendingProfileProposal?.changes?.[index]) return;
+      try {
+        const value = JSON.parse(input.value);
+        const change = pendingProfileProposal.changes[index];
+        change.new = value;
+        if (change.field.startsWith("profile.")) {
+          pendingProfileProposal.draft.profile[change.field.slice(8)] = value;
+        } else {
+          pendingProfileProposal.draft[change.field] = value;
+        }
+        input.classList.remove("border-rose-500");
+        input.dataset.invalid = "false";
+      } catch (error) {
+        input.classList.add("border-rose-500");
+        input.dataset.invalid = "true";
+      }
+    }
+
+    function validatePendingProfileDraft(draft) {
+      if (!draft || typeof draft !== "object") return "Bản nháp hồ sơ không hợp lệ.";
+      if (!Number.isInteger(draft.drl_target) || draft.drl_target < 0 || draft.drl_target > 100) return "Mục tiêu ĐRL phải là số nguyên từ 0 đến 100.";
+      const clock = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+      for (const interval of (draft.weekly_intervals || [])) {
+        if (!['busy', 'available'].includes(interval.kind) || !Number.isInteger(interval.weekday) || interval.weekday < 0 || interval.weekday > 6 || !clock.test(interval.start) || !clock.test(interval.end) || interval.start >= interval.end) return "Một khung lịch tuần không hợp lệ.";
+      }
+      for (const exception of (draft.exceptions || [])) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(exception.date || '') || !['busy', 'available'].includes(exception.kind) || !clock.test(exception.start) || !clock.test(exception.end) || exception.start >= exception.end) return "Một ngoại lệ lịch không hợp lệ.";
+      }
+      const patch = draft.preference_patch || {};
+      if (patch.max_activities != null && (!Number.isInteger(patch.max_activities) || patch.max_activities < 1 || patch.max_activities > 20)) return "Số hoạt động tối đa phải từ 1 đến 20.";
+      if (patch.weekly_participation_hours != null && (typeof patch.weekly_participation_hours !== 'number' || patch.weekly_participation_hours < 0.5 || patch.weekly_participation_hours > 168)) return "Giờ tham gia mỗi tuần phải từ 0,5 đến 168.";
+      return null;
+    }
+
     function confirmProfileProposal() {
       if (!pendingProfileProposal) return;
+      const preview = document.getElementById(pendingProfileProposal.source === "onboarding" ? "onboardingAiPreview" : "profileAiPreview");
+      if (preview?.querySelector('[data-invalid="true"]')) {
+        preview.insertAdjacentHTML("afterbegin", '<p class="mb-2 text-rose-300">Giá trị chỉnh sửa phải là JSON hợp lệ.</p>');
+        return;
+      }
+      const validationError = validatePendingProfileDraft(pendingProfileProposal.draft);
+      if (validationError) {
+        preview.insertAdjacentHTML("afterbegin", `<p class="mb-2 text-rose-300">${escapeHTML(validationError)}</p>`);
+        return;
+      }
       const source = pendingProfileProposal.source;
       const changes = pendingProfileProposal.changes || [];
       currentProfileDraft = JSON.parse(JSON.stringify(pendingProfileProposal.draft));
       currentProfileDraft.weekly_intervals = (currentProfileDraft.weekly_intervals || []).map(item => ({ ...item, confirmed: true }));
       currentProfileDraft.exceptions = (currentProfileDraft.exceptions || []).map(item => ({ ...item, confirmed: true }));
-      const preview = document.getElementById(source === "onboarding" ? "onboardingAiPreview" : "profileAiPreview");
       if (preview) preview.innerHTML = '<span class="text-emerald-300 font-bold">Đã xác nhận thay đổi.</span>';
       pendingProfileProposal = null;
       renderOnboardingIntervals();
-      if (source === "onboarding") renderOnboardingScores(currentProfileDraft.scores || {});
+      if (source === "onboarding") hydrateOnboardingFormFromDraft();
       renderProfileWorkspace();
       if (source === "profile" && changes.some(change => change.field === "preference_patch")) {
         syncConfirmedPreferenceFromProfile();
@@ -5033,6 +5089,11 @@
       const modal = document.getElementById('smartSwapModal');
       const content = document.getElementById('smartSwapContent');
       if (!modal || !content || !currentPlannerData) return;
+      if (SP3_SOURCE === 'real') {
+        content.innerHTML = '<p class="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 text-amber-200">Smart Swap chưa được hỗ trợ an toàn cho nguồn hoạt động thật. Kế hoạch hiện tại vẫn dùng dữ liệu thật và có thể đổi giữa các phương án đã tính.</p>';
+        modal.classList.remove('hidden');
+        return;
+      }
       const selected = new Set((currentPlannerData.plan?.selected_activities || []).map(item => item.activity_id));
       const candidates = (currentPlannerData.feasibility?.candidates || []).filter(item => item.feasibility?.status === 'FEASIBLE' && !selected.has(item.activity?.activity_id));
       const utilityByActivity = new Map((currentPlannerData.personalization?.candidate_breakdown || []).map(item => [item.activity_id, item]));

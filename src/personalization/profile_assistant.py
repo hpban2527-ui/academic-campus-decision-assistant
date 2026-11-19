@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import date as DateValue
 import re
+import unicodedata
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -330,7 +331,95 @@ For preferred_topics use only stable topic IDs from the current StudentPreferenc
 for example volunteer, artificial_intelligence, computer_science, soft_skills or sports.
 If recurrence or a specific date is ambiguous, emit no action and ask one concise question.
 Preserve unrelated current values; do not calculate DRL points or schedules.
+Understand common Vietnamese abbreviations (T2..T7, CN), accented or unaccented text,
+informal clocks such as 7h, 7h30 and 19g, and explicit add/remove/replace/negation wording.
+Return at most one clarification question, for the single missing fact needed next.
 """
+
+
+def deterministic_profile_extraction(
+    text: str,
+    conversation: list[dict[str, str]] | None = None,
+) -> ProfileExtraction | None:
+    """Conservative fallback for explicit DRL goals and weekly time statements."""
+
+    normalized = _fold_vi(text)
+    actions: list[ProfilePatchAction] = []
+    goal = re.search(r"(?:muc\s*tieu|drl|diem\s*ren\s*luyen)[^\d]{0,30}(\d{1,3})\b", normalized)
+    if goal:
+        value = int(goal.group(1))
+        if 0 <= value <= 100:
+            actions.append(ProfilePatchAction(
+                action="update_drl_goal", operation="set", value=value, source_text=text.strip()
+            ))
+
+    weekday = _fallback_weekday(normalized)
+    schedule_words = re.search(r"\b(?:ban|ranh|hoc|lich|t[2-7]|cn|thu|hang\s*tuan)\b", normalized)
+    remove = bool(re.search(r"\b(?:xoa|bo|huy)\b", normalized))
+    replace = bool(re.search(r"\b(?:thay|doi|chuyen)\b", normalized))
+    if weekday is not None and remove:
+        actions.append(ProfilePatchAction(
+            action="remove_weekly_interval",
+            operation="remove",
+            match={"weekday": weekday},
+            source_text=text.strip(),
+        ))
+    elif weekday is not None and schedule_words:
+        times = _fallback_times(normalized)
+        if len(times) >= 2:
+            if times[0] >= times[1]:
+                return ProfileExtraction(actions=actions, questions=["Giờ bắt đầu phải trước giờ kết thúc; bạn muốn khung giờ nào?"])
+            kind = "busy" if re.search(r"\b(?:khong\s*ranh|ban|hoc|kẹt|ket)\b", normalized) else "available"
+            actions.append(ProfilePatchAction(
+                action="upsert_weekly_interval",
+                operation="replace" if replace else "add",
+                value={
+                    "kind": kind,
+                    "weekday": weekday,
+                    "start": times[0],
+                    "end": times[1],
+                    "recurrence": "weekly",
+                    "source": "ai",
+                    "confirmed": False,
+                },
+                match={"weekday": weekday, "kind": kind} if replace else None,
+                source_text=text.strip(),
+            ))
+        elif not actions:
+            return ProfileExtraction(actions=[], questions=["Bạn bận hoặc rảnh từ mấy giờ đến mấy giờ?"])
+
+    if actions:
+        return ProfileExtraction(actions=actions, questions=[])
+    # A short recurrence answer may complete the preceding user statement.
+    if normalized in {"hang tuan", "moi tuan", "tuan nao cung vay"} and conversation:
+        previous = next((turn.get("content", "") for turn in reversed(conversation) if turn.get("role") == "user"), "")
+        if previous:
+            return deterministic_profile_extraction(f"{previous} hang tuan", [])
+    return None
+
+
+def _fold_vi(value: str) -> str:
+    value = value.casefold().replace("đ", "d")
+    decomposed = unicodedata.normalize("NFD", value)
+    return " ".join("".join(ch for ch in decomposed if unicodedata.category(ch) != "Mn").split())
+
+
+def _fallback_weekday(text: str) -> int | None:
+    patterns = {
+        0: r"\b(?:t2|thu\s*(?:2|hai))\b", 1: r"\b(?:t3|thu\s*(?:3|ba))\b",
+        2: r"\b(?:t4|thu\s*(?:4|tu))\b", 3: r"\b(?:t5|thu\s*(?:5|nam))\b",
+        4: r"\b(?:t6|thu\s*(?:6|sau))\b", 5: r"\b(?:t7|thu\s*(?:7|bay))\b",
+        6: r"\b(?:cn|chu\s*nhat)\b",
+    }
+    matches = [day for day, pattern in patterns.items() if re.search(pattern, text)]
+    return matches[0] if len(matches) == 1 else None
+
+
+def _fallback_times(text: str) -> list[str]:
+    values: list[str] = []
+    for match in re.finditer(r"(?<!\w)([01]?\d|2[0-3])\s*(?:h|g|:)([0-5]\d)?", text):
+        values.append(f"{int(match.group(1)):02d}:{int(match.group(2) or 0):02d}")
+    return values
 
 
 __all__ = [
@@ -340,4 +429,5 @@ __all__ = [
     "ProfileExtraction",
     "ProfilePatchAction",
     "merge_profile_extraction",
+    "deterministic_profile_extraction",
 ]

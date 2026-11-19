@@ -11,7 +11,11 @@ import httpx
 from pydantic import ValidationError
 
 from personalization.models import StudentPreference
-from personalization.profile_assistant import PROFILE_EXTRACTION_PROMPT, ProfileExtraction
+from personalization.profile_assistant import (
+    PROFILE_EXTRACTION_PROMPT,
+    ProfileExtraction,
+    deterministic_profile_extraction,
+)
 from personalization.normalization import normalize_ai_preference
 from personalization.prompt import build_system_prompt
 from personalization.providers.base import (
@@ -31,7 +35,7 @@ class OllamaPreferenceProvider:
         model: str = "qwen3:4b",
         timeout_seconds: float = 60.0,
         keep_alive: str = "30m",
-        num_predict: int = 512,
+        num_predict: int = 1024,
         client: httpx.Client | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
@@ -150,40 +154,70 @@ class OllamaPreferenceProvider:
 
         context = json.dumps(current_profile, ensure_ascii=False, sort_keys=True)
         history = json.dumps(conversation[-8:], ensure_ascii=False)
+        messages = [
+            {"role": "system", "content": PROFILE_EXTRACTION_PROMPT},
+            {
+                "role": "user",
+                "content": f"current profile: {context}\nconversation: {history}\nnew message: {text}",
+            },
+        ]
         request_body = {
             "model": self.model,
             "stream": False,
             "think": False,
             "keep_alive": self.keep_alive,
-            "format": ProfileExtraction.model_json_schema(),
+            # Keep Ollama's decoding grammar compact. The richer discriminated
+            # action contract is still enforced by Pydantic below.
+            "format": _PROFILE_EXTRACTION_FORMAT,
             "options": {"temperature": 0, "num_predict": self.num_predict},
-            "messages": [
-                {"role": "system", "content": PROFILE_EXTRACTION_PROMPT},
-                {
-                    "role": "user",
-                    "content": f"current profile: {context}\nconversation: {history}\nnew message: {text}",
-                },
-            ],
+            "messages": messages,
         }
+        last_error: PreferenceProviderInvalidResponse | None = None
+        for attempt in range(2):
+            if attempt:
+                request_body["messages"] = messages + [
+                    {
+                        "role": "user",
+                        "content": (
+                            "Phan hoi truoc khong hop le hoac bi cat. Tra lai MOT JSON object ngan gon, "
+                            "dung schema; chi gom action duoc noi ro hoac mot cau hoi lam ro."
+                        ),
+                    }
+                ]
+                request_body["options"] = {
+                    "temperature": 0,
+                    "num_predict": min(max(self.num_predict * 2, 1024), 2048),
+                }
+            response = self._profile_request(request_body)
+            try:
+                extraction = _validate_profile_content(_extract_content(response))
+                extraction = _ground_profile_extraction(text, extraction)
+                return _supplement_clear_actions(text, conversation, extraction)
+            except ValidationError as exc:
+                last_error = PreferenceProviderInvalidResponse(
+                    "AI_INVALID_SCHEMA",
+                    "AI trả về thay đổi hồ sơ không đúng cấu trúc an toàn sau khi đã thử sửa một lần.",
+                )
+                last_error.__cause__ = exc
+            except PreferenceProviderInvalidResponse as exc:
+                last_error = exc
+        assert last_error is not None
+        raise last_error
+
+    def _profile_request(self, request_body: dict[str, Any]) -> httpx.Response:
         try:
             response = self._request("POST", "/api/chat", json=request_body)
         except httpx.TimeoutException as exc:
-            raise PreferenceProviderUnavailable("AI_TIMEOUT", "AI mat qua nhieu thoi gian phan hoi.") from exc
+            raise PreferenceProviderUnavailable("AI_TIMEOUT", "AI mất quá nhiều thời gian phản hồi.") from exc
         except httpx.RequestError as exc:
-            raise PreferenceProviderUnavailable("AI_UNAVAILABLE", "Khong the ket noi Ollama.") from exc
+            raise PreferenceProviderUnavailable("AI_UNAVAILABLE", "Không thể kết nối Ollama.") from exc
         if response.status_code == 404:
-            raise PreferenceProviderUnavailable("AI_MODEL_NOT_FOUND", f"Ollama chua co model {self.model}.")
+            raise PreferenceProviderUnavailable("AI_MODEL_NOT_FOUND", f"Ollama chưa có model {self.model}.")
         if response.status_code >= 500:
-            raise PreferenceProviderUnavailable("AI_UPSTREAM_ERROR", "Ollama dang gap loi.")
+            raise PreferenceProviderUnavailable("AI_UPSTREAM_ERROR", "Ollama đang gặp lỗi.")
         if response.status_code != 200:
-            raise PreferenceProviderInvalidResponse("AI_REQUEST_REJECTED", "Ollama tu choi yeu cau.")
-        try:
-            extraction = ProfileExtraction.model_validate_json(_extract_content(response))
-            return _ground_profile_extraction(text, extraction)
-        except ValidationError as exc:
-            raise PreferenceProviderInvalidResponse(
-                "AI_INVALID_SCHEMA", "AI tra ve thay doi ho so khong dung cau truc an toan."
-            ) from exc
+            raise PreferenceProviderInvalidResponse("AI_REQUEST_REJECTED", "Ollama từ chối yêu cầu.")
+        return response
 
     def _request(self, method: str, path: str, **kwargs: Any) -> httpx.Response:
         url = f"{self.base_url}{path}"
@@ -202,6 +236,11 @@ def _extract_content(response: httpx.Response) -> str:
             "AI_INVALID_RESPONSE",
             "Không đọc được phản hồi từ Ollama.",
         ) from exc
+    if payload.get("done") is False or payload.get("done_reason") == "length":
+        raise PreferenceProviderInvalidResponse(
+            "AI_TRUNCATED_RESPONSE",
+            "Phản hồi AI bị cắt trước khi hoàn tất. Hãy rút gọn yêu cầu hoặc thử lại.",
+        )
     if not isinstance(content, str):
         raise PreferenceProviderInvalidResponse(
             "AI_INVALID_RESPONSE",
@@ -223,12 +262,63 @@ def _extract_content(response: httpx.Response) -> str:
     return content
 
 
+_PROFILE_EXTRACTION_FORMAT: dict[str, Any] = {
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["actions", "questions"],
+    "properties": {
+        "actions": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["action", "operation", "value", "match", "source_text"],
+                "properties": {
+                    "action": {"type": "string", "enum": [
+                        "update_drl_goal", "upsert_weekly_interval", "remove_weekly_interval",
+                        "upsert_exception", "remove_exception", "update_preferences",
+                        "update_profile_field", "update_score",
+                    ]},
+                    "operation": {"type": "string", "enum": ["add", "replace", "remove", "set"]},
+                    "value": {"type": ["object", "integer", "null"]},
+                    "match": {"type": ["object", "null"]},
+                    "source_text": {"type": "string", "maxLength": 500},
+                },
+            },
+        },
+        "questions": {"type": "array", "maxItems": 1, "items": {"type": "string"}},
+    },
+}
+
+
 def _model_is_installed(requested: str, installed: set[str]) -> bool:
     if requested in installed:
         return True
     if ":" not in requested and f"{requested}:latest" in installed:
         return True
     return False
+
+
+def _validate_profile_content(content: str) -> ProfileExtraction:
+    """Validate model output, discarding only semantically irrelevant match noise."""
+
+    payload = json.loads(content)
+    actions = payload.get("actions") if isinstance(payload, dict) else None
+    if isinstance(actions, list):
+        for action in actions:
+            if not isinstance(action, dict):
+                continue
+            name = action.get("action")
+            operation = action.get("operation")
+            if name not in {"remove_weekly_interval", "remove_exception"} and not (
+                name == "upsert_weekly_interval" and operation == "replace"
+            ):
+                # Small local models sometimes echo current-profile fields into
+                # `match`. Match has no meaning for these actions, so dropping it
+                # cannot broaden or fabricate the requested change.
+                action["match"] = None
+    return ProfileExtraction.model_validate(payload)
 
 
 def _ground_profile_extraction(user_text: str, extraction: ProfileExtraction) -> ProfileExtraction:
@@ -245,6 +335,23 @@ def _ground_profile_extraction(user_text: str, extraction: ProfileExtraction) ->
         if len(grounded_days) == 1:
             action["value"]["weekday"] = next(iter(grounded_days))
     return ProfileExtraction.model_validate(payload)
+
+
+def _supplement_clear_actions(
+    user_text: str,
+    conversation: list[dict[str, str]],
+    extraction: ProfileExtraction,
+) -> ProfileExtraction:
+    """Add only high-confidence deterministic actions the model omitted."""
+
+    deterministic = deterministic_profile_extraction(user_text, conversation)
+    if deterministic is None or not deterministic.actions:
+        return extraction
+    existing = {action.action for action in extraction.actions}
+    additions = [action for action in deterministic.actions if action.action not in existing]
+    if not additions:
+        return extraction
+    return ProfileExtraction(actions=[*extraction.actions, *additions], questions=[])
 
 
 def _mentioned_weekdays(text: str) -> set[int]:

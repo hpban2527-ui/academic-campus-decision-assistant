@@ -46,6 +46,7 @@ from personalization import (
     PreferenceProviderUnavailable,
     StudentPreference,
     ProfileAssistantDraft,
+    deterministic_profile_extraction,
     merge_profile_extraction,
     preference_provider_from_env,
 )
@@ -1484,22 +1485,37 @@ def interpret_profile_assistant(req: ProfileAssistantInterpretRequest):
     try:
         current = ProfileAssistantDraft.model_validate(req.draft)
         provider = _get_preference_provider()
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    provider_name = provider.provider_name
+    model = provider.model
+    fallback_used = False
+    try:
         extraction = provider.interpret_profile(
             req.message,
             current.model_dump(mode="json"),
             [turn.model_dump() for turn in req.conversation],
         )
         proposed, changes = merge_profile_extraction(current, extraction)
-    except PreferenceProviderUnavailable as exc:
-        raise HTTPException(status_code=503, detail=_preference_error_detail(exc)) from exc
-    except PreferenceProviderInvalidResponse as exc:
-        raise HTTPException(status_code=502, detail=_preference_error_detail(exc)) from exc
+    except (PreferenceProviderUnavailable, PreferenceProviderInvalidResponse) as exc:
+        extraction = deterministic_profile_extraction(
+            req.message,
+            [turn.model_dump() for turn in req.conversation],
+        )
+        if extraction is None:
+            status_code = 503 if isinstance(exc, PreferenceProviderUnavailable) else 502
+            detail = _preference_error_detail(exc)
+            detail["message"] += " Hãy nói rõ một thay đổi, trả lời câu hỏi làm rõ, hoặc nhập thủ công."
+            raise HTTPException(status_code=status_code, detail=detail) from exc
+        provider_name, model, fallback_used = "deterministic-fallback", None, True
+        proposed, changes = merge_profile_extraction(current, extraction)
     except (ValueError, TypeError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return {
         "status": "CLARIFICATION" if extraction.questions and not changes else "PREVIEW",
-        "provider": provider.provider_name,
-        "model": provider.model,
+        "provider": provider_name,
+        "model": model,
+        "fallback_used": fallback_used,
         "requires_confirmation": True,
         "proposed_draft": proposed.model_dump(mode="json"),
         "changes": [item.model_dump(mode="json") for item in changes],
@@ -1661,7 +1677,11 @@ from api.sp3_service import (
     preview_personalized_swap as _sp3_preview_swap,
     sp1_catalog as _sp3_catalog,
 )
-from api.sp3_real import real_catalog as _sp3_real_catalog, real_plan as _sp3_real_plan
+from api.sp3_real import (
+    real_catalog as _sp3_real_catalog,
+    real_plan as _sp3_real_plan,
+    real_plan_options as _sp3_real_options,
+)
 
 # ?source=real switches the SP3 screens to the SP1 v2 store (HK1 2026-2027, synthetic student).
 # The default stays the synthetic MVP fixture so existing demos and tests are unchanged.
@@ -1707,13 +1727,12 @@ def run_sp3_personalized_plan(req: PersonalizedPlanRequest, source: str = "synth
 
     try:
         if _sp3_source(source) == "real":
-            if req.availability is not None:
-                raise HTTPException(status_code=422, detail="canonical availability is not yet supported for source=real")
             return _sp3_real_plan(
                 req.scenario,
                 target_total=req.total_target,
                 busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
                 preference=req.preference,
+                availability_request=req.availability,
             )
         return _sp3_personalized_plan(
             req.preference,
@@ -1732,9 +1751,14 @@ def run_sp3_personalized_options(req: PersonalizedPlanRequest, source: str = "sy
 
     if req.scenario != "first_plan":
         raise HTTPException(status_code=422, detail="plan options are available for first_plan only")
-    if _sp3_source(source) != "synthetic":
-        raise HTTPException(status_code=422, detail="multi-strategy options are not yet available for source=real")
     try:
+        if _sp3_source(source) == "real":
+            return _sp3_real_options(
+                req.preference,
+                target_total=req.total_target,
+                busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
+                availability_request=req.availability,
+            )
         return _sp3_personalized_options(
             req.preference,
             target_total=req.total_target,

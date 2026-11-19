@@ -13,13 +13,14 @@ Nothing here is an official DRL award.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 from copy import deepcopy
 from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 
-from personalization.models import StudentPreference
+from personalization.models import PlanningStrategy, StudentPreference
 from personalization.planner_adapter import prepare_personalized_planner_input
 from personalization.scoring import load_activity_features
 from sp3.feasibility import FeasibilityEvidence, assess_feasibility
@@ -27,6 +28,7 @@ from sp3.plan_checker import check_plan
 from sp3.planner import build_plan, what_if_skip
 from sp3.projected_scorer import InMemoryScoringData, ProjectedScorer
 from sp3.scorer_adapter import ScorerAdapter
+from sp3.availability import resolve_availability
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "data"
@@ -171,6 +173,23 @@ def _free_time(busy: list[dict[str, str]]) -> list[dict[str, str]]:
     return [{"start": s.isoformat(), "end": e.isoformat()} for s, e in out]
 
 
+def _subtract_busy(available: list[dict[str, str]], busy: list[dict[str, str]]) -> list[dict[str, str]]:
+    remaining = [(datetime.fromisoformat(item["start"]), datetime.fromisoformat(item["end"])) for item in available]
+    for blocked in busy:
+        start, end = datetime.fromisoformat(blocked["start"]), datetime.fromisoformat(blocked["end"])
+        updated = []
+        for free_start, free_end in remaining:
+            if end <= free_start or start >= free_end:
+                updated.append((free_start, free_end))
+                continue
+            if free_start < start:
+                updated.append((free_start, start))
+            if end < free_end:
+                updated.append((end, free_end))
+        remaining = updated
+    return [{"start": start.isoformat(), "end": end.isoformat()} for start, end in remaining]
+
+
 def _previous(plan: dict | None) -> dict | None:
     if plan is None:
         return None
@@ -183,14 +202,23 @@ def _previous(plan: dict | None) -> dict | None:
 
 
 def _step(name: str, target_total: int, busy: list[dict[str, str]], previous: dict | None,
-          preference: StudentPreference | None) -> dict:
+          preference: StudentPreference | None, availability_request: dict | None = None) -> dict:
     data = _load_base()
-    free = _free_time(busy)
+    resolved_availability = None
+    if availability_request is not None:
+        resolved_availability = resolve_availability(
+            availability_request, window_start=WINDOW_START, window_end=WINDOW_END
+        )
+        free = _subtract_busy(resolved_availability["available_intervals"], busy)
+        calendar_version = resolved_availability["calendar_version"]
+    else:
+        free = _free_time(busy)
+        calendar_version = f"synthetic-free-{len(busy)}-busy"
     context = {
         "student_id": STUDENT_ID, "term_id": TERM["id"], "window_start": WINDOW_START, "window_end": WINDOW_END,
         "as_of": AS_OF, "timezone": "Asia/Ho_Chi_Minh", "baseline_ref": BASELINE_REF,
         "dataset_version": "sp1-store-v2", "ruleset_version": data["scoring"]["ruleset_version"],
-        "calendar_version": f"synthetic-free-{len(busy)}-busy",
+        "calendar_version": calendar_version,
     }
     request = {
         "contract_version": "sp3-planner/0.2", "request_id": "real-" + name, "context": context,
@@ -221,7 +249,10 @@ def _step(name: str, target_total: int, busy: list[dict[str, str]], previous: di
     plan = build_plan(planner_input, _score_callback(data), **extra)
     if check_plan(planner_input, plan, _score_callback(data), input_snapshot=snapshot):
         raise RuntimeError("SP3 independent plan check failed on the real store.")
-    return {"availability": {"available_intervals": free, "calendar_version": context["calendar_version"]},
+    availability = {"available_intervals": free, "calendar_version": context["calendar_version"]}
+    if resolved_availability is not None:
+        availability = {**resolved_availability, **availability}
+    return {"availability": availability,
             "feasibility": feasibility, "plan": plan, "planner_input": planner_input,
             "engine": engine, "hard_excluded": hard_excluded, "data": data}
 
@@ -235,7 +266,7 @@ def _block_of(plan: dict) -> list[dict[str, str]]:
 
 
 def real_plan(scenario: str, *, target_total: int | None = None, busy_intervals: list[dict[str, str]] | None = None,
-              preference: StudentPreference | None = None) -> dict:
+              preference: StudentPreference | None = None, availability_request: dict | None = None) -> dict:
     """first_plan / replan (first planned slot becomes busy) / what_if_skip (skip a replanned activity)."""
     if scenario not in {"first_plan", "replan", "what_if_skip"}:
         raise ValueError("scenario must be first_plan, replan, or what_if_skip")
@@ -243,12 +274,14 @@ def real_plan(scenario: str, *, target_total: int | None = None, busy_intervals:
         raise ValueError("target_total must be an integer from 0 to 100")
     target = 80 if target_total is None else target_total
     busy = list(busy_intervals or [])
-    first = _step("first_plan", target, busy, None, preference)
+    first = _step("first_plan", target, busy, None, preference, availability_request)
     skip_id = None
     if scenario == "first_plan":
         output = first
     else:
-        second = _step("replan", target, busy + _block_of(first["plan"]), first["plan"], preference)
+        second = _step(
+            "replan", target, busy + _block_of(first["plan"]), first["plan"], preference, availability_request
+        )
         if scenario == "replan":
             output = second
         else:
@@ -310,3 +343,56 @@ def real_plan(scenario: str, *, target_total: int | None = None, busy_intervals:
             "limits_applied": preference.limits.model_dump(mode="json"),
         }
     return result
+
+
+def _plan_signature(result: dict) -> str:
+    selected = [{"activity_id": item["activity_id"], "scheduled_blocks": item.get("scheduled_blocks", [])}
+                for item in result["plan"].get("selected_activities", [])]
+    canonical = json.dumps(selected, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
+def _plan_minutes(plan: dict) -> int:
+    return sum(
+        round((datetime.fromisoformat(block["end"]) - datetime.fromisoformat(block["start"])).total_seconds() / 60)
+        for item in plan.get("selected_activities", []) for block in item.get("scheduled_blocks", [])
+    )
+
+
+def real_plan_options(
+    preference: StudentPreference,
+    *,
+    target_total: int = 80,
+    busy_intervals: list[dict[str, str]] | None = None,
+    availability_request: dict | None = None,
+) -> dict:
+    """Run the existing real-source integration for all supported preference strategies."""
+
+    attempted, options, seen = [], [], set()
+    for strategy in ("MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"):
+        candidate = preference.model_copy(update={"strategy": PlanningStrategy(strategy)})
+        candidate = StudentPreference.model_validate(candidate.model_dump())
+        result = real_plan(
+            "first_plan", target_total=target_total, busy_intervals=busy_intervals,
+            preference=candidate, availability_request=availability_request,
+        )
+        signature = _plan_signature(result)
+        attempted.append({"strategy": strategy, "signature": signature})
+        if signature in seen:
+            continue
+        seen.add(signature)
+        plan, score = result["plan"], result["plan"].get("score_summary") or {}
+        options.append({
+            "strategy": strategy, "signature": signature,
+            "projected_total": score.get("projected_total"),
+            "target_met": score.get("remaining_total") == 0 if score else False,
+            "activity_count": len(plan.get("selected_activities", [])),
+            "duration_minutes": _plan_minutes(plan),
+            "utility": result["personalization"]["total_utility"],
+            "plan": plan, "result": result,
+        })
+    return {
+        "options": options, "attempted": attempted, "deduplicated": len(attempted) - len(options),
+        "message": None if len(options) == len(attempted) else "Một số chiến lược tạo cùng lịch nên đã được gộp.",
+        "source": "real",
+    }
