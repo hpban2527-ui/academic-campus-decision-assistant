@@ -368,22 +368,26 @@ def real_plan_options(
 ) -> dict:
     """Run the existing real-source integration for all supported preference strategies."""
 
-    attempted, options, seen = [], [], set()
+    attempted, options, seen = [], [], {}
     for strategy in ("MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"):
-        candidate = preference.model_copy(update={"strategy": PlanningStrategy(strategy)})
-        candidate = StudentPreference.model_validate(candidate.model_dump())
-        result = real_plan(
-            "first_plan", target_total=target_total, busy_intervals=busy_intervals,
-            preference=candidate, availability_request=availability_request,
-        )
-        signature = _plan_signature(result)
-        attempted.append({"strategy": strategy, "signature": signature})
-        if signature in seen:
+        try:
+            candidate = preference.model_copy(update={"strategy": PlanningStrategy(strategy)})
+            candidate = StudentPreference.model_validate(candidate.model_dump())
+            result = real_plan(
+                "first_plan", target_total=target_total, busy_intervals=busy_intervals,
+                preference=candidate, availability_request=availability_request,
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            attempted.append({"strategy": strategy, "status": "FAILED", "error": str(exc)})
+            options.append({"strategy": strategy, "status": "FAILED", "error": str(exc), "result": None})
             continue
-        seen.add(signature)
+        signature = _plan_signature(result)
+        duplicate_of = seen.get(signature)
+        seen.setdefault(signature, strategy)
+        attempted.append({"strategy": strategy, "status": "READY", "signature": signature})
         plan, score = result["plan"], result["plan"].get("score_summary") or {}
         options.append({
-            "strategy": strategy, "signature": signature,
+            "strategy": strategy, "status": "READY", "signature": signature, "duplicate_of": duplicate_of,
             "projected_total": score.get("projected_total"),
             "target_shortfall": score.get("remaining_total"),
             "target_met": score.get("remaining_total") == 0 if score else False,

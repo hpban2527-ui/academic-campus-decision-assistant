@@ -408,7 +408,15 @@ def deterministic_profile_extraction(
                 value={field: value}, source_text=text.strip(),
             ))
 
-    goal = re.search(r"(?:muc\s*tieu|drl|diem\s*ren\s*luyen)[^\d]{0,30}(\d{1,3})\b", normalized)
+    goal = re.search(
+        r"\b(?:muon\s+dat|dat|nang|can)\D{0,20}(\d{1,3})\s*(?:diem\s*)?(?:ren\s*luyen|drl)\b",
+        normalized,
+    )
+    if goal is None:
+        goal = re.search(
+            r"(?:muc\s*tieu|drl|diem\s*ren\s*luyen)[^\d,;]{0,30}(\d{1,3})\b",
+            normalized,
+        )
     if goal:
         value = int(goal.group(1))
         if 0 <= value <= 100:
@@ -474,17 +482,17 @@ def deterministic_profile_extraction(
 
     preference_value: dict[str, Any] = {}
     topic_terms = {
+        "mathematics": ("toan", "toan hoc"),
         "volunteer": ("tinh nguyen", "cong dong"),
         "artificial_intelligence": ("tri tue nhan tao", " ai "),
+        "economics_finance": ("kinh te", "tai chinh"),
         "computer_science": ("khoa hoc may tinh", "cong nghe thong tin", "cntt"),
         "soft_skills": ("ky nang mem",), "sports": ("the thao",),
         "culture": ("van hoa", "van nghe"), "research": ("nghien cuu",),
         "environment": ("moi truong",), "career": ("nghe nghiep", "viec lam"),
     }
-    preference_scope = " ".join(
-        clause for clause in re.split(r"[;,\n]+", normalized)
-        if re.search(r"\b(?:thich|uu\s*tien|quan\s*tam|muon\s*tham\s*gia)\b", clause)
-    )
+    preference_start = re.search(r"\b(?:thich|uu\s*tien|quan\s*tam|muon\s*tham\s*gia)\b", normalized)
+    preference_scope = normalized[preference_start.start():] if preference_start else ""
     padded = f" {preference_scope} "
     topics = [topic for topic, terms in topic_terms.items() if any(term in padded for term in terms)]
     if topics:

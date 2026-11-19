@@ -357,6 +357,9 @@
       transition-duration: 150ms;
       transition-timing-function: ease-out;
     }
+    label:has(#onboardingMaxActivities),
+    label:has(#onboardingWeeklyHours),
+    label:has(input[name="onboardingCampus"][value="ONLINE"]) { display: none; }
   </style>
 </head>
 <body class="min-h-screen antialiased bg-[#080c14] text-slate-100 selection:bg-indigo-900 selection:text-white">
@@ -4629,13 +4632,29 @@
       return data;
     }
 
-    function renderPlanOptionsSelector() {
+    function renderPlanOptionsSelectorBase() {
       const box = document.getElementById('planOptionsSelector');
       const message = document.getElementById('planOptionsMessage');
       if (!box) return;
       const labels = { MINIMUM_EFFORT: 'Ít thời gian', BALANCED: 'Cân bằng', PREFERENCE_FIRST: 'Theo sở thích' };
       box.innerHTML = cachedPlanOptions.map((option, index) => `<button type="button" onclick="selectCachedPlanOption(${index})" class="rounded-xl border p-3 text-left ${index === selectedPlanOptionIndex ? 'border-emerald-400 bg-emerald-950/30' : 'border-[#2b3a54] bg-[#080d18]'}"><span class="block text-sm font-extrabold text-white">${labels[option.strategy] || option.strategy}</span><span class="mt-1 block text-[11px] text-slate-400">${option.projected_total ?? '—'}đ · thiếu ${option.target_shortfall ?? '—'}đ · ${option.activity_count} hoạt động · ${Math.round((option.duration_minutes || 0) / 60 * 10) / 10} giờ · phù hợp ${option.utility}</span><span class="text-[11px] ${option.target_met ? 'text-emerald-300' : 'text-amber-300'}">${option.target_met ? 'Đạt mục tiêu' : 'Chưa đạt đủ mục tiêu'}</span></button>`).join('');
       if (message) message.textContent = planOptionsMessageText || (cachedPlanOptions.length === 3 ? 'Ba phương án đã lưu; chuyển tức thì không tính lại.' : `${cachedPlanOptions.length} phương án khác nhau đã lưu; chuyển không tính lại.`);
+    }
+
+    function renderPlanOptionsSelector() {
+      renderPlanOptionsSelectorBase();
+      const box = document.getElementById('planOptionsSelector');
+      const labels = { MINIMUM_EFFORT: 'Ãt thá»i gian', BALANCED: 'CÃ¢n báº±ng', PREFERENCE_FIRST: 'Theo sá»Ÿ thÃ­ch' };
+      cachedPlanOptions.forEach((option, index) => {
+        const card = box?.children[index];
+        if (!card) return;
+        if (option.status === 'FAILED') {
+          card.disabled = true;
+          card.innerHTML = `<span class="block text-sm font-extrabold text-white">${labels[option.strategy] || option.strategy}</span><span class="mt-1 block text-[11px] text-rose-300">KhÃ´ng thá»ƒ táº¡o phÆ°Æ¡ng Ã¡n nÃ y: ${escapeHTML(option.error || 'dá»¯ liá»‡u lá»‹ch khÃ´ng há»£p lá»‡')}</span>`;
+        } else if (option.duplicate_of) {
+          card.insertAdjacentHTML('beforeend', `<span class="mt-1 block text-[11px] text-slate-500">TrÃ¹ng lá»‹ch vá»›i phÆ°Æ¡ng Ã¡n ${escapeHTML(labels[option.duplicate_of] || option.duplicate_of)}</span>`);
+        }
+      });
     }
 
     function selectCachedPlanOption(index) {

@@ -437,32 +437,38 @@ def personalized_plan_options(
     busy_intervals: list[dict[str, str]] | None = None,
     availability_request: dict | None = None,
 ) -> dict:
-    """Compute each supported strategy once and deduplicate identical schedules."""
+    """Compute each supported strategy independently and retain all three cards."""
 
     attempted = []
     options = []
-    seen: set[str] = set()
+    seen: dict[str, str] = {}
     for strategy in ("MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"):
-        candidate_preference = preference.model_copy(update={"strategy": PlanningStrategy(strategy)})
-        # Revalidate because model_copy intentionally skips Pydantic validation.
-        candidate_preference = StudentPreference.model_validate(candidate_preference.model_dump())
-        result = personalized_demo_plan(
-            candidate_preference,
-            target_total=target_total,
-            busy_intervals=busy_intervals,
-            availability_request=availability_request,
-        )
-        signature = _plan_signature(result)
-        attempted.append({"strategy": strategy, "signature": signature})
-        if signature in seen:
+        try:
+            candidate_preference = preference.model_copy(update={"strategy": PlanningStrategy(strategy)})
+            # Revalidate because model_copy intentionally skips Pydantic validation.
+            candidate_preference = StudentPreference.model_validate(candidate_preference.model_dump())
+            result = personalized_demo_plan(
+                candidate_preference,
+                target_total=target_total,
+                busy_intervals=busy_intervals,
+                availability_request=availability_request,
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            attempted.append({"strategy": strategy, "status": "FAILED", "error": str(exc)})
+            options.append({"strategy": strategy, "status": "FAILED", "error": str(exc), "result": None})
             continue
-        seen.add(signature)
+        signature = _plan_signature(result)
+        duplicate_of = seen.get(signature)
+        seen.setdefault(signature, strategy)
+        attempted.append({"strategy": strategy, "status": "READY", "signature": signature})
         plan = result["plan"]
         score = plan.get("score_summary") or {}
         options.append(
             {
                 "strategy": strategy,
+                "status": "READY",
                 "signature": signature,
+                "duplicate_of": duplicate_of,
                 "projected_total": score.get("projected_total"),
                 "target_shortfall": score.get("remaining_total"),
                 "target_met": score.get("remaining_total") == 0 if score else False,

@@ -339,7 +339,7 @@ def _validate_profile_content(content: str) -> ProfileExtraction:
                     # deterministic grounding can still recover explicit supported
                     # fields from the user's text after this payload validates.
                     for field, item in normalized_value.items():
-                        normalized_actions.append({**action, "value": {field: item}})
+                        normalized_actions.append({**action, "value": {field: item}, "match": None})
                     continue
             if name not in {"remove_weekly_interval", "remove_exception"} and not (
                 name == "upsert_weekly_interval" and operation == "replace"

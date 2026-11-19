@@ -5,6 +5,7 @@ from copy import deepcopy
 import pytest
 from fastapi.testclient import TestClient
 
+import api.sp3_service as sp3_service
 from api.server import app
 from api.sp3_service import (
     personalized_plan_options,
@@ -21,7 +22,7 @@ def _preference(valid_preference_payload, strategy: str = "BALANCED") -> Student
     return StudentPreference.model_validate(payload)
 
 
-def test_three_strategies_are_computed_and_identical_plans_are_deduplicated(valid_preference_payload) -> None:
+def test_three_strategies_are_computed_independently(valid_preference_payload) -> None:
     result = personalized_plan_options(_preference(valid_preference_payload), target_total=80)
 
     assert len(result["options"]) == 3
@@ -34,6 +35,35 @@ def test_three_strategies_are_computed_and_identical_plans_are_deduplicated(vali
     assert len(signatures) == len(set(signatures))
     assert all(item["plan"]["selected_activities"] is not None for item in result["options"])
     assert all("target_shortfall" in item for item in result["options"])
+
+
+def test_identical_strategy_results_still_return_three_cards(valid_preference_payload, monkeypatch) -> None:
+    preference = _preference(valid_preference_payload)
+    identical = personalized_plan_options(preference, target_total=80)["options"][0]["result"]
+    monkeypatch.setattr(sp3_service, "personalized_demo_plan", lambda *args, **kwargs: deepcopy(identical))
+
+    result = personalized_plan_options(preference, target_total=80)
+
+    assert len(result["options"]) == 3
+    assert [item["status"] for item in result["options"]] == ["READY", "READY", "READY"]
+    assert result["options"][1]["duplicate_of"] == "MINIMUM_EFFORT"
+    assert result["options"][2]["duplicate_of"] == "MINIMUM_EFFORT"
+
+
+def test_one_strategy_failure_does_not_abort_other_cards(valid_preference_payload, monkeypatch) -> None:
+    original = sp3_service.personalized_demo_plan
+
+    def fail_balanced(preference, **kwargs):
+        if preference.strategy.value == "BALANCED":
+            raise ValueError("balanced fixture is infeasible")
+        return original(preference, **kwargs)
+
+    monkeypatch.setattr(sp3_service, "personalized_demo_plan", fail_balanced)
+    result = personalized_plan_options(_preference(valid_preference_payload), target_total=80)
+
+    assert len(result["options"]) == 3
+    assert [item["status"] for item in result["options"]] == ["READY", "FAILED", "READY"]
+    assert result["options"][1]["error"] == "balanced fixture is infeasible"
 
 
 def test_swap_preview_rejects_unselected_or_same_activity(valid_preference_payload) -> None:
