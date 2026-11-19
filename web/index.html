@@ -334,6 +334,27 @@
       height: 672px;
       background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 47px, rgba(51, 65, 85, 0.52) 48px);
     }
+    .onboarding-cal-col {
+      height: 672px;
+      cursor: crosshair;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      background-image:
+        repeating-linear-gradient(to bottom, transparent 0, transparent 23px, rgba(30, 41, 59, 0.45) 24px),
+        repeating-linear-gradient(to bottom, transparent 0, transparent 47px, rgba(51, 65, 85, 0.6) 48px);
+    }
+    .onboarding-drag-ghost {
+      position: absolute;
+      left: 3px;
+      right: 3px;
+      z-index: 20;
+      pointer-events: none;
+      border-radius: 0.5rem;
+      border: 1.5px dashed rgba(129, 140, 248, 0.95);
+      background: rgba(99, 102, 241, 0.3);
+      backdrop-filter: blur(2px);
+    }
     .plan-calendar-event {
       position: absolute;
       left: 5px;
@@ -1862,22 +1883,28 @@
     </div>
   </div>
 
-  <div id="onboardingModal" class="hidden fixed inset-0 z-[110] overflow-y-auto bg-[#080c14]/95 p-3 backdrop-blur-md sm:p-6">
-    <div class="mx-auto my-2 max-w-4xl overflow-hidden rounded-3xl border border-[#1b2537] bg-[#0e1524] shadow-2xl sm:my-6">
-      <div class="flex items-center justify-between border-b border-[#1b2537] px-5 py-4 sm:px-7">
-        <div><p class="text-[11px] font-bold uppercase tracking-[.2em] text-indigo-300">UniLife · Thiết lập hồ sơ</p><h2 class="mt-1 text-lg font-extrabold text-white">Cá nhân hóa hành trình của bạn</h2></div>
-        <span id="onboardingStepLabel" class="rounded-full border border-indigo-400/30 bg-indigo-950/40 px-3 py-1 text-xs font-bold text-indigo-200">Bước 1 / 3</span>
+  <div id="onboardingModal" class="hidden fixed inset-0 z-[110] overflow-y-auto bg-[#060a12]/95 p-3 backdrop-blur-md sm:p-5">
+    <div class="mx-auto my-2 max-w-6xl overflow-hidden rounded-3xl border border-[#1b2537] bg-[#0b1120] shadow-2xl shadow-black/60 sm:my-5">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#1b2537] bg-[#0e1524] px-5 py-4 sm:px-7">
+        <div class="flex items-center gap-3">
+          <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 text-sm font-black text-white shadow-lg shadow-indigo-500/25">U</div>
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-[.2em] text-indigo-300">UniLife · Thiết lập hồ sơ</p>
+            <h2 class="text-base font-extrabold text-white sm:text-lg">Cá nhân hóa hành trình học kỳ</h2>
+          </div>
+        </div>
+        <span id="onboardingStepLabel" class="rounded-full border border-indigo-400/30 bg-indigo-950/50 px-3.5 py-1 text-xs font-bold text-indigo-200">Bước 1 / 3</span>
       </div>
-      <div class="grid grid-cols-3 gap-2 px-5 pt-5 sm:px-7" aria-label="Tiến trình thiết lập hồ sơ">
-        <div id="onboardingStepMarker1" class="rounded-xl border p-3 text-center text-[11px] font-bold">1 · Thông tin của bạn</div>
-        <div id="onboardingStepMarker2" class="rounded-xl border p-3 text-center text-[11px] font-bold">2 · Lịch bận</div>
-        <div id="onboardingStepMarker3" class="rounded-xl border p-3 text-center text-[11px] font-bold">3 · Mục tiêu</div>
+      <div class="grid grid-cols-3 gap-2.5 border-b border-[#151e30] bg-[#090e1a] px-5 py-3.5 sm:px-7" aria-label="Tiến trình thiết lập hồ sơ">
+        <div id="onboardingStepMarker1" class="rounded-xl border px-3 py-2.5 text-center text-xs font-bold">1 · Thông tin sinh viên</div>
+        <div id="onboardingStepMarker2" class="rounded-xl border px-3 py-2.5 text-center text-xs font-bold">2 · Lịch bận trong tuần</div>
+        <div id="onboardingStepMarker3" class="rounded-xl border px-3 py-2.5 text-center text-xs font-bold">3 · Mục tiêu học kỳ</div>
       </div>
-      <div id="onboardingMessage" class="hidden mx-5 mt-4 rounded-xl border px-3 py-2.5 text-sm sm:mx-7" role="status"></div>
-      <div id="onboardingContent" class="min-h-[420px] p-5 sm:p-7"></div>
-      <div class="flex flex-col-reverse justify-between gap-3 border-t border-[#1b2537] px-5 py-4 sm:flex-row sm:px-7">
-        <button id="onboardingBackButton" type="button" onclick="previousOnboardingStep()" class="rounded-xl border border-[#2b3a54] px-5 py-2.5 text-sm font-bold text-slate-300 transition hover:bg-[#11192b]">Quay lại</button>
-        <button id="onboardingNextButton" type="button" onclick="nextOnboardingStep()" class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500">Tiếp tục</button>
+      <div id="onboardingMessage" class="hidden mx-5 mt-4 rounded-xl border px-3.5 py-2.5 text-sm sm:mx-7" role="status"></div>
+      <div id="onboardingContent" class="min-h-[460px] p-5 sm:p-7"></div>
+      <div class="flex flex-col-reverse items-stretch justify-between gap-3 border-t border-[#1b2537] bg-[#0e1524] px-5 py-4 sm:flex-row sm:items-center sm:px-7">
+        <button id="onboardingBackButton" type="button" onclick="previousOnboardingStep()" class="rounded-xl border border-[#2b3a54] bg-[#0b1120] px-5 py-2.5 text-sm font-bold text-slate-300 transition hover:border-slate-500 hover:bg-[#11192b] hover:text-white">Quay lại</button>
+        <button id="onboardingNextButton" type="button" onclick="nextOnboardingStep()" class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-500">Tiếp tục</button>
       </div>
     </div>
   </div>
@@ -2675,7 +2702,9 @@
       };
       saveLocalProfile(profile);
       currentProfileDraft = JSON.parse(JSON.stringify(readLocalUserData(currentStudent.student_id).profile));
-      syncConfirmedPreferenceFromProfile();
+      syncConfirmedPreferenceFromProfile("profile_preferences");
+      renderProfileWorkspace();
+      renderStudentProfile();
       markPlanStale();
       persistCurrentUserData();
       window.alert("Sở thích đã được lưu vào hồ sơ của bạn.");
@@ -2848,7 +2877,7 @@
             format: "",
             topics: []
           },
-          busy_schedule: { applies_to_semester: false, week_start: "2026-11-09", slots: [] },
+          busy_schedule: { applies_to_semester: false, week_start: "2026-11-09", slots: [], entries: [], overrides: [] },
           completed_onboarding: !isNewRegistration,
           onboarding_started: false
         },
@@ -2899,7 +2928,9 @@
           busy_schedule: {
             ...defaults.profile.busy_schedule,
             ...(savedProfile.busy_schedule || {}),
-            slots: Array.isArray(savedProfile.busy_schedule?.slots) ? savedProfile.busy_schedule.slots : []
+            slots: Array.isArray(savedProfile.busy_schedule?.slots) ? savedProfile.busy_schedule.slots : [],
+            entries: Array.isArray(savedProfile.busy_schedule?.entries) ? savedProfile.busy_schedule.entries : [],
+            overrides: Array.isArray(savedProfile.busy_schedule?.overrides) ? savedProfile.busy_schedule.overrides : []
           }
         },
         canonical_availability: { ...defaults.canonical_availability, ...(saved.canonical_availability || {}) },
@@ -3002,17 +3033,90 @@
       return modes;
     }
 
+    function busyScheduleDateSlotKeys(schedule) {
+      const keys = new Set();
+      if (!schedule || schedule.applies_to_semester) return keys;
+      const weekStart = /^\d{4}-\d{2}-\d{2}$/.test(schedule.week_start || "")
+        ? schedule.week_start
+        : AVAILABILITY_DEFAULT_WEEK_START;
+      (Array.isArray(schedule.slots) ? schedule.slots : []).forEach(slot => {
+        const parts = String(slot).split("|");
+        if (parts.length !== 3) return;
+        const isDate = /^\d{4}-\d{2}-\d{2}$/.test(parts[1]);
+        const dayIndex = isDate ? onboardingWeekdayIndex(parts[1]) : Number(parts[1]);
+        const period = AVAILABILITY_PERIODS.find(item => item.key === parts[2]);
+        if (!Number.isInteger(dayIndex) || dayIndex < 0 || dayIndex > 6 || !period) return;
+        const date = isDate ? parts[1] : addDaysToIsoDate(weekStart, dayIndex);
+        keys.add(`${date}|${period.key}`);
+      });
+      return keys;
+    }
+
     function syncBusyScheduleAndIntervals(profile) {
       if (!profile || typeof profile !== "object") return;
-      profile.busy_schedule = profile.busy_schedule || { applies_to_semester: false, week_start: AVAILABILITY_DEFAULT_WEEK_START, slots: [] };
+      profile.busy_schedule = profile.busy_schedule || { applies_to_semester: false, week_start: AVAILABILITY_DEFAULT_WEEK_START, slots: [], entries: [], overrides: [] };
       const schedule = profile.busy_schedule;
       if (!/^\d{4}-\d{2}-\d{2}$/.test(schedule.week_start || "")) {
         schedule.week_start = AVAILABILITY_DEFAULT_WEEK_START;
       }
-      profile.weekly_intervals = Array.isArray(profile.weekly_intervals) ? profile.weekly_intervals : [];
-      profile.exceptions = Array.isArray(profile.exceptions) ? profile.exceptions : [];
-      const slots = Array.isArray(schedule.slots) ? schedule.slots : [];
-      slots.forEach(slot => {
+      schedule.slots = Array.isArray(schedule.slots) ? schedule.slots : [];
+      schedule.entries = Array.isArray(schedule.entries) ? schedule.entries : [];
+      schedule.overrides = Array.isArray(schedule.overrides) ? schedule.overrides : [];
+      const keptWeekly = (Array.isArray(profile.weekly_intervals) ? profile.weekly_intervals : [])
+        .filter(item => item && item.source !== "busy_schedule");
+      const keptExceptions = (Array.isArray(profile.exceptions) ? profile.exceptions : [])
+        .filter(item => item && item.source !== "busy_schedule");
+      const clockRe = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+
+      const pushWeekly = (weekday, start, end, category) => {
+        const exists = keptWeekly.some(item =>
+          item.kind === "busy" && Number(item.weekday) === weekday && item.start === start && item.end === end
+        );
+        if (!exists) {
+          keptWeekly.push({
+            kind: "busy",
+            weekday,
+            start,
+            end,
+            recurrence: "weekly",
+            source: "busy_schedule",
+            category: category || "class",
+            confirmed: true
+          });
+        }
+      };
+
+      const pushException = (date, kind, start, end, category) => {
+        const exists = keptExceptions.some(item =>
+          item.kind === kind && item.date === date && item.start === start && item.end === end
+        );
+        if (!exists) {
+          keptExceptions.push({
+            date,
+            kind,
+            start,
+            end,
+            source: "busy_schedule",
+            category: category || "personal",
+            confirmed: true
+          });
+        }
+      };
+
+      schedule.entries.forEach(entry => {
+        if (!entry || !clockRe.test(entry.start || "") || !clockRe.test(entry.end || "") || entry.start >= entry.end) return;
+        const isDate = /^\d{4}-\d{2}-\d{2}$/.test(entry.date || "");
+        const dayIndex = Number.isInteger(Number(entry.weekday)) ? Number(entry.weekday) : (isDate ? onboardingWeekdayIndex(entry.date) : -1);
+        if (dayIndex < 0 || dayIndex > 6) return;
+        if (schedule.applies_to_semester) {
+          pushWeekly(dayIndex, entry.start, entry.end, entry.category);
+        } else {
+          const date = isDate ? entry.date : addDaysToIsoDate(schedule.week_start, dayIndex);
+          pushException(date, "busy", entry.start, entry.end, entry.category);
+        }
+      });
+
+      schedule.slots.forEach(slot => {
         const parts = String(slot).split("|");
         if (parts.length !== 3) return;
         const isDate = /^\d{4}-\d{2}-\d{2}$/.test(parts[1]);
@@ -3020,37 +3124,21 @@
         const period = AVAILABILITY_PERIODS.find(item => item.key === parts[2]);
         if (!Number.isInteger(dayIndex) || dayIndex < 0 || dayIndex > 6 || !period) return;
         if (schedule.applies_to_semester) {
-          const exists = profile.weekly_intervals.some(item =>
-            item.kind === "busy" && Number(item.weekday) === dayIndex && item.start === period.start && item.end === period.end
-          );
-          if (!exists) {
-            profile.weekly_intervals.push({
-              kind: "busy",
-              weekday: dayIndex,
-              start: period.start,
-              end: period.end,
-              recurrence: "weekly",
-              source: "manual",
-              confirmed: true
-            });
-          }
+          pushWeekly(dayIndex, period.start, period.end, parts[0]);
         } else {
           const date = isDate ? parts[1] : addDaysToIsoDate(schedule.week_start, dayIndex);
-          const exists = profile.exceptions.some(item =>
-            item.kind === "busy" && item.date === date && item.start === period.start && item.end === period.end
-          );
-          if (!exists) {
-            profile.exceptions.push({
-              date,
-              kind: "busy",
-              start: period.start,
-              end: period.end,
-              source: "manual",
-              confirmed: true
-            });
-          }
+          pushException(date, "busy", period.start, period.end, parts[0]);
         }
       });
+
+      schedule.overrides.forEach(ov => {
+        if (!ov || !/^\d{4}-\d{2}-\d{2}$/.test(ov.date || "") || !["available", "busy"].includes(ov.kind)) return;
+        if (!clockRe.test(ov.start || "") || !clockRe.test(ov.end || "") || ov.start >= ov.end) return;
+        pushException(ov.date, ov.kind, ov.start, ov.end, ov.category);
+      });
+
+      profile.weekly_intervals = keptWeekly;
+      profile.exceptions = keptExceptions;
     }
 
     function renderProfileWorkspace() {
@@ -3263,7 +3351,7 @@
         if (targetBadge) targetBadge.textContent = `${currentProfileDraft.drl_target} / 100đ`;
       }
       if (changes.some(change => change.field === "preference_patch")) {
-        syncConfirmedPreferenceFromProfile();
+        syncConfirmedPreferenceFromProfile("preference_patch");
       }
       renderProfileWorkspace();
       renderStudentProfile();
@@ -3272,13 +3360,13 @@
       persistCurrentUserData();
     }
 
-    function syncConfirmedPreferenceFromProfile() {
+    function syncConfirmedPreferenceFromProfile(authoritativeSource = "auto") {
       currentProfileDraft.preference_patch = currentProfileDraft.preference_patch || {
         preferred_topics: [], preferred_categories: [], preferred_modes: [], preferred_campuses: [], max_activities: null, weekly_participation_hours: null
       };
       const patch = currentProfileDraft.preference_patch;
-      const goal = currentProfileDraft.goal || {};
-      const prefs = currentProfileDraft.preferences || {};
+      const goal = currentProfileDraft.goal || { natural_text: "", target_score: 80, priorities: [], format: "", topics: [] };
+      const prefs = currentProfileDraft.preferences || { interest_fields: "", skills: "", personal_goals: "", favorite_activities: "" };
       const targetScore = Number.isFinite(Number(goal.target_score))
         ? Math.max(0, Math.min(100, Number(goal.target_score)))
         : (Number.isFinite(Number(currentProfileDraft.drl_target)) ? Math.max(0, Math.min(100, Number(currentProfileDraft.drl_target))) : 80);
@@ -3291,40 +3379,138 @@
       if (targetBadge) targetBadge.textContent = `${targetScore} / 100đ`;
       if (profileTarget) profileTarget.value = targetScore;
 
-      const topicIds = mapTopicInputsToTopicIds([
-        ...(patch.preferred_topics || []),
-        ...(goal.topics || []),
-        prefs.interest_fields || ""
-      ]);
-      const categoryIds = mapPriorityInputsToCategories([
-        ...(patch.preferred_categories || []),
-        ...(goal.priorities || []),
-        prefs.favorite_activities || ""
-      ]);
-      const modeIds = mapFormatInputToModes(goal.format, patch.preferred_modes);
-      const campusIds = (patch.preferred_campuses || []).filter(c => ["NVC", "DONG_HOA", "ONLINE", "OTHER"].includes(c));
-      patch.preferred_topics = topicIds;
-      patch.preferred_categories = categoryIds;
-      patch.preferred_modes = modeIds;
-      patch.preferred_campuses = campusIds;
-      if ((!Array.isArray(goal.topics) || !goal.topics.length) && topicIds.length) {
-        currentProfileDraft.goal.topics = topicIds.map(id => PREF_LABELS[id] || id);
-      }
-      if ((!Array.isArray(goal.priorities) || !goal.priorities.length) && categoryIds.length) {
-        currentProfileDraft.goal.priorities = categoryIds.map(id => PLAN_CAT_FULL[id] || id);
-      }
-
       const base = confirmedPreference ? JSON.parse(JSON.stringify(confirmedPreference)) : {
         topic_preferences: [], category_priorities: [], campus_preferences: [], mode_preferences: [], time_preferences: [],
         limits: { max_activities: null, max_duration_minutes: null, max_fee: null },
         hard_exclusions: { campus_ids: [], modes: [], time_slots: [] }, strategy: "BALANCED"
       };
-      base.topic_preferences = topicIds.map(topic_id => ({ topic_id, weight: 5 }));
-      base.category_priorities = categoryIds.map(category_id => ({ category_id, weight: 5 }));
-      base.campus_preferences = campusIds.map(campus_id => ({ campus_id, weight: 5 }));
-      base.mode_preferences = modeIds.map(mode => ({ mode, weight: 5 }));
+      const existingWeight = (list, key, id) => {
+        const found = (list || []).find(item => item[key] === id);
+        return Number.isInteger(found?.weight) ? found.weight : 5;
+      };
+      const allowedCampuses = new Set(["NVC", "DONG_HOA", "ONLINE", "OTHER"]);
+      const modeLabels = { online: "Trực tuyến", offline: "Trực tiếp", hybrid: "Kết hợp" };
+
+      let topicIds;
+      let categoryIds;
+      let modeIds;
+      let campusIds;
+
+      if (authoritativeSource === "onboarding") {
+        topicIds = (goal.completed_questions?.q5 || (Array.isArray(goal.topic_ids) && goal.topic_ids.length))
+          ? mapTopicInputsToTopicIds(goal.topic_ids || [])
+          : mapTopicInputsToTopicIds(goal.topics || []);
+        categoryIds = (goal.completed_questions?.q2 || (Array.isArray(goal.priority_ids) && goal.priority_ids.length))
+          ? mapPriorityInputsToCategories(goal.priority_ids || [])
+          : mapPriorityInputsToCategories(goal.priorities || []);
+        base.hard_exclusions = base.hard_exclusions || { campus_ids: [], modes: [], time_slots: [] };
+        if (goal.mode_choice) {
+          if (goal.mode_choice === "prefer_online") {
+            modeIds = ["online"];
+            base.hard_exclusions.modes = [];
+          } else if (goal.mode_choice === "online_only") {
+            modeIds = ["online"];
+            base.hard_exclusions.modes = ["offline", "hybrid"];
+          } else if (goal.mode_choice === "prefer_offline") {
+            modeIds = ["offline"];
+            base.hard_exclusions.modes = [];
+          } else {
+            modeIds = [];
+            base.hard_exclusions.modes = [];
+          }
+        } else {
+          modeIds = mapFormatInputToModes(goal.format);
+        }
+        if (goal.campus_choice) {
+          if (goal.campus_choice === "prefer_nvc") {
+            campusIds = ["NVC"];
+            base.hard_exclusions.campus_ids = [];
+          } else if (goal.campus_choice === "prefer_dong_hoa") {
+            campusIds = ["DONG_HOA"];
+            base.hard_exclusions.campus_ids = [];
+          } else if (goal.campus_choice === "only_nvc") {
+            campusIds = ["NVC"];
+            base.hard_exclusions.campus_ids = ["DONG_HOA"];
+          } else if (goal.campus_choice === "only_dong_hoa") {
+            campusIds = ["DONG_HOA"];
+            base.hard_exclusions.campus_ids = ["NVC"];
+          } else {
+            campusIds = [];
+            base.hard_exclusions.campus_ids = [];
+          }
+        } else {
+          campusIds = (base.campus_preferences || []).map(item => item.campus_id).filter(c => allowedCampuses.has(c));
+        }
+        patch.preferred_topics = topicIds;
+        patch.preferred_categories = categoryIds;
+        patch.preferred_modes = modeIds;
+        patch.preferred_campuses = campusIds;
+        const topicLabels = topicIds.map(id => PREF_LABELS[id] || id);
+        const categoryLabels = categoryIds.map(id => PLAN_CAT_FULL[id] || id);
+        currentProfileDraft.goal.topics = topicLabels;
+        currentProfileDraft.goal.priorities = categoryLabels;
+        currentProfileDraft.preferences = {
+          ...prefs,
+          interest_fields: topicLabels.join(", "),
+          favorite_activities: categoryLabels.join(", ")
+        };
+      } else if (authoritativeSource === "profile_preferences") {
+        topicIds = mapTopicInputsToTopicIds(prefs.interest_fields || "");
+        categoryIds = mapPriorityInputsToCategories(prefs.favorite_activities || "");
+        modeIds = (base.mode_preferences || []).map(item => item.mode);
+        campusIds = (base.campus_preferences || []).map(item => item.campus_id).filter(c => allowedCampuses.has(c));
+        patch.preferred_topics = topicIds;
+        patch.preferred_categories = categoryIds;
+        currentProfileDraft.goal.topics = topicIds.map(id => PREF_LABELS[id] || id);
+        currentProfileDraft.goal.priorities = categoryIds.map(id => PLAN_CAT_FULL[id] || id);
+      } else if (authoritativeSource === "preference_patch") {
+        topicIds = mapTopicInputsToTopicIds(patch.preferred_topics || []);
+        categoryIds = mapPriorityInputsToCategories(patch.preferred_categories || []);
+        modeIds = mapFormatInputToModes("", patch.preferred_modes || []);
+        campusIds = (patch.preferred_campuses || []).filter(c => allowedCampuses.has(c));
+        patch.preferred_topics = topicIds;
+        patch.preferred_categories = categoryIds;
+        patch.preferred_modes = modeIds;
+        patch.preferred_campuses = campusIds;
+        const topicLabels = topicIds.map(id => PREF_LABELS[id] || id);
+        const categoryLabels = categoryIds.map(id => PLAN_CAT_FULL[id] || id);
+        currentProfileDraft.goal.topics = topicLabels;
+        currentProfileDraft.goal.priorities = categoryLabels;
+        currentProfileDraft.goal.format = modeIds.map(m => modeLabels[m] || m).join(", ");
+        currentProfileDraft.preferences = {
+          ...prefs,
+          interest_fields: topicLabels.join(", "),
+          favorite_activities: categoryLabels.join(", ")
+        };
+      } else {
+        topicIds = Array.isArray(patch.preferred_topics) && patch.preferred_topics.length
+          ? mapTopicInputsToTopicIds(patch.preferred_topics)
+          : (Array.isArray(goal.topics) && goal.topics.length
+            ? mapTopicInputsToTopicIds(goal.topics)
+            : mapTopicInputsToTopicIds(prefs.interest_fields || ""));
+        categoryIds = Array.isArray(patch.preferred_categories) && patch.preferred_categories.length
+          ? mapPriorityInputsToCategories(patch.preferred_categories)
+          : (Array.isArray(goal.priorities) && goal.priorities.length
+            ? mapPriorityInputsToCategories(goal.priorities)
+            : mapPriorityInputsToCategories(prefs.favorite_activities || ""));
+        modeIds = Array.isArray(patch.preferred_modes) && patch.preferred_modes.length
+          ? mapFormatInputToModes("", patch.preferred_modes)
+          : mapFormatInputToModes(goal.format);
+        campusIds = (patch.preferred_campuses || []).filter(c => allowedCampuses.has(c));
+        patch.preferred_topics = topicIds;
+        patch.preferred_categories = categoryIds;
+        patch.preferred_modes = modeIds;
+        patch.preferred_campuses = campusIds;
+      }
+
+      base.topic_preferences = topicIds.map(topic_id => ({ topic_id, weight: existingWeight(base.topic_preferences, "topic_id", topic_id) }));
+      base.category_priorities = categoryIds.map(category_id => ({ category_id, weight: existingWeight(base.category_priorities, "category_id", category_id) }));
+      base.campus_preferences = campusIds.map(campus_id => ({ campus_id, weight: existingWeight(base.campus_preferences, "campus_id", campus_id) }));
+      base.mode_preferences = modeIds.map(mode => ({ mode, weight: existingWeight(base.mode_preferences, "mode", mode) }));
       base.limits = base.limits || { max_activities: null, max_duration_minutes: null, max_fee: null };
-      base.limits.max_activities = patch.max_activities || null;
+      if (authoritativeSource === "preference_patch" || patch.max_activities != null) {
+        base.limits.max_activities = patch.max_activities ?? null;
+      }
       confirmedPreference = base;
       preferenceDraft = JSON.parse(JSON.stringify(base));
       renderConfirmedPreferenceSummary();
@@ -3372,7 +3558,8 @@
       saved.confirmed_preference = confirmedPreference ? JSON.parse(JSON.stringify(confirmedPreference)) : null;
       saved.canonical_availability = buildCanonicalAvailability();
       saved.manual_busy_intervals = JSON.parse(JSON.stringify(customBusyIntervals));
-      saved.unavailable_slots = [...unavailableAvailabilitySlots];
+      const scheduleOwnedSlots = busyScheduleDateSlotKeys(saved.profile.busy_schedule);
+      saved.unavailable_slots = [...unavailableAvailabilitySlots].filter(key => !scheduleOwnedSlots.has(key));
       saved.planner = {
         ...saved.planner,
         target_total: normalizedTarget,
@@ -3543,6 +3730,8 @@
       };
       onboardingStep = 1;
       activeOnboardingBusyCategory = "class";
+      activeOnboardingGoalQuestion = 1;
+      onboardingTopicQuery = "";
       onboardingEditableLists = { priorities: false, topics: false };
       closeLoginModal();
       renderOnboardingStep();
@@ -3561,6 +3750,74 @@
       persistOnboardingDraft();
     }
 
+    let onboardingDragState = null;
+    let editingOnboardingEntryId = null;
+
+    const ONBOARDING_BUSY_CATEGORIES = {
+      class: {
+        label: "Học trên lớp",
+        blockClass: "border-indigo-400/70 bg-indigo-500/80 text-white hover:bg-indigo-500/95",
+        badgeClass: "border-indigo-400/35 bg-indigo-500/15 text-indigo-200",
+        dotClass: "bg-indigo-400"
+      },
+      work: {
+        label: "Làm thêm",
+        blockClass: "border-amber-400/70 bg-amber-500/80 text-slate-950 hover:bg-amber-400/95",
+        badgeClass: "border-amber-400/35 bg-amber-500/15 text-amber-200",
+        dotClass: "bg-amber-400"
+      },
+      personal: {
+        label: "Việc cá nhân",
+        blockClass: "border-rose-400/70 bg-rose-500/80 text-white hover:bg-rose-500/95",
+        badgeClass: "border-rose-400/35 bg-rose-500/15 text-rose-200",
+        dotClass: "bg-rose-400"
+      }
+    };
+
+    const ONBOARDING_CAL_START_MIN = 420;
+    const ONBOARDING_CAL_END_MIN = 1260;
+    const ONBOARDING_CAL_PX_PER_HOUR = 48;
+
+    function clockToMinutes(clock) {
+      const m = String(clock || "").match(/^(\d{2}):(\d{2})$/);
+      if (!m) return NaN;
+      return Number(m[1]) * 60 + Number(m[2]);
+    }
+
+    function minutesToClock(totalMinutes) {
+      const clamped = Math.max(ONBOARDING_CAL_START_MIN, Math.min(ONBOARDING_CAL_END_MIN, Math.round(totalMinutes)));
+      const h = Math.floor(clamped / 60);
+      const min = clamped % 60;
+      return `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+    }
+
+    function snapQuarterMinutes(minutes) {
+      const snapped = Math.round(minutes / 15) * 15;
+      return Math.max(ONBOARDING_CAL_START_MIN, Math.min(ONBOARDING_CAL_END_MIN, snapped));
+    }
+
+    function onboardingTimeOptions(minStart, maxEnd, selected) {
+      const options = [];
+      for (let m = minStart; m <= maxEnd; m += 15) {
+        const val = minutesToClock(m);
+        options.push(`<option value="${val}" ${val === selected ? "selected" : ""}>${val}</option>`);
+      }
+      return options.join("");
+    }
+
+    function ensureOnboardingScheduleShape() {
+      if (!onboardingDraft) return null;
+      onboardingDraft.profile.busy_schedule = onboardingDraft.profile.busy_schedule || {
+        applies_to_semester: false, week_start: AVAILABILITY_DEFAULT_WEEK_START, slots: [], entries: [], overrides: []
+      };
+      const schedule = onboardingDraft.profile.busy_schedule;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(schedule.week_start || "")) schedule.week_start = AVAILABILITY_DEFAULT_WEEK_START;
+      if (!Array.isArray(schedule.slots)) schedule.slots = [];
+      if (!Array.isArray(schedule.entries)) schedule.entries = [];
+      if (!Array.isArray(schedule.overrides)) schedule.overrides = [];
+      return schedule;
+    }
+
     function renderOnboardingStep() {
       if (!onboardingDraft) return;
       const content = document.getElementById("onboardingContent");
@@ -3568,85 +3825,165 @@
       const back = document.getElementById("onboardingBackButton");
       const next = document.getElementById("onboardingNextButton");
       const message = document.getElementById("onboardingMessage");
-      if (message) message.className = "hidden mx-5 mt-4 rounded-xl border px-3 py-2.5 text-sm sm:mx-7";
+      if (message) message.className = "hidden mx-5 mt-4 rounded-xl border px-3.5 py-2.5 text-sm sm:mx-7";
       if (label) label.textContent = `Bước ${onboardingStep} / 3`;
       [1, 2, 3].forEach(step => {
         const marker = document.getElementById(`onboardingStepMarker${step}`);
         if (!marker) return;
         marker.className = step === onboardingStep
-          ? "rounded-xl border border-indigo-400/40 bg-indigo-950/40 p-3 text-center text-[11px] font-bold text-indigo-200"
+          ? "rounded-xl border border-indigo-400/50 bg-indigo-500/15 px-3 py-2.5 text-center text-xs font-bold text-indigo-200 shadow-inner shadow-indigo-500/10"
           : step < onboardingStep
-            ? "rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3 text-center text-[11px] font-bold text-emerald-300"
-            : "rounded-xl border border-[#223046] bg-[#080d18] p-3 text-center text-[11px] font-bold text-slate-500";
+            ? "rounded-xl border border-emerald-500/35 bg-emerald-500/10 px-3 py-2.5 text-center text-xs font-bold text-emerald-300"
+            : "rounded-xl border border-[#1b2537] bg-[#080d18] px-3 py-2.5 text-center text-xs font-bold text-slate-500";
       });
-      if (back) back.textContent = onboardingStep === 1 ? "Quay lại" : "Quay lại";
-      if (next) next.textContent = onboardingStep === 3 ? "Xác nhận" : "Tiếp tục";
+      if (back) back.textContent = "Quay lại";
+      if (next) {
+        next.textContent = onboardingStep === 3 ? "Xác nhận & Hoàn tất" : "Tiếp tục";
+        next.disabled = onboardingStep === 3 ? !isOnboardingGoalReady() : false;
+        next.classList.toggle("opacity-50", Boolean(next.disabled));
+        next.classList.toggle("cursor-not-allowed", Boolean(next.disabled));
+      }
 
       if (onboardingStep === 1) {
         const semesters = ["HK3 · 2025–2026", "HK1 · 2026–2027"];
         content.innerHTML = `
-          <div class="mb-5"><h3 class="text-xl font-black text-white">Thông tin của bạn</h3><p class="mt-1 text-sm text-slate-400">Hoàn thiện hồ sơ sinh viên để cá nhân hóa trải nghiệm UniLife.</p></div>
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label class="text-xs font-bold text-slate-300">Họ và tên<input value="${escapeHTML(onboardingDraft.full_name)}" maxlength="100" oninput="updateOnboardingProfileField('full_name', this.value)" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500" /></label>
-            <label class="text-xs font-bold text-slate-300">MSSV<input value="${escapeHTML(onboardingDraft.student_id)}" readonly class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-slate-400 outline-none" /></label>
-            <label class="text-xs font-bold text-slate-300">Khoa<input value="${escapeHTML(onboardingDraft.profile.faculty)}" maxlength="100" oninput="updateOnboardingProfileField('faculty', this.value)" placeholder="Ví dụ: Khoa Công nghệ Thông tin" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500" /></label>
-            <label class="text-xs font-bold text-slate-300">Khóa tuyển<input value="${escapeHTML(onboardingDraft.profile.cohort)}" maxlength="40" oninput="updateOnboardingProfileField('cohort', this.value)" placeholder="Ví dụ: 2025" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500" /></label>
-            <label class="text-xs font-bold text-slate-300">Chương trình học<input value="${escapeHTML(onboardingDraft.profile.program)}" maxlength="120" oninput="updateOnboardingProfileField('program', this.value)" placeholder="Ví dụ: Chương trình chuẩn" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500" /></label>
-            <label class="text-xs font-bold text-slate-300">Học kỳ lập kế hoạch<select onchange="updateOnboardingProfileField('semester', this.value)" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500">${semesters.map(value => `<option ${value === onboardingDraft.profile.semester ? "selected" : ""}>${escapeHTML(value)}</option>`).join("")}</select></label>
+          <div class="mx-auto max-w-3xl">
+            <div class="mb-6">
+              <span class="inline-flex items-center gap-1.5 rounded-full border border-indigo-400/25 bg-indigo-500/10 px-3 py-1 text-[11px] font-bold text-indigo-300">Hồ sơ học tập</span>
+              <h3 class="mt-2.5 text-2xl font-black tracking-tight text-white">Thông tin của bạn</h3>
+              <p class="mt-1 text-sm text-slate-400">Hoàn thiện hồ sơ sinh viên để UniLife đồng bộ kế hoạch học kỳ chính xác.</p>
+            </div>
+            <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 sm:p-6">
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label class="text-xs font-bold text-slate-300">Họ và tên <span class="text-rose-400">*</span>
+                  <input value="${escapeHTML(onboardingDraft.full_name)}" maxlength="100" oninput="updateOnboardingProfileField('full_name', this.value)" placeholder="Nhập họ và tên đầy đủ" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+                </label>
+                <label class="text-xs font-bold text-slate-300">Mã số sinh viên (MSSV)
+                  <input value="${escapeHTML(onboardingDraft.student_id)}" readonly class="mt-1.5 w-full rounded-xl border border-[#1b2537] bg-[#070b14] px-3.5 py-3 text-sm font-mono text-slate-400 outline-none" />
+                </label>
+                <label class="text-xs font-bold text-slate-300">Khoa / Đơn vị đào tạo
+                  <input value="${escapeHTML(onboardingDraft.profile.faculty)}" maxlength="100" oninput="updateOnboardingProfileField('faculty', this.value)" placeholder="Ví dụ: Khoa Công nghệ Thông tin" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+                </label>
+                <label class="text-xs font-bold text-slate-300">Khóa tuyển
+                  <input value="${escapeHTML(onboardingDraft.profile.cohort)}" maxlength="40" oninput="updateOnboardingProfileField('cohort', this.value)" placeholder="Ví dụ: 2025" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+                </label>
+                <label class="text-xs font-bold text-slate-300">Chương trình đào tạo
+                  <input value="${escapeHTML(onboardingDraft.profile.program)}" maxlength="120" oninput="updateOnboardingProfileField('program', this.value)" placeholder="Ví dụ: Chương trình chuẩn" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+                </label>
+                <label class="text-xs font-bold text-slate-300">Học kỳ lập kế hoạch
+                  <select onchange="updateOnboardingProfileField('semester', this.value)" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">${semesters.map(value => `<option ${value === onboardingDraft.profile.semester ? "selected" : ""}>${escapeHTML(value)}</option>`).join("")}</select>
+                </label>
+              </div>
+            </div>
           </div>`;
       } else if (onboardingStep === 2) {
-        const checked = onboardingDraft.profile.busy_schedule.applies_to_semester;
+        const schedule = ensureOnboardingScheduleShape();
+        const checked = Boolean(schedule.applies_to_semester);
         const tabs = [
           ["class", "Học trên lớp"], ["work", "Làm thêm"], ["personal", "Việc cá nhân"]
         ];
+        const countByCat = cat => schedule.entries.filter(e => e.category === cat).length + schedule.slots.filter(s => String(s).startsWith(`${cat}|`)).length;
         content.innerHTML = `
-          <div class="flex flex-wrap items-start justify-between gap-3"><div><h3 class="text-xl font-black text-white">Lịch bận trong tuần</h3><p class="mt-1 text-sm text-slate-400">Chọn khung giờ bận; lịch này sẽ được lưu cùng hồ sơ để tham khảo khi lập kế hoạch.</p></div>
-            <label class="inline-flex items-center gap-2 rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2 text-xs font-semibold text-slate-300"><input type="checkbox" ${checked ? "checked" : ""} onchange="setOnboardingSemesterBusy(this.checked)" class="h-4 w-4 accent-indigo-500" />Áp dụng cho cả học kỳ</label>
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h3 class="text-xl font-black tracking-tight text-white sm:text-2xl">Lịch bận trong tuần</h3>
+              <p class="mt-1 text-sm text-slate-400">Kéo chuột trực tiếp trên lưới 07:00–21:00 để chọn khung bận chính xác theo từng 15 phút, hoặc nhập nhanh ở cột bên phải.</p>
+            </div>
+            <label class="inline-flex cursor-pointer items-center gap-2.5 rounded-xl border ${checked ? "border-indigo-400/50 bg-indigo-950/40 text-indigo-100" : "border-[#223046] bg-[#0e1524] text-slate-300"} px-3.5 py-2.5 text-xs font-bold transition">
+              <input id="onboardingAppliesSemester" type="checkbox" ${checked ? "checked" : ""} onchange="setOnboardingSemesterBusy(this.checked)" class="h-4 w-4 rounded accent-indigo-500" />
+              <span>Áp dụng giống nhau cho cả học kỳ</span>
+            </label>
           </div>
-          <div class="mt-5 border-b border-[#1b2537]">
-            <div class="flex flex-wrap gap-6" role="tablist" aria-label="Loại lịch bận">${tabs.map(([key, title]) => `<button type="button" role="tab" aria-selected="${activeOnboardingBusyCategory === key}" onclick="setOnboardingBusyCategory('${key}')" class="${activeOnboardingBusyCategory === key ? "relative whitespace-nowrap px-1 pb-3 text-sm font-bold text-indigo-300 after:absolute after:inset-x-0 after:-bottom-[1px] after:h-0.5 after:bg-indigo-400" : "relative whitespace-nowrap px-1 pb-3 text-sm font-bold text-slate-400 transition hover:text-white"}">${title}</button>`).join("")}</div>
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-[#1b2537] pb-3">
+            <div class="flex flex-wrap gap-2" role="tablist" aria-label="Loại lịch bận">${tabs.map(([key, title]) => {
+              const meta = ONBOARDING_BUSY_CATEGORIES[key];
+              const active = activeOnboardingBusyCategory === key;
+              return `<button type="button" role="tab" aria-selected="${active}" onclick="setOnboardingBusyCategory('${key}')" class="inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-bold transition ${active ? `${meta.badgeClass} shadow-sm` : "border-[#1b2537] bg-[#0e1524] text-slate-400 hover:border-[#2b3a54] hover:text-white"}"><span class="h-2 w-2 rounded-full ${meta.dotClass}"></span>${title}<span class="rounded-md bg-black/25 px-1.5 py-0.5 text-[10px] planner-number">${countByCat(key)}</span></button>`;
+            }).join("")}</div>
+            <span class="text-[11px] text-slate-400">${checked ? "Đang áp dụng lặp lại hằng tuần cho cả học kỳ." : "Đang chỉ áp dụng cho tuần đang chọn."}</span>
           </div>
-          <div id="onboardingScheduleGrid" class="mt-4 overflow-x-auto rounded-2xl border border-[#223046] bg-[#080d18] p-3" role="tabpanel"></div>
-          <p class="mt-3 text-[11px] text-slate-500">Chọn hoặc bỏ chọn các khung giờ bận. Lịch của từng loại được lưu riêng biệt.</p>`;
+          <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div id="onboardingScheduleGrid" class="overflow-x-auto rounded-2xl border border-[#1b2537] bg-[#080d18] p-3" role="tabpanel"></div>
+            <aside id="onboardingScheduleSidebar" class="space-y-4"></aside>
+          </div>`;
         renderOnboardingSchedule();
       } else {
-        const goal = onboardingDraft.profile.goal;
-        const priorities = Array.isArray(goal.priorities) ? goal.priorities : [];
-        const topics = Array.isArray(goal.topics) ? goal.topics : [];
         content.innerHTML = `
-          <div><h3 class="text-xl font-black text-white">Mục tiêu học kỳ</h3><p class="mt-1 text-sm text-slate-400">Viết mục tiêu bằng ngôn ngữ tự nhiên. Bạn có thể tự chỉnh mọi thông tin trước khi lưu.</p></div>
-          <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
-            <textarea id="onboardingGoalText" rows="3" oninput="updateOnboardingGoalText(this.value)" placeholder="Bạn mong muốn đạt được gì trong học kỳ này?" class="w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none focus:border-indigo-500">${escapeHTML(goal.natural_text)}</textarea>
-            <button type="button" onclick="analyzeOnboardingGoal()" class="self-start rounded-xl border border-indigo-400/30 bg-indigo-500/15 px-5 py-3 text-sm font-bold text-indigo-200 transition hover:bg-indigo-500/25">Phân tích</button>
+          <div class="mb-5">
+            <span class="inline-flex items-center gap-1.5 rounded-full border border-indigo-400/25 bg-indigo-500/10 px-3 py-1 text-[11px] font-bold text-indigo-300">Thiết lập thủ công · 5 câu hỏi nhanh</span>
+            <h3 class="mt-2.5 text-2xl font-black tracking-tight text-white">Mục tiêu học kỳ này</h3>
+            <p class="mt-1 text-sm text-slate-400">Chọn từng tiêu chí bên trái; các lựa chọn sẽ áp dụng trực tiếp vào bộ lập lịch SP3.</p>
           </div>
-          <div id="onboardingAnalysisMessage" class="mt-2 text-[11px] text-slate-500">Phân tích hỗ trợ nhập nhanh bằng từ khóa; hãy rà soát và chỉnh sửa kết quả.</div>
-          <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div class="rounded-2xl border border-[#223046] bg-[#080d18] p-4">
-              <div class="flex items-center justify-between"><label for="onboardingGoalScore" class="text-xs font-bold text-slate-300">Điểm mục tiêu</label><button type="button" onclick="toggleOnboardingEdit('onboardingGoalScore')" class="text-[11px] font-bold text-indigo-300">Chỉnh sửa</button></div>
-              <input id="onboardingGoalScore" type="number" min="0" max="100" value="${safeNumber(goal.target_score) || 80}" disabled oninput="updateOnboardingGoalField('target_score', this.value)" class="mt-3 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2.5 text-sm text-white outline-none disabled:opacity-70 focus:border-indigo-500" />
-            </div>
-            <div class="rounded-2xl border border-[#223046] bg-[#080d18] p-4">
-              <div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-300">Hình thức</span><button type="button" onclick="toggleOnboardingEdit('onboardingGoalFormat')" class="text-[11px] font-bold text-indigo-300">Chỉnh sửa</button></div>
-              <input id="onboardingGoalFormat" value="${escapeHTML(goal.format)}" disabled oninput="updateOnboardingGoalField('format', this.value)" placeholder="Trực tiếp, trực tuyến..." class="mt-3 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2.5 text-sm text-white outline-none disabled:opacity-70 focus:border-indigo-500" />
-            </div>
-            <div class="rounded-2xl border border-[#223046] bg-[#080d18] p-4">
-              <div class="flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-slate-300">Mục ưu tiên</span><div class="flex gap-3"><button type="button" onclick="toggleOnboardingListEdit('priorities')" class="text-[11px] font-bold text-indigo-300">Chỉnh sửa</button><button type="button" onclick="addOnboardingListItem('priorities')" class="text-[11px] font-bold text-indigo-300">+ Thêm mục</button></div></div>
-              <div class="mt-3 space-y-2">${priorities.map((item, index) => `<div class="flex gap-2"><input data-onboarding-list="priorities" ${onboardingEditableLists.priorities ? "" : "disabled"} value="${escapeHTML(item)}" oninput="updateOnboardingListItem('priorities', ${index}, this.value)" class="min-w-0 flex-1 rounded-lg border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none disabled:opacity-70 focus:border-indigo-500" /><button type="button" onclick="removeOnboardingListItem('priorities', ${index})" aria-label="Xóa mục ưu tiên" class="px-2 text-rose-300">×</button></div>`).join("") || `<p class="text-[11px] text-slate-500">Chưa thêm mục ưu tiên.</p>`}</div>
-            </div>
-            <div class="rounded-2xl border border-[#223046] bg-[#080d18] p-4">
-              <div class="flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-slate-300">Chủ đề</span><div class="flex gap-3"><button type="button" onclick="toggleOnboardingListEdit('topics')" class="text-[11px] font-bold text-indigo-300">Chỉnh sửa</button><button type="button" onclick="addOnboardingListItem('topics')" class="text-[11px] font-bold text-indigo-300">+ Thêm chủ đề</button></div></div>
-              <div class="mt-3 space-y-2">${topics.map((item, index) => `<div class="flex gap-2"><input data-onboarding-list="topics" ${onboardingEditableLists.topics ? "" : "disabled"} value="${escapeHTML(item)}" oninput="updateOnboardingListItem('topics', ${index}, this.value)" class="min-w-0 flex-1 rounded-lg border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none disabled:opacity-70 focus:border-indigo-500" /><button type="button" onclick="removeOnboardingListItem('topics', ${index})" aria-label="Xóa chủ đề" class="px-2 text-rose-300">×</button></div>`).join("") || `<p class="text-[11px] text-slate-500">Chưa thêm chủ đề.</p>`}</div>
-            </div>
-          </div>
-          <label class="mt-5 flex items-start gap-3 rounded-xl border border-amber-400/20 bg-amber-950/20 p-4 text-xs leading-relaxed text-amber-100"><input id="onboardingCommitment" type="checkbox" ${onboardingDraft.commitment ? "checked" : ""} onchange="onboardingDraft.commitment = this.checked" class="mt-0.5 h-4 w-4 shrink-0 accent-amber-400" />Tôi xác nhận thông tin đã cung cấp là chính xác và hiểu rằng kết quả UniLife chỉ mang tính hỗ trợ, không thay thế xác nhận chính thức của nhà trường.</label>`;
+          <div class="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div id="onboardingGoalQuestions" class="space-y-3"></div>
+            <aside id="onboardingGoalSummary" class="lg:sticky lg:top-4 h-fit space-y-4"></aside>
+          </div>`;
+        renderOnboardingGoalStep();
       }
+    }
+
+    function onboardingBlocksForDate(schedule, date, dayIndex) {
+      const blocks = [];
+      (schedule.entries || []).forEach(entry => {
+        const entryDay = Number.isInteger(Number(entry.weekday)) ? Number(entry.weekday) : onboardingWeekdayIndex(entry.date);
+        const applies = schedule.applies_to_semester
+          ? entryDay === dayIndex
+          : (entry.date || addDaysToIsoDate(schedule.week_start, entryDay)) === date;
+        if (!applies) return;
+        blocks.push({
+          id: entry.id,
+          sourceType: "entry",
+          category: entry.category || "class",
+          weekday: entryDay,
+          date,
+          start: entry.start,
+          end: entry.end,
+          recurring: Boolean(schedule.applies_to_semester)
+        });
+      });
+      (schedule.slots || []).forEach(slot => {
+        const parts = String(slot).split("|");
+        if (parts.length !== 3) return;
+        const isDate = /^\d{4}-\d{2}-\d{2}$/.test(parts[1]);
+        const slotDay = isDate ? onboardingWeekdayIndex(parts[1]) : Number(parts[1]);
+        const period = AVAILABILITY_PERIODS.find(item => item.key === parts[2]);
+        if (!period || slotDay !== dayIndex) return;
+        const slotDate = isDate ? parts[1] : addDaysToIsoDate(schedule.week_start, slotDay);
+        if (!schedule.applies_to_semester && slotDate !== date) return;
+        blocks.push({
+          id: slot,
+          sourceType: "slot",
+          category: parts[0] || "class",
+          weekday: slotDay,
+          date,
+          start: period.start,
+          end: period.end,
+          recurring: Boolean(schedule.applies_to_semester)
+        });
+      });
+      (schedule.overrides || []).forEach(ov => {
+        if (ov.date !== date) return;
+        blocks.push({
+          id: ov.id,
+          sourceType: "override",
+          kind: ov.kind,
+          category: ov.category || "personal",
+          weekday: dayIndex,
+          date,
+          start: ov.start,
+          end: ov.end,
+          note: ov.note || "",
+          recurring: false
+        });
+      });
+      return blocks;
     }
 
     function renderOnboardingSchedule() {
       const grid = document.getElementById("onboardingScheduleGrid");
       if (!grid || !onboardingDraft) return;
-      const busySlots = new Set(onboardingDraft.profile.busy_schedule.slots || []);
-      const weekStart = onboardingDraft.profile.busy_schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START;
+      const schedule = ensureOnboardingScheduleShape();
+      const weekStart = schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START;
       const weekEnd = addDaysToIsoDate(weekStart, 6);
       const headers = AVAILABILITY_DAYS.map((day, index) => {
         const date = addDaysToIsoDate(weekStart, index);
@@ -3654,44 +3991,427 @@
       }).join("");
       const hourLabels = Array.from({ length: 15 }, (_, index) => {
         const hour = 7 + index;
-        return `<span class="absolute right-2 -translate-y-1/2 text-[10px] text-slate-500 planner-number" style="top:${index * 48}px">${String(hour).padStart(2, "0")}:00</span>`;
+        return `<span class="absolute right-2 -translate-y-1/2 text-[10px] text-slate-500 planner-number" style="top:${index * ONBOARDING_CAL_PX_PER_HOUR}px">${String(hour).padStart(2, "0")}:00</span>`;
       }).join("");
       const dayColumns = AVAILABILITY_DAYS.map((_, dayIndex) => {
         const date = addDaysToIsoDate(weekStart, dayIndex);
-        const blocks = AVAILABILITY_PERIODS.map(period => {
-          const key = `${activeOnboardingBusyCategory}|${date}|${period.key}`;
-          const busy = isOnboardingBusySlotSelected(
-            onboardingDraft.profile.busy_schedule,
-            activeOnboardingBusyCategory,
-            date,
-            dayIndex,
-            period.key,
-            busySlots
-          );
-          const [startHour, startMinute] = period.start.split(":").map(Number);
-          const [endHour, endMinute] = period.end.split(":").map(Number);
-          const top = ((startHour * 60 + startMinute - 420) / 60) * 48;
-          const height = ((endHour * 60 + endMinute - startHour * 60 - startMinute) / 60) * 48;
-          const status = busy ? "Bận" : "Rảnh";
-          return `<button type="button" aria-pressed="${busy}" aria-label="${AVAILABILITY_DAYS[dayIndex]} ${period.label}, ${period.time}: ${status}" title="${period.label} · ${period.time}" onclick="toggleOnboardingBusySlot('${key}')" class="absolute left-1 right-1 z-[1] overflow-hidden rounded-md border px-1.5 py-1 text-left transition ${busy ? "border-rose-400/50 bg-rose-500/70 text-white hover:bg-rose-500/85" : "border-slate-600/50 bg-slate-800/35 text-slate-400 hover:border-indigo-400/60 hover:bg-indigo-950/60"}" style="top:${top + 3}px;height:${height - 6}px">
-            <span class="block text-[10px] font-extrabold">${status} · ${period.label}</span><span class="block mt-1 text-[9px] planner-number opacity-80">${period.time}</span>
-          </button>`;
+        const dayBlocks = onboardingBlocksForDate(schedule, date, dayIndex);
+        const blocksHtml = dayBlocks.map(block => {
+          const startMin = clockToMinutes(block.start);
+          const endMin = clockToMinutes(block.end);
+          if (!Number.isFinite(startMin) || !Number.isFinite(endMin) || endMin <= startMin) return "";
+          const top = ((startMin - ONBOARDING_CAL_START_MIN) / 60) * ONBOARDING_CAL_PX_PER_HOUR;
+          const height = Math.max(18, ((endMin - startMin) / 60) * ONBOARDING_CAL_PX_PER_HOUR - 2);
+          const meta = ONBOARDING_BUSY_CATEGORIES[block.category] || ONBOARDING_BUSY_CATEGORIES.class;
+          if (block.sourceType === "override" && block.kind === "available") {
+            return `<div data-busy-block="override" class="absolute left-1 right-1 z-[4] overflow-hidden rounded-lg border border-dashed border-emerald-400/80 bg-emerald-950/85 px-1.5 py-1 text-left text-emerald-200 shadow-sm" style="top:${top + 1}px;height:${height}px">
+              <div class="flex items-start justify-between gap-1">
+                <span class="truncate text-[10px] font-extrabold">Rảnh · Ghi đè</span>
+                <button type="button" onclick="event.stopPropagation();removeOnboardingBusyOverride('${escapeHTML(block.id)}')" aria-label="Xóa ngoại lệ" class="rounded px-1 text-[11px] leading-none text-emerald-200 hover:bg-emerald-800/70">×</button>
+              </div>
+              <span class="block text-[9px] planner-number opacity-90">${escapeHTML(block.start)}–${escapeHTML(block.end)}</span>
+            </div>`;
+          }
+          const isOverrideBusy = block.sourceType === "override";
+          const isActiveCategory = block.category === activeOnboardingBusyCategory;
+          const deleteHandler = block.sourceType === "entry"
+            ? `removeOnboardingBusyEntry('${escapeHTML(block.id)}')`
+            : block.sourceType === "override"
+              ? `removeOnboardingBusyOverride('${escapeHTML(block.id)}')`
+              : `toggleOnboardingBusySlot('${escapeHTML(block.id)}')`;
+          const selectHandler = block.sourceType === "entry"
+            ? `startEditOnboardingBusyEntry('${escapeHTML(block.id)}')`
+            : "";
+          return `<div data-busy-block="${block.sourceType}" role="button" tabindex="0" ${selectHandler ? `onclick="event.stopPropagation();${selectHandler}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();${selectHandler}}"` : ""} aria-label="${escapeHTML(meta.label)} ${AVAILABILITY_DAYS[dayIndex]} ${block.start}–${block.end}" class="absolute left-1 right-1 z-[2] overflow-hidden rounded-lg border px-1.5 py-1 text-left shadow-sm transition ${meta.blockClass} ${isActiveCategory ? "opacity-100 ring-1 ring-white/20" : "opacity-75 hover:opacity-100"}" style="top:${top + 1}px;height:${height}px">
+            <div class="flex items-start justify-between gap-1">
+              <span class="truncate text-[10px] font-extrabold leading-tight">${escapeHTML(isOverrideBusy ? "Bận đột xuất" : meta.label)}</span>
+              <button type="button" onclick="event.stopPropagation();${deleteHandler}" aria-label="Xóa khung bận" class="rounded px-1 text-[11px] leading-none opacity-80 hover:bg-black/25 hover:opacity-100">×</button>
+            </div>
+            <span class="block text-[9px] font-semibold planner-number opacity-90">${escapeHTML(block.start)}–${escapeHTML(block.end)}</span>
+          </div>`;
         }).join("");
-        return `<div class="plan-calendar-day relative border-l border-[#1b2537]">${blocks}</div>`;
+        return `<div data-onboarding-day-col="${dayIndex}" data-date="${date}" onpointerdown="startOnboardingGridDrag(event, '${date}', ${dayIndex})" onpointermove="moveOnboardingGridDrag(event)" onpointerup="endOnboardingGridDrag(event)" onpointercancel="cancelOnboardingGridDrag()" class="onboarding-cal-col relative border-l border-[#1b2537]">${blocksHtml}</div>`;
       }).join("");
-      grid.innerHTML = `<div class="flex items-center justify-between gap-3 p-1 pb-3">
+      grid.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-2 p-1 pb-3">
           <div class="flex items-center gap-2">
-            <button type="button" onclick="changeOnboardingBusyWeek(-1)" aria-label="Tuần trước" class="w-10 h-10 rounded-xl border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">‹</button>
-            <button type="button" onclick="changeOnboardingBusyWeek(1)" aria-label="Tuần sau" class="w-10 h-10 rounded-xl border border-[#2b3a54] text-slate-300 hover:bg-[#162032]">›</button>
+            <button type="button" onclick="changeOnboardingBusyWeek(-1)" aria-label="Tuần trước" class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2b3a54] bg-[#0e1524] text-slate-300 transition hover:bg-[#162032] hover:text-white">‹</button>
+            <button type="button" onclick="changeOnboardingBusyWeek(1)" aria-label="Tuần sau" class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2b3a54] bg-[#0e1524] text-slate-300 transition hover:bg-[#162032] hover:text-white">›</button>
+            <button type="button" onclick="resetOnboardingBusyWeek()" class="rounded-xl border border-[#223046] bg-[#0e1524] px-2.5 py-1.5 text-[11px] font-bold text-slate-300 transition hover:border-indigo-400/50 hover:text-white">Tuần gốc</button>
           </div>
-          <strong class="text-sm text-white planner-number text-center">Tuần ${shortCalendarDate(weekStart)} – ${shortCalendarDate(weekEnd)}</strong>
-          <span class="hidden sm:inline text-[11px] text-slate-500">07:00–21:00</span>
+          <strong class="text-sm text-white planner-number">Tuần ${shortCalendarDate(weekStart)} – ${shortCalendarDate(weekEnd)}</strong>
+          <span class="rounded-lg border border-[#1b2537] bg-[#0e1524] px-2.5 py-1 text-[11px] text-slate-400">Kéo để chọn · bước 15 phút</span>
         </div>
         <div class="plan-calendar-board">
-          <div class="grid bg-[#0b101b] border-b border-[#1b2537]" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div></div>${headers}</div>
-          <div class="grid" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div class="relative h-[672px] bg-[#080d18]">${hourLabels}</div>${dayColumns}</div>
+          <div class="grid bg-[#0b101b] border-b border-[#1b2537]" style="grid-template-columns:52px repeat(7,minmax(88px,1fr))"><div></div>${headers}</div>
+          <div class="grid" style="grid-template-columns:52px repeat(7,minmax(88px,1fr))"><div class="relative h-[672px] bg-[#080d18]">${hourLabels}</div>${dayColumns}</div>
         </div>
-        <p class="sm:hidden mt-3 text-[11px] text-indigo-300">Kéo ngang để xem đủ 7 ngày trong tuần.</p>`;
+        <p class="sm:hidden mt-3 text-[11px] text-indigo-300">Kéo ngang để xem đủ 7 ngày hoặc dùng biểu mẫu thêm nhanh bên dưới.</p>`;
+      renderOnboardingScheduleSidebar();
+    }
+
+    function renderOnboardingScheduleSidebar() {
+      const sidebar = document.getElementById("onboardingScheduleSidebar");
+      if (!sidebar || !onboardingDraft) return;
+      const schedule = ensureOnboardingScheduleShape();
+      const weekStart = schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START;
+      const entries = schedule.entries || [];
+      const overrides = schedule.overrides || [];
+      const totalMinutes = entries.reduce((sum, item) => {
+        const diff = clockToMinutes(item.end) - clockToMinutes(item.start);
+        return sum + (Number.isFinite(diff) && diff > 0 ? diff : 0);
+      }, 0) + (schedule.slots || []).reduce((sum, slot) => {
+        const period = AVAILABILITY_PERIODS.find(p => p.key === String(slot).split("|")[2]);
+        return sum + (period ? clockToMinutes(period.end) - clockToMinutes(period.start) : 0);
+      }, 0);
+      const totalHoursLabel = (totalMinutes / 60).toFixed(totalMinutes % 60 === 0 ? 0 : 2).replace(/\.00$/, "");
+      const weeklyHours = onboardingDraft.profile.preference_patch?.weekly_participation_hours ?? "";
+
+      const summaryRows = entries.map(entry => {
+        const meta = ONBOARDING_BUSY_CATEGORIES[entry.category] || ONBOARDING_BUSY_CATEGORIES.class;
+        const dayIndex = Number.isInteger(Number(entry.weekday)) ? Number(entry.weekday) : onboardingWeekdayIndex(entry.date);
+        const displayDate = schedule.applies_to_semester
+          ? `${AVAILABILITY_DAYS[dayIndex]} hằng tuần`
+          : `${AVAILABILITY_DAYS[dayIndex]} ${shortCalendarDate(entry.date || addDaysToIsoDate(weekStart, dayIndex))}`;
+        const viewDateForWeekday = addDaysToIsoDate(weekStart, dayIndex);
+        if (editingOnboardingEntryId === entry.id) {
+          return `<div class="rounded-xl border border-indigo-400/50 bg-[#080d18] p-2.5 space-y-2">
+            <div class="grid grid-cols-2 gap-2">
+              <select id="editEntryStart_${escapeHTML(entry.id)}" class="rounded-lg border border-[#223046] bg-[#0e1524] px-2 py-1.5 text-xs text-white">${onboardingTimeOptions(420, 1245, entry.start)}</select>
+              <select id="editEntryEnd_${escapeHTML(entry.id)}" class="rounded-lg border border-[#223046] bg-[#0e1524] px-2 py-1.5 text-xs text-white">${onboardingTimeOptions(435, 1260, entry.end)}</select>
+            </div>
+            <select id="editEntryCat_${escapeHTML(entry.id)}" class="w-full rounded-lg border border-[#223046] bg-[#0e1524] px-2 py-1.5 text-xs text-white">
+              ${Object.entries(ONBOARDING_BUSY_CATEGORIES).map(([k, v]) => `<option value="${k}" ${k === entry.category ? "selected" : ""}>${v.label}</option>`).join("")}
+            </select>
+            <div class="flex justify-end gap-2">
+              <button type="button" onclick="cancelEditOnboardingBusyEntry()" class="rounded-lg border border-[#2b3a54] px-2.5 py-1 text-[11px] font-bold text-slate-300">Hủy</button>
+              <button type="button" onclick="saveEditOnboardingBusyEntry('${escapeHTML(entry.id)}')" class="rounded-lg bg-indigo-600 px-2.5 py-1 text-[11px] font-bold text-white">Lưu</button>
+            </div>
+          </div>`;
+        }
+        return `<div class="rounded-xl border border-[#1b2537] bg-[#080d18] p-2.5">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-white"><span class="h-2 w-2 rounded-full ${meta.dotClass}"></span>${escapeHTML(meta.label)}</span>
+              <div class="mt-0.5 text-[11px] text-slate-400 planner-number">${escapeHTML(displayDate)} · <b class="text-slate-200">${escapeHTML(entry.start)}–${escapeHTML(entry.end)}</b></div>
+            </div>
+            <div class="flex shrink-0 items-center gap-1">
+              <button type="button" onclick="startEditOnboardingBusyEntry('${escapeHTML(entry.id)}')" class="rounded-lg px-2 py-1 text-[11px] font-bold text-indigo-300 hover:bg-indigo-950/60">Sửa</button>
+              <button type="button" onclick="removeOnboardingBusyEntry('${escapeHTML(entry.id)}')" aria-label="Xóa khung bận" class="rounded-lg px-2 py-1 text-[11px] font-bold text-rose-300 hover:bg-rose-950/60">×</button>
+            </div>
+          </div>
+          ${schedule.applies_to_semester ? `<button type="button" onclick="overrideOnboardingRecurringBlock('${viewDateForWeekday}', '${escapeHTML(entry.start)}', '${escapeHTML(entry.end)}', '${escapeHTML(entry.category)}')" class="mt-1.5 text-[10px] font-bold text-emerald-300 hover:underline">+ Ghi đè rảnh ngày ${shortCalendarDate(viewDateForWeekday)}</button>` : ""}
+        </div>`;
+      }).join("");
+
+      const overrideRows = overrides.map(ov => `
+        <div class="flex items-center justify-between gap-2 rounded-xl border ${ov.kind === "available" ? "border-emerald-500/30 bg-emerald-950/20" : "border-amber-500/30 bg-amber-950/20"} px-2.5 py-2 text-[11px]">
+          <div class="min-w-0">
+            <span class="font-bold ${ov.kind === "available" ? "text-emerald-300" : "text-amber-200"}">${ov.kind === "available" ? "Rảnh (ghi đè)" : "Bận đột xuất"}</span>
+            <span class="block text-slate-300 planner-number">${shortCalendarDate(ov.date)} · ${escapeHTML(ov.start)}–${escapeHTML(ov.end)}</span>
+          </div>
+          <button type="button" onclick="removeOnboardingBusyOverride('${escapeHTML(ov.id)}')" aria-label="Xóa ngoại lệ" class="rounded-lg px-2 py-1 font-bold text-slate-300 hover:bg-black/30">×</button>
+        </div>`).join("");
+
+      const dayOptions = AVAILABILITY_DAYS.map((d, i) => {
+        const dt = addDaysToIsoDate(weekStart, i);
+        return `<option value="${i}|${dt}">${d} (${shortCalendarDate(dt)})</option>`;
+      }).join("");
+
+      sidebar.innerHTML = `
+        <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4">
+          <div class="flex items-center justify-between gap-2">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Tóm tắt lịch bận</h4>
+            <span class="rounded-full border border-indigo-400/30 bg-indigo-950/40 px-2.5 py-0.5 text-[11px] font-bold text-indigo-200 planner-number">${entries.length + (schedule.slots || []).length} khung · ${totalHoursLabel}h</span>
+          </div>
+          <div class="mt-3 max-h-52 space-y-2 overflow-y-auto pr-1">
+            ${summaryRows || `<p class="rounded-xl border border-dashed border-[#223046] p-3 text-center text-[11px] text-slate-500">Chưa có khung bận. Kéo chuột trên lịch hoặc thêm nhanh bên dưới.</p>`}
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 space-y-2.5">
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Thêm nhanh (chạm / bàn phím)</h4>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="text-[11px] font-semibold text-slate-400">Ngày<select id="onboardingQuickDay" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${dayOptions}</select></label>
+            <label class="text-[11px] font-semibold text-slate-400">Loại<select id="onboardingQuickCat" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${Object.entries(ONBOARDING_BUSY_CATEGORIES).map(([k, v]) => `<option value="${k}" ${k === activeOnboardingBusyCategory ? "selected" : ""}>${v.label}</option>`).join("")}</select></label>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="text-[11px] font-semibold text-slate-400">Bắt đầu<select id="onboardingQuickStart" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${onboardingTimeOptions(420, 1245, "08:00")}</select></label>
+            <label class="text-[11px] font-semibold text-slate-400">Kết thúc<select id="onboardingQuickEnd" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-2 text-xs text-white">${onboardingTimeOptions(435, 1260, "10:00")}</select></label>
+          </div>
+          <button type="button" onclick="submitOnboardingQuickBusy()" class="w-full rounded-xl bg-indigo-600/90 px-3 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">+ Thêm khung bận</button>
+        </div>
+
+        <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 space-y-2.5">
+          <div>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Ngoại lệ theo ngày / tuần</h4>
+            <p class="mt-0.5 text-[11px] text-slate-500">Ghi đè rảnh vào ngày nghỉ học hoặc thêm bận đột xuất.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="text-[11px] font-semibold text-slate-400">Ngày<input id="onboardingOverrideDate" type="date" value="${weekStart}" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white" /></label>
+            <label class="text-[11px] font-semibold text-slate-400">Loại<select id="onboardingOverrideKind" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white"><option value="available">Rảnh (ghi đè lịch bận)</option><option value="busy">Bận đột xuất</option></select></label>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="text-[11px] font-semibold text-slate-400">Từ<select id="onboardingOverrideStart" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white">${onboardingTimeOptions(420, 1245, "08:00")}</select></label>
+            <label class="text-[11px] font-semibold text-slate-400">Đến<select id="onboardingOverrideEnd" class="mt-1 w-full rounded-lg border border-[#223046] bg-[#080d18] px-2 py-1.5 text-xs text-white">${onboardingTimeOptions(435, 1260, "10:00")}</select></label>
+          </div>
+          <button type="button" onclick="submitOnboardingOverride()" class="w-full rounded-xl border border-emerald-500/35 bg-emerald-500/15 px-3 py-2 text-xs font-bold text-emerald-200 transition hover:bg-emerald-500/25">+ Thêm ngoại lệ ngày</button>
+          <div class="max-h-32 space-y-1.5 overflow-y-auto">${overrideRows}</div>
+        </div>
+
+        <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4">
+          <label for="onboardingWeeklyParticipationHours" class="block text-xs font-extrabold uppercase tracking-wider text-slate-300">Giờ tham gia hoạt động / tuần (tùy chọn)</label>
+          <p class="mt-1 text-[11px] text-slate-500">Để trống nếu bạn không muốn giới hạn tổng thời lượng hoạt động mỗi tuần.</p>
+          <input id="onboardingWeeklyParticipationHours" type="number" min="0.5" max="168" step="0.5" value="${escapeHTML(weeklyHours)}" oninput="setOnboardingWeeklyHours(this.value)" placeholder="Ví dụ: 6 (giờ/tuần)" class="mt-2.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" />
+        </div>`;
+    }
+
+    function pointerMinutesInColumn(colEl, clientY) {
+      const rect = colEl.getBoundingClientRect ? colEl.getBoundingClientRect() : { top: 0, height: 672 };
+      const relY = Math.max(0, Math.min(rect.height || 672, clientY - rect.top));
+      const rawMinutes = ONBOARDING_CAL_START_MIN + (relY / ONBOARDING_CAL_PX_PER_HOUR) * 60;
+      return snapQuarterMinutes(rawMinutes);
+    }
+
+    function updateOnboardingDragGhost() {
+      if (!onboardingDragState) return;
+      const { colEl, startMin, endMin } = onboardingDragState;
+      let ghost = onboardingDragState.ghostEl;
+      if (!ghost && colEl?.appendChild) {
+        ghost = document.createElement("div");
+        ghost.className = "onboarding-drag-ghost px-1.5 py-1 text-[10px] font-extrabold text-indigo-100 planner-number";
+        colEl.appendChild(ghost);
+        onboardingDragState.ghostEl = ghost;
+      }
+      if (!ghost) return;
+      const top = ((startMin - ONBOARDING_CAL_START_MIN) / 60) * ONBOARDING_CAL_PX_PER_HOUR;
+      const height = Math.max(12, ((endMin - startMin) / 60) * ONBOARDING_CAL_PX_PER_HOUR);
+      ghost.style.top = `${top}px`;
+      ghost.style.height = `${height}px`;
+      ghost.textContent = `${minutesToClock(startMin)}–${minutesToClock(endMin)}`;
+    }
+
+    function startOnboardingGridDrag(event, date, dayIndex) {
+      if (event.button != null && event.button !== 0) return;
+      if (event.target?.closest && event.target.closest("[data-busy-block]")) return;
+      const colEl = event.currentTarget;
+      const anchorMin = Math.min(ONBOARDING_CAL_END_MIN - 15, pointerMinutesInColumn(colEl, event.clientY));
+      onboardingDragState = {
+        colEl,
+        date,
+        dayIndex,
+        anchorMin,
+        startMin: anchorMin,
+        endMin: Math.min(ONBOARDING_CAL_END_MIN, anchorMin + 15),
+        pointerId: event.pointerId ?? null,
+        ghostEl: null
+      };
+      if (event.pointerId != null && colEl?.setPointerCapture) {
+        try { colEl.setPointerCapture(event.pointerId); } catch (_) {}
+      }
+      updateOnboardingDragGhost();
+    }
+
+    function moveOnboardingGridDrag(event) {
+      if (!onboardingDragState) return;
+      const curMin = pointerMinutesInColumn(onboardingDragState.colEl, event.clientY);
+      if (curMin >= onboardingDragState.anchorMin) {
+        onboardingDragState.startMin = onboardingDragState.anchorMin;
+        onboardingDragState.endMin = Math.max(onboardingDragState.anchorMin + 15, Math.min(ONBOARDING_CAL_END_MIN, curMin));
+      } else {
+        onboardingDragState.startMin = Math.max(ONBOARDING_CAL_START_MIN, curMin);
+        onboardingDragState.endMin = Math.min(ONBOARDING_CAL_END_MIN, onboardingDragState.anchorMin + 15);
+      }
+      updateOnboardingDragGhost();
+    }
+
+    function cancelOnboardingGridDrag() {
+      if (onboardingDragState?.ghostEl?.remove) onboardingDragState.ghostEl.remove();
+      onboardingDragState = null;
+    }
+
+    function endOnboardingGridDrag(event) {
+      if (!onboardingDragState) return;
+      if (event && Number.isFinite(event.clientY)) moveOnboardingGridDrag(event);
+      const { date, dayIndex, startMin, endMin } = onboardingDragState;
+      cancelOnboardingGridDrag();
+      addOnboardingBusyEntry({
+        category: activeOnboardingBusyCategory,
+        weekday: dayIndex,
+        date,
+        start: minutesToClock(startMin),
+        end: minutesToClock(endMin)
+      });
+    }
+
+    function addOnboardingBusyEntry({ category, weekday, date, start, end }) {
+      if (!onboardingDraft) return null;
+      const schedule = ensureOnboardingScheduleShape();
+      const startMin = clockToMinutes(start);
+      const endMin = clockToMinutes(end);
+      if (!Number.isFinite(startMin) || !Number.isFinite(endMin) || startMin < ONBOARDING_CAL_START_MIN || endMin > ONBOARDING_CAL_END_MIN || endMin <= startMin) {
+        showOnboardingMessage("Khung giờ bận phải nằm trong 07:00–21:00 và giờ kết thúc phải sau giờ bắt đầu.");
+        return null;
+      }
+      const normCategory = ONBOARDING_BUSY_CATEGORIES[category] ? category : "class";
+      const normDay = Number.isInteger(Number(weekday)) ? Number(weekday) : onboardingWeekdayIndex(date);
+      const normDate = /^\d{4}-\d{2}-\d{2}$/.test(date || "") ? date : addDaysToIsoDate(schedule.week_start, normDay);
+      const normStart = minutesToClock(snapQuarterMinutes(startMin));
+      const normEnd = minutesToClock(snapQuarterMinutes(endMin));
+      if (normStart >= normEnd) return null;
+      const duplicate = schedule.entries.find(item =>
+        item.category === normCategory &&
+        item.start === normStart &&
+        item.end === normEnd &&
+        (schedule.applies_to_semester ? Number(item.weekday) === normDay : item.date === normDate)
+      );
+      if (duplicate) return duplicate;
+      const entry = {
+        id: `bs_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        category: normCategory,
+        weekday: normDay,
+        date: normDate,
+        start: normStart,
+        end: normEnd
+      };
+      schedule.entries.push(entry);
+      syncBusyScheduleAndIntervals(onboardingDraft.profile);
+      persistOnboardingDraft();
+      renderOnboardingStep();
+      return entry;
+    }
+
+    function startEditOnboardingBusyEntry(entryId) {
+      editingOnboardingEntryId = entryId;
+      renderOnboardingScheduleSidebar();
+    }
+
+    function cancelEditOnboardingBusyEntry() {
+      editingOnboardingEntryId = null;
+      renderOnboardingScheduleSidebar();
+    }
+
+    function saveEditOnboardingBusyEntry(entryId) {
+      const start = document.getElementById(`editEntryStart_${entryId}`)?.value;
+      const end = document.getElementById(`editEntryEnd_${entryId}`)?.value;
+      const category = document.getElementById(`editEntryCat_${entryId}`)?.value;
+      updateOnboardingBusyEntry(entryId, { start, end, category });
+    }
+
+    function updateOnboardingBusyEntry(entryId, updates) {
+      if (!onboardingDraft) return false;
+      const schedule = ensureOnboardingScheduleShape();
+      const entry = schedule.entries.find(item => item.id === entryId);
+      if (!entry) return false;
+      const nextStart = updates.start ?? entry.start;
+      const nextEnd = updates.end ?? entry.end;
+      if (clockToMinutes(nextStart) >= clockToMinutes(nextEnd)) {
+        showOnboardingMessage("Giờ kết thúc phải sau giờ bắt đầu.");
+        return false;
+      }
+      entry.start = nextStart;
+      entry.end = nextEnd;
+      if (updates.category && ONBOARDING_BUSY_CATEGORIES[updates.category]) entry.category = updates.category;
+      editingOnboardingEntryId = null;
+      syncBusyScheduleAndIntervals(onboardingDraft.profile);
+      persistOnboardingDraft();
+      renderOnboardingStep();
+      return true;
+    }
+
+    function removeOnboardingBusyEntry(entryId) {
+      if (!onboardingDraft) return;
+      const schedule = ensureOnboardingScheduleShape();
+      schedule.entries = schedule.entries.filter(item => item.id !== entryId);
+      if (editingOnboardingEntryId === entryId) editingOnboardingEntryId = null;
+      syncBusyScheduleAndIntervals(onboardingDraft.profile);
+      persistOnboardingDraft();
+      renderOnboardingStep();
+    }
+
+    function submitOnboardingQuickBusy() {
+      const dayVal = document.getElementById("onboardingQuickDay")?.value || "";
+      const [dayStr, date] = dayVal.split("|");
+      const category = document.getElementById("onboardingQuickCat")?.value || activeOnboardingBusyCategory;
+      const start = document.getElementById("onboardingQuickStart")?.value || "08:00";
+      const end = document.getElementById("onboardingQuickEnd")?.value || "10:00";
+      addOnboardingBusyEntry({ category, weekday: Number(dayStr), date, start, end });
+    }
+
+    function addOnboardingBusyOverride({ date, kind, start, end, category = "personal", note = "" }) {
+      if (!onboardingDraft) return null;
+      const schedule = ensureOnboardingScheduleShape();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "") || !["available", "busy"].includes(kind)) {
+        showOnboardingMessage("Ngày hoặc loại ngoại lệ không hợp lệ.");
+        return null;
+      }
+      const startMin = clockToMinutes(start);
+      const endMin = clockToMinutes(end);
+      if (!Number.isFinite(startMin) || !Number.isFinite(endMin) || startMin < ONBOARDING_CAL_START_MIN || endMin > ONBOARDING_CAL_END_MIN || endMin <= startMin) {
+        showOnboardingMessage("Giờ ngoại lệ phải nằm trong 07:00–21:00 và giờ kết thúc sau giờ bắt đầu.");
+        return null;
+      }
+      const exists = schedule.overrides.find(ov => ov.date === date && ov.kind === kind && ov.start === start && ov.end === end);
+      if (exists) return exists;
+      const override = {
+        id: `ov_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        date,
+        kind,
+        start,
+        end,
+        category,
+        note
+      };
+      schedule.overrides.push(override);
+      syncBusyScheduleAndIntervals(onboardingDraft.profile);
+      persistOnboardingDraft();
+      renderOnboardingSchedule();
+      return override;
+    }
+
+    function submitOnboardingOverride() {
+      const date = document.getElementById("onboardingOverrideDate")?.value || "";
+      const kind = document.getElementById("onboardingOverrideKind")?.value || "available";
+      const start = document.getElementById("onboardingOverrideStart")?.value || "08:00";
+      const end = document.getElementById("onboardingOverrideEnd")?.value || "10:00";
+      addOnboardingBusyOverride({ date, kind, start, end });
+    }
+
+    function overrideOnboardingRecurringBlock(date, start, end, category) {
+      addOnboardingBusyOverride({ date, kind: "available", start, end, category });
+    }
+
+    function removeOnboardingBusyOverride(overrideId) {
+      if (!onboardingDraft) return;
+      const schedule = ensureOnboardingScheduleShape();
+      schedule.overrides = schedule.overrides.filter(ov => ov.id !== overrideId);
+      syncBusyScheduleAndIntervals(onboardingDraft.profile);
+      persistOnboardingDraft();
+      renderOnboardingSchedule();
+    }
+
+    function setOnboardingWeeklyHours(value) {
+      if (!onboardingDraft) return;
+      onboardingDraft.profile.preference_patch = onboardingDraft.profile.preference_patch || {
+        preferred_topics: [], preferred_categories: [], preferred_modes: [], preferred_campuses: [], max_activities: null, weekly_participation_hours: null
+      };
+      const trimmed = String(value ?? "").trim();
+      if (!trimmed) {
+        onboardingDraft.profile.preference_patch.weekly_participation_hours = null;
+      } else {
+        const num = Number(trimmed);
+        if (Number.isFinite(num) && num >= 0.5 && num <= 168) {
+          onboardingDraft.profile.preference_patch.weekly_participation_hours = num;
+        }
+      }
+      persistOnboardingDraft();
+    }
+
+    function resetOnboardingBusyWeek() {
+      if (!onboardingDraft) return;
+      const schedule = ensureOnboardingScheduleShape();
+      schedule.week_start = AVAILABILITY_DEFAULT_WEEK_START;
+      persistOnboardingDraft();
+      renderOnboardingSchedule();
     }
 
     function onboardingWeekdayIndex(isoDate) {
@@ -3716,7 +4436,7 @@
 
     function changeOnboardingBusyWeek(direction) {
       if (!onboardingDraft) return;
-      const schedule = onboardingDraft.profile.busy_schedule;
+      const schedule = ensureOnboardingScheduleShape();
       schedule.week_start = addDaysToIsoDate(schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START, direction * 7);
       persistOnboardingDraft();
       renderOnboardingSchedule();
@@ -3730,7 +4450,7 @@
 
     function toggleOnboardingBusySlot(key) {
       const [category, date, periodKey] = key.split("|");
-      const schedule = onboardingDraft.profile.busy_schedule;
+      const schedule = ensureOnboardingScheduleShape();
       const dayIndex = onboardingWeekdayIndex(date);
       const slots = Array.isArray(schedule.slots) ? schedule.slots : [];
       const selected = isOnboardingBusySlotSelected(schedule, category, date, dayIndex, periodKey, slots);
@@ -3749,81 +4469,426 @@
       schedule.slots = selected
         ? slots.filter(slot => !matchesSlot(slot))
         : [...slots, key];
+      syncBusyScheduleAndIntervals(onboardingDraft.profile);
       persistOnboardingDraft();
-      renderOnboardingSchedule();
+      renderOnboardingStep();
     }
 
     function setOnboardingSemesterBusy(value) {
-      onboardingDraft.profile.busy_schedule.applies_to_semester = Boolean(value);
+      const schedule = ensureOnboardingScheduleShape();
+      schedule.applies_to_semester = Boolean(value);
+      syncBusyScheduleAndIntervals(onboardingDraft.profile);
       persistOnboardingDraft();
-      renderOnboardingSchedule();
+      renderOnboardingStep();
     }
 
-    function updateOnboardingGoalText(value) {
-      onboardingDraft.profile.goal.natural_text = value;
-      persistOnboardingDraft();
+    let activeOnboardingGoalQuestion = 1;
+    let onboardingTopicQuery = "";
+
+    const ONBOARDING_ALL_TOPICS = [
+      "mathematics", "physics", "chemistry", "biology", "computer_science",
+      "foreign_language", "economics_finance", "artificial_intelligence", "technology",
+      "research", "soft_skills", "career", "volunteer", "environment", "culture",
+      "sports", "health", "safety", "civic_education"
+    ];
+
+    const ONBOARDING_MODE_OPTIONS = [
+      { id: "any", title: "Linh hoạt mọi hình thức", desc: "Chấp nhận cả trực tiếp, trực tuyến và kết hợp.", badge: "Không ràng buộc", badgeClass: "border-slate-600/50 bg-slate-800/60 text-slate-300" },
+      { id: "prefer_online", title: "Ưu tiên Online", desc: "Ưu tiên hoạt động trực tuyến nhưng vẫn cho phép trực tiếp khi cần đạt điểm.", badge: "Ưu tiên mềm", badgeClass: "border-indigo-400/35 bg-indigo-500/15 text-indigo-200" },
+      { id: "online_only", title: "Chỉ tham gia Online", desc: "Loại trừ hoàn toàn hoạt động trực tiếp (offline) và kết hợp (hybrid).", badge: "Loại trừ bắt buộc", badgeClass: "border-rose-400/40 bg-rose-500/15 text-rose-200" },
+      { id: "prefer_offline", title: "Ưu tiên Trực tiếp (Offline)", desc: "Ưu tiên hoạt động diễn ra trực tiếp tại trường.", badge: "Ưu tiên mềm", badgeClass: "border-indigo-400/35 bg-indigo-500/15 text-indigo-200" }
+    ];
+
+    const ONBOARDING_CAMPUS_OPTIONS = [
+      { id: "any", title: "Cơ sở nào cũng được", desc: "Không giới hạn cơ sở tổ chức hoạt động.", badge: "Không ràng buộc", badgeClass: "border-slate-600/50 bg-slate-800/60 text-slate-300" },
+      { id: "prefer_nvc", title: "Ưu tiên cơ sở Nguyễn Văn Cừ (NVC)", desc: "Ưu tiên hoạt động tại NVC, vẫn cho phép cơ sở khác khi cần.", badge: "Ưu tiên mềm", badgeClass: "border-indigo-400/35 bg-indigo-500/15 text-indigo-200" },
+      { id: "prefer_dong_hoa", title: "Ưu tiên cơ sở Đông Hòa (Linh Trung)", desc: "Ưu tiên hoạt động tại Đông Hòa, vẫn cho phép cơ sở khác khi cần.", badge: "Ưu tiên mềm", badgeClass: "border-indigo-400/35 bg-indigo-500/15 text-indigo-200" },
+      { id: "only_nvc", title: "Chỉ tham gia tại NVC", desc: "Loại trừ hoàn toàn hoạt động tại cơ sở Đông Hòa.", badge: "Loại trừ bắt buộc", badgeClass: "border-rose-400/40 bg-rose-500/15 text-rose-200" },
+      { id: "only_dong_hoa", title: "Chỉ tham gia tại Đông Hòa", desc: "Loại trừ hoàn toàn hoạt động tại cơ sở Nguyễn Văn Cừ.", badge: "Loại trừ bắt buộc", badgeClass: "border-rose-400/40 bg-rose-500/15 text-rose-200" }
+    ];
+
+    const ONBOARDING_CATEGORY_OPTIONS = [
+      { id: "C1", title: "Mục 1 · Học tập & NCKH", desc: "Hội thảo học thuật, NCKH, thi học thuật, kỹ năng chuyên môn." },
+      { id: "C2", title: "Mục 2 · Chấp hành nội quy", desc: "Sinh hoạt công dân, tuyên truyền pháp luật & quy chế." },
+      { id: "C3", title: "Mục 3 · Chính trị, Văn hóa, Thể thao", desc: "Văn nghệ, thể thao, giao lưu văn hóa & phong trào." },
+      { id: "C4", title: "Mục 4 · Cộng đồng & Tình nguyện", desc: "Tình nguyện, hiến máu, hoạt động vì cộng đồng & môi trường." },
+      { id: "C5", title: "Mục 5 · Cán bộ lớp & CLB", desc: "Hoạt động Ban cán sự, Đoàn – Hội, Câu lạc bộ / Đội / Nhóm." },
+      { id: "ANY", title: "Linh hoạt mọi mục ĐRL", desc: "Để UniLife tự cân đối các mục nhằm đạt điểm mục tiêu." }
+    ];
+
+    function ensureOnboardingGoalShape() {
+      if (!onboardingDraft) return null;
+      const g = onboardingDraft.profile.goal = onboardingDraft.profile.goal || {
+        natural_text: "", target_score: 80, priorities: [], format: "", topics: []
+      };
+      if (!g.completed_questions || typeof g.completed_questions !== "object") {
+        g.completed_questions = { q1: false, q2: false, q3: false, q4: false, q5: false };
+      }
+      if (!Array.isArray(g.priority_ids)) g.priority_ids = mapPriorityInputsToCategories(g.priorities || []);
+      if (!Array.isArray(g.topic_ids)) g.topic_ids = mapTopicInputsToTopicIds(g.topics || []);
+      if (!g.mode_choice) g.mode_choice = "";
+      if (!g.campus_choice) g.campus_choice = "";
+      return g;
+    }
+
+    function isOnboardingGoalReady() {
+      const g = ensureOnboardingGoalShape();
+      if (!g) return false;
+      const cq = g.completed_questions;
+      return Boolean(cq.q1 && cq.q2 && cq.q3 && cq.q4);
     }
 
     function updateOnboardingGoalField(field, value) {
-      onboardingDraft.profile.goal[field] = field === "target_score"
+      const g = ensureOnboardingGoalShape();
+      if (!g) return;
+      g[field] = field === "target_score"
         ? Math.max(0, Math.min(100, safeNumber(value)))
         : value;
       persistOnboardingDraft();
     }
 
-    function updateOnboardingListItem(field, index, value) {
-      onboardingDraft.profile.goal[field][index] = value;
+    function advanceOnboardingGoalQuestion(nextQ) {
+      activeOnboardingGoalQuestion = Math.max(1, Math.min(5, nextQ));
       persistOnboardingDraft();
+      renderOnboardingGoalStep();
+      const nextBtn = document.getElementById("onboardingNextButton");
+      if (nextBtn && onboardingStep === 3) {
+        const ready = isOnboardingGoalReady();
+        nextBtn.disabled = !ready;
+        nextBtn.classList.toggle("opacity-50", !ready);
+        nextBtn.classList.toggle("cursor-not-allowed", !ready);
+      }
+      window.setTimeout(() => {
+        const card = document.getElementById(`onboardingGoalQ${activeOnboardingGoalQuestion}`);
+        card?.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
+      }, 20);
     }
 
-    function addOnboardingListItem(field) {
-      onboardingEditableLists[field] = true;
-      onboardingDraft.profile.goal[field].push("");
-      renderOnboardingStep();
-      const inputs = document.querySelectorAll(`#onboardingContent input[data-onboarding-list="${field}"]`);
-      if (inputs.length) inputs[inputs.length - 1].focus();
+    function editOnboardingGoalQuestion(qNum) {
+      activeOnboardingGoalQuestion = Math.max(1, Math.min(5, Number(qNum) || 1));
+      renderOnboardingGoalStep();
+      window.setTimeout(() => {
+        const card = document.getElementById(`onboardingGoalQ${activeOnboardingGoalQuestion}`);
+        card?.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
+      }, 20);
+    }
+
+    function selectOnboardingTargetPreset(score) {
+      const g = ensureOnboardingGoalShape();
+      if (!g) return;
+      const num = Math.max(0, Math.min(100, Math.round(Number(score))));
+      if (!Number.isFinite(num)) return;
+      g.target_score = num;
+      onboardingDraft.profile.drl_target = num;
+      g.completed_questions.q1 = true;
+      advanceOnboardingGoalQuestion(2);
+    }
+
+    function confirmOnboardingCustomTarget() {
+      const input = document.getElementById("onboardingCustomTargetInput");
+      const raw = input?.value?.trim();
+      const num = Number(raw);
+      if (raw === "" || !Number.isInteger(num) || num < 0 || num > 100) {
+        showOnboardingMessage("Vui lòng nhập điểm mục tiêu là số nguyên từ 0 đến 100.");
+        return;
+      }
+      selectOnboardingTargetPreset(num);
+    }
+
+    function selectOnboardingCategoryChoice(catId) {
+      const g = ensureOnboardingGoalShape();
+      if (!g) return;
+      if (catId === "ANY") {
+        g.priority_ids = [];
+      } else if (["C1", "C2", "C3", "C4", "C5"].includes(catId)) {
+        g.priority_ids = [catId];
+      }
+      g.priorities = g.priority_ids.map(id => PLAN_CAT_FULL[id] || id);
+      g.completed_questions.q2 = true;
+      advanceOnboardingGoalQuestion(3);
+    }
+
+    function toggleOnboardingCategoryMulti(catId) {
+      const g = ensureOnboardingGoalShape();
+      if (!g || !["C1", "C2", "C3", "C4", "C5"].includes(catId)) return;
+      if (g.priority_ids.includes(catId)) {
+        g.priority_ids = g.priority_ids.filter(id => id !== catId);
+      } else {
+        g.priority_ids = [...g.priority_ids, catId];
+      }
+      g.priorities = g.priority_ids.map(id => PLAN_CAT_FULL[id] || id);
+      g.completed_questions.q2 = true;
       persistOnboardingDraft();
+      renderOnboardingGoalStep();
     }
 
-    function toggleOnboardingListEdit(field) {
-      onboardingEditableLists[field] = !onboardingEditableLists[field];
-      renderOnboardingStep();
+    function selectOnboardingModeChoice(modeId) {
+      const g = ensureOnboardingGoalShape();
+      if (!g) return;
+      const opt = ONBOARDING_MODE_OPTIONS.find(item => item.id === modeId);
+      if (!opt) return;
+      g.mode_choice = modeId;
+      g.format = opt.title;
+      g.completed_questions.q3 = true;
+      advanceOnboardingGoalQuestion(4);
     }
 
-    function removeOnboardingListItem(field, index) {
-      onboardingDraft.profile.goal[field].splice(index, 1);
-      renderOnboardingStep();
+    function selectOnboardingCampusChoice(campusId) {
+      const g = ensureOnboardingGoalShape();
+      if (!g) return;
+      const opt = ONBOARDING_CAMPUS_OPTIONS.find(item => item.id === campusId);
+      if (!opt) return;
+      g.campus_choice = campusId;
+      g.completed_questions.q4 = true;
+      advanceOnboardingGoalQuestion(5);
+    }
+
+    function setOnboardingTopicSearch(query) {
+      onboardingTopicQuery = String(query || "");
+      renderOnboardingGoalStep(true);
+    }
+
+    function toggleOnboardingTopicId(topicId) {
+      const g = ensureOnboardingGoalShape();
+      if (!g || !ONBOARDING_ALL_TOPICS.includes(topicId)) return;
+      if (g.topic_ids.includes(topicId)) {
+        g.topic_ids = g.topic_ids.filter(id => id !== topicId);
+      } else {
+        g.topic_ids = [...g.topic_ids, topicId];
+      }
+      g.topics = g.topic_ids.map(id => PREF_LABELS[id] || id);
       persistOnboardingDraft();
+      renderOnboardingGoalStep(true);
     }
 
-    function toggleOnboardingEdit(id) {
-      const field = document.getElementById(id);
-      if (!field) return;
-      field.disabled = !field.disabled;
-      if (!field.disabled) field.focus();
-    }
-
-    function analyzeOnboardingGoal() {
-      const goal = onboardingDraft.profile.goal;
-      const text = String(goal.natural_text || "").trim();
-      const scoreMatch = text.match(/(?:điểm mục tiêu|mục tiêu|đrl)?\s*(\d{1,3})\s*(?:điểm|đ|\/100)/i);
-      if (scoreMatch) goal.target_score = Math.max(0, Math.min(100, Number(scoreMatch[1])));
-      const categoryTerms = [
-        ["Tình nguyện / cộng đồng", /tình nguyện|cộng đồng|hiến máu/i],
-        ["Học thuật / nghiên cứu", /học thuật|nghiên cứu|học tập|điểm số/i],
-        ["Thể thao / văn nghệ", /thể thao|văn nghệ|văn hóa/i],
-        ["Kỹ năng / nghề nghiệp", /kỹ năng|nghề nghiệp|thực tập|việc làm/i]
-      ];
-      const foundPriorities = categoryTerms.filter(([, pattern]) => pattern.test(text)).map(([label]) => label);
-      if (foundPriorities.length) goal.priorities = foundPriorities;
-      const topicMatches = ["công nghệ", "lập trình", "trí tuệ nhân tạo", "môi trường", "ngoại ngữ", "tài chính", "sức khỏe", "an toàn"]
-        .filter(topic => text.toLocaleLowerCase("vi").includes(topic));
-      if (topicMatches.length) goal.topics = topicMatches;
-      goal.format = /trực tuyến|online|webinar/i.test(text) ? "Trực tuyến" : /kết hợp|hybrid/i.test(text) ? "Kết hợp" : "Trực tiếp";
+    function finishOnboardingTopics(skip = false) {
+      const g = ensureOnboardingGoalShape();
+      if (!g) return;
+      if (skip) {
+        g.topic_ids = [];
+        g.topics = [];
+      } else {
+        g.topics = g.topic_ids.map(id => PREF_LABELS[id] || id);
+      }
+      g.completed_questions.q5 = true;
+      activeOnboardingGoalQuestion = 0;
       persistOnboardingDraft();
-      renderOnboardingStep();
-      const status = document.getElementById("onboardingAnalysisMessage");
-      if (status) status.textContent = "Đã phân tích gợi ý. Hãy kiểm tra và chỉnh sửa các trường trước khi xác nhận.";
+      renderOnboardingGoalStep();
+    }
+
+    function renderOnboardingGoalStep(preserveSearchFocus = false) {
+      const qBox = document.getElementById("onboardingGoalQuestions");
+      const sBox = document.getElementById("onboardingGoalSummary");
+      if (!qBox || !sBox || !onboardingDraft) return;
+      const g = ensureOnboardingGoalShape();
+      const cq = g.completed_questions;
+      const modeOpt = ONBOARDING_MODE_OPTIONS.find(o => o.id === g.mode_choice);
+      const campusOpt = ONBOARDING_CAMPUS_OPTIONS.find(o => o.id === g.campus_choice);
+
+      const summaryRow = (num, title, valueHtml, badgeHtml = "") => `
+        <div id="onboardingGoalQ${num}" class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-500/25 bg-[#0e1524] px-4 py-3.5 transition">
+          <div class="flex min-w-0 items-center gap-3">
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-black text-emerald-300">✓</span>
+            <div class="min-w-0">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Câu ${num} · ${escapeHTML(title)}</div>
+              <div class="mt-0.5 flex flex-wrap items-center gap-2 text-sm font-bold text-white">${valueHtml}${badgeHtml}</div>
+            </div>
+          </div>
+          <button type="button" onclick="editOnboardingGoalQuestion(${num})" class="rounded-lg border border-[#2b3a54] bg-[#080d18] px-3 py-1.5 text-xs font-bold text-indigo-300 transition hover:border-indigo-400/60 hover:text-white">Sửa</button>
+        </div>`;
+
+      const pendingRow = (num, title, unlocked) => `
+        <div id="onboardingGoalQ${num}" class="flex items-center justify-between gap-3 rounded-2xl border border-[#1b2537] bg-[#080d18]/80 px-4 py-3.5 opacity-65">
+          <div class="flex items-center gap-3">
+            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#223046] text-xs font-bold text-slate-400">${num}</span>
+            <span class="text-sm font-bold text-slate-400">${escapeHTML(title)}</span>
+          </div>
+          ${unlocked ? `<button type="button" onclick="editOnboardingGoalQuestion(${num})" class="text-xs font-bold text-indigo-300 hover:underline">Mở</button>` : `<span class="text-[11px] text-slate-500">Chờ câu trước</span>`}
+        </div>`;
+
+      const q1Html = activeOnboardingGoalQuestion === 1
+        ? `<div id="onboardingGoalQ1" class="rounded-2xl border border-indigo-400/50 bg-[#0e1524] p-5 shadow-lg shadow-indigo-950/30">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Câu 1 / 5 · Bắt buộc</span>
+              <span class="text-[11px] text-slate-400">Mục tiêu điểm rèn luyện</span>
+            </div>
+            <h4 class="mt-1.5 text-lg font-black text-white">Bạn muốn đạt bao nhiêu điểm rèn luyện học kỳ này?</h4>
+            <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              ${[
+                [65, "Khá", "Đạt mức an toàn, tối ưu thời gian"],
+                [80, "Tốt", "Cân bằng học tập và hoạt động"],
+                [90, "Xuất sắc", "Mục tiêu học bổng & thành tích cao"]
+              ].map(([score, rank, desc]) => `
+                <button type="button" onclick="selectOnboardingTargetPreset(${score})" class="rounded-2xl border p-4 text-left transition ${cq.q1 && g.target_score === score ? "border-indigo-400 bg-indigo-500/20 text-white" : "border-[#223046] bg-[#080d18] text-slate-200 hover:border-indigo-400/60 hover:bg-[#11192b]"}">
+                  <div class="flex items-baseline justify-between"><span class="text-2xl font-black planner-number">${score}đ</span><span class="rounded-full bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold text-indigo-200">${rank}</span></div>
+                  <p class="mt-2 text-xs text-slate-400">${desc}</p>
+                </button>`).join("")}
+            </div>
+            <div class="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[#223046] bg-[#080d18] p-3">
+              <label for="onboardingCustomTargetInput" class="text-xs font-bold text-slate-300">Hoặc nhập điểm tùy chỉnh (0–100):</label>
+              <input id="onboardingCustomTargetInput" type="number" min="0" max="100" value="${escapeHTML(g.target_score ?? "")}" placeholder="Ví dụ: 85" class="w-24 rounded-lg border border-[#2b3a54] bg-[#0e1524] px-3 py-1.5 text-sm font-bold text-white outline-none focus:border-indigo-500" />
+              <button type="button" onclick="confirmOnboardingCustomTarget()" class="rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-indigo-500">Chọn điểm này</button>
+            </div>
+          </div>`
+        : cq.q1
+          ? summaryRow(1, "Mục tiêu ĐRL", `<span class="planner-number">${g.target_score} / 100 điểm</span>`)
+          : pendingRow(1, "Mục tiêu điểm rèn luyện", true);
+
+      const q2Html = activeOnboardingGoalQuestion === 2
+        ? `<div id="onboardingGoalQ2" class="rounded-2xl border border-indigo-400/50 bg-[#0e1524] p-5 shadow-lg shadow-indigo-950/30">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Câu 2 / 5 · Bắt buộc</span>
+              <span class="rounded-full border border-indigo-400/35 bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold text-indigo-200">Ưu tiên mềm</span>
+            </div>
+            <h4 class="mt-1.5 text-lg font-black text-white">Bạn muốn ưu tiên nhóm mục điểm rèn luyện nào?</h4>
+            <p class="mt-1 text-xs text-slate-400">Nhấn vào một mục để chọn nhanh và chuyển câu tiếp theo, hoặc chọn nhiều mục rồi bấm tiếp tục.</p>
+            <div class="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              ${ONBOARDING_CATEGORY_OPTIONS.map(opt => {
+                const selected = opt.id === "ANY" ? (cq.q2 && g.priority_ids.length === 0) : g.priority_ids.includes(opt.id);
+                return `<button type="button" onclick="selectOnboardingCategoryChoice('${opt.id}')" class="rounded-xl border p-3.5 text-left transition ${selected ? "border-indigo-400 bg-indigo-500/20 text-white" : "border-[#223046] bg-[#080d18] text-slate-200 hover:border-indigo-400/60 hover:bg-[#11192b]"}">
+                  <div class="text-xs font-extrabold">${escapeHTML(opt.title)}</div>
+                  <p class="mt-1 text-[11px] text-slate-400">${escapeHTML(opt.desc)}</p>
+                </button>`;
+              }).join("")}
+            </div>
+          </div>`
+        : cq.q2
+          ? summaryRow(2, "Mục ưu tiên", escapeHTML(g.priority_ids.length ? g.priority_ids.map(id => `${id} · ${PLAN_CAT_FULL[id]}`).join(", ") : "Linh hoạt mọi mục"), `<span class="rounded-full border border-indigo-400/30 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-bold text-indigo-200">Ưu tiên mềm</span>`)
+          : pendingRow(2, "Mục điểm rèn luyện ưu tiên", cq.q1);
+
+      const q3Html = activeOnboardingGoalQuestion === 3
+        ? `<div id="onboardingGoalQ3" class="rounded-2xl border border-indigo-400/50 bg-[#0e1524] p-5 shadow-lg shadow-indigo-950/30">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Câu 3 / 5 · Bắt buộc</span>
+              <span class="text-[11px] text-slate-400">Phân biệt Ưu tiên vs Loại trừ</span>
+            </div>
+            <h4 class="mt-1.5 text-lg font-black text-white">Bạn mong muốn tham gia hoạt động theo hình thức nào?</h4>
+            <div class="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              ${ONBOARDING_MODE_OPTIONS.map(opt => `
+                <button type="button" onclick="selectOnboardingModeChoice('${opt.id}')" class="rounded-xl border p-3.5 text-left transition ${g.mode_choice === opt.id ? "border-indigo-400 bg-indigo-500/20 text-white" : "border-[#223046] bg-[#080d18] text-slate-200 hover:border-indigo-400/60 hover:bg-[#11192b]"}">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-extrabold">${escapeHTML(opt.title)}</span>
+                    <span class="shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold ${opt.badgeClass}">${opt.badge}</span>
+                  </div>
+                  <p class="mt-1.5 text-[11px] text-slate-400">${escapeHTML(opt.desc)}</p>
+                </button>`).join("")}
+            </div>
+          </div>`
+        : cq.q3
+          ? summaryRow(3, "Hình thức tham gia", escapeHTML(modeOpt?.title || "Linh hoạt"), modeOpt ? `<span class="rounded-full border px-2 py-0.5 text-[10px] font-bold ${modeOpt.badgeClass}">${modeOpt.badge}</span>` : "")
+          : pendingRow(3, "Hình thức tham gia", cq.q2);
+
+      const q4Html = activeOnboardingGoalQuestion === 4
+        ? `<div id="onboardingGoalQ4" class="rounded-2xl border border-indigo-400/50 bg-[#0e1524] p-5 shadow-lg shadow-indigo-950/30">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Câu 4 / 5 · Bắt buộc</span>
+              <span class="text-[11px] text-slate-400">Phân biệt Ưu tiên vs Loại trừ</span>
+            </div>
+            <h4 class="mt-1.5 text-lg font-black text-white">Bạn muốn tham gia hoạt động ở cơ sở nào?</h4>
+            <div class="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              ${ONBOARDING_CAMPUS_OPTIONS.map(opt => `
+                <button type="button" onclick="selectOnboardingCampusChoice('${opt.id}')" class="rounded-xl border p-3.5 text-left transition ${g.campus_choice === opt.id ? "border-indigo-400 bg-indigo-500/20 text-white" : "border-[#223046] bg-[#080d18] text-slate-200 hover:border-indigo-400/60 hover:bg-[#11192b]"}">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-extrabold">${escapeHTML(opt.title)}</span>
+                    <span class="shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-bold ${opt.badgeClass}">${opt.badge}</span>
+                  </div>
+                  <p class="mt-1.5 text-[11px] text-slate-400">${escapeHTML(opt.desc)}</p>
+                </button>`).join("")}
+            </div>
+          </div>`
+        : cq.q4
+          ? summaryRow(4, "Cơ sở tham gia", escapeHTML(campusOpt?.title || "Cơ sở nào cũng được"), campusOpt ? `<span class="rounded-full border px-2 py-0.5 text-[10px] font-bold ${campusOpt.badgeClass}">${campusOpt.badge}</span>` : "")
+          : pendingRow(4, "Cơ sở tham gia", cq.q3);
+
+      const queryLower = onboardingTopicQuery.trim().toLocaleLowerCase("vi");
+      const filteredTopics = ONBOARDING_ALL_TOPICS.filter(id => {
+        if (!queryLower) return true;
+        const label = (PREF_LABELS[id] || id).toLocaleLowerCase("vi");
+        return label.includes(queryLower) || id.includes(queryLower);
+      });
+
+      const q5Html = activeOnboardingGoalQuestion === 5
+        ? `<div id="onboardingGoalQ5" class="rounded-2xl border border-indigo-400/50 bg-[#0e1524] p-5 shadow-lg shadow-indigo-950/30">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Câu 5 / 5 · Tùy chọn</span>
+              <span class="rounded-full border border-indigo-400/35 bg-indigo-500/15 px-2 py-0.5 text-[10px] font-bold text-indigo-200">Ưu tiên mềm · 19 chủ đề</span>
+            </div>
+            <h4 class="mt-1.5 text-lg font-black text-white">Chủ đề / lĩnh vực bạn quan tâm</h4>
+            <p class="mt-1 text-xs text-slate-400">Tìm kiếm và chọn một hoặc nhiều chủ đề để ưu tiên khi xếp lịch, hoặc bỏ qua bước này.</p>
+            <input id="onboardingTopicSearch" type="search" value="${escapeHTML(onboardingTopicQuery)}" oninput="setOnboardingTopicSearch(this.value)" placeholder="Tìm chủ đề (ví dụ: Trí tuệ nhân tạo, Ngoại ngữ, Tình nguyện...)" class="mt-3 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-2.5 text-xs text-white outline-none focus:border-indigo-500" />
+            <div class="mt-3 flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-1">
+              ${filteredTopics.map(id => {
+                const selected = g.topic_ids.includes(id);
+                return `<button type="button" aria-pressed="${selected}" onclick="toggleOnboardingTopicId('${id}')" class="rounded-full border px-3 py-1.5 text-xs font-bold transition ${selected ? "border-indigo-400 bg-indigo-500/25 text-white" : "border-[#223046] bg-[#080d18] text-slate-300 hover:border-indigo-400/50 hover:text-white"}">${selected ? "✓ " : ""}${escapeHTML(PREF_LABELS[id] || id)}</button>`;
+              }).join("") || `<p class="text-xs text-slate-500">Không tìm thấy chủ đề phù hợp.</p>`}
+            </div>
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[#1b2537] pt-3">
+              <button type="button" onclick="finishOnboardingTopics(true)" class="rounded-xl border border-[#2b3a54] px-3.5 py-2 text-xs font-bold text-slate-300 transition hover:bg-[#11192b] hover:text-white">Bỏ qua bước này</button>
+              <button type="button" onclick="finishOnboardingTopics(false)" class="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-indigo-500">Lưu chủ đề (${g.topic_ids.length})</button>
+            </div>
+          </div>`
+        : cq.q5
+          ? summaryRow(5, "Chủ đề quan tâm", escapeHTML(g.topic_ids.length ? g.topic_ids.map(id => PREF_LABELS[id] || id).join(", ") : "Không giới hạn chủ đề (đã bỏ qua)"))
+          : pendingRow(5, "Chủ đề / sở thích quan tâm (tùy chọn)", cq.q4);
+
+      qBox.innerHTML = `${q1Html}${q2Html}${q3Html}${q4Html}${q5Html}`;
+
+      const ready = isOnboardingGoalReady();
+      const selectedTopicsChips = g.topic_ids.length
+        ? g.topic_ids.map(id => `<span class="inline-flex items-center gap-1 rounded-full border border-indigo-400/30 bg-indigo-500/15 px-2 py-0.5 text-[11px] font-semibold text-indigo-200">${escapeHTML(PREF_LABELS[id] || id)}</span>`).join("")
+        : `<span class="text-xs text-slate-500">${cq.q5 ? "Đã bỏ qua (mọi chủ đề)" : "Chưa chọn (tùy chọn)"}</span>`;
+
+      sBox.innerHTML = `
+        <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 space-y-3.5">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Tóm tắt lựa chọn</h4>
+            <span class="rounded-full px-2 py-0.5 text-[10px] font-bold ${ready ? "bg-emerald-500/15 text-emerald-300" : "bg-amber-500/15 text-amber-200"}">${ready ? "Sẵn sàng xác nhận" : "Cần 4 câu bắt buộc"}</span>
+          </div>
+          <dl class="space-y-2.5 text-xs">
+            <div class="rounded-xl border border-[#1b2537] bg-[#080d18] p-2.5">
+              <dt class="text-[10px] font-bold uppercase text-slate-500">1. Mục tiêu ĐRL</dt>
+              <dd class="mt-1 font-extrabold text-white planner-number">${cq.q1 ? `${g.target_score} / 100 điểm` : "Chưa chọn"}</dd>
+            </div>
+            <div class="rounded-xl border border-[#1b2537] bg-[#080d18] p-2.5">
+              <dt class="text-[10px] font-bold uppercase text-slate-500">2. Mục ưu tiên</dt>
+              <dd class="mt-1 font-bold text-slate-200">${cq.q2 ? escapeHTML(g.priority_ids.length ? g.priority_ids.map(id => `${id} · ${PLAN_CAT_FULL[id]}`).join(", ") : "Linh hoạt mọi mục") : "Chưa chọn"}</dd>
+            </div>
+            <div class="rounded-xl border border-[#1b2537] bg-[#080d18] p-2.5">
+              <dt class="text-[10px] font-bold uppercase text-slate-500">3. Hình thức</dt>
+              <dd class="mt-1 flex flex-wrap items-center gap-1.5 font-bold text-slate-200">${cq.q3 && modeOpt ? `${escapeHTML(modeOpt.title)} <span class="rounded-full border px-1.5 py-0.5 text-[9px] ${modeOpt.badgeClass}">${modeOpt.badge}</span>` : "Chưa chọn"}</dd>
+            </div>
+            <div class="rounded-xl border border-[#1b2537] bg-[#080d18] p-2.5">
+              <dt class="text-[10px] font-bold uppercase text-slate-500">4. Cơ sở</dt>
+              <dd class="mt-1 flex flex-wrap items-center gap-1.5 font-bold text-slate-200">${cq.q4 && campusOpt ? `${escapeHTML(campusOpt.title)} <span class="rounded-full border px-1.5 py-0.5 text-[9px] ${campusOpt.badgeClass}">${campusOpt.badge}</span>` : "Chưa chọn"}</dd>
+            </div>
+            <div class="rounded-xl border border-[#1b2537] bg-[#080d18] p-2.5">
+              <dt class="text-[10px] font-bold uppercase text-slate-500">5. Chủ đề quan tâm</dt>
+              <dd class="mt-1.5 flex flex-wrap gap-1.5">${selectedTopicsChips}</dd>
+            </div>
+          </dl>
+          <div class="rounded-xl border border-[#1b2537] bg-[#080d18]/70 p-2.5 text-[11px] leading-relaxed text-slate-400">
+            <div><span class="font-bold text-indigo-300">Ưu tiên mềm:</span> Cộng điểm ưu tiên khi xếp lịch.</div>
+            <div class="mt-1"><span class="font-bold text-rose-300">Loại trừ bắt buộc:</span> Loại bỏ hoàn toàn hoạt động không khớp.</div>
+          </div>
+          <button id="onboardingConfirmGoalBtn" type="button" ${ready ? "" : "disabled"} onclick="nextOnboardingStep()" class="w-full rounded-xl px-4 py-2.5 text-sm font-extrabold transition ${ready ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25 hover:bg-emerald-500" : "cursor-not-allowed bg-slate-800 text-slate-500"}">Xác nhận & Lưu hồ sơ</button>
+          <p class="text-[10px] leading-relaxed text-slate-500">Kết quả UniLife mang tính hỗ trợ, không thay thế xác nhận chính thức của nhà trường.</p>
+        </div>`;
+
+      const nextBtn = document.getElementById("onboardingNextButton");
+      if (nextBtn && onboardingStep === 3) {
+        nextBtn.disabled = !ready;
+        nextBtn.classList.toggle("opacity-50", !ready);
+        nextBtn.classList.toggle("cursor-not-allowed", !ready);
+      }
+
+      if (preserveSearchFocus) {
+        const searchEl = document.getElementById("onboardingTopicSearch");
+        if (searchEl) {
+          searchEl.focus();
+          const len = searchEl.value.length;
+          searchEl.setSelectionRange?.(len, len);
+        }
+      }
     }
 
     function showOnboardingMessage(message) {
@@ -3865,11 +4930,14 @@
       }
       if (onboardingStep === 2) {
         onboardingStep = 3;
+        const g = ensureOnboardingGoalShape();
+        const cq = g.completed_questions;
+        activeOnboardingGoalQuestion = !cq.q1 ? 1 : !cq.q2 ? 2 : !cq.q3 ? 3 : !cq.q4 ? 4 : 5;
         renderOnboardingStep();
         return;
       }
-      if (!document.getElementById("onboardingCommitment")?.checked) {
-        showOnboardingMessage("Vui lòng xác nhận cam kết trước khi hoàn tất thiết lập.");
+      if (!isOnboardingGoalReady()) {
+        showOnboardingMessage("Vui lòng hoàn thành 4 câu hỏi bắt buộc trước khi xác nhận.");
         return;
       }
       completeOnboarding();
@@ -3881,9 +4949,9 @@
       profile.drl_target = profile.goal.target_score;
       profile.preferences = {
         ...profile.preferences,
-        interest_fields: profile.preferences.interest_fields || profile.goal.topics.join(", "),
-        personal_goals: profile.preferences.personal_goals || profile.goal.natural_text,
-        favorite_activities: profile.preferences.favorite_activities || profile.goal.priorities.join(", ")
+        interest_fields: (profile.goal.topics || []).filter(Boolean).join(", "),
+        personal_goals: profile.goal.natural_text || profile.preferences.personal_goals || "",
+        favorite_activities: (profile.goal.priorities || []).filter(Boolean).join(", ")
       };
       profile.completed_onboarding = true;
       profile.onboarding_started = false;
@@ -3900,7 +4968,7 @@
       localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
       currentProfileDraft = JSON.parse(JSON.stringify(data.profile));
       restoreOnboardingBusySchedule(currentProfileDraft.busy_schedule, data);
-      syncConfirmedPreferenceFromProfile();
+      syncConfirmedPreferenceFromProfile("onboarding");
       persistCurrentUserData();
       const users = readLocalUsers();
       const account = users.find(user => normalizeMssv(user.student_id) === normalizeMssv(currentStudent.student_id));
@@ -4061,7 +5129,7 @@
 
     async function applyCurrentStudent(st) {
       if (!st) return;
-      plannerRequestGeneration++;
+      const requestGeneration = ++plannerRequestGeneration;
       const plannerButton = document.getElementById("btnRunPlanner");
       if (plannerButton) plannerButton.disabled = false;
       document.getElementById("headerUserName").innerText = st.full_name || "Sinh viên";
@@ -4095,6 +5163,7 @@
       renderCategoryBars(studentCategoryScores);
       updateResetBaselineButton();
       await loadConfirmedPreferenceForStudent(st.student_id);
+      if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== st.student_id) return;
       if (!confirmedPreference && accountData.confirmed_preference) {
         confirmedPreference = JSON.parse(JSON.stringify(accountData.confirmed_preference));
         preferenceDraft = JSON.parse(JSON.stringify(accountData.confirmed_preference));
@@ -4833,9 +5902,53 @@
       container.innerHTML = rows.length ? `<span class="w-full text-[11px] font-bold text-sky-300">Quy tắc lặp lại và ngoại lệ đã xác nhận</span>${rows.join('')}` : '';
     }
 
+    function removeBusyScheduleSlotsMatching({ weekday = null, date = null, periodKey = null, start = null, end = null }) {
+      const schedule = currentProfileDraft?.busy_schedule;
+      if (!schedule) return;
+      const weekStart = /^\d{4}-\d{2}-\d{2}$/.test(schedule.week_start || "")
+        ? schedule.week_start
+        : AVAILABILITY_DEFAULT_WEEK_START;
+      if (Array.isArray(schedule.slots)) {
+        schedule.slots = schedule.slots.filter(slot => {
+          const parts = String(slot).split("|");
+          if (parts.length !== 3) return true;
+          const isDate = /^\d{4}-\d{2}-\d{2}$/.test(parts[1]);
+          const slotDay = isDate ? onboardingWeekdayIndex(parts[1]) : Number(parts[1]);
+          const slotDate = isDate ? parts[1] : addDaysToIsoDate(weekStart, slotDay);
+          const period = AVAILABILITY_PERIODS.find(item => item.key === parts[2]);
+          if (!period) return true;
+          const periodMatches = periodKey ? period.key === periodKey : (period.start === start && period.end === end);
+          if (!periodMatches) return true;
+          if (weekday != null) return slotDay !== Number(weekday);
+          if (date != null) return slotDate !== date;
+          return true;
+        });
+      }
+      if (Array.isArray(schedule.entries)) {
+        schedule.entries = schedule.entries.filter(entry => {
+          const timeMatches = start && end ? (entry.start === start && entry.end === end) : false;
+          if (!timeMatches) return true;
+          if (weekday != null) return Number(entry.weekday) !== Number(weekday);
+          if (date != null) {
+            const entryDate = entry.date || addDaysToIsoDate(weekStart, Number(entry.weekday));
+            return entryDate !== date;
+          }
+          return true;
+        });
+      }
+      if (Array.isArray(schedule.overrides) && date != null && start && end) {
+        schedule.overrides = schedule.overrides.filter(ov => !(ov.date === date && ov.start === start && ov.end === end));
+      }
+    }
+
     function removeProfileWeeklyInterval(index) {
-      currentProfileDraft.weekly_intervals.splice(index, 1);
-      renderAssistantAvailableIntervals();
+      const removed = currentProfileDraft.weekly_intervals.splice(index, 1)[0];
+      if (removed?.source === 'busy_schedule') {
+        removeBusyScheduleSlotsMatching({ weekday: removed.weekday, start: removed.start, end: removed.end });
+        const period = AVAILABILITY_PERIODS.find(p => p.start === removed.start && p.end === removed.end);
+        if (period) recurringAvailabilitySlots.delete(`${Number(removed.weekday)}|${period.key}`);
+      }
+      renderAvailabilityPicker();
       markPlanStale();
       persistCurrentUserData();
     }
@@ -4858,8 +5971,13 @@
     }
 
     function removeProfileException(index) {
-      currentProfileDraft.exceptions.splice(index, 1);
-      renderAssistantAvailableIntervals();
+      const removed = currentProfileDraft.exceptions.splice(index, 1)[0];
+      if (removed?.source === 'busy_schedule') {
+        removeBusyScheduleSlotsMatching({ date: removed.date, start: removed.start, end: removed.end });
+        const period = AVAILABILITY_PERIODS.find(p => p.start === removed.start && p.end === removed.end);
+        if (period) unavailableAvailabilitySlots.delete(`${removed.date}|${period.key}`);
+      }
+      renderAvailabilityPicker();
       markPlanStale();
       persistCurrentUserData();
     }
@@ -4976,6 +6094,10 @@
         else recurringAvailabilityOverrides.add(key);
       } else if (unavailableAvailabilitySlots.has(key)) {
         unavailableAvailabilitySlots.delete(key);
+        if (!currentProfileDraft?.busy_schedule?.applies_to_semester) {
+          removeBusyScheduleSlotsMatching({ date, periodKey });
+          syncBusyScheduleAndIntervals(currentProfileDraft);
+        }
       } else {
         unavailableAvailabilitySlots.add(key);
       }
@@ -4991,6 +6113,12 @@
       availabilityWeekStart = AVAILABILITY_DEFAULT_WEEK_START;
       customBusyIntervals = [];
       assistantAvailableIntervals = [];
+      if (currentProfileDraft?.busy_schedule) {
+        currentProfileDraft.busy_schedule.slots = [];
+        currentProfileDraft.busy_schedule.entries = [];
+        currentProfileDraft.busy_schedule.overrides = [];
+        syncBusyScheduleAndIntervals(currentProfileDraft);
+      }
       const start = document.getElementById('customBusyStart');
       const end = document.getElementById('customBusyEnd');
       if (start) start.value = '';
@@ -5081,8 +6209,8 @@
           }
         });
       }
-      const weeklyBusyCount = (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'busy').length;
-      const exceptionBusyCount = (currentProfileDraft.exceptions || []).filter(item => item.kind === 'busy').length;
+      const weeklyBusyCount = (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'busy' && item.source !== 'busy_schedule').length;
+      const exceptionBusyCount = (currentProfileDraft.exceptions || []).filter(item => item.kind === 'busy' && item.source !== 'busy_schedule').length;
       const count = busySlots.size + customBusyIntervals.length + weeklyBusyCount + exceptionBusyCount;
       badge.innerText = count ? `${count} khung bận` : 'Tất cả rảnh';
       if (count > 0) {
@@ -5136,20 +6264,54 @@
           intervals.push({ start: interval.start, end: interval.end });
         });
       }
-      intervals.push(...expandWeeklyProfileIntervals(
+      expandWeeklyProfileIntervals(
         (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'busy'),
         '2026-10-01',
         '2027-03-31'
-      ));
+      ).forEach(interval => {
+        if (interval.source === 'profile_weekly') {
+          const date = interval.start.slice(0, 10);
+          const period = AVAILABILITY_PERIODS.find(p => `${date}T${p.start}:00+07:00` === interval.start && `${date}T${p.end}:00+07:00` === interval.end);
+          if (period && recurringAvailabilityOverrides.has(`${date}|${period.key}`)) return;
+        }
+        intervals.push(interval);
+      });
       (currentProfileDraft.exceptions || []).filter(item => item.kind === 'busy').forEach(item => intervals.push({ start: `${item.date}T${item.start}:00+07:00`, end: `${item.date}T${item.end}:00+07:00`, source: 'profile_exception' }));
+      const availableExceptions = (currentProfileDraft.exceptions || [])
+        .filter(item => item.kind === 'available' && item.date && item.start && item.end && item.start < item.end)
+        .map(item => ({ start: `${item.date}T${item.start}:00+07:00`, end: `${item.date}T${item.end}:00+07:00` }));
+      const subtracted = availableExceptions.length
+        ? subtractAvailableExceptions(intervals, availableExceptions)
+        : intervals;
       const seen = new Set();
-      const deduped = intervals.filter(item => {
+      const deduped = subtracted.filter(item => {
         const key = `${item.start}|${item.end}`;
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
       });
       return deduped.sort((a, b) => a.start.localeCompare(b.start));
+    }
+
+    function subtractAvailableExceptions(busyIntervals, availableExceptions) {
+      let current = [...busyIntervals];
+      availableExceptions.forEach(avail => {
+        const next = [];
+        current.forEach(busy => {
+          if (busy.end <= avail.start || busy.start >= avail.end) {
+            next.push(busy);
+            return;
+          }
+          if (busy.start < avail.start) {
+            next.push({ ...busy, end: avail.start });
+          }
+          if (busy.end > avail.end) {
+            next.push({ ...busy, start: avail.end });
+          }
+        });
+        current = next;
+      });
+      return current;
     }
 
     function expandWeeklyProfileIntervals(rules, fromDate, untilDate) {
@@ -5442,7 +6604,36 @@
     async function confirmPreference() {
       if (!preferenceDraft || !document.getElementById('confirmPreferenceCheck')?.checked) return;
       confirmedPreference = JSON.parse(JSON.stringify(preferenceDraft));
+      if (currentProfileDraft) {
+        const modeLabels = { online: 'Trực tuyến', offline: 'Trực tiếp', hybrid: 'Kết hợp' };
+        const topicIds = (confirmedPreference.topic_preferences || []).map(item => item.topic_id);
+        const categoryIds = (confirmedPreference.category_priorities || []).map(item => item.category_id);
+        const modeIds = (confirmedPreference.mode_preferences || []).map(item => item.mode);
+        const campusIds = (confirmedPreference.campus_preferences || []).map(item => item.campus_id);
+        const topicLabels = topicIds.map(id => PREF_LABELS[id] || id);
+        const categoryLabels = categoryIds.map(id => PLAN_CAT_FULL[id] || id);
+        currentProfileDraft.preference_patch = {
+          ...(currentProfileDraft.preference_patch || {}),
+          preferred_topics: topicIds,
+          preferred_categories: categoryIds,
+          preferred_modes: modeIds,
+          preferred_campuses: campusIds,
+          max_activities: confirmedPreference.limits?.max_activities ?? null
+        };
+        currentProfileDraft.goal = {
+          ...(currentProfileDraft.goal || {}),
+          topics: topicLabels,
+          priorities: categoryLabels,
+          format: modeIds.map(m => modeLabels[m] || m).join(', ')
+        };
+        currentProfileDraft.preferences = {
+          ...(currentProfileDraft.preferences || {}),
+          interest_fields: topicLabels.join(', '),
+          favorite_activities: categoryLabels.join(', ')
+        };
+      }
       renderConfirmedPreferenceSummary();
+      renderStudentProfile();
       updatePreferenceConfirmButton();
       const badge = document.getElementById('preferenceConfirmedBadge');
       badge?.classList.add('scale-110', 'ring-2', 'ring-emerald-400/40');
