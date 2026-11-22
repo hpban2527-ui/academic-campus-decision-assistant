@@ -43,8 +43,25 @@ def enter_workspace(page) -> None:
     page.locator("#registerName").fill("Sinh viên kiểm thử")
     page.locator("#registerMssv").fill("TEST2026")
     page.locator("#registerPassword").fill("TestPass2026!")
+    page.locator("#registerPasswordConfirm").fill("TestPass2026!")
     page.locator("#btnSubmitRegister").click()
-    page.locator("#workspaceApp").wait_for(state="visible", timeout=20000)
+    page.locator("#onboardingModal").wait_for(state="visible", timeout=20000)
+    page.locator("#onboardingNextButton").click()
+    page.locator("#onboardingNextButton").click()
+    page.evaluate("""() => {
+      selectOnboardingTargetPreset(80);
+      selectOnboardingCategoryChoice('ANY');
+      selectOnboardingModeChoice('any');
+      selectOnboardingCampusChoice('any');
+      finishOnboardingTopics(true);
+      renderOnboardingStep();
+    }""")
+    page.locator("#onboardingNextButton").click()
+    page.locator("#planOptionsScreen").wait_for(state="visible", timeout=60000)
+    page.locator('[data-pos-card] [data-pos-action="review"]').first.click()
+    page.locator("#planReviewScreen").wait_for(state="visible", timeout=30000)
+    page.locator("#onboardingNextButton").click()
+    page.locator("#workspaceApp").wait_for(state="visible", timeout=30000)
 
 
 def main() -> None:
@@ -58,7 +75,7 @@ def main() -> None:
     try:
         check_health()
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=True)
+            browser = playwright.chromium.launch(headless=True, channel="msedge" if os.name == "nt" else None)
             page = browser.new_page(viewport={"width": 1440, "height": 1000}, device_scale_factor=1)
             errors = []
             page.on("pageerror", lambda e: errors.append(str(e)))
@@ -165,82 +182,84 @@ def main() -> None:
             assert page.locator("#inspectorTableBody img").count() == 0, "Untrusted SP1 evidence parsed as HTML"
             output["security"].append("inspector evidence HTML escaped")
 
-            # Run the SP3 journey through the real FastAPI server, not mock responses.
             sp3 = browser.new_page(viewport={"width": 1440, "height": 940})
             sp3_errors = []
             sp3.on("pageerror", lambda error: sp3_errors.append(str(error)))
             sp3.goto(BASE, wait_until="domcontentloaded")
             enter_workspace(sp3)
 
-            def is_sp3_response(response):
-                return "/api/sp3/demo/plan" in response.url and response.request.method == "POST"
-
-            with sp3.expect_response(is_sp3_response, timeout=60000) as initial_call:
-                sp3.locator("#tabBtnPlan").click()
-            initial = initial_call.value.json()
-            sp3.locator("#plannerActiveResult").wait_for(state="visible", timeout=60000)
-            assert initial["mode"] == "DEMO_ONLY"
-            assert initial["official_award_verified"] is False
-            assert initial["plan"]["status"] == "TARGET_MET"
-            assert initial["plan"]["score_summary"]["projected_total"] == 80
-            assert len(initial["plan"]["selected_activities"]) == 3
-            assert sp3.locator("#planDisclosure").is_visible(), "Demo disclaimer hidden in user mode"
-            assert "Điểm chỉ được ghi nhận sau khi nhà trường xác nhận" in sp3.locator("#planDisclosure").inner_text()
-            assert "60 → 80" in sp3.locator("#planScoreOverview").inner_text()
-            assert sp3.locator("#planPanelSelected .candidate-card").count() == 3
-            sp3.screenshot(path=str(OUT / "04_sp3_first_plan.png"), full_page=True)
-
-            with sp3.expect_response(is_sp3_response, timeout=60000) as replan_call:
-                sp3.locator("#planStepper button").nth(1).click()
-            replanned = replan_call.value.json()
-            assert replanned["scenario"] == "replan"
-            assert replanned["official_award_verified"] is False
-            assert "Tình huống mẫu" in sp3.locator("#planChangeCard").inner_text()
-            sp3.screenshot(path=str(OUT / "05_sp3_replan.png"), full_page=True)
-
-            with sp3.expect_response(is_sp3_response, timeout=60000) as skip_call:
-                sp3.locator("#planStepper button").nth(2).click()
-            skipped = skip_call.value.json()
-            assert skipped["scenario"] == "what_if_skip"
-            assert skipped["plan"]["status"] == "PARTIAL"
-            assert "QUIZ-L" not in {a["activity_id"] for a in skipped["plan"]["selected_activities"]}
-            sp3.screenshot(path=str(OUT / "06_sp3_what_if.png"), full_page=True)
-
-            sp3.locator("#planStepper button").first.click()
-            sp3.locator("#inputPlanTarget").fill("90")
-            sp3.locator("#btnToggleBusySlots").click()
-            sp3.locator("#availabilityPickerGrid .availability-cell").first.click()
-            sp3.locator("#btnToggleBusySlots").click()
-            assert sp3.locator("#planStaleNotice").is_visible(), "Changed inputs did not mark plan stale"
-            with sp3.expect_response(is_sp3_response, timeout=60000) as adjusted_call:
-                sp3.locator("#btnRunPlanner").click()
-            adjusted = adjusted_call.value.json()
-            assert adjusted["requested_total_target"] == 90
-            assert adjusted["official_award_verified"] is False
-            assert adjusted["availability"]["available_intervals"] != initial["availability"]["available_intervals"]
-            assert "90đ" in sp3.locator("#planTargetScoreText").inner_text()
-            assert not sp3.locator("#planStaleNotice").is_visible()
-
-            sp3.locator("#tabBtnActivities").click()
-            sp3.wait_for_function(
-                "document.querySelector('#validActivitiesList').textContent.includes('Chưa rõ điểm')",
-                timeout=45000,
-            )
-            assert "Hoạt động đã thu thập" in sp3.locator("#viewActivities").inner_text()
-            assert "đã công nhận" not in sp3.locator("#viewActivities h3").first.inner_text().lower()
-            sp3.screenshot(path=str(OUT / "07_sp3_source_catalog.png"), full_page=True)
-
+            # Build personalized options from the current five-step profile.
             sp3.locator("#tabBtnPlan").click()
+            def is_options_response(response):
+                return "/api/sp3/personalized/options" in response.url and response.request.method == "POST"
+
+            with sp3.expect_response(is_options_response, timeout=60000) as options_call:
+                sp3.evaluate("runSp3Planner()")
+            options = options_call.value.json()
+            assert options_call.value.status == 200
+            assert isinstance(options.get("options"), list) and options["options"]
+            assert any(item.get("status") == "READY" and item.get("result") for item in options["options"])
+            sp3.locator("#planOptionsScreen").wait_for(state="visible", timeout=30000)
+            assert sp3.locator('[data-pos-card] [data-pos-action="review"]').count() >= 1
+            assert sp3.evaluate("!!planStages.first && !planStages.first.official_award_verified")
+            sp3.screenshot(path=str(OUT / "04_personalized_options.png"), full_page=True)
+
+            sp3.locator('[data-pos-card] [data-pos-action="review"]').first.click()
+            sp3.locator("#planReviewScreen").wait_for(state="visible", timeout=15000)
+            assert sp3.evaluate("!!prvDraft && !!prvDraft.result")
+            sp3.screenshot(path=str(OUT / "05_plan_review.png"), full_page=True)
+            sp3.evaluate("reviewDashBackToPlanOptions()")
+
+            # The scenario API still provides a real replan and what-if result.
+            def is_plan_response(response):
+                return "/api/sp3/personalized/plan" in response.url and response.request.method == "POST"
+
+            with sp3.expect_response(is_plan_response, timeout=60000) as replan_call:
+                sp3.evaluate("gotoPlanStage('replan')")
+            replanned = replan_call.value.json()
+            assert replan_call.value.status == 200
+            assert replanned["scenario"] == "personalized_replan"
+            sp3.wait_for_function("!!planStages.replan", timeout=30000)
+            assert replanned["official_award_verified"] is False
+
+            with sp3.expect_response(is_plan_response, timeout=60000) as skip_call:
+                sp3.evaluate("gotoPlanStage('whatif')")
+            skipped = skip_call.value.json()
+            assert skip_call.value.status == 200
+            assert skipped["scenario"] == "personalized_what_if_skip"
+            sp3.wait_for_function("!!planStages.whatif", timeout=30000)
+            assert skipped["official_award_verified"] is False
+            sp3.screenshot(path=str(OUT / "06_replan_whatif.png"), full_page=True)
+
+            # Updating the target must fetch fresh options rather than reuse old results.
             sp3.evaluate("""() => {
-                window.__sp3_xss = 0;
-                const payload = '<img src=x onerror="window.__sp3_xss=1">SP3 UNSAFE';
-                planStages.first.plan.selected_activities[0].title = payload;
-                planStages.first.feasibility.candidates[0].activity.title = payload;
-                currentPlanStage = 'first';
-                renderSp3PlanResult();
+              document.getElementById('inputPlanTarget').value = '90';
+              reviewDashClosePlanOptions(true);
             }""")
-            assert sp3.evaluate("window.__sp3_xss") == 0, "Untrusted SP3 activity title executed JavaScript"
-            assert sp3.locator("#planPanelSelected img").count() == 0, "Untrusted SP3 title parsed as HTML"
+            with sp3.expect_response(is_options_response, timeout=60000) as adjusted_call:
+                sp3.evaluate("runSp3Planner()")
+            assert adjusted_call.value.status == 200
+            sp3.wait_for_function("!!planStages.first && planStages.first.requested_total_target === 90", timeout=30000)
+
+            # Both halves of the activity repository must remain accessible.
+            sp3.evaluate("reviewDashClosePlanOptions(true); switchTab('activities'); setActivitiesSubView('timeline')")
+            assert sp3.locator("#timelineDateCardsContainer > *").count() == 5
+            sp3.evaluate("setActivitiesSubView('qa')")
+            assert not sp3.locator("#activitiesQaSection").evaluate("(el) => el.classList.contains('hidden')")
+            sp3.wait_for_function("document.querySelector('#validActivitiesList').textContent.length > 0", timeout=20000)
+            sp3.screenshot(path=str(OUT / "07_activity_catalog.png"), full_page=True)
+
+            # Render a hostile plan title as text, not an executable element.
+            sp3.evaluate("""() => {
+              window.__sp3_xss = 0;
+              const activity = planStages.first.plan?.selected_activities?.[0];
+              if (!activity) throw new Error('No selected activity for XSS probe');
+              activity.title = '<img src=x onerror="window.__sp3_xss=1">SP3 UNSAFE';
+              currentPlanStage = 'first';
+              renderSp3PlanResult();
+            }""")
+            assert sp3.evaluate("window.__sp3_xss") == 0
+            assert sp3.locator("#planPanelSelected img").count() == 0
             assert not sp3_errors, f"SP3 desktop errors: {sp3_errors}"
             sp3.close()
 
@@ -249,19 +268,18 @@ def main() -> None:
             mobile.on("pageerror", lambda error: mobile_errors.append(str(error)))
             mobile.goto(BASE, wait_until="domcontentloaded")
             enter_workspace(mobile)
+            assert mobile.evaluate("!!readLocalUserData(currentStudent.student_id).confirmed_plan")
             mobile.locator("#btnMobileMenuToggle").click()
-            with mobile.expect_response(is_sp3_response, timeout=60000) as mobile_call:
-                mobile.locator("#tabBtnPlan").click()
-            mobile.locator("#plannerActiveResult").wait_for(state="visible", timeout=60000)
-            assert mobile_call.value.json()["plan"]["status"] == "TARGET_MET"
-            assert mobile.locator("#planDisclosure").is_visible()
+            mobile.evaluate("switchTab('dashboard')")
+            assert mobile.locator("#viewDashboard").is_visible()
             assert not mobile_errors, f"SP3 mobile errors: {mobile_errors}"
-            mobile.screenshot(path=str(OUT / "08_sp3_mobile.png"), full_page=True)
+            mobile.screenshot(path=str(OUT / "08_mobile_dashboard.png"), full_page=True)
             mobile.close()
 
             output["sp3"] = {
-                "first_plan": "PASS", "replan": "PASS", "what_if_skip": "PASS",
-                "goal_and_busy_constraints": "PASS", "source_review_labels": "PASS",
+                "personalized_options": "PASS", "review": "PASS",
+                "replan": "PASS", "what_if_skip": "PASS",
+                "target_refresh": "PASS", "catalog_timeline": "PASS",
                 "desktop": "PASS", "mobile": "PASS", "xss": "PASS",
             }
             output["security"].append("SP3 activity title HTML escaped")
@@ -269,8 +287,8 @@ def main() -> None:
             browser.close()
         output["browser_errors"] = errors
         (OUT / "evidence.json").write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
-        print("MVP_BROWSER_E2E: 5/5 H4; SP3 desktop/mobile, constraints, replan, what-if and XSS; errors: 0")
-        print(json.dumps(output, ensure_ascii=False))
+        print("MVP_BROWSER_E2E: 5/5 H4; personalized options, review, replan, what-if, desktop/mobile and XSS")
+        print(json.dumps(output, ensure_ascii=True))
     finally:
         server.terminate()
         try:

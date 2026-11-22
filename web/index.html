@@ -4260,6 +4260,10 @@
     const authModal = document.getElementById("loginModal");
     if (!authModal) throw new Error("The local account dialog is missing from the page.");
     document.body.appendChild(authModal);
+    // The onboarding dialog must remain visible before the workspace opens.
+    const onboardingDialog = document.getElementById("onboardingModal");
+    if (!onboardingDialog) throw new Error("The onboarding dialog is missing from the page.");
+    document.body.appendChild(onboardingDialog);
 
     let workspaceTransitionStarted = false;
     let pendingWorkspaceTab = null;
