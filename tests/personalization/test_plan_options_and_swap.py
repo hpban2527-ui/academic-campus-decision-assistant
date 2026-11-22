@@ -182,7 +182,10 @@ def test_real_source_options_use_real_planner_and_canonical_weekly_availability(
 
 
 def test_real_source_smart_swap_and_null_addition_removal_are_supported(valid_preference_payload) -> None:
-    preference = _preference(valid_preference_payload)
+    # The real catalog has activities with unstated fees. This test covers removal, not the fee cap.
+    without_fee_cap = deepcopy(valid_preference_payload)
+    without_fee_cap["limits"]["max_fee"] = None
+    preference = _preference(without_fee_cap)
     from api.sp3_real import real_plan_options
 
     real_base = real_plan_options(preference, target_total=80)["options"][0]["result"]
