@@ -349,7 +349,6 @@ def evaluate_rule_conditions(
     *,
     required_fields: Iterable[str] = (),
     apply_default_awards: bool = False,
-    category_score_offsets: Mapping[str, float] | None = None,
 ) -> dict[str, Any]:
     """Match the flat rules against a confirmed student record.
 
@@ -358,9 +357,6 @@ def evaluate_rule_conditions(
     with their ``default_value`` if the record does not provide the field.
     An explicit value in the record always wins, so a reported violation
     still removes the points.
-
-    Trusted category offsets account for points already in the scoreboard whose
-    underlying rule facts are unavailable. They are subject to the category cap.
     """
 
     configuration_issues = audit_rules_config(config)
@@ -498,10 +494,6 @@ def evaluate_rule_conditions(
         for item in scoring.get("category_caps", [])
         if isinstance(item, Mapping)
     }
-    for category, offset in (category_score_offsets or {}).items():
-        if category not in caps or not _is_number(offset):
-            raise DRLEngineError("category score offsets must be numeric and name a configured category")
-        by_category_raw[category] = by_category_raw.get(category, 0) + offset
     by_category: list[dict[str, Any]] = []
     rule_points_total = 0.0
     for category, raw_score in by_category_raw.items():

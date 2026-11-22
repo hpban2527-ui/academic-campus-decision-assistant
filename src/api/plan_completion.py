@@ -8,11 +8,11 @@ import os
 import re
 from copy import deepcopy
 from datetime import datetime, timedelta
-from functools import lru_cache, partial
+from functools import lru_cache
 from typing import Any
 
 from api.lead_contract import canonical_url
-from sp2.drl_engine import evaluate_rule_conditions
+from sp2.drl_engine import DRLEngineError, evaluate_rule_conditions
 from sp3.projected_scorer import InMemoryScoringData, ProjectedScorer
 from sp3.scorer_adapter import ScorerAdapter
 
@@ -173,6 +173,67 @@ def completion_catalog(source: str) -> CompletionCatalog:
     return _synthetic_completion_catalog()
 
 
+def _number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _clean(value: float | int) -> float | int:
+    return int(value) if float(value).is_integer() else value
+
+
+def _apply_category_offsets(result: dict, config: dict, record: dict, offsets: dict[str, float]) -> dict:
+    """Add trusted per-category offsets to an SP2 result outside the locked SP2 engine.
+
+    Offsets cover points already on the scoreboard whose rule facts are unavailable. Each offset is added to the
+    category's raw (pre-cap) score, then the category cap and the total clamp are re-applied exactly as
+    sp2.drl_engine.evaluate_rule_conditions does: score = min(raw, cap) when raw > 0.
+    """
+    if not offsets:
+        return result
+    scoring = config["scoring_model"]
+    caps = {
+        str(item.get("category_id")): item.get("max_score")
+        for item in scoring.get("category_caps", [])
+        if isinstance(item, dict)
+    }
+    rows = [dict(row) for row in result["category_scores"]]
+    by_id = {row["category_id"]: row for row in rows}
+    for category, offset in offsets.items():
+        if category not in caps or not _number(offset):
+            raise DRLEngineError("category score offsets must be numeric and name a configured category")
+        row = by_id.get(category)
+        if row is None:
+            row = {"category_id": category, "raw_score": 0, "cap": caps[category], "score": 0}
+            rows.append(row)
+            by_id[category] = row
+        raw = row["raw_score"] + offset
+        cap = caps[category]
+        row["raw_score"] = _clean(raw)
+        row["score"] = _clean(min(raw, cap) if _number(cap) and raw > 0 else raw)
+
+    rule_points_total = sum(row["score"] for row in rows)
+    raw_total = record.get("current_confirmed_score", 0) + record.get("eligible_extra_points", 0) + rule_points_total
+    maximum = scoring.get("max_total_score", scoring.get("semester_score_max", 100))
+    minimum = scoring.get("semester_score_min", 0)
+    return {
+        **result,
+        "category_scores": rows,
+        "rule_points_total": _clean(rule_points_total),
+        "raw_total_before_cap": _clean(raw_total),
+        "final_score": _clean(min(maximum, max(minimum, raw_total))),
+    }
+
+
+def _engine_with_offsets(offsets: dict[str, float]):
+    """SP2 engine callable for ProjectedScorer: unchanged SP2 evaluation, then the account offsets."""
+
+    def engine(config: dict, record: dict) -> dict:
+        result = evaluate_rule_conditions(config, record, apply_default_awards=True)
+        return _apply_category_offsets(result, config, record, offsets)
+
+    return engine
+
+
 @lru_cache(maxsize=1)
 def _synthetic_completion_catalog() -> CompletionCatalog:
 
@@ -219,7 +280,7 @@ class AccountPlanScoring:
             for category, value in scores.items()
             if (raw_score := raw.get(category, 0)) != value
         }
-        self.engine = partial(evaluate_rule_conditions, apply_default_awards=True, category_score_offsets=offsets)
+        self.engine = _engine_with_offsets(offsets)
         self.baseline = {
             **base, "category_scores": scores,
             "total_score": min(base["max_total_score"], sum(scores.values())),
