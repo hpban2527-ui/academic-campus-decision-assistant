@@ -228,6 +228,17 @@ The fields from v0.1 (`contract_version`, `request_id`, `context`, `baseline`,
 without a keep request may be kept, moved or replaced. Registration is not a
 keep request.
 
+**Revision 0.2.1 (additive; the wire string stays `sp3-planner/0.2`).**
+`keep_requests` also accepts `{activity_id, mode: "FORCE_INCLUDE"}`. The
+activity must be in the plan but is not time-frozen: it may be absent from
+`previous_plan` (a `KEEP_TIME` ID must be in it), a flexible one is placed by
+the normal scheduler around the `KEEP_TIME` blocks, and one that is in
+`previous_plan` may move. An ID appears in at most one request. The base set
+of every plan is all `KEEP_TIME` and `FORCE_INCLUDE` activities; a base set
+that meets every target with no previous plan is a normal `TARGET_MET` plan,
+not `ALREADY_MET` (which stays the empty plan). `contract.CONTRACT_REVISION`
+holds the revision; inputs without `FORCE_INCLUDE` behave exactly as in 0.2.
+
 ## 8. Scheduling a candidate set (planner)
 
 For a set `S` of eligible candidates:
@@ -369,7 +380,11 @@ The planner returns `KEEP_CONFLICT` when any of these holds:
 - a `KEEP_TIME` activity is not `FEASIBLE`;
 - a kept block is outside the usable window or outside available time;
 - kept blocks overlap each other or a fixed block of another kept activity;
-- a kept `FIXED` activity's blocks no longer equal its current `fixed_blocks`.
+- a kept `FIXED` activity's blocks no longer equal its current `fixed_blocks`;
+- (0.2.1) a `FORCE_INCLUDE` activity is not listed, not eligible, conflicts
+  with or overlaps another required activity, or cannot be placed (`NO_TIME`:
+  no schedule fits it together with the `KEEP_TIME` blocks, or, when each fits
+  alone, all forced activities cannot be placed together).
 
 With `KEEP_CONFLICT`:
 

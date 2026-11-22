@@ -26,7 +26,42 @@ ONLINE = r"trực tuyến|\bonline\b|zoom|google meet|ms teams|moodle"
 VENUE = r"giảng đường|hội trường|\bphòng\b|\bsân\b|cơ sở|nhà văn hóa|\btòa\b|\btoà\b|\bkhu\b"
 HYBRID = r"kết hợp|hybrid|trực tiếp và trực tuyến|trực tuyến và trực tiếp"
 DATE = r"\d{1,2}\s*[/.-]\s*\d{1,2}|\d{1,2}\s+tháng\s+\d{1,2}"
-BANNERS = {"hỗ trợ truyền thông", "chia sẻ", "repost", "thông báo", "tin tức", "cập nhật"}
+BANNERS = {"hỗ trợ truyền thông", "httt", "chia sẻ", "repost", "thông báo", "tin tức", "cập nhật"}
+# Project convention: a leading bracketed HTTT label means media support. Match
+# only the complete label, never HTTT inside a real name or a different tag.
+# Accept a mismatched closing brace used in copied Facebook announcements.
+_MEDIA_BANNER_PREFIX = re.compile(
+    r"^\[\s*(?:httt|hỗ\s+trợ\s+truyền\s+thông)\s*[\]}]\s*(?:[-–—:|]\s*)?",
+    re.IGNORECASE,
+)
+_CAMPAIGN_CONTEXT_PREFIX = re.compile(
+    r"^\[\s*hưởng\s+ứng\b[^\]\n]*\]\s*(?:[-–—:|]\s*)?",
+    re.IGNORECASE,
+)
+
+
+def clean_title_candidate(text: str) -> str | None:
+    """Remove known publication labels while retaining the activity's own name.
+
+    Candidate spans and IDs stay unchanged, so recorded LLM roles keep their
+    meaning. The original span remains evidence even when its banner is omitted.
+    """
+    text = re.sub(r"(?:\s*#\w+)+\s*$", "", text).strip()
+    text = re.sub(r"^[^\w\[]+", "", text)
+    while text:
+        prefix = _MEDIA_BANNER_PREFIX.match(text) or _CAMPAIGN_CONTEXT_PREFIX.match(text)
+        if prefix:
+            text = text[prefix.end():].lstrip()
+            continue
+        head, separator, tail = text.partition("\n")
+        if head.strip("[]{} -–—:| ").casefold() in BANNERS:
+            text = tail.lstrip() if separator else ""
+            continue
+        break
+    text = re.sub(r"^[^\w\[]+|[^\w\]]+$", "", text).strip()
+    if re.fullmatch(r"\[[^\[\]\n]+\]", text):
+        text = text[1:-1].strip()
+    return text if len(text) >= 4 and text.casefold() not in BANNERS else None
 
 
 def has(pattern, text):
@@ -308,16 +343,8 @@ def extract_v2(post: dict) -> dict:
     reader = Reader(post)
     text, record = reader.text, reader.record
     for candidate in reader.seg.title_candidates:
-        title = re.sub(r"(?:\s*#\w+)+\s*$", "", candidate.text).strip()
-        title = re.sub(r"^[^\w\[]+|[^\w\]]+$", "", title)
-        if re.fullmatch(r"\[[^\[\]\n]+\]", title):
-            title = title[1:-1].strip()
-        # A joined candidate beginning with a standalone media banner retains that banner.
-        # Prefer the next candidate, which contains the event title itself.
-        first_line = title.split("\n")[0].strip("[] ").casefold()
-        if first_line in BANNERS:
-            continue
-        if len(title) >= 4 and title.casefold() not in BANNERS:
+        title = clean_title_candidate(candidate.text)
+        if title is not None:
             reader.put("title", title, candidate.text, "segment")
             break
     first = reader.calendar()

@@ -221,6 +221,7 @@ class PersonalizedPlanRequest(StrictModel):
     scenario: Literal["first_plan", "replan", "what_if_skip"] = "first_plan"
     total_target: int = Field(default=80, ge=0, le=100)
     busy_intervals: list[BusyInterval] = Field(default_factory=list, max_length=50)
+    availability: dict | None = None
 
 
 class ConfirmedPreferenceSaveRequest(StrictModel):

@@ -138,6 +138,10 @@ class PreferenceUtilityEngine:
         fee = activity.get("fee")
         if max_fee is not None and isinstance(fee, (int, float)) and not isinstance(fee, bool) and fee > max_fee:
             reasons.append(f"fee>{max_fee}")
+        elif max_fee is not None and fee is None:
+            # Unknown, team-based or deposit-dependent cost (sp3-activity/0.3 null fee): the plan cannot
+            # certify that it respects the student's hard budget, so the activity is not selected.
+            reasons.append("fee:unknown")
         return reasons
 
     def selected_breakdown(self, score_result: Mapping[str, Any], activity_ids: Sequence[str]) -> list[dict[str, Any]]:
