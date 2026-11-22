@@ -5,6 +5,14 @@ use these primitives, so a timestamp, interval, schedule, participation state,
 previous plan or keep request means the same thing everywhere. Validators raise
 ``ContractError(path, problem)``; the problem text describes structure and never
 echoes payload values.
+
+Revision 0.2.1 (additive, wire string unchanged): ``keep_requests`` also accepts
+``FORCE_INCLUDE``. ``KEEP_TIME`` freezes the previous blocks of an activity that
+is in ``previous_plan``. ``FORCE_INCLUDE`` only requires the activity to be in
+the plan; it may be absent from ``previous_plan`` and, when flexible, is placed
+by the normal scheduler around the ``KEEP_TIME`` blocks. A forced activity that
+cannot be included is reported through ``keep_conflicts``. Inputs that use only
+``KEEP_TIME`` behave exactly as in 0.2.
 """
 from __future__ import annotations
 
@@ -19,6 +27,9 @@ import re
 from typing import Any
 
 CONTRACT_VERSION = "sp3-planner/0.2"
+# Additive revision of the 0.2 wire contract; it is documentation, not a wire value,
+# because upstream modules emit and compare the "sp3-planner/0.2" string.
+CONTRACT_REVISION = "0.2.1"
 TIMEZONE = "Asia/Ho_Chi_Minh"
 ABS_TOLERANCE = 1e-9
 PLAN_VERSION_PREFIX = "sp3plan-"
@@ -112,6 +123,7 @@ class ProgressStatus(str, Enum):
 
 class KeepMode(str, Enum):
     KEEP_TIME = "KEEP_TIME"
+    FORCE_INCLUDE = "FORCE_INCLUDE"
 
 
 class ChangeLabel(str, Enum):
@@ -132,8 +144,12 @@ class KeepConflictCode(str, Enum):
     """Section 10.4 conflicts, declared in the order they are listed per activity.
 
     NOT_LISTED, NOT_ELIGIBLE, FIXED_CHANGED and BLOCK_INVALID describe one kept
-    activity; BLOCK_OVERLAP and CONFLICT a pair of kept activities; LIMIT the
-    whole keep set, which no plan can contain within the stated limits.
+    activity (FIXED_CHANGED and BLOCK_INVALID only a KEEP_TIME one);
+    BLOCK_OVERLAP and CONFLICT a pair of kept or forced activities; NO_TIME a
+    FORCE_INCLUDE activity that no schedule can place together with the kept
+    blocks (or every forced activity, when only the whole set cannot be
+    placed); LIMIT the whole keep set, which no plan can contain within the
+    stated limits.
     """
 
     NOT_LISTED = "NOT_LISTED"
@@ -142,6 +158,7 @@ class KeepConflictCode(str, Enum):
     BLOCK_INVALID = "BLOCK_INVALID"
     BLOCK_OVERLAP = "BLOCK_OVERLAP"
     CONFLICT = "CONFLICT"
+    NO_TIME = "NO_TIME"
     LIMIT = "LIMIT"
 
 
@@ -592,22 +609,56 @@ def validate_previous_plan(value: Any, path: str) -> PreviousPlan | None:
     return PreviousPlan(version, based_on, blocks)
 
 
-def validate_keep_requests(value: Any, previous_plan: PreviousPlan | None, path: str) -> frozenset[str]:
-    """Section 7 keep_requests: unique KEEP_TIME requests for previous-plan activities."""
+@dataclass(frozen=True)
+class KeepRequests:
+    """Validated keep_requests split by mode (contract revision 0.2.1)."""
+
+    keep_time: frozenset[str] = frozenset()
+    force_include: frozenset[str] = frozenset()
+
+    @property
+    def required(self) -> frozenset[str]:
+        """Activities every plan must contain, whatever the mode."""
+        return self.keep_time | self.force_include
+
+
+def parse_keep_requests(value: Any, previous_plan: PreviousPlan | None, path: str) -> KeepRequests:
+    """Section 7 keep_requests: unique requests, one per activity.
+
+    ``KEEP_TIME`` must reference an activity of ``previous_plan``.
+    ``FORCE_INCLUDE`` may name any activity, in or outside ``previous_plan``.
+    """
     require(isinstance(value, list), path, "must be an array")
-    kept: set[str] = set()
+    keep_time: set[str] = set()
+    force_include: set[str] = set()
     for index, item in enumerate(value):
         item_path = f"{path}[{index}]"
         request = exact_object(item, KEEP_REQUEST_FIELDS, item_path)
         activity_id = non_empty_string(request["activity_id"], item_path + ".activity_id")
-        require(request["mode"] == KeepMode.KEEP_TIME.value, item_path + ".mode", "unsupported keep mode")
-        require(activity_id not in kept, path, "keep requests must be unique")
+        mode = request["mode"]
         require(
-            previous_plan is not None and activity_id in previous_plan.blocks,
-            item_path + ".activity_id", "must reference an activity of previous_plan",
+            isinstance(mode, str) and mode in {KeepMode.KEEP_TIME.value, KeepMode.FORCE_INCLUDE.value},
+            item_path + ".mode", "unsupported keep mode",
         )
-        kept.add(activity_id)
-    return frozenset(kept)
+        require(activity_id not in keep_time and activity_id not in force_include, path, "keep requests must be unique")
+        if mode == KeepMode.KEEP_TIME.value:
+            require(
+                previous_plan is not None and activity_id in previous_plan.blocks,
+                item_path + ".activity_id", "must reference an activity of previous_plan",
+            )
+            keep_time.add(activity_id)
+        else:
+            force_include.add(activity_id)
+    return KeepRequests(frozenset(keep_time), frozenset(force_include))
+
+
+def validate_keep_requests(value: Any, previous_plan: PreviousPlan | None, path: str) -> frozenset[str]:
+    """Validate keep_requests and return the KEEP_TIME activity IDs.
+
+    Kept for callers that only care about time-frozen activities; FORCE_INCLUDE
+    entries are validated too but are returned by ``parse_keep_requests``.
+    """
+    return parse_keep_requests(value, previous_plan, path).keep_time
 
 
 # --- Scoring and plan identity (sections 10.1 and 10.2) ------------------------

@@ -3,11 +3,11 @@ from pathlib import Path
 
 import pytest
 
-from scripts.compare_llm_dev import (choose_model, choose_policy, evaluate_models, load_gold,
-                                     load_outputs, main, render_report)
+from scripts.eval.compare_llm_dev import (choose_model, choose_policy, evaluate_models, load_gold,
+                                          load_outputs, main, render_report)
 from sp1.devdata import dev_ids
 from sp1.hybrid import DECIDABLE_FIELDS
-from scripts import compare_llm_dev as comparison
+from scripts.eval import compare_llm_dev as comparison
 
 FIXTURES = Path(__file__).parent / "fixtures/llm_v2"
 
