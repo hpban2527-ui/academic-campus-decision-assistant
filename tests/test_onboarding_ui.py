@@ -40,7 +40,7 @@ def test_dashboard_assistant_is_replaced_by_one_time_onboarding_and_profile_edit
 
 
 def test_profile_schedule_workspace_and_local_migration_are_present() -> None:
-    assert "Hồ sơ & Lịch" in HTML
+    assert "Cài đặt" in HTML
     for marker in (
         'id="profileScheduleTabProfile"',
         'id="profileScheduleTabSchedule"',
@@ -1683,3 +1683,172 @@ function subviewState() {
         ("2026-11-09T07:00:00+07:00", "2026-11-09T09:00:00+07:00"),
         ("2026-11-09T11:00:00+07:00", "2026-11-09T21:00:00+07:00"),
     ]
+
+
+def test_sidebar_settings_footer_and_dropdown_profile_navigation() -> None:
+    """Verify navigation-only update:
+    - tabBtnProfile removed from left sidebar, viewProfile preserved.
+    - userDropdown preserves single 'Hồ sơ sinh viên' button calling switchTab('profile').
+    - tabBtnPlan moved to bottom-left sidebar footer with gear icon and 'Cài đặt' label.
+    - viewPlan header renamed to 'Cài đặt' while keeping internal Hồ sơ / Lịch tabs.
+    - Runtime dropdown navigation, Settings navigation, active state, page isolation & mobile sidebar.
+    """
+    html = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+
+    # 1. Sidebar & dropdown static structure
+    dropdown_start = html.index('id="userDropdown"')
+    sidebar_start = html.index('id="sidebarNav"')
+    sidebar_end = html.index("</aside>", sidebar_start)
+    dropdown_html = html[dropdown_start:sidebar_start]
+    sidebar_html = html[sidebar_start:sidebar_end]
+
+    assert 'id="tabBtnProfile"' not in sidebar_html
+    assert 'id="viewProfile"' in html
+    assert dropdown_html.count("switchTab('profile')") == 1
+    assert "Hồ sơ sinh viên" in dropdown_html
+
+    # Sidebar uses flex-col justify-between so footer stays near bottom on desktop and scrollable on mobile
+    assert "flex flex-col justify-between" in sidebar_html
+    assert "overflow-y-auto" in sidebar_html
+
+    nav_end = sidebar_html.index("</nav>")
+    footer_start = sidebar_html.index('id="sidebarFooter"')
+    assert footer_start > nav_end
+    footer_html = sidebar_html[footer_start:]
+    assert "border-t" in footer_html
+    assert 'id="tabBtnPlan"' in footer_html
+    assert 'onclick="switchTab(\'plan\')"' in footer_html
+    assert "Cài đặt" in footer_html
+    assert "M10.325 4.317" in footer_html  # gear icon path
+    assert 'id="tabBtnPlan"' not in sidebar_html[:nav_end]
+
+    # viewPlan header renamed to Cài đặt while preserving internal Hồ sơ / Lịch tabs
+    view_plan_start = html.index('id="viewPlan"')
+    view_profile_start = html.index('id="viewProfile"')
+    view_plan_html = html[view_plan_start:view_profile_start]
+    assert ">Cài đặt " in view_plan_html
+    assert ">Hồ sơ & Lịch " not in view_plan_html
+    assert 'id="profileScheduleTabProfile"' in view_plan_html
+    assert 'id="profileScheduleTabSchedule"' in view_plan_html
+
+    # 2. Runtime navigation, active state, page isolation & mobile sidebar behavior
+    js = r"""
+const fs = require('fs');
+const vm = require('vm');
+const html = fs.readFileSync('web/index.html', 'utf8');
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
+
+const elements = new Map();
+function makeEl(id) {
+  if (!elements.has(id)) {
+    const classes = new Set();
+    if (id === 'sidebarNav') classes.add('-translate-x-full');
+    if (id === 'sidebarBackdrop') classes.add('hidden');
+    if (id === 'userDropdown') classes.add('hidden');
+    elements.set(id, {
+      id, value: id === 'inputPlanTarget' ? '80' : '', innerText: '', textContent: '', innerHTML: '',
+      checked: false, disabled: false, hidden: false, style: {}, dataset: {},
+      className: '',
+      classList: {
+        add: (...c) => c.forEach(x => classes.add(x)),
+        remove: (...c) => c.forEach(x => classes.delete(x)),
+        toggle: (c, f) => { if (f === undefined) { classes.has(c) ? classes.delete(c) : classes.add(c); } else if (f) classes.add(c); else classes.delete(c); },
+        contains: c => classes.has(c)
+      },
+      setAttribute(k, v) { this[k] = v; },
+      getAttribute(k) { return this[k]; },
+      focus() {}, scrollIntoView() {}, scrollTo() {},
+      querySelector() { return makeEl(id + ':q'); },
+      querySelectorAll() { return []; },
+      appendChild() {}
+    });
+  }
+  return elements.get(id);
+}
+
+const storage = new Map();
+const sandbox = {
+  console, Math, Date, JSON, Set, Map, Array, Object, Number, String, Boolean, RegExp, Promise, Error,
+  parseInt, parseFloat, isNaN, encodeURIComponent, decodeURIComponent, btoa, atob, escape, unescape,
+  setTimeout: () => 0, clearTimeout: () => {}, requestAnimationFrame: cb => cb(),
+  localStorage: {
+    getItem: k => storage.has(k) ? storage.get(k) : null,
+    setItem: (k, v) => storage.set(k, String(v)),
+    removeItem: k => storage.delete(k)
+  },
+  document: {
+    readyState: 'complete',
+    body: { classList: { toggle() {}, add() {}, remove() {} }, style: {}, appendChild() {} },
+    getElementById: id => id === 'tabBtnProfile' ? null : makeEl(id),
+    querySelector: () => makeEl('qs'),
+    querySelectorAll: () => [],
+    addEventListener: () => {},
+    createElement: () => makeEl('dyn_' + Math.random())
+  },
+  window: { addEventListener: () => {}, scrollTo: () => {}, innerWidth: 390 },
+  tailwind: {},
+  navigator: { clipboard: { writeText: async () => {} } },
+  fetch: async () => ({ ok: false, json: async () => ({}) }),
+  alert: () => {}, confirm: () => true,
+};
+sandbox.window.document = sandbox.document;
+sandbox.window.localStorage = sandbox.localStorage;
+vm.createContext(sandbox);
+vm.runInContext(scripts, sandbox);
+
+const allTabs = ['dashboard', 'profile', 'calculator', 'activities', 'snapshot', 'plan', 'testSuites', 'inspector'];
+function visibleViews() {
+  return allTabs.filter(t => {
+    const el = sandbox.document.getElementById('view' + sandbox.capitalize(t));
+    return !el.classList.contains('hidden') && !el.hidden;
+  });
+}
+
+(async () => {
+  await vm.runInContext("currentStudent = { student_id: '25127444', full_name: 'Nav Footer Tester', major: 'CNTT' }; applyCurrentStudent(currentStudent);", sandbox);
+
+  // Open mobile sidebar, then click Settings (tabBtnPlan -> switchTab('plan'))
+  sandbox.toggleMobileSidebar(true);
+  const mobileOpen = !sandbox.document.getElementById('sidebarNav').classList.contains('-translate-x-full');
+  sandbox.switchTab('plan');
+  const afterPlan = {
+    visible: visibleViews(),
+    planBtnActive: sandbox.document.getElementById('tabBtnPlan').className.includes('nav-btn-active'),
+    dashBtnInactive: sandbox.document.getElementById('tabBtnDashboard').className.includes('nav-btn-inactive'),
+    mobileClosed: sandbox.document.getElementById('sidebarNav').classList.contains('-translate-x-full'),
+  };
+
+  // Navigate to Student Profile via top-right userDropdown
+  sandbox.toggleUserDropdown();
+  const dropdownOpen = !sandbox.document.getElementById('userDropdown').classList.contains('hidden');
+  sandbox.switchTab('profile');
+  sandbox.document.getElementById('userDropdown').classList.add('hidden');
+  const afterProfile = {
+    visible: visibleViews(),
+    planBtnInactive: sandbox.document.getElementById('tabBtnPlan').className.includes('nav-btn-inactive'),
+    dashBtnInactive: sandbox.document.getElementById('tabBtnDashboard').className.includes('nav-btn-inactive'),
+    dropdownClosed: sandbox.document.getElementById('userDropdown').classList.contains('hidden'),
+    mobileClosed: sandbox.document.getElementById('sidebarNav').classList.contains('-translate-x-full'),
+  };
+
+  console.log(JSON.stringify({ mobileOpen, afterPlan, dropdownOpen, afterProfile }));
+})();
+"""
+    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    res = json.loads(raw)
+
+    assert res["mobileOpen"] is True
+    assert res["afterPlan"] == {
+        "visible": ["plan"],
+        "planBtnActive": True,
+        "dashBtnInactive": True,
+        "mobileClosed": True,
+    }
+    assert res["dropdownOpen"] is True
+    assert res["afterProfile"] == {
+        "visible": ["profile"],
+        "planBtnInactive": True,
+        "dashBtnInactive": True,
+        "dropdownClosed": True,
+        "mobileClosed": True,
+    }
