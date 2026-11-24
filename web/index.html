@@ -45,6 +45,18 @@
     .bar-transition {
       transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     }
+    #simulationDateDialog {
+      box-sizing: border-box;
+      width: min(24rem, calc(100% - 2rem));
+      margin: auto;
+      padding: 1.25rem;
+      border: 1px solid #223046;
+      border-radius: 0.75rem;
+      background: #0e1524;
+      color: #f8fafc;
+    }
+    #simulationDateDialog::backdrop { background: rgb(0 0 0 / 60%); }
+    #simulationDateInput { color-scheme: dark; }
     .nav-btn-active {
       background-color: #1e1b4b;
       color: #a5b4fc;
@@ -535,6 +547,31 @@
 
 </style>
   <script src="/static/user_tour.js" defer></script>
+
+  <style>
+    /* Keep the calendar and participation actions together in the main viewport. */
+    #cpdActivitiesCard, #cpdCalendarCard { min-width: 0; }
+    @media (min-width: 1024px) {
+      main:has(#viewDashboard:not(.hidden)) { padding-top: 1rem; }
+      #cpdContent:not(.hidden) {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+        gap: 1rem;
+        align-items: start;
+      }
+      #cpdContent > * { margin-top: 0; }
+      #cpdProgress { grid-column: 1 / -1; }
+      #cpdCalendarCard { grid-column: 1; grid-row: 2; }
+      #cpdActivitiesCard { grid-column: 2; grid-row: 2; }
+      #cpdCalendarCard, #cpdActivitiesCard {
+        max-height: max(260px, calc(100dvh - 350px));
+        overflow: auto;
+        scrollbar-gutter: stable;
+      }
+      #cpdActivityPanel { grid-template-columns: minmax(0, 1fr); }
+      #cpdDetail { grid-column: 1 / -1; }
+    }
+  </style>
 </head>
 <body class="min-h-screen antialiased bg-[#080c14] text-slate-100 selection:bg-indigo-900 selection:text-white">
 
@@ -553,7 +590,7 @@
               <div class="galaxy-task-dropdown-panel">
                 <button type="button" onclick="showWorkspace('activities')"><span class="block text-sm font-semibold">Khám phá hoạt động</span><span class="block text-xs text-slate-400 mt-0.5">Sự kiện và workshop phù hợp</span></button>
                 <button type="button" onclick="showWorkspace('calculator', 'tracker')"><span class="block text-sm font-semibold">Theo dõi điểm rèn luyện</span><span class="block text-xs text-slate-400 mt-0.5">Điểm số và tiến độ của bạn</span></button>
-                <button type="button" onclick="showWorkspace('plan')"><span class="block text-sm font-semibold">Lập lịch thông minh</span><span class="block text-xs text-slate-400 mt-0.5">Lên kế hoạch theo thời gian rảnh</span></button>
+                <button type="button" onclick="showWorkspace('plan')"><span class="block text-sm font-semibold">Lộ trình</span><span class="block text-xs text-slate-400 mt-0.5">Lên kế hoạch theo thời gian rảnh</span></button>
                 <button type="button" onclick="showWorkspace('calculator', 'calculate')"><span class="block text-sm font-semibold">Tính điểm hoạt động</span><span class="block text-xs text-slate-400 mt-0.5">Đánh giá theo quy chế ĐRL</span></button>
                 <button type="button" onclick="showWorkspace('snapshot')"><span class="block text-sm font-semibold">Điểm học vụ</span><span class="block text-xs text-slate-400 mt-0.5">Kết quả học tập và GPA</span></button>
               </div>
@@ -642,7 +679,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <button type="button" onclick="showWorkspace('activities')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">✦</div><h3 class="text-xl font-bold mb-3">Khám phá hoạt động</h3><p class="text-sm text-slate-400 leading-relaxed">Tìm kiếm sự kiện, workshop, theo dõi dòng thời gian 7 ngày và tra cứu hoạt động đã kiểm duyệt.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Khám phá ngay ↗</div></button>
           <button type="button" onclick="showWorkspace('calculator', 'tracker')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">◈</div><h3 class="text-xl font-bold mb-3">Theo dõi điểm rèn luyện</h3><p class="text-sm text-slate-400 leading-relaxed">Theo dõi điểm rèn luyện, tiêu chí và tiến độ hoàn thành.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Theo dõi ngay ↗</div></button>
-          <button type="button" onclick="showWorkspace('plan')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">⌘</div><h3 class="text-xl font-bold mb-3">Lập lịch thông minh</h3><p class="text-sm text-slate-400 leading-relaxed">Sắp xếp lịch trình và lựa chọn hoạt động phù hợp với thời gian.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Lập kế hoạch ↗</div></button>
+          <button type="button" onclick="showWorkspace('plan')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">⌘</div><h3 class="text-xl font-bold mb-3">Lộ trình</h3><p class="text-sm text-slate-400 leading-relaxed">Sắp xếp lịch trình và lựa chọn hoạt động phù hợp với thời gian.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Lập kế hoạch ↗</div></button>
           <button type="button" onclick="showWorkspace('calculator', 'calculate')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">◎</div><h3 class="text-xl font-bold mb-3">Tính điểm hoạt động</h3><p class="text-sm text-slate-400 leading-relaxed">Chấm điểm chi tiết từng hoạt động dựa trên quy chế 75 quy tắc.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Tính điểm ngay ↗</div></button>
           <button type="button" onclick="showWorkspace('snapshot')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">✧</div><h3 class="text-xl font-bold mb-3">Điểm học vụ</h3><p class="text-sm text-slate-400 leading-relaxed">Theo dõi kết quả học tập, GPA học kỳ và tiến độ tích lũy.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Xem kết quả ↗</div></button>
         </div>
@@ -695,7 +732,7 @@
   <!-- 1. TOP STATUS BAR (THANH TRẠNG THÁI TRÊN CÙNG)                           -->
   <!-- ======================================================================== -->
   <header class="h-16 bg-[#0b101b]/95 backdrop-blur-md border-b border-[#1b2537] px-4 sm:px-6 lg:px-8 flex items-center justify-between shrink-0 z-30 shadow-lg shadow-black/20">
-    
+
     <!-- Left: Mobile Menu Toggle + App Identity & Mode Switcher -->
     <div class="flex items-center gap-3 sm:gap-5">
       <!-- Mobile Sidebar Toggle Button -->
@@ -779,6 +816,31 @@
   <!-- ======================================================================== -->
   <!-- BODY CONTAINER: LEFT SIDEBAR + FULL-WIDTH EXPANDED WORKSPACE            -->
   <!-- ======================================================================== -->
+  <!-- TERM-CLOCK: the selected semester and its simulated date; one strip, the same on desktop and mobile -->
+  <div id="termPill" class="shrink-0 flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-[#1b2537] bg-[#0b101b] px-4 sm:px-6 lg:px-8 py-1.5 text-[11px] sm:text-xs text-slate-300">
+    <label class="flex items-center gap-1.5"><span class="text-slate-400">Học kỳ</span>
+      <span id="termSelectHeader" aria-label="Học kỳ đang chọn" class="rounded-lg border border-[#223046] bg-[#0e1524] px-2 py-1 font-bold text-white outline-none focus:border-indigo-500" data-term-label>Học kì</span></label>
+    <span class="whitespace-nowrap text-slate-400">Ngày mô phỏng <b data-term-today class="text-slate-100"></b></span>
+    <button id="simulationDateButton" type="button" onclick="openSimulationDate()" class="rounded-lg border border-[#223046] px-2.5 py-1 text-indigo-200 hover:border-indigo-400 disabled:opacity-50">Đổi ngày</button>
+    <span id="simulationDateHint" hidden>Kịch bản tổng hợp có ngày mô phỏng riêng.</span>
+    <span id="simulationDateNotice" role="status" class="text-amber-200"></span>
+  </div>
+  <dialog id="simulationDateDialog" aria-labelledby="simulationDateTitle" oncancel="if (simulationDateSaving) event.preventDefault()">
+    <form onsubmit="advanceSimulationDate(event)" class="space-y-3">
+      <h2 id="simulationDateTitle" class="text-lg font-bold">Đổi ngày mô phỏng</h2>
+      <p class="text-sm">Ngày hiện tại: <b data-term-today></b></p>
+      <label class="block text-sm">Ngày mới
+        <input id="simulationDateInput" type="date" required class="mt-1 block w-full rounded-lg border border-[#223046] bg-[#0b101b] p-2" />
+      </label>
+      <p class="text-sm text-slate-300">Thời gian mô phỏng sẽ chuyển đến cuối ngày bạn chọn.</p>
+      <p id="simulationDateError" role="alert" class="text-sm text-rose-300"></p>
+      <div class="flex justify-end gap-2">
+        <button id="simulationDateCancel" type="button" onclick="document.getElementById('simulationDateDialog').close()" class="rounded-lg border border-[#223046] px-3 py-2 text-sm disabled:opacity-50">Hủy</button>
+        <button id="simulationDateApply" type="submit" class="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-bold disabled:opacity-50">Áp dụng</button>
+      </div>
+    </form>
+  </dialog>
+
   <div class="flex-1 flex overflow-hidden relative">
 
     <!-- Mobile Drawer Backdrop Overlay -->
@@ -788,7 +850,7 @@
     <!-- 2. LEFT SIDEBAR NAVIGATION (RESPONSIVE OFF-CANVAS TRÊN MOBILE)         -->
     <!-- ====================================================================== -->
     <aside id="sidebarNav" class="fixed inset-y-0 left-0 z-40 w-72 sm:w-80 bg-[#0b101b] border-r border-[#1b2537] flex flex-col justify-between shrink-0 overflow-y-auto p-5 select-none transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-250 ease-out shadow-2xl lg:shadow-none">
-      
+
       <div class="space-y-6">
         <div>
           <!-- Mobile Drawer Header with Close Button -->
@@ -816,37 +878,10 @@
               <span id="sidebarActCount" class="text-xs font-bold px-2 py-0.5 rounded-full bg-[#162032] text-slate-300 border border-[#223046]">20</span>
             </button>
 
-            <button id="tabBtnDrlTracker" onclick="switchTab('calculator', 'tracker')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 12.5 9 17l10.5-11"/></svg>
-              <span class="text-sm font-bold">Theo dõi điểm rèn luyện</span>
-            </button>
-
-            <button id="tabBtnCalculator" onclick="switchTab('calculator', 'calculate')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              <span class="text-sm font-bold">Tính điểm hoạt động</span>
-            </button>
-
-            <button id="tabBtnSnapshot" onclick="switchTab('snapshot')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-              <span class="text-sm font-bold">Điểm học vụ</span>
-            </button>
-
-            <!-- Developer-Only Workspaces -->
-            <button id="tabBtnTestSuites" onclick="switchTab('testSuites')" class="dev-only nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                <span class="text-sm font-bold">Kiểm thử 5 Ca E2E</span>
-              </div>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-[#162032] text-slate-300 border border-[#223046]">Dev</span>
-            </button>
-
-            <button id="tabBtnInspector" onclick="switchTab('inspector')" class="dev-only nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                <span class="text-sm font-bold">Hợp đồng 14 Trường</span>
-              </div>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-[#162032] text-slate-300 border border-[#223046]">Dev</span>
-            </button>
+            <label class="block rounded-xl border border-indigo-400/30 bg-indigo-500/10 px-4 py-3">
+              <span class="block text-sm font-bold text-indigo-200 mb-2">Học kì</span>
+              <span aria-label="Học kì trong không gian làm việc" class="w-full rounded-lg bg-[#0e1524] px-2 py-2 text-xs font-bold text-white" data-term-label>Học kì</span>
+            </label>
 
           </nav>
         </div>
@@ -855,7 +890,7 @@
         <div class="p-3.5 rounded-xl bg-[#0e1524] border border-[#1b2537]">
           <div class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
-            <span>Học kỳ 1 / 2026-2027</span>
+            <span data-term-chip>Học kỳ</span>
           </div>
         </div>
       </div>
@@ -892,6 +927,43 @@
         <!-- ================================================================== -->
         <div id="viewDashboard" class="space-y-8">
           <section id="workspaceOverview" class="space-y-6">
+            <!-- REVIEW-DASH START -->
+            <section id="confirmedPlanDashboard" aria-labelledby="cpdTitle" class="space-y-4">
+              <div class="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-[.22em] text-emerald-300">KẾ HOẠCH ĐÃ CHỐT</p>
+                  <h2 id="cpdTitle" class="mt-1 text-lg sm:text-xl font-extrabold text-white">Lịch hoạt động của bạn</h2>
+                  <p id="cpdToday" class="mt-1 text-xs text-slate-400"></p>
+                </div>
+                <div id="cpdViewToggle" class="hidden inline-flex rounded-xl border border-[#2b3a54] bg-[#080d18] p-1" role="group" aria-label="Chế độ xem lịch">
+                  <button type="button" data-cpd-view="today" onclick="setConfirmedPlanView('today')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white">Hôm nay</button>
+                  <button type="button" data-cpd-view="week" onclick="setConfirmedPlanView('week')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300">Tuần</button>
+                  <button type="button" data-cpd-view="month" onclick="setConfirmedPlanView('month')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300">Tháng</button>
+                </div>
+              </div>
+              <div id="cpdBannerPending" class="hidden flex flex-col gap-2 rounded-xl border border-sky-500/40 bg-sky-950/30 p-3.5 text-sm text-sky-100 sm:flex-row sm:items-center sm:justify-between">
+                <span><b>Có kế hoạch mới chưa chốt.</b> Bạn vừa lập lại kế hoạch; lịch bên dưới vẫn là kế hoạch bạn đã chốt trước đó.</span>
+                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-500">Đến Lộ trình</button>
+              </div>
+              <div id="cpdBannerInvalid" class="hidden flex flex-col gap-2 rounded-xl border border-amber-500/40 bg-amber-950/30 p-3.5 text-sm text-amber-100 sm:flex-row sm:items-center sm:justify-between">
+                <span><b>Kế hoạch bị ảnh hưởng.</b> <span id="cpdInvalidReason"></span> Hãy lập và chốt lại kế hoạch.</span>
+                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-500">Đến Lộ trình</button>
+              </div>
+              <div id="cpdEmpty" class="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-[#2b3a54] bg-[#0e1524] p-5 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-sm text-slate-300">Bạn chưa chốt kế hoạch nào; hãy lập lịch và bấm “Xác nhận kế hoạch” để xem lịch tại đây.</p>
+                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-indigo-500">Đến Lộ trình</button>
+              </div>
+              <div id="cpdContent" class="hidden space-y-4">
+                <div id="cpdProgress"></div>
+                <section id="cpdActivitiesCard" aria-labelledby="cpdActivitiesTitle" class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 sm:p-5">
+                  <h3 id="cpdActivitiesTitle" class="text-sm font-extrabold text-white">Hoạt động của bạn</h3>
+                  <div id="cpdActivityList" class="mt-3"></div>
+                </section>
+                <div id="cpdCalendarCard" class="min-w-0 rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 sm:p-5"><div id="cpdCalendar"></div></div>
+                <div id="cpdDetail" class="hidden"></div>
+              </div>
+            </section>
+            <!-- REVIEW-DASH END -->
             <div class="relative overflow-hidden rounded-3xl border border-blue-400/20 bg-gradient-to-br from-[#101d3c] via-[#0b1429] to-[#101d3a] px-6 py-7 sm:px-8 sm:py-9 shadow-xl shadow-blue-950/20">
               <div class="absolute -right-10 -top-20 h-64 w-64 rounded-full border border-blue-300/10 bg-blue-500/5 shadow-[0_0_90px_rgba(37,99,235,0.12)]"></div>
               <div class="absolute -right-1 -top-10 h-48 w-48 rounded-full border border-cyan-300/10"></div>
@@ -901,7 +973,7 @@
                 <p class="mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-slate-300">Cùng UniLife theo dõi tiến độ, khám phá cơ hội mới và lên kế hoạch cho một học kỳ thật trọn vẹn.</p>
               </div>
               <div class="relative z-10 mt-6 flex flex-wrap items-center gap-2 text-xs">
-                <span class="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 font-semibold text-emerald-200">● Học kỳ 1 · 2026–2027</span>
+                <span class="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 font-semibold text-emerald-200">● <span data-term-label>Học kỳ</span></span>
                 <span class="rounded-full border border-blue-300/20 bg-blue-300/10 px-3 py-1.5 font-semibold text-blue-100">Mỗi bước tiến đều đáng ghi nhận</span>
               </div>
             </div>
@@ -949,70 +1021,10 @@
               </article>
             </div>
 
-            <section aria-labelledby="quickActionsTitle" class="space-y-3">
-              <div class="flex flex-wrap items-end justify-between gap-2">
-                <div>
-                  <p class="text-[11px] font-bold uppercase tracking-[.22em] text-indigo-300">BẮT ĐẦU NGAY</p>
-                  <h2 id="quickActionsTitle" class="mt-1 text-lg sm:text-xl font-extrabold text-white">Bạn muốn làm gì hôm nay?</h2>
-                </div>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-                <button type="button" onclick="switchTab('calculator', 'calculate')" class="group rounded-2xl border border-indigo-400/20 bg-[#0e1524] p-4 text-left transition hover:-translate-y-1 hover:border-indigo-400/60 hover:bg-[#11192b]">
-                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/15 text-xl text-indigo-300" aria-hidden="true">◎</span>
-                  <span class="mt-3 block text-sm font-bold text-white">Tính điểm hoạt động</span>
-                  <span class="mt-1 block text-xs leading-relaxed text-slate-400">Kiểm tra điểm theo quy chế ĐRL.</span>
-                </button>
-                <button type="button" onclick="switchTab('activities', 'discover')" class="group rounded-2xl border border-blue-400/20 bg-[#0e1524] p-4 text-left transition hover:-translate-y-1 hover:border-blue-400/60 hover:bg-[#11192b]">
-                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15 text-xl text-blue-300" aria-hidden="true">⌕</span>
-                  <span class="mt-3 block text-sm font-bold text-white">Khám phá hoạt động</span>
-                  <span class="mt-1 block text-xs leading-relaxed text-slate-400">Tìm sự kiện và workshop phù hợp.</span>
-                </button>
-                <button type="button" onclick="switchTab('plan')" class="group rounded-2xl border border-cyan-400/20 bg-[#0e1524] p-4 text-left transition hover:-translate-y-1 hover:border-cyan-400/60 hover:bg-[#11192b]">
-                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/15 text-xl text-cyan-300" aria-hidden="true">⌘</span>
-                  <span class="mt-3 block text-sm font-bold text-white">Lập lịch thông minh</span>
-                  <span class="mt-1 block text-xs leading-relaxed text-slate-400">Lên lộ trình theo mục tiêu của bạn.</span>
-                </button>
-                <button type="button" onclick="switchTab('snapshot')" class="group rounded-2xl border border-violet-400/20 bg-[#0e1524] p-4 text-left transition hover:-translate-y-1 hover:border-violet-400/60 hover:bg-[#11192b]">
-                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/15 text-xl text-violet-300" aria-hidden="true">✧</span>
-                  <span class="mt-3 block text-sm font-bold text-white">Điểm học vụ</span>
-                  <span class="mt-1 block text-xs leading-relaxed text-slate-400">Theo dõi điểm và tiến độ tích lũy.</span>
-                </button>
-              </div>
-            </section>
 
-            <!-- REVIEW-DASH START -->
-            <section id="confirmedPlanDashboard" aria-labelledby="cpdTitle" class="space-y-4">
-              <div class="flex flex-wrap items-end justify-between gap-3">
-                <div>
-                  <p class="text-[11px] font-bold uppercase tracking-[.22em] text-emerald-300">KẾ HOẠCH ĐÃ CHỐT</p>
-                  <h2 id="cpdTitle" class="mt-1 text-lg sm:text-xl font-extrabold text-white">Lịch hoạt động của bạn</h2>
-                  <p id="cpdToday" class="mt-1 text-xs text-slate-400"></p>
-                </div>
-                <div id="cpdViewToggle" class="hidden inline-flex rounded-xl border border-[#2b3a54] bg-[#080d18] p-1" role="group" aria-label="Chế độ xem lịch">
-                  <button type="button" data-cpd-view="today" onclick="setConfirmedPlanView('today')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white">Hôm nay</button>
-                  <button type="button" data-cpd-view="week" onclick="setConfirmedPlanView('week')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300">Tuần</button>
-                  <button type="button" data-cpd-view="month" onclick="setConfirmedPlanView('month')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300">Tháng</button>
-                </div>
-              </div>
-              <div id="cpdBannerPending" class="hidden flex flex-col gap-2 rounded-xl border border-sky-500/40 bg-sky-950/30 p-3.5 text-sm text-sky-100 sm:flex-row sm:items-center sm:justify-between">
-                <span><b>Có kế hoạch mới chưa chốt.</b> Bạn vừa lập lại kế hoạch; lịch bên dưới vẫn là kế hoạch bạn đã chốt trước đó.</span>
-                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-500">Đến Lập lịch</button>
-              </div>
-              <div id="cpdBannerInvalid" class="hidden flex flex-col gap-2 rounded-xl border border-amber-500/40 bg-amber-950/30 p-3.5 text-sm text-amber-100 sm:flex-row sm:items-center sm:justify-between">
-                <span><b>Kế hoạch bị ảnh hưởng.</b> <span id="cpdInvalidReason"></span> Hãy lập và chốt lại kế hoạch.</span>
-                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-500">Đến Lập lịch</button>
-              </div>
-              <div id="cpdEmpty" class="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-[#2b3a54] bg-[#0e1524] p-5 sm:flex-row sm:items-center sm:justify-between">
-                <p class="text-sm text-slate-300">Bạn chưa chốt kế hoạch nào; hãy lập lịch và bấm “Xác nhận kế hoạch” để xem lịch tại đây.</p>
-                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-indigo-500">Đến Lập lịch</button>
-              </div>
-              <div id="cpdContent" class="hidden space-y-4">
-                <div id="cpdProgress"></div>
-                <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 sm:p-5"><div id="cpdCalendar"></div></div>
-                <div id="cpdDetail" class="hidden"></div>
-              </div>
-            </section>
-            <!-- REVIEW-DASH END -->
+
+
+
 
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
               <section aria-labelledby="semesterProgressTitle" class="xl:col-span-5 rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 sm:p-6">
@@ -1028,7 +1040,7 @@
                 </div>
                 <div class="mt-3 flex items-center justify-between gap-2 text-xs text-slate-400">
                   <span id="overviewSemesterCaption">0 / 100 điểm đã ghi nhận</span>
-                  <span>Học kỳ 1</span>
+                  <span data-term-label>Học kỳ</span>
                 </div>
               </section>
               <section aria-labelledby="recommendedActivitiesTitle" class="xl:col-span-7 rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 sm:p-6">
@@ -1044,6 +1056,26 @@
                 </div>
               </section>
             </div>
+            <section aria-labelledby="quickActionsTitle" class="space-y-3">
+              <div class="flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-[.22em] text-indigo-300">BẮT ĐẦU NGAY</p>
+                  <h2 id="quickActionsTitle" class="mt-1 text-lg sm:text-xl font-extrabold text-white">Bạn muốn làm gì hôm nay?</h2>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button type="button" onclick="switchTab('activities', 'discover')" class="group rounded-2xl border border-blue-400/20 bg-[#0e1524] p-4 text-left transition hover:-translate-y-1 hover:border-blue-400/60 hover:bg-[#11192b]">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15 text-xl text-blue-300" aria-hidden="true">⌕</span>
+                  <span class="mt-3 block text-sm font-bold text-white">Khám phá hoạt động</span>
+                  <span class="mt-1 block text-xs leading-relaxed text-slate-400">Tìm sự kiện và workshop phù hợp.</span>
+                </button>
+                <button type="button" onclick="switchTab('plan')" class="group rounded-2xl border border-cyan-400/20 bg-[#0e1524] p-4 text-left transition hover:-translate-y-1 hover:border-cyan-400/60 hover:bg-[#11192b]">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/15 text-xl text-cyan-300" aria-hidden="true">⌘</span>
+                  <span class="mt-3 block text-sm font-bold text-white">Lộ trình</span>
+                  <span class="mt-1 block text-xs leading-relaxed text-slate-400">Lên lộ trình theo mục tiêu của bạn.</span>
+                </button>
+              </div>
+            </section>
           </section>
 
         </div>
@@ -1057,10 +1089,10 @@
             <span class="rounded-full border border-indigo-400/20 bg-indigo-400/10 px-3 py-1.5 text-xs font-semibold text-indigo-200">Quy chế ĐRL · UniLife</span>
           </div>
           <div id="activityScoringSection" class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start scroll-mt-6">
-          
+
           <!-- CỘT TRÁI (7/12): KHÔNG GIAN NHẬP LIỆU & BÓC TÁCH TO RÕ -->
           <div class="xl:col-span-7 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl divide-y divide-[#1b2537] overflow-hidden">
-            
+
             <!-- TẦNG 1: NHẬP LIỆU TÍNH ĐIỂM -->
             <div class="p-6 lg:p-7 space-y-5">
               <div class="flex flex-wrap items-start justify-between gap-3">
@@ -1097,7 +1129,7 @@
                     </div>
                     <div>
                       <label class="block text-xs font-bold text-slate-400 mb-1">Ngày đăng</label>
-                      <input id="inputDatePosted" type="date" value="2026-10-25" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition" />
+                      <input id="inputDatePosted" type="date" value="" class="w-full px-3 py-1.5 rounded-lg bg-[#0c1220] border border-[#223046] text-white text-sm focus:border-indigo-500 outline-none transition" />
                     </div>
                     <div>
                       <label class="block text-xs font-bold text-slate-400 mb-1">URL bài viết</label>
@@ -1194,7 +1226,7 @@
 
               <!-- Active Result Content -->
               <div id="sp2ActiveResult" class="hidden space-y-4">
-                
+
                 <!-- 3 Big Metric Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div class="p-4 rounded-xl bg-indigo-950/40 border border-indigo-700/50">
@@ -1219,7 +1251,7 @@
                 <!-- Clean, Human-Friendly Explanation Box -->
                 <div class="p-5 rounded-xl bg-[#080d18] border border-[#223046] space-y-2">
                   <p id="resExplanation" class="text-base text-slate-200 leading-relaxed font-medium">—</p>
-                  
+
                   <!-- Developer-only Citation & Dedup Diagnostics -->
                   <div class="dev-only pt-2.5 border-t border-[#1b2537] flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-400">
                     <span id="resCitation">—</span>
@@ -1246,7 +1278,7 @@
 
           <!-- CỘT PHẢI (5/12): BIỂU ĐỒ TRÒN & 5 THANH TIẾN ĐỘ RỘNG RÃI, ĐẸP MẮT -->
           <div id="drlScorePanel" class="xl:col-span-5 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-5 sm:p-6 lg:p-7 space-y-6 sticky top-6 scroll-mt-6">
-            
+
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#1b2537] pb-4">
               <div>
                 <h2 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Điểm rèn luyện của bạn</h2>
@@ -1377,7 +1409,7 @@
                 <div class="flex items-center gap-2 shrink-0">
                   <button id="timelineBtnToday"
                     class="px-3 py-1.5 rounded-lg bg-[#11192b] hover:bg-[#18233a] border border-[#223046] text-xs font-bold text-slate-200 transition shadow-sm">
-                    Hôm nay (<span id="timelineTodayLabel">25/10</span>)
+                    Hôm nay (<span id="timelineTodayLabel"></span>)
                   </button>
                   <div class="relative">
                     <input type="date" id="timelineDatePickerInput" class="sr-only" />
@@ -1477,7 +1509,7 @@
 
 
             <div id="activitiesQaSection" class="hidden space-y-6" style="display:none !important">
-          
+
           <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl space-y-3">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div class="flex flex-wrap items-center gap-2.5">
@@ -1493,10 +1525,7 @@
                 </span>
               </div>
               <div class="flex items-center gap-2 shrink-0">
-                <select id="sp3SourceSelectCatalog" onchange="setSp3Source(this.value)" title="Nguồn dữ liệu cho kho hoạt động và kế hoạch" class="px-3 py-2 rounded-xl bg-[#080d18] border border-[#223046] text-xs font-bold text-slate-200 focus:ring-indigo-500">
-                  <option value="synthetic">Dữ liệu giả lập (MVP)</option>
-                  <option value="real">Kho bài thật · HK1 2026-2027</option>
-                </select>
+                <label class="rounded-xl border border-indigo-400/40 bg-indigo-500/10 px-3 py-2 shadow-lg shadow-indigo-950/20"><span class="mr-2 text-xs font-bold text-indigo-200">Học kì</span><span aria-label="Học kì" class="rounded-lg bg-[#0e1524] px-2 py-1 text-sm font-bold text-white" data-term-label>Học kì</span></label>
                 <button onclick="loadActivitiesFromApi()" class="px-4 py-2 rounded-xl bg-[#162032] hover:bg-[#1f2d46] text-slate-200 border border-[#223046] text-xs font-bold transition flex items-center gap-1.5">
                   <span>↻ Đồng bộ</span>
                 </button>
@@ -1513,7 +1542,7 @@
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
+
             <!-- CỘT 1 (7/12): DANH SÁCH HOẠT ĐỘNG ĐÃ CÔNG NHẬN + DATA QA -->
             <div class="lg:col-span-7 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
               <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
@@ -1528,7 +1557,7 @@
 
             <!-- CỘT 2 (5/12): BẢN NHÁP NGUỒN MỚI, HÀNG ĐỢI CHỜ DUYỆT & THÔNG TIN LƯU TRỮ -->
             <div class="lg:col-span-5 space-y-6">
-              
+
               <!-- Real source posts not in the reviewed 20-record catalog. -->
               <div class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-[#1b2537] pb-3">
@@ -1745,19 +1774,13 @@
                 </span>
               </div>
               <div class="flex items-center gap-2 shrink-0">
-                <select id="sp3SourceSelectPlan" onchange="setSp3Source(this.value)" title="Nguồn dữ liệu cho kho hoạt động và kế hoạch" class="px-3 py-2 rounded-xl bg-[#080d18] border border-[#223046] text-xs font-bold text-slate-200 focus:ring-indigo-500">
-                  <option value="synthetic">Dữ liệu giả lập (MVP)</option>
-                  <option value="real">Kho bài thật · HK1 2026-2027</option>
-                </select>
-                <span class="text-xs text-slate-400 font-medium">Học kỳ 1 / 2026-2027</span>
-                <span id="planTermLabel" class="dev-only text-xs font-mono text-indigo-300">Fixture Tháng 11/2026</span>
+                <label class="rounded-xl border border-indigo-400/40 bg-indigo-500/10 px-3 py-2 shadow-lg shadow-indigo-950/20"><span class="mr-2 text-xs font-bold text-indigo-200">Học kì</span><span aria-label="Học kì" class="rounded-lg bg-[#0e1524] px-2 py-1 text-sm font-bold text-white" data-term-label>Học kì</span></label>
+
+                <span id="planTermLabel" class="dev-only text-xs font-mono text-indigo-300"></span>
               </div>
             </div>
 
-            <div id="planDisclosure" class="px-3 py-2 rounded-xl bg-[#080d18] border border-slate-700/70 text-xs text-slate-400 flex flex-wrap items-center gap-2">
-              <span aria-hidden="true">ℹ</span>
-              <span><b class="text-slate-300">Bản đề xuất tham khảo.</b> Điểm chỉ được ghi nhận sau khi nhà trường xác nhận.</span><span id="planDisclosureSource" class="dev-only font-mono text-amber-300">DEMO_ONLY · official_award_verified: false · SYNTHETIC-DEMO</span><span id="planRealSourceNote" class="hidden text-sky-300">Đang dùng kho bài thật (hoạt động từ bài đăng thật, sinh viên giả lập, mốc ngày 01/10/2026).</span>
-            </div>
+
 
             <div class="flex flex-wrap items-center justify-between gap-3">
               <div class="inline-flex rounded-xl border border-[#1b2537] bg-[#080d18] p-1" role="tablist" aria-label="Hồ sơ và Lịch">
@@ -2009,7 +2032,7 @@
                 <label class="text-xs font-semibold text-slate-400">Họ và tên<input id="profileName" maxlength="100" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" /></label>
                 <label class="text-xs font-semibold text-slate-400">Khoa<input id="profileFaculty" maxlength="100" placeholder="Ví dụ: Khoa Công nghệ Thông tin" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" /></label>
                 <label class="text-xs font-semibold text-slate-400">Khóa tuyển<input id="profileCohort" maxlength="40" placeholder="Ví dụ: 2025" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" /></label>
-                <label class="text-xs font-semibold text-slate-400">Học kỳ lập kế hoạch<select id="profileSemester" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500"><option>HK3 · 2025–2026</option><option>HK1 · 2026–2027</option></select></label>
+                <label class="text-xs font-semibold text-slate-400">Học kỳ lập kế hoạch<span id="profileSemester" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500" data-term-label>Học kì</span></label>
                 <label class="text-xs font-semibold text-slate-400 sm:col-span-2">Chương trình học<select id="profileProgram" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500"><option value="Chương trình Chuẩn">Chương trình Chuẩn</option><option value="Chương trình Chất lượng cao">Chương trình Chất lượng cao</option></select></label>
               </div>
               <div class="mt-5 rounded-2xl border border-indigo-400/20 bg-indigo-950/20 p-4">
@@ -2036,7 +2059,7 @@
               <div class="flex flex-wrap items-end justify-between gap-3">
                 <div><h2 class="text-lg font-extrabold text-white">Bảng điểm rèn luyện</h2><p class="mt-1 text-xs text-slate-400">Nhập điểm từng học kỳ; xếp loại được suy ra tự động.</p></div>
                 <div class="flex flex-wrap items-end gap-2">
-                  <label class="text-[11px] font-semibold text-slate-400">Học kỳ<input id="gradeSemesterInput" maxlength="60" placeholder="HK1 2026–2027" class="mt-1 block w-40 rounded-lg border border-[#223046] bg-[#080d18] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
+                  <label class="text-[11px] font-semibold text-slate-400">Học kỳ<input id="gradeSemesterInput" maxlength="60" placeholder="Ví dụ: HK2 2025–2026" class="mt-1 block w-40 rounded-lg border border-[#223046] bg-[#080d18] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
                   <label class="text-[11px] font-semibold text-slate-400">Điểm<input id="gradePointsInput" type="number" min="0" max="100" placeholder="0–100" class="mt-1 block w-24 rounded-lg border border-[#223046] bg-[#080d18] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
                   <button type="button" onclick="addProfileGrade()" class="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white hover:bg-indigo-500">+ Thêm kỳ</button>
                 </div>
@@ -2115,7 +2138,7 @@
       <div id="posCards" class="mt-5"></div>
       <p id="posNote" class="mt-4 text-xs text-slate-400"></p>
       <p id="posError" role="alert" class="mt-3 text-xs text-rose-300"></p>
-      <p class="mt-6 text-[11px] text-slate-500">Điểm là ước tính để lập kế hoạch; điểm rèn luyện chính thức do trường công nhận.</p>
+
     </div>
   </div>
   <!-- REVIEW-DASH END -->
@@ -2228,13 +2251,13 @@
         }
         #onboardingModal #planOptionsScreen > div, #onboardingModal #planReviewScreen > div { padding: 0; }
         #onboardingModal #posClose, #onboardingModal #prvClose, #onboardingModal #prvBackToOptions,
-        #onboardingModal [data-pos-action="confirm"], #onboardingModal #prvPanel [onclick="prvConfirm()"] { display: none; }
+        #onboardingModal [data-pos-action="confirm"] { display: none; }
         body.rd-onboarding #planDiffModal { z-index: 130; }
       </style>
       <!-- REVIEW-DASH END -->
-      <div class="flex flex-col-reverse items-stretch justify-between gap-3 border-t border-[#1b2537] bg-[#0e1524] px-5 py-4 sm:flex-row sm:items-center sm:px-7">
+      <div class="flex flex-row items-center justify-between gap-3 border-t border-[#1b2537] bg-[#0e1524] px-5 py-4 sm:flex-row sm:items-center sm:px-7">
         <button id="onboardingBackButton" type="button" onclick="previousOnboardingStep()" class="rounded-xl border border-[#2b3a54] bg-[#0b1120] px-5 py-2.5 text-sm font-bold text-slate-300 transition hover:border-slate-500 hover:bg-[#11192b] hover:text-white">Quay lại</button>
-        <button id="onboardingNextButton" type="button" onclick="nextOnboardingStep()" class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-500">Tiếp tục</button>
+        <button id="onboardingNextButton" type="button" onclick="nextOnboardingStep()" class="ml-auto rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition hover:bg-indigo-500">Tiếp tục</button>
       </div>
     </div>
   </div>
@@ -2261,6 +2284,7 @@
     var cpdView = 'today';          // 'today' | 'week' | 'month'
     var cpdAnchor = null;           // ISO date used by the week and month views
     var cpdSelectedActivityId = null;
+    var cpdActivityTab = 'upcoming';
     var cpdCompletionState = null;
     var cpdPlanSaving = false;
     var CPD_WEEKDAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
@@ -2439,13 +2463,17 @@
       const mssv = currentStudent?.student_id;
       if (!mssv) throw new Error('Hãy đăng nhập trước khi xác nhận kế hoạch.');
       if (!cpdIsEngineResult(result)) throw new Error('Chỉ có thể xác nhận một kế hoạch do hệ thống lập kế hoạch tạo ra.');
+      if (!isCurrentTermResponse(result)) throw new Error('Ngày mô phỏng đã thay đổi. Hãy lập lại kế hoạch trước khi chốt.');
       if (!result.completion_offer) return cpdStoreConfirmedPlan(result, optionLabel, mssv);
       if (cpdPlanSaving) throw new Error('Đang lưu kế hoạch. Vui lòng đợi.');
       cpdPlanSaving = true;
+      const planTerm = result.plan.context.term_id;
       return cpdCompletionRequest('/api/sp3/confirmed-plan', {
-        student_id: mssv, offer: result.completion_offer
+        student_id: mssv, term_id: planTerm, offer: result.completion_offer
       }).then(progress => {
         if (currentStudent?.student_id !== mssv) throw new Error('Tài khoản đã thay đổi. Hãy mở lại kế hoạch.');
+        // Only a semester can change under a plan: the synthetic test scenario has its own id and clock.
+        if (termClock && planTerm !== termClock.term_id && termList.some(term => term.term_id === planTerm)) throw new Error('Học kỳ đã thay đổi. Hãy mở lại kế hoạch.');
         if (progress.plan_version !== result.plan.plan_version) throw new Error('Máy chủ trả về kế hoạch khác.');
         return cpdStoreConfirmedPlan(result, optionLabel, mssv, progress);
       }).finally(() => { cpdPlanSaving = false; });
@@ -2462,8 +2490,10 @@
         source: result.data_source || (SP3_SOURCE === 'real' ? 'OPERATIONAL-DATASET' : 'SYNTHETIC-DEMO'),
         option_label: optionLabel || 'Kế hoạch đề xuất',
         target_total: target,
-        // The planner's demo clock; the dashboard uses it as "today" instead of the system date.
+        // Keep the original simulation time in the confirmed snapshot.
         as_of: plan.context.as_of,
+        term_id: plan.context.term_id,
+        clock_version: result.clock_version || null,
         score_summary: JSON.parse(JSON.stringify(plan.score_summary)),
         ...(progress ? { completion_synced: true } : {}),
         activities
@@ -2487,7 +2517,7 @@
         currentProfileDraft.completed_onboarding = true;
         currentProfileDraft.onboarding_started = false;
       }
-      cpdCompletionState = progress ? { studentId: mssv, version: plan.plan_version, progress } : null;
+      cpdCompletionState = progress ? { studentId: mssv, termId: plan.context.term_id, version: plan.plan_version, progress } : null;
       cpdAnchor = null;
       cpdSelectedActivityId = null;
       reviewDashAdoptConfirmedResult(result, optionLabel);
@@ -2627,7 +2657,7 @@
     function shiftConfirmedPlanPeriod(direction) {
       const state = reviewDashReadState();
       if (!state || !state.plan) return;
-      const today = cpdVn(state.plan.as_of).date;
+      const today = cpdSimulationToday(state.plan);
       const anchor = cpdEffectiveAnchor(state.plan, today);
       cpdAnchor = cpdView === 'month' ? cpdAddMonths(anchor, direction) : addDaysToIsoDate(anchor, 7 * direction);
       renderConfirmedPlanDashboard();
@@ -2652,6 +2682,10 @@
     function resetConfirmedPlanAnchor() {
       cpdAnchor = null;
       renderConfirmedPlanDashboard();
+    }
+
+    function cpdSimulationToday(plan) {
+      return cpdVn(plan.term_id && plan.term_id === termClock?.term_id ? termClock.as_of : plan.as_of).date;
     }
 
     function renderConfirmedPlanDashboard() {
@@ -2750,7 +2784,7 @@
       const inRange = events.some(event => event.date >= today && event.date <= days[days.length - 1]);
       const next = events.find(event => event.date > days[days.length - 1]);
       if (!inRange && next) {
-        note = `<p class="rounded-xl border border-dashed border-[#2b3a54] p-3 text-xs text-slate-400">Hoạt động gần nhất diễn ra vào ${escapeHTML(cpdLong(next.date))}. <button type="button" onclick="cpdAnchor='${next.date}';setConfirmedPlanView('week')" class="font-bold text-cyan-300">Xem tuần đó</button></p>`;
+        note = `<p class="rounded-xl border border-dashed border-[#2b3a54] p-3 text-xs text-slate-400">Hoạt động gần nhất diễn ra vào ${escapeHTML(cpdLong(next.date))}. <button type="button" data-first-activity onclick="cpdAnchor='${next.date}';setConfirmedPlanView('week')" class="font-bold text-cyan-300">Đến hoạt động đầu tiên</button></p>`;
       } else if (!events.length) {
         note = '<p class="rounded-xl border border-dashed border-[#2b3a54] p-3 text-xs text-slate-400">Kế hoạch đã chốt không có hoạt động nào cần tham gia.</p>';
       }
@@ -2871,7 +2905,7 @@
           </div>
         </div>
         <div class="mt-4 flex h-2.5 overflow-hidden rounded-full bg-[#080d18]"><div class="h-full bg-slate-400" style="width:${width(baseline)}"></div><div class="h-full bg-emerald-400" style="width:${width(gainWidth)}"></div></div>
-        <p class="mt-2 text-xs text-slate-400">${verdict} Điểm dự kiến do hệ thống lập kế hoạch tính, chưa phải điểm được nhà trường xác nhận.</p>
+        <p class="mt-2 text-xs text-slate-400">${verdict}</p>
         ${history}
       </section>`;
     }
@@ -2927,13 +2961,15 @@
         cpdCompletionState = null;
         return;
       }
-      if (cpdCompletionState?.studentId === studentId && cpdCompletionState.version === plan.plan_version) return;
-      cpdCompletionState = { studentId, version: plan.plan_version };
+      const termId = plan.term_id || termClock?.term_id;
+      if (cpdCompletionState?.studentId === studentId && cpdCompletionState.termId === termId && cpdCompletionState.version === plan.plan_version) return;
+      cpdCompletionState = { studentId, termId, version: plan.plan_version };
       cpdLoadCompletion();
     }
 
     function cpdCompletionCurrent(state) {
-      return cpdCompletionState === state && currentStudent?.student_id === state.studentId;
+      return cpdCompletionState === state && currentStudent?.student_id === state.studentId
+        && (!termClock || !state.termId || state.termId === 'SYNTHETIC-DEMO' || state.termId === termClock.term_id);
     }
 
     async function cpdLoadCompletion() {
@@ -2941,10 +2977,10 @@
       if (!state || state.loading || state.saving) return;
       state.loading = true;
       state.loadError = '';
-      const query = new URLSearchParams({ student_id: state.studentId, plan_version: state.version });
+      const query = new URLSearchParams({ student_id: state.studentId, term_id: state.termId, plan_version: state.version });
       try {
         const { scores, ...progress } = await cpdCompletionRequest(`/api/sp3/confirmed-plan/progress?${query}`);
-        if (!cpdCompletionCurrent(state)) return;
+        if (!cpdCompletionCurrent(state) || !isCurrentTermResponse(progress)) return;
         state.progress = progress;
         applyServerScorePayload(scores, { persist: false });
         renderCategoryBars(studentCategoryScores);
@@ -2965,9 +3001,9 @@
       renderConfirmedPlanDashboard();
       try {
         const saved = await cpdCompletionRequest('/api/sp3/confirmed-plan/complete', {
-          student_id: state.studentId, plan_version: state.version, activity_id: activityId, affirmed: true
+          student_id: state.studentId, term_id: state.termId, plan_version: state.version, activity_id: activityId, affirmed: true
         });
-        if (!cpdCompletionCurrent(state)) return;
+        if (!cpdCompletionCurrent(state) || !isCurrentTermResponse(saved.progress)) return;
         state.progress = saved.progress;
         applyServerScorePayload(saved.scores);
         renderCategoryBars(studentCategoryScores);
@@ -2990,7 +3026,7 @@
       }[status.status] || '';
     }
 
-    function cpdCompletionHtml(activity, token) {
+    function cpdCompletionHtml(activity, token, buttonId = 'cpdConfirmCompletion') {
       const state = cpdCompletionState;
       if (!state) return '<p class="text-slate-400">Hãy lập lại và chốt kế hoạch để bật xác nhận hoàn thành.</p>';
       const status = state.progress?.activities?.[activity.activity_id];
@@ -3010,8 +3046,64 @@
       return `<section aria-label="Xác nhận hoàn thành" class="space-y-2 rounded-lg border border-emerald-500/30 bg-emerald-950/20 p-3">
         <p class="font-semibold text-slate-100">${escapeHTML(status.question)}</p>
         ${error ? `<p role="alert" class="text-rose-300">${escapeHTML(error)}</p>` : ''}
-        <button id="cpdConfirmCompletion" type="button" onclick="cpdConfirmActivityCompletion('${token}')" ${state.saving || state.loading ? 'disabled' : ''} class="rounded-lg bg-emerald-700 px-3 py-2 font-bold text-white hover:bg-emerald-600 disabled:opacity-50">${saving ? 'Đang lưu…' : (error ? 'Thử xác nhận lại' : 'Xác nhận đã hoàn thành')}</button>
+        <button id="${buttonId}" type="button" onclick="cpdConfirmActivityCompletion('${token}')" ${state.saving || state.loading ? 'disabled' : ''} class="rounded-lg bg-emerald-700 px-3 py-2 font-bold text-white hover:bg-emerald-600 disabled:opacity-50">${saving ? 'Đang lưu…' : (error ? 'Thử xác nhận lại' : 'Xác nhận đã hoàn thành')}</button>
       </section>`;
+    }
+
+    function cpdActivityGroups(plan) {
+      const progress = cpdCompletionState?.progress;
+      const current = plan.term_id === termClock?.term_id ? termClock.as_of : plan.as_of;
+      const freshProgress = !progress?.clock_version || progress.clock_version === termClock?.clock_version;
+      const now = Date.parse((freshProgress && progress?.as_of) || current);
+      const groups = { upcoming: [], past: [] };
+      (plan.activities || []).forEach(activity => {
+        const status = progress?.activities?.[activity.activity_id];
+        const starts = (activity.scheduled_blocks || []).map(block => Date.parse(block.start)).filter(Number.isFinite);
+        const ends = (activity.scheduled_blocks || []).map(block => Date.parse(block.end)).filter(Number.isFinite);
+        const start = starts.length ? Math.min(...starts) : Infinity;
+        // A quiz's participation deadline may be later than its scheduled working slot.
+        const end = status?.available_at ? Date.parse(status.available_at) : (ends.length ? Math.max(...ends) : NaN);
+        const past = status?.status === 'COMPLETED' || status?.status === 'READY'
+          || (status?.status !== 'NOT_DUE' && Number.isFinite(end) && now >= end);
+        groups[past ? 'past' : 'upcoming'].push({ activity, start, end, ongoing: now >= start && now < end });
+      });
+      groups.upcoming.sort((a, b) => a.start - b.start || a.activity.activity_id.localeCompare(b.activity.activity_id));
+      groups.past.sort((a, b) => (Number.isFinite(b.end) ? b.end : 0) - (Number.isFinite(a.end) ? a.end : 0)
+        || a.activity.activity_id.localeCompare(b.activity.activity_id));
+      return groups;
+    }
+
+    function setConfirmedActivityTab(tab) {
+      cpdActivityTab = tab === 'past' ? 'past' : 'upcoming';
+      const plan = reviewDashReadState()?.plan;
+      if (plan) cpdRenderActivityList(plan);
+    }
+
+    function cpdRenderActivityList(plan) {
+      const box = document.getElementById('cpdActivityList');
+      if (!box) return;
+      const groups = cpdActivityGroups(plan);
+      const tabs = [['upcoming', 'Sắp tới'], ['past', 'Đã qua']].map(([key, label]) => {
+        const active = key === cpdActivityTab;
+        return `<button id="cpdActivityTab-${key}" type="button" role="tab" aria-selected="${active}" aria-controls="cpdActivityPanel" onclick="setConfirmedActivityTab('${key}')" class="rounded-lg px-3 py-2 text-xs font-bold ${active ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-[#162032]'}">${label} (${groups[key].length})</button>`;
+      }).join('');
+      const rows = groups[cpdActivityTab].map(({ activity, ongoing }) => {
+        const token = activityToken(activity.activity_id);
+        const times = (activity.scheduled_blocks || []).map(block => formatPlanTimeRange(block.start, block.end)).join(' · ');
+        const status = cpdCompletionState?.progress?.activities?.[activity.activity_id];
+        const completed = status?.status === 'COMPLETED';
+        return `<article data-cpd-activity="${escapeHTML(activity.activity_id)}" class="min-w-0 rounded-xl border border-[#223046] bg-[#080d18] p-3 text-xs space-y-2">
+          <button type="button" onclick="cpdOpenActivity('${token}')" class="text-left text-sm font-bold text-white hover:text-cyan-200 break-words">${escapeHTML(activity.title)}</button>
+          <p class="text-slate-400">${escapeHTML(times || 'Chưa rõ thời gian')} · ${escapeHTML(cpdPlaceText(activity))}</p>
+          ${ongoing ? '<p class="font-semibold text-cyan-300">Đang diễn ra</p>' : ''}
+          ${completed ? '<p class="text-xs font-bold text-emerald-300">Đã hoàn thành</p>' : '<p class="text-xs text-slate-400">Chưa xác nhận</p>'}
+          ${completed ? '' : `<p class="font-bold text-emerald-300">${escapeHTML(cpdDashboardPoints(activity))}</p>`}
+          ${cpdActivityTab === 'past' ? cpdCompletionHtml(activity, token, 'cpdListComplete-' + token) : ''}
+        </article>`;
+      }).join('');
+      const empty = cpdActivityTab === 'past' ? 'Chưa có hoạt động nào đã kết thúc.' : 'Không có hoạt động sắp tới trong kế hoạch.';
+      box.innerHTML = `<div role="tablist" aria-label="Thời gian hoạt động" class="flex flex-wrap gap-1 mb-3">${tabs}</div>
+        <div id="cpdActivityPanel" role="tabpanel" aria-labelledby="cpdActivityTab-${cpdActivityTab}" class="grid grid-cols-1 md:grid-cols-2 gap-3">${rows || `<p class="text-xs text-slate-400">${empty}</p>`}</div>`;
     }
 
     function cpdResultForConfirmed(state) {
@@ -3025,9 +3117,9 @@
       const state = reviewDashReadState();
       if (!state?.plan) return;
       const result = cpdResultForConfirmed(state);
-      if (!result) {
+      if (!result || !isCurrentTermResponse(result)) {
         const box = document.getElementById('cpdDetail');
-        if (box) box.innerHTML += '<p role="alert" class="mt-2 text-xs text-amber-300">Kế hoạch cũ chưa lưu đủ dữ liệu để xem tác động. Hãy mở lại phương án gốc hoặc lập và xác nhận kế hoạch mới.</p>';
+        if (box) box.innerHTML += '<p role="alert" class="mt-2 text-xs text-amber-300">Hãy lập kế hoạch mới để xem tác động theo ngày mô phỏng hiện tại.</p>';
         return;
       }
       prvNewDraft(result, state.plan.option_label, 'dashboard');
@@ -3086,12 +3178,12 @@
         if (todayLabel) todayLabel.textContent = '';
         return;
       }
-      const today = cpdVn(plan.as_of).date;
+      const today = cpdSimulationToday(plan);
       if (todayLabel) {
         const completionTime = cpdVn(cpdCompletionState?.progress?.as_of);
         const completionNote = completionTime && completionTime.date !== today
           ? ` · Mốc xét hoàn thành ${escapeHTML(cpdShort(completionTime.date))} ${escapeHTML(completionTime.time)}` : '';
-        todayLabel.innerHTML = `Hôm nay: <b class="text-white">${escapeHTML(cpdLong(today))}</b> · ngày mốc của hệ thống lập kế hoạch${completionNote} · ${escapeHTML(plan.option_label || 'Kế hoạch đã chốt')} <span class="dev-only font-mono">${escapeHTML(plan.plan_version)}</span>`;
+        todayLabel.innerHTML = `Hôm nay: <b class="text-white">${escapeHTML(cpdLong(today))}</b>${completionNote}`;
       }
       document.querySelectorAll('[data-cpd-view]').forEach(button => {
         const active = button.getAttribute('data-cpd-view') === cpdView;
@@ -3100,6 +3192,7 @@
       });
       const progress = document.getElementById('cpdProgress');
       if (progress) progress.innerHTML = cpdRenderProgress(plan);
+      cpdRenderActivityList(plan);
       const calendar = document.getElementById('cpdCalendar');
       if (calendar) {
         calendar.innerHTML = cpdView === 'week'
@@ -3401,10 +3494,10 @@
       }).join('');
       const violation = summary.violations > 0
         ? `<p class="font-bold text-rose-300">Kiểm tra độc lập SP3: ${summary.violations} vi phạm — chưa thể xác nhận.</p>`
-        : '<p class="text-slate-300">Kiểm tra độc lập SP3: <b class="text-emerald-300">0 vi phạm</b></p>';
+        : '';
       const mandatory = summary.mandatoryPending.length
         ? `<p class="font-bold text-amber-300">Mục bắt buộc chưa xếp: ${summary.mandatoryPending.map(escapeHTML).join(', ')}</p>`
-        : '<p class="text-slate-300">Mục bắt buộc chưa xếp: <b class="text-white">không có</b></p>';
+        : '';
       const pending = summary.pendingConfirmation ? `<p class="text-slate-300">Hoạt động đã hoàn thành chờ xác nhận điểm: <b class="text-white">${summary.pendingConfirmation}</b></p>` : '';
       const warning = !summary.met && summary.violations === 0
         ? '<p class="text-[11px] text-amber-200">Kế hoạch này chưa đạt mục tiêu điểm. Bạn vẫn có thể xác nhận.</p>' : '';
@@ -3416,9 +3509,9 @@
         <div class="space-y-2.5">${bars}</div>
         <div class="space-y-1 text-xs">${violation}${mandatory}${pending}</div>
         <div class="space-y-2">
+          <button type="button" ${changed ? '' : 'disabled'} onclick="prvRestoreOriginal()" class="w-full rounded-xl border border-[#2b3a54] px-4 py-2 text-xs font-bold text-slate-200 hover:bg-[#162032] disabled:opacity-40">Khôi phục phương án gốc</button>
           <button type="button" ${summary.violations > 0 || prvDraft.busy ? 'disabled' : ''} onclick="prvConfirm()" class="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-extrabold text-white hover:bg-emerald-500 disabled:opacity-40">Xác nhận kế hoạch</button>
           ${warning}
-          <button type="button" ${changed ? '' : 'disabled'} onclick="prvRestoreOriginal()" class="w-full rounded-xl border border-[#2b3a54] px-4 py-2 text-xs font-bold text-slate-200 hover:bg-[#162032] disabled:opacity-40">Khôi phục phương án gốc</button>
           <p id="prvConfirmError" class="text-xs text-rose-300"></p>
         </div>
       </section>`;
@@ -3436,12 +3529,13 @@
       const alternatives = panel.alternatives || {};
       const suggestion = panel.suggestion || {};
       const errorHtml = (message, part) => `<div role="alert" class="rounded-lg border border-rose-500/40 bg-rose-950/30 p-3 text-xs text-rose-200">${escapeHTML(message)} <button type="button" onclick="prvRetryChange('${part}')" class="font-bold text-cyan-300">Thử lại</button></div>`;
-      let impactHtml = '<p class="text-xs text-slate-400" aria-live="polite">Nếu bỏ hoạt động này: đang tính tác động…</p>';
-      if (impact.error) impactHtml = '<p class="text-xs font-bold text-slate-300">Nếu bỏ hoạt động này:</p>' + errorHtml(impact.error, 'impact');
+      let impactHtml = '<p class="text-xs text-slate-400" aria-live="polite">Nếu bỏ: đang tính tác động…</p>';
+      if (impact.error) impactHtml = '<p class="text-xs font-bold text-slate-300">Nếu bỏ:</p>' + errorHtml(impact.error, 'impact');
       else if (impact.data) {
         const data = impact.data;
-        const tail = data.target_met ? ', vẫn đạt mục tiêu' : ` (thấp hơn mục tiêu ${prvTotalText(data.target_total)})`;
-        impactHtml = `<p data-change-impact class="text-sm font-bold ${data.target_met ? 'text-emerald-300' : 'text-amber-300'}">Nếu bỏ hoạt động này: ${escapeHTML(prvTotalText(data.before.projected_total))} → ${escapeHTML(prvTotalText(data.projected_total))}${escapeHTML(tail)}</p>`;
+        const gap = Math.max(0, Number((Number(data.target_total) - Number(data.projected_total)).toFixed(2)));
+        const tail = gap > 0 ? ` — thiếu ${gap}đ.` : Number(data.projected_total) > Number(data.target_total) ? ' — vượt mục tiêu.' : ' — đủ điểm.';
+        impactHtml = `<p data-change-impact class="text-sm font-bold ${data.target_met ? 'text-emerald-300' : 'text-amber-300'}">Nếu bỏ: Còn ${escapeHTML(String(data.projected_total))}/${escapeHTML(String(data.target_total))}đ${escapeHTML(tail)}</p>`;
       }
       let alternativeHtml = '<p class="text-xs text-slate-400">Đang tìm hoạt động thay thế…</p>';
       if (alternatives.error) alternativeHtml = errorHtml(alternatives.error, 'alternatives');
@@ -3468,7 +3562,7 @@
       return `<section id="prvChangePanel" role="region" tabindex="-1" aria-labelledby="prvChangeTitle" class="space-y-4 rounded-2xl border border-indigo-500/40 bg-[#0e1524] p-4 sm:p-5">
         <header><h3 id="prvChangeTitle" class="text-sm font-extrabold text-white">${escapeHTML(activity.title)}</h3><p class="mt-1 text-xs text-slate-400">${escapeHTML(prvWhen(activity))} · ${escapeHTML(cpdPointsText(activity))}</p></header>
         <div aria-live="polite">${impactHtml}</div>
-        <section class="space-y-2"><h4 class="text-xs font-extrabold text-slate-200">Thay bằng (vẫn đạt mục tiêu):</h4>${alternativeHtml}</section>
+        <section class="space-y-2"><h4 class="text-xs font-extrabold text-slate-200">Thay thế để đủ điểm:</h4>${alternativeHtml}</section>
         ${suggestionHtml}${panel.applyError ? `<p role="alert" class="text-xs text-rose-300">${escapeHTML(panel.applyError)}</p>` : ''}
         <footer class="flex flex-wrap gap-2 border-t border-[#223046] pt-3"><button id="prvRemoveChoice" type="button" ${removal ? '' : 'disabled'} onclick="prvApplyRemoval()" class="rounded-lg border border-rose-500/40 px-3 py-2 text-xs font-bold text-rose-200 disabled:opacity-40">${escapeHTML(removeLabel)}</button><button id="prvCancelChange" type="button" onclick="prvCancelChange()" class="rounded-lg border border-[#2b3a54] px-3 py-2 text-xs font-bold text-slate-200">Huỷ</button></footer>
       </section>`;
@@ -3652,12 +3746,13 @@
           confirmed_profile: true,
           preference: plannerPreferencePayload(preference),
           base_result: prvDraft.result,
-          availability: plannerAvailabilityPayload(),
+          availability: plannerAvailabilityPayload(prvDraft.source),
           ...extra
         })
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : `Máy chủ phản hồi mã ${response.status}.`);
+      if (!isCurrentTermResponse(data)) throw new Error('Kết quả thuộc học kỳ khác nên đã bị bỏ qua. Hãy thử lại.');
       return data;
     }
 
@@ -3861,7 +3956,7 @@
     function reviewDashFriendlyError(message, source, withPrefix) {
       const text = String(message == null ? '' : message).trim();
       if (/source=real/i.test(text) || (source === 'real' && /not yet (available|supported)/i.test(text))) {
-        return 'Chức năng này chưa hỗ trợ kho bài thật. Hãy chuyển nguồn dữ liệu sang “Dữ liệu giả lập (MVP)” ở đầu trang Lập lịch thông minh.';
+        return 'Chức năng này chưa hỗ trợ kho bài thật. Hãy chuyển nguồn dữ liệu sang “Dữ liệu giả lập (MVP)” ở đầu trang Lộ trình.';
       }
       if (/failed to fetch|networkerror|load failed|network request failed|fetch failed/i.test(text)) {
         return 'Không kết nối được máy chủ. Hãy kiểm tra server rồi thử lại.';
@@ -3991,7 +4086,7 @@
       const targetText = Number.isFinite(targetNumber) ? String(targetNumber) : '—';
       const sourceText = SP3_SOURCE === 'real' ? 'Kho bài thật' : 'Dữ liệu giả lập';
       const subtitle = document.getElementById('posSubtitle');
-      if (subtitle) subtitle.textContent = `Mục tiêu ${targetText} điểm · ${sourceText}`;
+      if (subtitle) subtitle.hidden = true;
       const suggested = models.length ? rdPosSuggestedIndex(models) : -2;
       const hasPreference = rdPosHasPreference();
       const columns = models.length >= 3 ? 'lg:grid-cols-3' : (models.length === 2 ? 'lg:grid-cols-2' : 'lg:grid-cols-1 lg:max-w-xl');
@@ -4078,7 +4173,7 @@
           return;
         }
         reviewDashClosePlanOptions(true);
-        if (openPlanReview(data, label)) document.getElementById(rdOnboardingActive() ? 'onboardingNextButton' : 'prvBackToOptions')?.focus();
+        if (openPlanReview(data, label)) (rdOnboardingActive() ? document.querySelector('#prvPanel [onclick="prvConfirm()"]') : document.getElementById('prvBackToOptions'))?.focus();
       } catch (err) {
         if (error) error.textContent = reviewDashFriendlyError(err && err.message, SP3_SOURCE, false);
       }
@@ -4174,7 +4269,7 @@
       const back = document.getElementById('onboardingBackButton');
       back.hidden = onboardingStep === 1;
       back.disabled = cpdPlanSaving;
-      next.hidden = onboardingStep === 4;
+      next.hidden = onboardingStep >= 4;
       if (onboardingStep === 5) {
         next.textContent = 'Xác nhận lịch & hoàn tất';
         next.disabled = !prvDraft || prvDraft.busy || cpdPlanSaving || prvSummary(prvDraft.result).violations > 0;
@@ -4202,7 +4297,7 @@
       document.getElementById('onboardingReviewHost').classList.toggle('hidden', onboardingStep !== 5);
       document.getElementById('onboardingPlanStatus').textContent = flow.busy
         ? 'Đang lập các phương án từ mục tiêu và lịch bận/rảnh của bạn…'
-        : onboardingStep === 4 ? 'Chọn một phương án để tiếp tục review ở bước cuối.' : '';
+        : onboardingStep === 4 ? '' : '';
       document.getElementById('onboardingPlanError').textContent = flow.error;
       document.getElementById('onboardingRetryPlan').classList.toggle('hidden', onboardingStep !== 4 || flow.busy || !flow.error);
       if (!planning) rdOnboardingPersistStep();
@@ -4353,6 +4448,19 @@
     const onboardingDialog = document.getElementById("onboardingModal");
     if (!onboardingDialog) throw new Error("The onboarding dialog is missing from the page.");
     document.body.appendChild(onboardingDialog);
+
+    // TERM-CLOCK state (declared first: the page logic below reads it while the script is still loading)
+    // The term the page is working in. termList = every configured term (GET /api/terms); termClock = the one
+    // object of the selected term (GET /api/clock). Both are null until the first load finishes.
+    let termList = [];
+    let termClock = null;
+    let termSwitching = false;
+    let termReviewDrafts = {};
+    // Derived values, refreshed by applyTermClock(). They replace the old fixed demo date and week anchors.
+    let TERM_TODAY_ISO = null;
+    let TIMELINE_SIMULATED_TODAY = null;
+    let AVAILABILITY_DEFAULT_WEEK_START = null;
+    let AVAILABILITY_CONTRACT_WEEK_START = null;
 
     let workspaceTransitionStarted = false;
     let pendingWorkspaceTab = null;
@@ -5027,7 +5135,7 @@
       setValue("profileName", currentStudent.full_name);
       setValue("profileFaculty", profile.faculty);
       setValue("profileCohort", profile.cohort);
-      setValue("profileSemester", profile.semester);
+      setValue("profileSemester", profile.term_id);
       setValue("profileProgram", normalizeStudentProgram(profile.program));
       setValue("profileInterestFields", profile.preferences.interest_fields);
       setValue("profileSkills", profile.preferences.skills);
@@ -5110,7 +5218,7 @@
       currentStudent.full_name = fullName;
       profile.faculty = document.getElementById("profileFaculty").value.trim();
       profile.cohort = document.getElementById("profileCohort").value.trim();
-      profile.semester = document.getElementById("profileSemester").value;
+      profile.semester = termLabelOf(profile.term_id);
       profile.program = normalizeStudentProgram(document.getElementById("profileProgram").value);
       saveLocalProfile(profile);
       localStorage.setItem("unilife_student", JSON.stringify(currentStudent));
@@ -5288,17 +5396,23 @@
     // Planner snapshots repeat the whole catalog in options, stages and the confirmed result.
     // Store identical top-level payloads once, then restore independent copies for the controllers.
     // Profile, scores and the confirmed calendar keep their existing on-disk shape.
+    // The snapshots live in each term's slice (data.terms[term_id]); an old term-less blob keeps them at the top.
     function mapLocalPlannerSnapshots(data, transform) {
-      const mapped = { ...data };
-      if (data.confirmed_plan_result) mapped.confirmed_plan_result = transform(data.confirmed_plan_result);
-      if (data.planner) {
-        const planner = mapped.planner = { ...data.planner };
-        if (planner.plan_stages) planner.plan_stages = Object.fromEntries(
-          Object.entries(planner.plan_stages).map(([stage, result]) => [stage, result ? transform(result) : result]));
-        if (Array.isArray(planner.cached_plan_options)) planner.cached_plan_options = planner.cached_plan_options.map(
-          option => option.result ? { ...option, result: transform(option.result) } : { ...option });
-        if (planner.custom_plan_backup) planner.custom_plan_backup = transform(planner.custom_plan_backup);
-      }
+      const mapSlice = slice => {
+        const mapped = { ...slice };
+        if (slice.confirmed_plan_result) mapped.confirmed_plan_result = transform(slice.confirmed_plan_result);
+        if (slice.planner) {
+          const planner = mapped.planner = { ...slice.planner };
+          if (planner.plan_stages) planner.plan_stages = Object.fromEntries(
+            Object.entries(planner.plan_stages).map(([stage, result]) => [stage, result ? transform(result) : result]));
+          if (Array.isArray(planner.cached_plan_options)) planner.cached_plan_options = planner.cached_plan_options.map(
+            option => option.result ? { ...option, result: transform(option.result) } : { ...option });
+          if (planner.custom_plan_backup) planner.custom_plan_backup = transform(planner.custom_plan_backup);
+        }
+        return mapped;
+      };
+      const mapped = mapSlice(data);
+      if (data.terms) mapped.terms = Object.fromEntries(Object.entries(data.terms).map(([termId, slice]) => [termId, mapSlice(slice)]));
       return mapped;
     }
 
@@ -5346,9 +5460,14 @@
         || error?.code === 22 || error?.code === 1014;
     }
 
+    // data is the in-memory view of the account (the active term flattened); it is stored split by term.
     function writeLocalUserData(mssv, data) {
+      writeStoredLocalUserData(mssv, termViewToStored(data));
+    }
+
+    function writeStoredLocalUserData(mssv, stored) {
       const key = localUserDataKey(mssv);
-      const serialized = serializeLocalUserData(data);
+      const serialized = serializeLocalUserData(stored);
       try {
         localStorage.setItem(key, serialized);
         return;
@@ -5381,14 +5500,16 @@
       throw new Error('Trình duyệt không còn đủ dung lượng để lưu tài khoản. Hãy giải phóng dung lượng của trang rồi thử lại. Dữ liệu đã lưu vẫn được giữ.');
     }
 
-    function createDefaultLocalUserData(mssv, isNewRegistration = false) {
+    function createDefaultLocalUserData(mssv, isNewRegistration = false, termId = defaultTermId()) {
+      const clock = termClockFor(termId);
+      if (!clock) throw new Error('Chưa tải được danh sách học kỳ.');
       return {
-        schema_version: 2,
+        schema_version: 3,
         student_id: mssv,
         onboarding_status: isNewRegistration ? "NOT_STARTED" : "COMPLETED",
         onboarding_step: 1,
         score_sources: {},
-        canonical_availability: { timezone: "Asia/Ho_Chi_Minh", apply_scope: "SEMESTER_WEEKLY", effective_from: "2026-11-09", effective_until: "2027-03-31", weekly_blocks: [], exceptions: [], busy_intervals: [], weekly_participation_hours: null },
+        canonical_availability: { timezone: "Asia/Ho_Chi_Minh", apply_scope: "SEMESTER_WEEKLY", effective_from: clock.term_start, effective_until: clock.term_end, weekly_blocks: [], exceptions: [], busy_intervals: [], weekly_participation_hours: null },
         manual_busy_intervals: [],
         unavailable_slots: [],
         profile_assistant_history: [],
@@ -5412,7 +5533,8 @@
           faculty: "",
           cohort: "",
           program: "Chương trình Chuẩn",
-          semester: "HK1 · 2026–2027",
+          term_id: clock.term_id,
+          semester: clock.term_label,
           avatar_data_url: "",
           score_history: [],
           preferences: {
@@ -5428,7 +5550,7 @@
             format: "",
             topics: []
           },
-          busy_schedule: { applies_to_semester: false, week_start: "2026-11-09", slots: [], entries: [], overrides: [] },
+          busy_schedule: { applies_to_semester: false, week_start: termDefaultWeekStart(clock), slots: [], entries: [], overrides: [] },
           completed_onboarding: !isNewRegistration,
           onboarding_started: false
         },
@@ -5445,10 +5567,10 @@
       };
     }
 
-    function migrateLocalUserData(mssv, saved) {
-      const defaults = createDefaultLocalUserData(mssv, false);
+    function migrateLocalUserData(mssv, saved, forceWrite = false) {
+      const defaults = createDefaultLocalUserData(mssv, false, saved.profile?.term_id);
       const legacy = !saved.schema_version;
-      const needsMigration = Number(saved.schema_version) !== 2;
+      const needsMigration = forceWrite || Number(saved.schema_version) !== 3;
       const savedProfile = saved.profile || {};
       const targetScore = Number.isFinite(Number(savedProfile.goal?.target_score))
         ? Number(savedProfile.goal.target_score)
@@ -5456,12 +5578,14 @@
       const migrated = {
         ...defaults,
         ...saved,
-        schema_version: 2,
+        schema_version: 3,
         student_id: mssv,
         onboarding_status: legacy ? "COMPLETED" : (["NOT_STARTED", "IN_PROGRESS", "COMPLETED"].includes(saved.onboarding_status) ? saved.onboarding_status : "COMPLETED"),
         profile: {
           ...defaults.profile,
           ...savedProfile,
+          term_id: defaults.profile.term_id,
+          semester: defaults.profile.semester,
           program: normalizeStudentProgram(savedProfile.program),
           drl_target: targetScore,
           profile: { ...defaults.profile.profile, ...(savedProfile.profile || {}) },
@@ -5505,7 +5629,16 @@
       if (!saved || typeof saved !== "object" || Array.isArray(saved)) {
         throw new Error(`Dữ liệu tài khoản ${mssv} trong trình duyệt không hợp lệ.`);
       }
-      return migrateLocalUserData(mssv, saved);
+      return migrateLocalUserData(mssv, ...storedToActiveView(saved));
+    }
+
+    // Stored account (any version) -> [view of its active term, whether the stored copy must be rewritten].
+    function storedToActiveView(saved) {
+      const old = Number(saved.schema_version) < 3 || !saved.schema_version;
+      const stored = old ? termMigrateLegacy(saved, termList, defaultTermId()) : saved;
+      const chosen = stored.profile?.term_id;
+      const termId = termList.some(term => term.term_id === chosen) ? chosen : defaultTermId();
+      return [termStoredToView(stored, termId), old];
     }
 
     function maybeStartOnboarding() {
@@ -5936,7 +6069,7 @@
       const faculty = document.getElementById("psFaculty")?.value.trim() ?? currentProfileDraft.faculty ?? "";
       const cohort = document.getElementById("psCohort")?.value.trim() ?? currentProfileDraft.cohort ?? "";
       const program = normalizeStudentProgram(document.getElementById("psProgram")?.value ?? currentProfileDraft.program);
-      const semester = document.getElementById("psSemester")?.value || currentProfileDraft.semester || "HK1 · 2026–2027";
+      const semester = termLabelOf(currentProfileDraft.term_id);
       const rawTarget = document.getElementById("psDrlTarget")?.value;
       const targetScore = normalizeDrlTarget(rawTarget, normalizeDrlTarget(currentProfileDraft.drl_target, 80));
 
@@ -5989,7 +6122,6 @@
       if (!container || !currentProfileDraft) return;
       const g = ensureProfileDraftGoal();
       const targetScore = normalizeDrlTarget(g.target_score, normalizeDrlTarget(currentProfileDraft.drl_target, 80));
-      const semesters = ["HK3 · 2025–2026", "HK1 · 2026–2027"];
       const queryLower = profileScheduleTopicQuery.trim().toLocaleLowerCase("vi");
       const filteredTopics = ONBOARDING_ALL_TOPICS.filter(id => {
         if (!queryLower) return true;
@@ -6012,7 +6144,7 @@
               <label class="text-xs font-bold text-slate-300">Khoa<input id="psFaculty" value="${escapeHTML(currentProfileDraft.faculty || "")}" maxlength="100" placeholder="Ví dụ: Khoa Công nghệ Thông tin" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
               <label class="text-xs font-bold text-slate-300">Khóa tuyển<input id="psCohort" value="${escapeHTML(currentProfileDraft.cohort || "")}" maxlength="40" placeholder="Ví dụ: 2025" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" /></label>
               <label class="text-xs font-bold text-slate-300">Chương trình đào tạo<select id="psProgram" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500">${STUDENT_PROGRAMS.map(p => `<option value="${escapeHTML(p)}" ${p === normalizeStudentProgram(currentProfileDraft.program) ? "selected" : ""}>${escapeHTML(p)}</option>`).join("")}</select></label>
-              <label class="text-xs font-bold text-slate-300">Học kỳ lập kế hoạch<select id="psSemester" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500">${semesters.map(s => `<option ${s === (currentProfileDraft.semester || "HK1 · 2026–2027") ? "selected" : ""}>${escapeHTML(s)}</option>`).join("")}</select></label>
+              <label class="text-xs font-bold text-slate-300">Học kỳ lập kế hoạch<span id="psSemester" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#0e1524] px-3 py-2 text-xs text-white outline-none focus:border-indigo-500" data-term-label>${escapeHTML(termClock?.term_label || "Học kì")}</span></label>
             </div>
           </div>
 
@@ -6545,7 +6677,7 @@
 
     function persistCurrentUserData() {
       const mssv = currentStudent?.student_id;
-      if (!mssv) return;
+      if (!mssv || termSwitching) return;
       const saved = readLocalUserData(mssv);
       const targetInput = document.getElementById("inputPlanTarget");
       const draftTarget = Number(currentProfileDraft?.drl_target ?? currentProfileDraft?.goal?.target_score);
@@ -6563,7 +6695,8 @@
         faculty: currentProfileDraft.faculty ?? saved.profile?.faculty ?? "",
         cohort: currentProfileDraft.cohort ?? saved.profile?.cohort ?? "",
         program: currentProfileDraft.program ?? saved.profile?.program ?? "",
-        semester: currentProfileDraft.semester ?? saved.profile?.semester ?? "HK1 · 2026–2027",
+        term_id: saved.profile.term_id,
+        semester: termLabelOf(saved.profile.term_id),
         avatar_data_url: currentProfileDraft.avatar_data_url ?? saved.profile?.avatar_data_url ?? "",
         score_history: Array.isArray(currentProfileDraft.score_history) ? currentProfileDraft.score_history : (Array.isArray(saved.profile?.score_history) ? saved.profile.score_history : []),
         preferences: { ...(saved.profile?.preferences || {}), ...(currentProfileDraft.preferences || {}) },
@@ -6729,6 +6862,7 @@
         major: user.major || "Sinh viên",
         demo_only: true
       };
+      renderTermLabels();
       localStorage.setItem("unilife_student", JSON.stringify(currentStudent));
       localStorage.setItem(CURRENT_USER_KEY, currentStudent.student_id);
       const accountData = readLocalUserData(currentStudent.student_id);
@@ -6778,6 +6912,7 @@
       if (field === "full_name") onboardingDraft.full_name = value;
       else if (field === "student_id") onboardingDraft.student_id = value;
       else if (field === "program") onboardingDraft.profile.program = normalizeStudentProgram(value);
+      else if (field === "semester") { onboardingChangeTerm(value); return; }
       else onboardingDraft.profile[field] = value;
       persistOnboardingDraft();
     }
@@ -6880,6 +7015,7 @@
       };
       const schedule = ctx.profile.busy_schedule;
       if (!/^\d{4}-\d{2}-\d{2}$/.test(schedule.week_start || "")) schedule.week_start = AVAILABILITY_DEFAULT_WEEK_START;
+      schedule.week_start = termClampWeekStart(schedule.week_start);
       if (!Array.isArray(schedule.slots)) schedule.slots = [];
       if (!Array.isArray(schedule.entries)) schedule.entries = [];
       if (!Array.isArray(schedule.overrides)) schedule.overrides = [];
@@ -6920,7 +7056,6 @@
       }
 
       if (onboardingStep === 1) {
-        const semesters = ["HK3 · 2025–2026", "HK1 · 2026–2027"];
         content.innerHTML = `
           <div class="mx-auto max-w-3xl">
             <div class="mb-6">
@@ -6946,7 +7081,7 @@
                   <select id="onboardingProgram" onchange="updateOnboardingProfileField('program', this.value)" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">${STUDENT_PROGRAMS.map(value => `<option value="${escapeHTML(value)}" ${value === normalizeStudentProgram(onboardingDraft.profile.program) ? "selected" : ""}>${escapeHTML(value)}</option>`).join("")}</select>
                 </label>
                 <label class="text-xs font-bold text-slate-300">Học kỳ lập kế hoạch
-                  <select onchange="updateOnboardingProfileField('semester', this.value)" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">${semesters.map(value => `<option ${value === onboardingDraft.profile.semester ? "selected" : ""}>${escapeHTML(value)}</option>`).join("")}</select>
+                  <select onchange="updateOnboardingProfileField('semester', this.value)" class="mt-1.5 w-full rounded-xl border border-[#223046] bg-[#080d18] px-3.5 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20">${termList.map(t => `<option value="${escapeHTML(t.term_id)}" ${t.term_id === onboardingDraft.profile.term_id ? "selected" : ""}>${escapeHTML(t.term_label)}</option>`).join("")}</select>
                 </label>
               </div>
             </div>
@@ -6985,9 +7120,9 @@
       } else {
         content.innerHTML = `
           <div class="mb-5">
-            <span class="inline-flex items-center gap-1.5 rounded-full border border-indigo-400/25 bg-indigo-500/10 px-3 py-1 text-[11px] font-bold text-indigo-300">Thiết lập thủ công · 5 câu hỏi nhanh</span>
+
             <h3 class="mt-2.5 text-2xl font-black tracking-tight text-white">Mục tiêu học kỳ này</h3>
-            <p class="mt-1 text-sm text-slate-400">Chọn từng tiêu chí bên trái; các lựa chọn sẽ áp dụng trực tiếp vào bộ lập lịch SP3.</p>
+
           </div>
           <div class="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div id="onboardingGoalQuestions" class="space-y-3"></div>
@@ -7063,7 +7198,8 @@
       const weekEnd = addDaysToIsoDate(weekStart, 6);
       const headers = AVAILABILITY_DAYS.map((day, index) => {
         const date = addDaysToIsoDate(weekStart, index);
-        return `<div class="py-2.5 text-center border-l border-[#1b2537]"><span class="block text-xs font-extrabold text-slate-200">${day}</span><span class="text-[10px] text-slate-500 planner-number">${date.slice(8, 10)}/${date.slice(5, 7)}</span></div>`;
+        const outside = !termContainsDay(termClock, date);
+        return `<div class="py-2.5 text-center border-l border-[#1b2537]${outside ? ' opacity-40' : ''}"${outside ? ' data-outside-term="true" title="Ngoài học kỳ"' : ''}><span class="block text-xs font-extrabold text-slate-200">${day}</span><span class="text-[10px] text-slate-500 planner-number">${date.slice(8, 10)}/${date.slice(5, 7)}</span></div>`;
       }).join("");
       const hourLabels = Array.from({ length: 15 }, (_, index) => {
         const hour = 7 + index;
@@ -7071,6 +7207,10 @@
       }).join("");
       const dayColumns = AVAILABILITY_DAYS.map((_, dayIndex) => {
         const date = addDaysToIsoDate(weekStart, dayIndex);
+        // A day outside the term is greyed, takes no input and is never sent as free time.
+        if (!termContainsDay(termClock, date)) {
+          return `<div data-onboarding-day-col="${dayIndex}" data-date="${date}" data-outside-term="true" aria-disabled="true" title="Ngoài học kỳ" class="onboarding-cal-col relative border-l border-[#1b2537] bg-slate-500/20 opacity-40 cursor-not-allowed"></div>`;
+        }
         const dayBlocks = onboardingBlocksForDate(schedule, date, dayIndex);
         const blocksHtml = dayBlocks.map(block => {
           const startMin = clockToMinutes(block.start);
@@ -7110,8 +7250,8 @@
       }).join("");
       grid.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-2 p-1 pb-3">
           <div class="flex items-center gap-2">
-            <button type="button" onclick="changeOnboardingBusyWeek(-1, '${scope}')" aria-label="Tuần trước" class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2b3a54] bg-[#0e1524] text-slate-300 transition hover:bg-[#162032] hover:text-white">‹</button>
-            <button type="button" onclick="changeOnboardingBusyWeek(1, '${scope}')" aria-label="Tuần sau" class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#2b3a54] bg-[#0e1524] text-slate-300 transition hover:bg-[#162032] hover:text-white">›</button>
+            <button type="button" onclick="changeOnboardingBusyWeek(-1, '${scope}')" ${termWeekHasNeighbor(weekStart, -1) ? '' : 'disabled'} aria-label="Tuần trước" class="disabled:opacity-40 disabled:cursor-not-allowed flex h-9 w-9 items-center justify-center rounded-xl border border-[#2b3a54] bg-[#0e1524] text-slate-300 transition hover:bg-[#162032] hover:text-white">‹</button>
+            <button type="button" onclick="changeOnboardingBusyWeek(1, '${scope}')" ${termWeekHasNeighbor(weekStart, 1) ? '' : 'disabled'} aria-label="Tuần sau" class="disabled:opacity-40 disabled:cursor-not-allowed flex h-9 w-9 items-center justify-center rounded-xl border border-[#2b3a54] bg-[#0e1524] text-slate-300 transition hover:bg-[#162032] hover:text-white">›</button>
             <button type="button" onclick="resetOnboardingBusyWeek('${scope}')" class="rounded-xl border border-[#223046] bg-[#0e1524] px-2.5 py-1.5 text-[11px] font-bold text-slate-300 transition hover:border-indigo-400/50 hover:text-white">Tuần gốc</button>
           </div>
           <strong class="text-sm text-white planner-number">Tuần ${shortCalendarDate(weekStart)} – ${shortCalendarDate(weekEnd)}</strong>
@@ -7273,6 +7413,7 @@
 
     function startOnboardingGridDrag(event, date, dayIndex, scope = "onboarding") {
       if (event.button != null && event.button !== 0) return;
+      if (!termContainsDay(termClock, date)) return;
       if (event.target?.closest && event.target.closest("[data-busy-block]")) return;
       const colEl = event.currentTarget;
       const anchorMin = Math.min(ONBOARDING_CAL_END_MIN - 15, pointerMinutesInColumn(colEl, event.clientY));
@@ -7338,6 +7479,7 @@
       const normCategory = ONBOARDING_BUSY_CATEGORIES[category] ? category : "class";
       const normDay = Number.isInteger(Number(weekday)) ? Number(weekday) : onboardingWeekdayIndex(date);
       const normDate = /^\d{4}-\d{2}-\d{2}$/.test(date || "") ? date : addDaysToIsoDate(schedule.week_start, normDay);
+      if (!schedule.applies_to_semester && !termContainsDay(termClock, normDate)) return null; // outside the term
       const normStart = minutesToClock(snapQuarterMinutes(startMin));
       const normEnd = minutesToClock(snapQuarterMinutes(endMin));
       if (normStart >= normEnd) return null;
@@ -7530,6 +7672,7 @@
       const ctx = getBusyCalendarContext(scope);
       if (!ctx.profile) return;
       const schedule = ensureOnboardingScheduleShape(scope);
+      if (!termWeekHasNeighbor(schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START, direction)) return;
       schedule.week_start = addDaysToIsoDate(schedule.week_start || AVAILABILITY_DEFAULT_WEEK_START, direction * 7);
       if (scope === "profile") {
         persistCurrentUserData();
@@ -7552,6 +7695,7 @@
       if (!ctx.profile) return;
       const [category, date, periodKey] = key.split("|");
       const schedule = ensureOnboardingScheduleShape(scope);
+      if (!schedule.applies_to_semester && !termContainsDay(termClock, date)) return;
       const dayIndex = onboardingWeekdayIndex(date);
       const slots = Array.isArray(schedule.slots) ? schedule.slots : [];
       const selected = isOnboardingBusySlotSelected(schedule, category, date, dayIndex, periodKey, slots);
@@ -7969,8 +8113,8 @@
             <div><span class="font-bold text-indigo-300">Ưu tiên mềm:</span> Cộng điểm ưu tiên khi xếp lịch.</div>
             <div class="mt-1"><span class="font-bold text-rose-300">Loại trừ bắt buộc:</span> Loại bỏ hoàn toàn hoạt động không khớp.</div>
           </div>
-          <button id="onboardingConfirmGoalBtn" type="button" ${ready ? "" : "disabled"} onclick="nextOnboardingStep()" class="w-full rounded-xl px-4 py-2.5 text-sm font-extrabold transition ${ready ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/25 hover:bg-emerald-500" : "cursor-not-allowed bg-slate-800 text-slate-500"}">Xác nhận & Lưu hồ sơ</button>
-          <p class="text-[10px] leading-relaxed text-slate-500">Kết quả UniLife mang tính hỗ trợ, không thay thế xác nhận chính thức của nhà trường.</p>
+
+
         </div>`;
 
       const nextBtn = document.getElementById("onboardingNextButton");
@@ -8120,7 +8264,7 @@
 
     async function startLocalSession(user) {
       persistCurrentUserData();
-      readLocalUserData(user.student_id);
+      await ensureTermClockFor(user.student_id);
       const student = {
         student_id: user.student_id,
         full_name: user.full_name,
@@ -8131,6 +8275,8 @@
       localStorage.setItem("unilife_student", JSON.stringify(student));
       localStorage.setItem(CURRENT_USER_KEY, student.student_id);
       currentStudent = student;
+      renderTermLabels();
+      await loadActivitiesFromApi();
       await applyCurrentStudent(student);
       closeLoginModal();
       const needsOnboarding = maybeStartOnboarding();
@@ -8150,6 +8296,8 @@
       localStorage.removeItem(CURRENT_USER_KEY);
       localStorage.removeItem("unilife_student");
       currentStudent = null;
+      document.getElementById('simulationDateNotice').textContent = '';
+      renderTermLabels();
       pendingProfileProposal = null;
       profileAssistantConversation = [];
       cachedPlanOptions = [];
@@ -8226,6 +8374,7 @@
         accountData.profile.profile.full_name = fullName;
         writeLocalUserData(mssv, accountData);
         localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify([...users, user]));
+        await ensureTermClockFor(mssv);
         beginOnboarding(user);
       } catch (error) {
         console.error("Local account registration failed:", error);
@@ -8239,12 +8388,13 @@
     async function syncScoresFromServer(mssv) {
       const targetId = mssv || (currentStudent ? currentStudent.student_id : "25127242");
       const activeId = currentStudent?.student_id;
+      const clock = termClock;
       if (window.serverSupportsCommit === true) {
         try {
-          const res = await fetch(`${API_BASE}/api/scores?student_id=${encodeURIComponent(targetId)}`);
+          const res = await fetch(`${API_BASE}/api/scores?student_id=${encodeURIComponent(targetId)}${termQueryPart()}`);
           if (res.ok) {
             const data = await res.json();
-            if (currentStudent?.student_id !== activeId) return;
+            if (currentStudent?.student_id !== activeId || termClock !== clock || !isCurrentTermResponse(data)) return;
             applyServerScorePayload(data);
             renderCategoryBars(studentCategoryScores);
             return;
@@ -8324,7 +8474,7 @@
 
     async function syncProfileFromApi(mssv) {
       try {
-        const res = await fetch(`${API_BASE}/api/profile?student_id=${encodeURIComponent(mssv)}`);
+        const res = await fetch(`${API_BASE}/api/profile?student_id=${encodeURIComponent(mssv)}${termQueryPart()}`);
         if (res.ok) {
           const data = await res.json();
           currentStudent = data;
@@ -8348,19 +8498,22 @@
       if (targetBadge) targetBadge.textContent = `${target} / 100đ`;
 
       const stages = planner.plan_stages || {};
-      planStages.first = stages.first || null;
-      planStages.replan = stages.replan || null;
-      planStages.whatif = stages.whatif || null;
+      const staleProposal = Object.values(stages).some(result => result && !isCurrentTermResponse(result));
+      planStages.first = isCurrentTermResponse(stages.first) ? stages.first || null : null;
+      planStages.replan = isCurrentTermResponse(stages.replan) ? stages.replan || null : null;
+      planStages.whatif = isCurrentTermResponse(stages.whatif) ? stages.whatif || null : null;
       currentPlanStage = ["first", "replan", "whatif"].includes(planner.current_stage)
         ? planner.current_stage
         : "first";
       if (!planStages[currentPlanStage]) currentPlanStage = "first";
       currentPlanTab = "selected";
       currentPlannerData = planStages[currentPlanStage];
-      cachedPlanOptions = Array.isArray(planner.cached_plan_options) ? planner.cached_plan_options : [];
-      selectedPlanOptionIndex = Number.isInteger(planner.selected_plan_option) ? planner.selected_plan_option : 0;
-      currentPlanConfirmed = Boolean(planner.plan_confirmed);
-      customPlanBackup = planner.custom_plan_backup || null;
+      const savedOptions = Array.isArray(planner.cached_plan_options) ? planner.cached_plan_options : [];
+      cachedPlanOptions = isCurrentTermResponse({ options: savedOptions }) ? savedOptions : [];
+      selectedPlanOptionIndex = cachedPlanOptions.length && Number.isInteger(planner.selected_plan_option) ? planner.selected_plan_option : 0;
+      currentPlanConfirmed = Boolean(currentPlannerData && planner.plan_confirmed);
+      customPlanBackup = staleProposal ? null : planner.custom_plan_backup || null;
+      if (staleProposal || cachedPlanOptions.length !== savedOptions.length) showSimulationDateNotice();
       planInputsDirty = false;
       planStageError = "";
       if (currentPlannerData) {
@@ -8689,8 +8842,8 @@
       toggleMobileSidebar(false);
 
       if (tab === 'activities') {
-        if (typeof TIMELINE_SIMULATED_TODAY !== 'undefined' && typeof timelineState !== 'undefined') {
-          timelineState.focusDate = new Date(TIMELINE_SIMULATED_TODAY);
+        if (TERM_TODAY_ISO && typeof timelineState !== 'undefined') {
+          timelineState.focusDate = timelineTodayLocal();
         }
         loadActivitiesFromApi();
         loadLeadAuditFromApi();
@@ -8782,13 +8935,15 @@
 
     let SP3_SOURCE = 'real';
     // A source saved by an older page ('real_live', removed) falls back to the real store.
-    try { const saved = localStorage.getItem('sp3Source'); if (saved === 'real' || saved === 'real_live') SP3_SOURCE = 'real'; } catch (e) { /* storage unavailable */ }
-    function sp3Query() { return SP3_SOURCE === 'synthetic' ? '' : '?source=' + SP3_SOURCE; }
+    try { localStorage.setItem('sp3Source', 'real'); } catch (e) { /* storage unavailable */ }
+    // The term travels as the term_id query parameter on every real-store request.
+    function termQueryPart() { return termClock ? '&term_id=' + encodeURIComponent(termClock.term_id) : ''; }
 
     function sp3PlanQuery(source = SP3_SOURCE) {
       const params = [];
       if (source === 'real') params.push('source=real');
       if (currentStudent?.student_id) params.push('student_id=' + encodeURIComponent(currentStudent.student_id));
+      if (termClock) params.push('term_id=' + encodeURIComponent(termClock.term_id));
       return params.length ? '?' + params.join('&') : '';
     }
     // The real store picks the skipped activity from the replanned schedule; the fixture always uses QUIZ-L.
@@ -8805,8 +8960,7 @@
       });
       const badge = document.getElementById('planDataSourceBadge');
       if (badge) badge.innerText = real ? 'OPERATIONAL-DATASET' : 'SYNTHETIC-DEMO';
-      const term = document.getElementById('planTermLabel');
-      if (term) term.innerText = real ? 'Kho thật · từ 01/10/2026' : 'Fixture Tháng 11/2026';
+      renderTermLabels();
       const disclosure = document.getElementById('planDisclosureSource');
       if (disclosure) disclosure.innerText = 'DEMO_ONLY · official_award_verified: false · ' + (real ? 'OPERATIONAL-DATASET' : 'SYNTHETIC-DEMO');
       const note = document.getElementById('planRealSourceNote');
@@ -9004,7 +9158,7 @@
         await applyAssistantDraftToPlanner(assistantDraft);
         assistantDraft.preferences_confirmed = true;
         const preview = document.getElementById('assistantPreview');
-        if (preview) preview.innerHTML = `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><div class="font-extrabold text-emerald-300">Đã điền vào Lập lịch thông minh</div><div class="mt-1 text-xs text-slate-400">Bạn vẫn có thể chỉnh sửa trước khi tạo kế hoạch.</div></div><button type="button" onclick="switchTab('plan')" class="min-h-10 rounded-xl bg-emerald-600 px-5 text-sm font-extrabold text-white hover:bg-emerald-500">Xem tại Lập lịch thông minh</button></div>`;
+        if (preview) preview.innerHTML = `<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><div class="font-extrabold text-emerald-300">Đã điền vào Lộ trình</div><div class="mt-1 text-xs text-slate-400">Bạn vẫn có thể chỉnh sửa trước khi tạo kế hoạch.</div></div><button type="button" onclick="switchTab('plan')" class="min-h-10 rounded-xl bg-emerald-600 px-5 text-sm font-extrabold text-white hover:bg-emerald-500">Xem tại Lộ trình</button></div>`;
         if (status) status.textContent = 'Đã áp dụng sau xác nhận; chưa tự chuyển trang và chưa chạy planner.';
       } catch (error) {
         if (status) status.textContent = error.message || 'Không thể áp dụng thiết lập.';
@@ -9137,16 +9291,421 @@
       C4: 'Hoạt động cộng đồng', C5: 'Cán bộ lớp & CLB'
     };
 
-    // The one demo "today" of the UI (keep equal to DEMO_TODAY in src/api/demo_clock.py).
-    const DEMO_TODAY_ISO = '2026-10-25';
-    // The busy calendar opens on the Monday of the demo week (19/10/2026).
-    const AVAILABILITY_DEFAULT_WEEK_START = (() => {
-      const day = new Date(`${DEMO_TODAY_ISO}T00:00:00Z`);
-      day.setUTCDate(day.getUTCDate() - ((day.getUTCDay() + 6) % 7));
-      return day.toISOString().slice(0, 10);
-    })();
-    // The availability API contract keeps its own anchor week (sp3_real maps effective_from 2026-11-09 to the planning window).
-    const AVAILABILITY_CONTRACT_WEEK_START = '2026-11-09';
+    // TERM-CLOCK START: the active student's simulation clock.
+    // The dates of a term come only from GET /api/terms and GET /api/clock (data/config/semesters.json); the page
+    // never embeds a date. The simulated "today" of a term is its first day, and every decision of the UI
+    // (registration open, activity happened, "today", the busy calendar) uses the clock of the selected term.
+
+    // TERM-CORE START (pure helpers: no DOM, no network; tests/test_term_clock_frontend.py runs this block in a headless browser)
+    const TERM_UNASSIGNED = '_unassigned';
+    // Fields owned by one (student, term) pair. Everything else (name, MSSV, faculty, cohort, programme,
+    // general preferences, grade history) belongs to the student only.
+    const TERM_SLICE_KEYS = [
+      'canonical_availability', 'manual_busy_intervals', 'unavailable_slots', 'score_sources',
+      'confirmed_plan', 'confirmed_plan_result', 'pending_plan_notice', 'invalidated', 'confirmed_plan_basis',
+      'category_scores', 'default_baseline_total', 'saved_activities', 'planner'
+    ];
+    const TERM_SLICE_PROFILE_KEYS = ['drl_target', 'goal', 'weekly_intervals', 'exceptions', 'busy_schedule'];
+
+    function termIsoAddDays(iso, days) {
+      const [year, month, day] = iso.split('-').map(Number);
+      return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+    }
+    function termWeekdayIndex(iso) {
+      const [year, month, day] = iso.split('-').map(Number);
+      return (new Date(Date.UTC(year, month - 1, day)).getUTCDay() + 6) % 7;
+    }
+    function termMondayOnOrBefore(iso) { return termIsoAddDays(iso, -termWeekdayIndex(iso)); }
+    function termMondayOnOrAfter(iso) {
+      const index = termWeekdayIndex(iso);
+      return index === 0 ? iso : termIsoAddDays(iso, 7 - index);
+    }
+    // A label such as "HK1 - 2026 - 2027" becomes the id "HK1_2026_2027" (an id, never a date; the server decides whether it exists).
+    function termIdFromLabel(label) {
+      const match = String(label || '').match(/(HK\d)\D*(\d{4})\D+(\d{4})/);
+      return match ? `${match[1]}_${match[2]}_${match[3]}` : null;
+    }
+    // Monday of every week row that touches the term (HK3: 16 rows, HK1: 12 rows).
+    function termWeekRows(clock) {
+      const rows = [];
+      for (let monday = termMondayOnOrBefore(clock.term_start); monday <= clock.term_end; monday = termIsoAddDays(monday, 7)) rows.push(monday);
+      return rows;
+    }
+    function termContainsDay(clock, iso) { return Boolean(clock) && iso >= clock.term_start && iso <= clock.term_end; }
+    function termOfDate(value, terms) {
+      const day = String(value || '').slice(0, 10);
+      const found = terms.find(term => day >= term.term_start && day <= term.term_end);
+      return found ? found.term_id : null;
+    }
+    // The availability contract needs a Monday that lies inside [effective_from, effective_until].
+    function termContractWeekStart(clock) { return termMondayOnOrAfter(clock.term_start); }
+    function termDefaultWeekStart(clock) { return termMondayOnOrBefore(clock.as_of.slice(0, 10)); }
+
+    // In-memory "view" of an account (the active term's fields flattened at their old positions) -> stored shape.
+    function termViewToStored(view) {
+      const stored = {};
+      const slice = { profile: {} };
+      Object.keys(view).forEach(key => {
+        if (key === 'terms') return;
+        if (TERM_SLICE_KEYS.includes(key)) slice[key] = view[key];
+        else stored[key] = view[key];
+      });
+      const profile = { ...(view.profile || {}) };
+      TERM_SLICE_PROFILE_KEYS.forEach(key => {
+        if (key in profile) { slice.profile[key] = profile[key]; delete profile[key]; }
+      });
+      stored.profile = profile;
+      stored.schema_version = 3;
+      stored.terms = { ...(view.terms || {}), [profile.term_id || TERM_UNASSIGNED]: slice };
+      return stored;
+    }
+    // Stored shape -> the view of one term. A term never opened before has an empty slice (defaults are merged later).
+    function termStoredToView(stored, termId) {
+      const slice = (stored.terms && stored.terms[termId]) || { profile: {} };
+      const view = {};
+      Object.keys(stored).forEach(key => { if (key !== 'terms') view[key] = stored[key]; });
+      Object.keys(slice).forEach(key => { if (key !== 'profile') view[key] = slice[key]; });
+      view.profile = { ...(stored.profile || {}), ...(slice.profile || {}), term_id: termId };
+      const others = { ...(stored.terms || {}) };
+      delete others[termId];
+      view.terms = others;
+      return view;
+    }
+    // Legacy data has no term. It belongs to a term only if the plan stored with it says so: context.term_id,
+    // else the date of its as_of, else the dates of its activities. No evidence, or conflicting evidence: null.
+    function termEvidenceOfLegacy(saved, terms) {
+      const ids = new Set(terms.map(term => term.term_id));
+      const planner = saved.planner || {};
+      const results = [saved.confirmed_plan_result, ...Object.values(planner.plan_stages || {}),
+        ...(Array.isArray(planner.cached_plan_options) ? planner.cached_plan_options.map(option => option && option.result) : [])]
+        .filter(result => result && typeof result === 'object');
+      const found = new Set();
+      results.forEach(result => {
+        const context = (result.plan && result.plan.context) || (result.feasibility && result.feasibility.context) || {};
+        if (context.term_id) {
+          if (ids.has(context.term_id)) found.add(context.term_id);
+          return; // another scenario's id (for example the synthetic test scenario) is not a semester
+        }
+        // Legacy demos shared one simulated date across terms, so as_of alone is not ownership evidence.
+        const days = ((result.plan && result.plan.selected_activities) || [])
+          .flatMap(item => (item.scheduled_blocks || []).map(block => termOfDate(block.start, terms)));
+        const distinct = new Set(days);
+        if (distinct.size === 1 && !distinct.has(null)) found.add([...distinct][0]);
+      });
+      return found.size === 1 ? [...found][0] : null;
+    }
+    // Version 1/2 blob (one term-less account) -> stored shape version 3. Term-scoped fields go under the evidenced
+    // term, or aside under TERM_UNASSIGNED (never shown). profile.term_id is the term the student last chose.
+    function termMigrateLegacy(saved, terms, fallbackTermId) {
+      const evidence = termEvidenceOfLegacy(saved, terms);
+      const view = { ...saved, profile: { ...(saved.profile || {}), term_id: evidence || TERM_UNASSIGNED } };
+      delete view.terms;
+      const stored = termViewToStored(view);
+      const labelled = termIdFromLabel(saved.profile && saved.profile.semester);
+      stored.profile.term_id = evidence || (labelled && terms.some(term => term.term_id === labelled) ? labelled : fallbackTermId);
+      return stored;
+    }
+    // TERM-CORE END
+
+    // The simulated today as a local calendar day (the timeline formats days with local getters).
+    function timelineTodayLocal() {
+      const [year, month, day] = TERM_TODAY_ISO.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+    // Week navigation of the busy grids stays inside the term's week rows (HK3: 16, HK1: 12).
+    function termClampWeekStart(weekStart) {
+      if (!termClock) return weekStart;
+      const rows = termWeekRows(termClock);
+      const monday = termMondayOnOrBefore(weekStart);
+      return monday < rows[0] ? rows[0] : (monday > rows[rows.length - 1] ? rows[rows.length - 1] : monday);
+    }
+    function termWeekHasNeighbor(weekStart, direction) {
+      const rows = termWeekRows(termClock);
+      const neighbor = termIsoAddDays(termMondayOnOrBefore(weekStart), direction * 7);
+      return neighbor >= rows[0] && neighbor <= rows[rows.length - 1];
+    }
+    function termClockFor(termId) { return termList.find(term => term.term_id === termId) || null; }
+    // A new account opens in the latest configured term.
+    function defaultTermId() { return termList.length ? termList[termList.length - 1].term_id : null; }
+    function termLabelOf(termId) { return termClockFor(termId)?.term_label || termId || ''; }
+    function termDateLabel(iso) { return iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : ''; }
+    // A planner, option, review or catalog answer carries term_id and clock_version; one that belongs to another
+    // term (or another version of this term's clock) is never rendered.
+    function isCurrentTermResponse(data) {
+      if (!termClock || !data || typeof data !== 'object') return true;
+      const parts = [data, data.result, ...(Array.isArray(data.options) ? data.options.map(option => option && option.result) : [])].filter(Boolean);
+      return parts.every(part => {
+        const context = part.plan?.context;
+        const termId = part.term_id || context?.term_id;
+        if (!termList.some(term => term.term_id === termId)) return true;
+        if (termId !== termClock.term_id) return false;
+        if (part.clock_version) return part.clock_version === termClock.clock_version;
+        return !context?.as_of || Date.parse(context.as_of) === Date.parse(termClock.as_of);
+      });
+    }
+
+    async function loadTermList() {
+      const response = await fetch(`${API_BASE}/api/terms`);
+      if (!response.ok) throw new Error('Không tải được danh sách học kỳ.');
+      termList = (await response.json()).terms || [];
+      return termList;
+    }
+
+    function applyTermClock(clock) {
+      termClock = clock;
+      TERM_TODAY_ISO = clock.as_of.slice(0, 10);
+      TIMELINE_SIMULATED_TODAY = new Date(clock.as_of);
+      if (typeof timelineState !== 'undefined') timelineState.focusDate = timelineTodayLocal();
+      AVAILABILITY_DEFAULT_WEEK_START = termDefaultWeekStart(clock);
+      AVAILABILITY_CONTRACT_WEEK_START = termContractWeekStart(clock);
+      availabilityWeekStart = AVAILABILITY_DEFAULT_WEEK_START;
+      renderTermLabels();
+    }
+
+    async function loadTermClock(termId, studentId = null) {
+      const student = studentId ? '&student_id=' + encodeURIComponent(studentId) : '';
+      const response = await fetch(`${API_BASE}/api/clock?term_id=${encodeURIComponent(termId)}${student}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error('Không tải được đồng hồ của học kỳ.');
+      const clock = await response.json();
+      applyTermClock(clock);
+      return clock;
+    }
+
+    let simulationDateSaving = false;
+
+    function setSimulationDateBounds() {
+      const input = document.getElementById('simulationDateInput');
+      input.min = TERM_TODAY_ISO;
+      input.max = termClock.term_end;
+      input.value = TERM_TODAY_ISO;
+    }
+
+    function openSimulationDate() {
+      if (!currentStudent || !termClock || termSwitching || simulationDateSaving || SP3_SOURCE !== 'real') return;
+      if (cpdPlanSaving || cpdCompletionState?.saving) return;
+      setSimulationDateBounds();
+      document.getElementById('simulationDateError').textContent = '';
+      document.getElementById('simulationDateDialog').showModal();
+    }
+
+    function showSimulationDateNotice() {
+      document.getElementById('simulationDateNotice').textContent = 'Đã cập nhật ngày mô phỏng.';
+    }
+
+    function refreshSimulationDate(clock) {
+      if (clock.clock_version === termClock.clock_version) return;
+      plannerRequestGeneration += 1;
+      const previousWeek = availabilityWeekStart;
+      applyTermClock(clock);
+      availabilityWeekStart = previousWeek;
+      closePlanReview(true);
+      reviewDashClosePlanOptions(true);
+      delete termReviewDrafts[clock.term_id];
+      planStages.first = null; planStages.replan = null; planStages.whatif = null;
+      currentPlannerData = null; currentPlanConfirmed = false; cachedPlanOptions = [];
+      currentPlanStage = 'first'; planStageError = ''; planInputsDirty = false;
+      customPlanBackup = null; pendingSwapPreview = null; calendarPreviewChange = null;
+      lastCalendarPlanData = null;
+      document.getElementById('smartSwapModal')?.classList.add('hidden');
+      const planButton = document.getElementById('btnRunPlanner');
+      if (planButton) planButton.disabled = false;
+      setScheduleSubview('calendar');
+      showPlanPanels('empty');
+      setPlanButtonLabel('Lập kế hoạch mới');
+      updatePlanConfirmationBadge();
+      renderPlanOptionsSelector();
+      persistCurrentUserData();
+      showSimulationDateNotice();
+      cpdAnchor = null;
+      if (cpdCompletionState?.termId === clock.term_id) {
+        const { studentId, termId, version, progress } = cpdCompletionState;
+        cpdCompletionState = { studentId, termId, version, progress };
+        cpdLoadCompletion();
+      }
+      renderConfirmedPlanDashboard();
+      renderProfileScheduleTab();
+      renderTimelineView();
+      loadActivitiesFromApi();
+    }
+
+    async function advanceSimulationDate(event) {
+      event.preventDefault();
+      const studentId = currentStudent?.student_id;
+      if (!studentId || !termClock || termSwitching || simulationDateSaving || SP3_SOURCE !== 'real') return;
+      const termId = termClock.term_id;
+      const input = document.getElementById('simulationDateInput');
+      if (!input.reportValidity()) return;
+      const error = document.getElementById('simulationDateError');
+      const dialog = document.getElementById('simulationDateDialog');
+      const controls = [input, document.getElementById('simulationDateApply'), document.getElementById('simulationDateCancel')];
+      const date = input.value;
+      simulationDateSaving = true;
+      controls.forEach(control => { control.disabled = true; });
+      error.textContent = '';
+      try {
+        const response = await fetch(`${API_BASE}/api/clock/advance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ student_id: studentId, term_id: termId, date })
+        });
+        const data = await response.json();
+        if (currentStudent?.student_id !== studentId || termClock?.term_id !== termId) return;
+        if (!response.ok) {
+          if (response.status === 409 && data.detail?.clock?.term_id === termId) {
+            refreshSimulationDate(data.detail.clock);
+            setSimulationDateBounds();
+            error.textContent = data.detail.message;
+          } else {
+            error.textContent = 'Không lưu được ngày mô phỏng. Hãy kiểm tra ngày và thử lại.';
+          }
+          return;
+        }
+        refreshSimulationDate(data);
+        dialog.close();
+      } catch (failure) {
+        error.textContent = 'Không thể cập nhật ngày mô phỏng. Hãy thử lại.';
+      } finally {
+        simulationDateSaving = false;
+        controls.forEach(control => { control.disabled = false; });
+      }
+    }
+
+    // Every place that names the term or its simulated date reads it from here (desktop and mobile share one chip).
+    function renderTermLabels() {
+      if (!termClock) return;
+      const date = termDateLabel(TERM_TODAY_ISO);
+      const dateButton = document.getElementById('simulationDateButton');
+      if (dateButton) dateButton.disabled = !currentStudent || termSwitching || SP3_SOURCE !== 'real';
+      const dateHint = document.getElementById('simulationDateHint');
+      if (dateHint) dateHint.hidden = SP3_SOURCE === 'real';
+      document.querySelectorAll('[data-term-label]').forEach(el => { el.textContent = termClock.term_label; });
+      document.querySelectorAll('[data-term-today]').forEach(el => { el.textContent = date; });
+      document.querySelectorAll('[data-term-chip]').forEach(el => {
+        el.textContent = `${termClock.term_label} · Ngày mô phỏng ${date}`;
+        el.title = `Học kỳ ${termDateLabel(termClock.term_start)} – ${termDateLabel(termClock.term_end)}`;
+      });
+      document.querySelectorAll('[data-term-select]').forEach(select => {
+        select.innerHTML = termList.map(term => `<option value="${escapeHTML(term.term_id)}">${escapeHTML(term.term_label)}</option>`).join('');
+        select.value = termClock.term_id;
+      });
+      const planLabel = document.getElementById('planTermLabel');
+      if (planLabel) planLabel.innerText = SP3_SOURCE === 'real' ? `Kho thật · ${termClock.term_label}` : 'Kịch bản thử nghiệm tổng hợp';
+      document.querySelectorAll('option[data-real-source]').forEach(el => { el.textContent = `Kho bài thật · ${termClock.term_label}`; });
+      const posted = document.getElementById('inputDatePosted');
+      if (posted) posted.value = TERM_TODAY_ISO;
+      const timelineToday = document.getElementById('timelineTodayLabel');
+      if (timelineToday) timelineToday.textContent = `${TERM_TODAY_ISO.slice(8, 10)}/${TERM_TODAY_ISO.slice(5, 7)}`;
+    }
+    // Stored account -> its active term moves to termId (the stored slices of every term stay untouched).
+    async function setAccountTerm(mssv, termId) {
+      const clock = await loadTermClock(termId, mssv); // fails before any storage is touched
+      const key = localUserDataKey(mssv);
+      let stored = deserializeLocalUserData(JSON.parse(localStorage.getItem(key)));
+      if (!stored.schema_version || Number(stored.schema_version) < 3) {
+        readLocalUserData(mssv); // migrates the old blob (and writes it back)
+        stored = deserializeLocalUserData(JSON.parse(localStorage.getItem(key)));
+      }
+      stored.profile = { ...stored.profile, term_id: termId, semester: clock.term_label };
+      writeStoredLocalUserData(mssv, stored);
+    }
+
+    // The clock of the term this account is in (after login, or when a stored session is restored).
+    async function ensureTermClockFor(mssv) {
+      if (!termList.length) await loadTermList();
+      const termId = readLocalUserData(mssv).profile.term_id;
+      await loadTermClock(termId, mssv);
+    }
+
+    // A review draft is kept under its own term, so switching never loses it.
+    function stashTermReviewDraft(termId) {
+      if (typeof prvDraft === 'undefined' || !prvDraft) return;
+      prvDraft.busy = false;
+      termReviewDrafts[termId] = prvDraft;
+    }
+    function restoreTermReviewDraft(termId) {
+      const draft = termReviewDrafts[termId];
+      delete termReviewDrafts[termId];
+      if (!draft || draft.studentId !== currentStudent?.student_id) return;
+      if (!isCurrentTermResponse(draft.result)) {
+        showSimulationDateNotice();
+        return;
+      }
+      prvDraft = draft;
+      prvSeq += 1;
+      activePlanPreference = draft.preference || activePlanPreference;
+      if (draft.origin === 'review') {
+        const screen = document.getElementById('planReviewScreen');
+        if (screen) { screen.hidden = false; screen.classList.remove('hidden'); }
+        document.body.classList.add('overflow-hidden');
+        setScheduleSubview('review');
+      }
+      prvRender();
+    }
+    function closeTermScopedScreens() {
+      if (typeof closePlanReview === 'function') closePlanReview(true);
+      if (typeof reviewDashClosePlanOptions === 'function') reviewDashClosePlanOptions(true);
+      cpdCompletionState = null;
+      cpdAnchor = null;
+      cpdSelectedActivityId = null;
+      pendingSwapPreview = null;
+      calendarPreviewChange = null;
+    }
+
+    function onTermSelectChange(select) {
+      if (document.getElementById('onboardingModal') && !document.getElementById('onboardingModal').classList.contains('hidden')) return;
+      switchTerm(select.value);
+    }
+
+    // One term = one clock, one busy schedule, one target, one plan. Everything listed here changes together.
+    async function switchTerm(termId) {
+      const mssv = currentStudent?.student_id;
+      if (!mssv || termSwitching || simulationDateSaving || !termClockFor(termId) || (termClock && termId === termClock.term_id)) {
+        renderTermLabels();
+        return;
+      }
+      const previous = termClock.term_id;
+      persistCurrentUserData();
+      stashTermReviewDraft(previous);
+      termSwitching = true;
+      document.getElementById('simulationDateNotice').textContent = '';
+      renderTermLabels();
+      plannerRequestGeneration += 1; // answers still in flight for the previous term are dropped
+      try {
+        await setAccountTerm(mssv, termId);
+        closeTermScopedScreens();
+        await applyCurrentStudent(currentStudent);
+        restoreTermReviewDraft(termId);
+        await loadActivitiesFromApi();
+        syncScoresFromServer(mssv);
+        renderWorkspaceOverview();
+        renderConfirmedPlanDashboard();
+        if (typeof renderTimelineView === 'function') renderTimelineView();
+      } catch (error) {
+        console.error('Could not switch term:', error);
+        try {
+          await setAccountTerm(mssv, previous);
+          await applyCurrentStudent(currentStudent);
+        } catch (restoreError) { console.error('Could not restore the previous term:', restoreError); }
+        window.alert('Không đổi được học kỳ. Dữ liệu của bạn vẫn được giữ nguyên.');
+      } finally {
+        termSwitching = false;
+        renderTermLabels();
+      }
+    }
+
+    // The onboarding wizard picks the term in step 1; its draft follows the term (busy schedule, target, goals).
+    async function onboardingChangeTerm(termId) {
+      const mssv = currentStudent?.student_id;
+      if (!onboardingDraft || !mssv || !termClockFor(termId) || termId === termClock?.term_id) return;
+      persistOnboardingDraft();
+      await setAccountTerm(mssv, termId);
+      const data = readLocalUserData(mssv);
+      onboardingDraft.profile = JSON.parse(JSON.stringify(data.profile));
+      restoreOnboardingBusySchedule(data.profile.busy_schedule, data);
+      renderOnboardingStep();
+    }
+    // TERM-CLOCK END
+
     const AVAILABILITY_DAYS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
     const AVAILABILITY_PERIODS = [
       { key: 'morning', label: 'Sáng', time: '07:00–12:00', start: '07:00', end: '12:00' },
@@ -9217,6 +9776,9 @@
         const cells = AVAILABILITY_DAYS.map((label, dayIndex) => {
           const date = addDaysToIsoDate(availabilityWeekStart, dayIndex);
           const key = `${date}|${period.key}`;
+          if (!termContainsDay(termClock, date)) {
+            return `<button type="button" disabled data-outside-term="true" aria-label="${label} ${period.label}: ngoài học kỳ" class="availability-cell rounded-xl border px-2 py-2 text-center text-[11px] font-bold opacity-30 cursor-not-allowed"><span class="block">—</span><span class="block mt-0.5 text-[9px] opacity-70">${period.time}</span></button>`;
+          }
           const free = !isAvailabilityCellBusy(date, period, activeBusyIntervals, dayIndex);
           return `<button type="button" data-free="${free}" aria-pressed="${!free}" aria-label="${label} ${period.label}: ${free ? 'rảnh' : 'bận'}" onclick="toggleAvailabilitySlot('${key}')" class="availability-cell rounded-xl border px-2 py-2 text-center text-[11px] font-bold">
             <span class="block">${free ? 'Rảnh' : 'Bận'}</span><span class="block mt-0.5 text-[9px] opacity-70">${period.time}</span>
@@ -9236,12 +9798,14 @@
     }
 
     function changeAvailabilityWeek(direction) {
+      if (!termWeekHasNeighbor(availabilityWeekStart, direction)) return;
       availabilityWeekStart = addDaysToIsoDate(availabilityWeekStart, direction * 7);
       renderAvailabilityPicker();
     }
 
     function toggleAvailabilitySlot(key) {
       const [date, periodKey] = key.split('|');
+      if (!termContainsDay(termClock, date)) return;
       const weekday = new Date(`${date}T00:00:00Z`).getUTCDay();
       const dayIndex = (weekday + 6) % 7;
       const recurringKey = `${dayIndex}|${periodKey}`;
@@ -9358,6 +9922,7 @@
       const busySlots = new Set(unavailableAvailabilitySlots);
       for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
         const date = addDaysToIsoDate(availabilityWeekStart, dayIndex);
+        if (!termContainsDay(termClock, date)) continue; // a day outside the term has no schedule
         AVAILABILITY_PERIODS.forEach(period => {
           const key = `${date}|${period.key}`;
           if (recurringAvailabilitySlots.has(`${dayIndex}|${period.key}`) && !recurringAvailabilityOverrides.has(key)) {
@@ -9394,6 +9959,7 @@
       const busySlots = new Set(unavailableAvailabilitySlots);
       for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
         const date = addDaysToIsoDate(availabilityWeekStart, dayIndex);
+        if (!termContainsDay(termClock, date)) continue; // a day outside the term has no schedule
         AVAILABILITY_PERIODS.forEach(period => {
           const key = `${date}|${period.key}`;
           if (recurringAvailabilitySlots.has(`${dayIndex}|${period.key}`) && !recurringAvailabilityOverrides.has(key)) {
@@ -9413,7 +9979,7 @@
         return period ? { weekday: Number(weekdayStr), start: period.start, end: period.end, periodKey } : null;
       }).filter(Boolean);
       if (recurringRules.length) {
-        expandWeeklyProfileIntervals(recurringRules, '2026-10-01', '2027-03-31').forEach(interval => {
+        expandWeeklyProfileIntervals(recurringRules, termClock.term_start, termClock.term_end).forEach(interval => {
           const date = interval.start.slice(0, 10);
           const period = AVAILABILITY_PERIODS.find(p => `${date}T${p.start}:00+07:00` === interval.start && `${date}T${p.end}:00+07:00` === interval.end);
           if (period && recurringAvailabilityOverrides.has(`${date}|${period.key}`)) return;
@@ -9422,8 +9988,8 @@
       }
       expandWeeklyProfileIntervals(
         (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'busy'),
-        '2026-10-01',
-        '2027-03-31'
+        termClock.term_start,
+        termClock.term_end
       ).forEach(interval => {
         if (interval.source === 'profile_weekly') {
           const date = interval.start.slice(0, 10);
@@ -9470,30 +10036,25 @@
       return current;
     }
 
+    // A weekly block keeps its weekday and hours on every date of the range (calendar dates only: no time zone shift).
     function expandWeeklyProfileIntervals(rules, fromDate, untilDate) {
       const results = [];
-      const cursor = new Date(`${fromDate}T00:00:00+07:00`);
-      const end = new Date(`${untilDate}T23:59:59+07:00`);
-      while (cursor <= end) {
-        const jsDay = cursor.getDay();
-        const weekday = jsDay === 0 ? 6 : jsDay - 1;
-        const date = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
+      for (let date = fromDate; date <= untilDate; date = termIsoAddDays(date, 1)) {
+        const weekday = termWeekdayIndex(date);
         rules.filter(rule => Number(rule.weekday) === weekday).forEach(rule => results.push({ start: `${date}T${rule.start}:00+07:00`, end: `${date}T${rule.end}:00+07:00`, source: 'profile_weekly' }));
-        cursor.setDate(cursor.getDate() + 1);
       }
       return results;
     }
 
     function buildCanonicalAvailability() {
       const dayNames = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
-      const effectiveFrom = '2026-11-09';
-      const effectiveUntil = '2027-03-31';
+      // The server clips this semester template to its effective planning window.
+      const effectiveFrom = termClock.term_start;
+      const effectiveUntil = termClock.term_end;
       const policyDefaultBlocks = dayNames.map(day => ({ day_of_week: day, start_time: '07:00', end_time: '21:00' }));
       const extraWeeklyAvailable = (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'available');
       const availableExceptionDays = new Map();
-      // The real store plans from the demo day (the backend maps effective_from 2026-11-09 to its window start),
-      // so extra free days from DEMO_TODAY_ISO on must be kept, not only those after 2026-11-09.
-      const exceptionsFrom = SP3_SOURCE === 'real' ? DEMO_TODAY_ISO : effectiveFrom;
+      const exceptionsFrom = effectiveFrom;
       (currentProfileDraft.exceptions || []).filter(item => item.kind === 'available').forEach(item => {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(item.date || '') || item.date < exceptionsFrom || item.date > effectiveUntil) return;
         if (!item.start || !item.end || item.start >= item.end) return;
@@ -9523,7 +10084,9 @@
       };
     }
 
-    function plannerAvailabilityPayload() {
+    function plannerAvailabilityPayload(source = SP3_SOURCE) {
+      // The synthetic fixture owns its calendar; semester dates must not clip it to an empty window.
+      if (source === 'synthetic') return undefined;
       const payload = buildCanonicalAvailability();
       delete payload.weekly_participation_hours;
       return payload;
@@ -10274,6 +10837,7 @@
           const optionPayload = await fetchPersonalizedSp3Options(targetTotal, busyIntervals, confirmedPreference);
           // REVIEW-DASH START
           if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
+          if (!isCurrentTermResponse(optionPayload)) return;
           // REVIEW-DASH END
           cachedPlanOptions = optionPayload.options || [];
           planOptionsMessageText = optionPayload.message || "";
@@ -10291,6 +10855,7 @@
           data = await fetchSp3Plan('first_plan', targetTotal, busyIntervals);
         }
         if (requestGeneration !== plannerRequestGeneration || currentStudent?.student_id !== studentId) return;
+        if (!isCurrentTermResponse(data)) return;
         planStages.first = data;
         planStages.replan = null;
         planStages.whatif = null;
@@ -11204,6 +11769,7 @@
         has_evidence: document.getElementById("inputEvidence").checked,
         rule_override: document.getElementById("inputRuleOverride").value,
         student_id: studentId,
+        term_id: termClock?.term_id,
         simulate_demo: simulateDemo
       };
       if (window.serverSupportsCommit === false) {
@@ -11586,12 +12152,11 @@
           };
 
           const TIMELINE_DAY_NAMES = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-          const TIMELINE_SIMULATED_TODAY = new Date(`${DEMO_TODAY_ISO}T00:00:00+07:00`);
           const TIMELINE_ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
           const timelineState = {
             allActivities: [],
-            focusDate: new Date(TIMELINE_SIMULATED_TODAY),
+            focusDate: TERM_TODAY_ISO ? timelineTodayLocal() : new Date(0),
             domainFilter: 'all',
             modeFilter: 'all',
             activeOnly: false,
@@ -11740,6 +12305,19 @@
             return { scheduled, unscheduled };
           }
 
+          // Moves only the visible range to the first activity that has not ended at the term's simulated now.
+          // It never changes the simulated now.
+          function timelineGoToFirstActivity() {
+            const { scheduled } = filterTimelineActs();
+            const upcoming = scheduled
+              .filter(act => act._endDateIso >= TERM_TODAY_ISO)
+              .sort((a, b) => a.start.localeCompare(b.start))[0];
+            if (!upcoming) return;
+            const [year, month, day] = upcoming._startDateIso.split('-').map(Number);
+            timelineState.focusDate = new Date(year, month - 1, day);
+            renderTimelineView();
+          }
+
           function packTimelineLanesGreedy(visibleActs) {
             const sorted = [...visibleActs].sort((a, b) => {
               if (b._span !== a._span) return b._span - a._span;
@@ -11781,14 +12359,14 @@
             renderTimelineUnscheduled(unscheduled);
 
             const sevenDays = getTimeline7Dates();
-            const systemTodayIso = formatTimelineDateIso(TIMELINE_SIMULATED_TODAY);
+            const systemTodayIso = TERM_TODAY_ISO;
             const datesIsoList = sevenDays.map(d => formatTimelineDateIso(d));
             const windowStart = datesIsoList[0];
             const windowEnd = datesIsoList[6];
 
             const focusLabel = document.getElementById('timelineActiveFocusLabel');
             if (focusLabel) {
-              focusLabel.innerText = `Đang xem: ${TIMELINE_DAY_NAMES[timelineState.focusDate.getDay()]}, ${formatTimelineShortDate(timelineState.focusDate)}/2026`;
+              focusLabel.innerText = `Đang xem: ${TIMELINE_DAY_NAMES[timelineState.focusDate.getDay()]}, ${formatTimelineShortDate(timelineState.focusDate)}/${timelineState.focusDate.getFullYear()}`;
             }
 
             // 1. Render 7 date cards
@@ -11858,6 +12436,7 @@
             <span class="text-2xl">🔍</span>
             <span class="font-semibold text-slate-400">Không có hoạt động nào trong 7 ngày này</span>
             <span class="text-[11px] text-slate-600">Lăn chuột trên thanh ngày hoặc bấm Chọn ngày để xem các mốc khác</span>
+            <button type="button" data-first-activity onclick="timelineGoToFirstActivity()" class="not-italic rounded-lg border border-cyan-500/40 bg-cyan-950/30 px-3 py-1.5 text-[11px] font-bold text-cyan-300 hover:bg-cyan-950/60">Đến hoạt động đầu tiên</button>
           </div>
         `;
               return;
@@ -12076,7 +12655,7 @@
             const btnToday = document.getElementById('timelineBtnToday');
             if (btnToday) {
               btnToday.onclick = () => {
-                timelineState.focusDate = new Date(TIMELINE_SIMULATED_TODAY);
+                timelineState.focusDate = timelineTodayLocal();
                 renderTimelineView();
               };
             }
@@ -12146,7 +12725,7 @@
                 timelineState.modeFilter = 'all';
                 timelineState.activeOnly = false;
                 timelineState.searchQuery = '';
-                timelineState.focusDate = new Date(TIMELINE_SIMULATED_TODAY);
+                timelineState.focusDate = timelineTodayLocal();
                 renderTimelineView();
               };
             }
@@ -12154,23 +12733,27 @@
 
 
     async function loadActivitiesFromApi() {
+      const scope = [currentStudent?.student_id, termClock, SP3_SOURCE];
       try {
         const [actRes, catRes] = await Promise.all([
           fetch(`${API_BASE}/api/activities`),
-          fetch(`${API_BASE}/api/sp3/catalog${sp3Query()}`).catch(() => null)
+          fetch(`${API_BASE}/api/sp3/catalog${sp3PlanQuery()}`, { cache: 'no-store' }).catch(() => null)
         ]);
 
         const actData = (actRes && actRes.ok) ? await actRes.json() : {};
         const catData = (catRes && catRes.ok) ? await catRes.json() : null;
 
-        const catalogRows = catData?.activities || [];
+        if (scope[0] !== currentStudent?.student_id || scope[1] !== termClock || scope[2] !== SP3_SOURCE
+          || (catData && !isCurrentTermResponse(catData))) return;
+        // The store is filtered by the selected term: an activity belongs to a term by its own start date.
+        const catalogRows = (catData?.activities || []).filter(row => row.term_scope !== 'OUT_OF_SCOPE');
         const newPostDrafts = catData?.new_post_drafts || [];
-        const validList = catalogRows.length > 0
+        const validList = catData
           ? catalogRows
           : (actData.activities || actData.valid_activities || []).map(a => ({ activity: a, publication_status: "REVIEW_REQUIRED", score_binding_verified: false }));
         const reviewList = actData.review_queue || [];
 
-        const actCount = catData?.activity_count ?? validList.length;
+        const actCount = catData?.term_id ? validList.length : (catData?.activity_count ?? validList.length);
         const draftCount = catData?.unstructured_new_posts ?? newPostDrafts.length;
 
         document.getElementById("validCountBadge").innerHTML = `<span>${actCount} hoạt động</span> <span class="dev-only font-mono text-[11px] opacity-80">(Catalog)</span>`;
@@ -12244,6 +12827,7 @@
           if (row.score_binding) act.score_binding = row.score_binding;
           if (row.warnings) act.warnings = row.warnings;
           if (row.publication_status) act.publication_status = row.publication_status;
+          if (row.term_scope) act.term_scope = row.term_scope;
           return act;
         }));
 
@@ -12354,6 +12938,12 @@
       await checkBackendHealth();
       await checkPreferenceAIHealth();
       await loadE2ECasesFromApi();
+      try {
+        await loadTermList();
+        await loadTermClock(defaultTermId());
+      } catch (error) {
+        console.error('Could not load the semester clock:', error);
+      }
       await loadActivitiesFromApi();
 
       let savedStudentId = null;
@@ -12384,7 +12974,9 @@
             major: account.major || "Sinh viên",
             demo_only: true
           };
+          await ensureTermClockFor(account.student_id);
           const accountData = readLocalUserData(account.student_id);
+          await loadActivitiesFromApi();
           if (accountData.profile.onboarding_started && !accountData.profile.completed_onboarding) {
             beginOnboarding(account);
             return;

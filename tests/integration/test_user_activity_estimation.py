@@ -42,6 +42,7 @@ def _request(post: dict, *, exact_identity: bool = False, evidence: bool = False
         has_evidence=evidence,
         student_id="new-user-estimation-test",
         simulate_demo=True,
+        term_id="HK1_2026_2027",
     )
 
 

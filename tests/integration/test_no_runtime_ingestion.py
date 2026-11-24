@@ -48,9 +48,9 @@ def test_real_live_source_is_rejected(method, path, body):
 
 def test_synthetic_and_real_sources_still_work():
     assert client.post("/api/sp3/demo/plan", json=PLAN).json()["data_source"] == "SYNTHETIC-DEMO"
-    real = client.post("/api/sp3/demo/plan?source=real", json=PLAN).json()
+    real = client.post("/api/sp3/demo/plan?source=real&term_id=HK1_2026_2027", json=PLAN).json()
     assert real["data_source"] == "OPERATIONAL-DATASET" and real["live_published"] == {}
-    catalog = client.get("/api/sp3/catalog?source=real").json()
+    catalog = client.get("/api/sp3/catalog?source=real&term_id=HK1_2026_2027").json()
     assert catalog["data_source"] == "OPERATIONAL-DATASET"
     assert all(row["live_revision"] is None for row in catalog["activities"])
 
@@ -101,4 +101,4 @@ def test_nothing_under_src_api_imports_the_model_or_ingestion_modules():
 def test_web_page_offers_only_the_synthetic_and_real_sources():
     page = (ROOT / "web/index.html").read_text(encoding="utf-8")
     assert '<option value="real_live">' not in page and "SP1-STORE-V2+LIVE" not in page
-    assert page.count('<option value="real">') == 2
+    assert page.count('<option value="real"') == 2

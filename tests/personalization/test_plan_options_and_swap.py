@@ -161,7 +161,7 @@ def test_real_source_options_use_real_planner_and_canonical_weekly_availability(
         "busy_intervals": [],
     }
     response = TestClient(app).post(
-        "/api/sp3/personalized/options?source=real",
+        "/api/sp3/personalized/options?source=real&term_id=HK1_2026_2027",
         json={
             "confirmed": True,
             "preference": valid_preference_payload,
@@ -188,7 +188,7 @@ def test_real_source_smart_swap_and_null_addition_removal_are_supported(valid_pr
     preference = _preference(without_fee_cap)
     from api.sp3_real import real_plan_options
 
-    real_base = real_plan_options(preference, target_total=80)["options"][0]["result"]
+    real_base = real_plan_options(preference, term_id="HK1_2026_2027", target_total=80)["options"][0]["result"]
     selected = [item["activity_id"] for item in real_base["plan"]["selected_activities"]]
     assert selected
 
@@ -198,13 +198,14 @@ def test_real_source_smart_swap_and_null_addition_removal_are_supported(valid_pr
         selected[0],
         None,
         source="real",
+        term_id="HK1_2026_2027",
     )
     assert removed["status"] == "PREVIEW"
     assert selected[0] in removed["dropped_activity_ids"]
     assert removed["result"]["data_source"] == "OPERATIONAL-DATASET"
 
     invalid = TestClient(app).post(
-        "/api/sp3/personalized/swap-preview?source=real",
+        "/api/sp3/personalized/swap-preview?source=real&term_id=HK1_2026_2027",
         json={
             "confirmed_profile": True,
             "preference": valid_preference_payload,

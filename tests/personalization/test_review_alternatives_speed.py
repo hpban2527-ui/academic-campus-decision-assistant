@@ -179,10 +179,10 @@ def test_direct_swap_previews_do_not_depend_on_the_fast_paths(monkeypatch, valid
 @pytest.mark.parametrize("name", sorted(REAL_PREFERENCES))
 def test_real_source_alternatives_are_identical(monkeypatch, name):
     preference = _preference(REAL_PREFERENCES[name])
-    option = _distinct(real_plan_options(preference, target_total=80)["options"])[0]
+    option = _distinct(real_plan_options(preference, term_id="HK1_2026_2027", target_total=80)["options"])[0]
     base = option["result"]
     remove_id = base["plan"]["selected_activities"][0]["activity_id"]
-    kwargs = {"source": "real"}
+    kwargs = {"source": "real", "term_id": "HK1_2026_2027"}
 
     reference, fast = _both(monkeypatch, lambda: list_swap_alternatives(preference, base, remove_id, 10, **kwargs))
 

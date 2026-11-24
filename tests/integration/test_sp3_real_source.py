@@ -10,11 +10,11 @@ client = TestClient(app)
 def test_default_catalog_is_unchanged():
     data = client.get("/api/sp3/catalog").json()
     assert data.get("data_source") != "OPERATIONAL-DATASET"
-    assert data["term"]["id"] == "HK3_2025_2026"
+    assert data["term"]["id"] == "SYNTHETIC-DEMO"
 
 
 def test_real_catalog_lists_handed_over_activities():
-    data = client.get("/api/sp3/catalog?source=real").json()
+    data = client.get("/api/sp3/catalog?source=real&term_id=HK1_2026_2027").json()
     assert data["data_source"] == "OPERATIONAL-DATASET"
     assert data["term"]["id"] == "HK1_2026_2027"
     assert data["activity_count"] == len(data["activities"]) > 0
@@ -33,7 +33,7 @@ def test_default_plan_is_still_synthetic():
 
 @pytest.mark.parametrize("scenario", ["first_plan", "replan", "what_if_skip"])
 def test_real_plan_runs_and_passes_the_checker(scenario):
-    response = client.post("/api/sp3/demo/plan?source=real", json={"scenario": scenario, "total_target": 80})
+    response = client.post("/api/sp3/demo/plan?source=real&term_id=HK1_2026_2027", json={"scenario": scenario, "total_target": 80})
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["data_source"] == "OPERATIONAL-DATASET"
@@ -48,9 +48,11 @@ def test_real_plan_runs_and_passes_the_checker(scenario):
 
 
 def test_real_plan_respects_busy_slots():
-    busy = [{"start": "2026-10-25T00:00:00+07:00", "end": "2026-10-26T00:00:00+07:00"}]
-    plan = client.post("/api/sp3/demo/plan?source=real",
-                       json={"scenario": "first_plan", "busy_intervals": busy}).json()["plan"]
+    url = "/api/sp3/demo/plan?source=real&term_id=HK1_2026_2027"
+    free = client.post(url, json={"scenario": "first_plan"}).json()["plan"]
+    day = min(block["start"][:10] for item in free["selected_activities"] for block in item["scheduled_blocks"])
+    busy = [{"start": f"{day}T00:00:00+07:00", "end": f"{day}T23:59:00+07:00"}]
+    plan = client.post(url, json={"scenario": "first_plan", "busy_intervals": busy}).json()["plan"]
     for item in plan["selected_activities"]:
         for block in item["scheduled_blocks"]:
-            assert not block["start"].startswith("2026-10-25")
+            assert not block["start"].startswith(day)

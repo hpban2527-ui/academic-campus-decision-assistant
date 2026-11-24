@@ -10,7 +10,8 @@ import json
 from pathlib import Path
 
 from api.lead_contract import prepare_publication
-from api.plan_completion import AccountPlanScoring
+from api.plan_completion import AccountPlanScoring, timestamp
+from api.term_clock import SYNTHETIC_TERM_ID
 from personalization.models import PlanningStrategy, StudentPreference
 from personalization.planner_adapter import prepare_personalized_planner_input
 from personalization.scoring import ActivityFeatures, load_activity_features
@@ -87,7 +88,8 @@ def sp1_catalog() -> dict:
     return {
         "mode": "DEMO_ONLY",
         "official_award_verified": False,
-        "term": {"id": "HK3_2025_2026", "start": "2026-05-18", "end": "2026-08-17"},
+        # An independent test scenario with its own clock; it is not a semester (api.term_clock).
+        "term": {"id": SYNTHETIC_TERM_ID, "label": "Synthetic test scenario"},
         "source_dataset": {
             "path": "data/raw/source.json",
             "total_posts": len(source_posts),
@@ -528,27 +530,30 @@ def preview_personalized_swap(
     availability_request: dict | None = None,
     account: AccountPlanScoring | None = None,
     internal: dict | None = None,  # REVIEW-DASH: precomputed review context (needs Ngoc review)
+    term_id: str | None = None,
 ) -> dict:
     """Preview a safe replacement through SP3 whole-plan scoring."""
-    return _preview_personalized_change(preference, base_result, remove_activity_id, add_activity_id, source=source, availability_request=availability_request, account=account, internal=internal)
+    return _preview_personalized_change(preference, base_result, remove_activity_id, add_activity_id, source=source, availability_request=availability_request, account=account, internal=internal, term_id=term_id)
 
 
 def preview_personalized_addition(
     preference: StudentPreference, base_result: dict, add_activity_id: str, *, source: str = "synthetic",
     availability_request: dict | None = None,
     account: AccountPlanScoring | None = None,
+    term_id: str | None = None,
 ) -> dict:
     """Preview adding one fixed-time activity while keeping unaffected selections."""
-    return _preview_personalized_change(preference, base_result, None, add_activity_id, source=source, availability_request=availability_request, account=account)
+    return _preview_personalized_change(preference, base_result, None, add_activity_id, source=source, availability_request=availability_request, account=account, term_id=term_id)
 
 
 def preview_personalized_removal(
     preference: StudentPreference, base_result: dict, remove_activity_id: str, *, source: str = "synthetic",
     availability_request: dict | None = None,
     account: AccountPlanScoring | None = None,
+    term_id: str | None = None,
 ) -> dict:
     """Preview removing one activity only; never add compensation."""
-    return _preview_personalized_change(preference, base_result, remove_activity_id, None, source=source, availability_request=availability_request, account=account)
+    return _preview_personalized_change(preference, base_result, remove_activity_id, None, source=source, availability_request=availability_request, account=account, term_id=term_id)
 
 
 def _preview_personalized_change(
@@ -561,6 +566,7 @@ def _preview_personalized_change(
     availability_request: dict | None = None,
     account: AccountPlanScoring | None = None,
     internal: dict | None = None,  # REVIEW-DASH: precomputed review context (needs Ngoc review)
+    term_id: str | None = None,
 ) -> dict:
     """Validate a calendar edit by rebuilding and independently checking the whole plan.
 
@@ -571,7 +577,7 @@ def _preview_personalized_change(
     if add_activity_id is None and remove_activity_id is not None:
         return remove_planned_activity(
             preference, base_result, remove_activity_id,
-            availability_request=availability_request, source=source, account=account,
+            availability_request=availability_request, source=source, account=account, term_id=term_id,
         )
 
     if not isinstance(base_result, dict):
@@ -622,7 +628,7 @@ def _preview_personalized_change(
     shared = internal is not None
     internal = (
         _review_clone_internal(internal) if shared
-        else _review_internal(preference, base_result, target_total, availability_request, source, account)
+        else _review_internal(preference, base_result, target_total, availability_request, source, account, term_id)
     )
     # REVIEW-DASH END
     planner_input = internal.pop("_planner_input")
@@ -794,13 +800,25 @@ def _review_fast_plan(planner_input: dict, score_callback, build_options: dict) 
     return plan
 
 
-def _review_internal(preference, base_result, target_total, availability_request, source, account):
+def _review_internal(preference, base_result, target_total, availability_request, source, account, term_id=None):
     if source not in {"synthetic", "real"}:
         raise ValueError("source must be 'synthetic' or 'real'")
     if source == "real":
         from api.sp3_real import real_plan
+        from api.term_clock import get_term
+
+        clock = account.clock if account and account.clock else get_term(term_id)
+        context = (base_result.get("plan") or {}).get("context") or {}
+        planned_term = context.get("term_id")
+        if planned_term is not None and planned_term != term_id:
+            raise ValueError("base_result was planned in another term; plan again in the selected term")
+        planned_version = base_result.get("clock_version")
+        planned_time = context.get("as_of")
+        if ((planned_version is not None and planned_version != clock.clock_version)
+                or (planned_time is not None and timestamp(planned_time) != timestamp(clock.as_of))):
+            raise ValueError("Ngày mô phỏng đã thay đổi. Hãy lập lại kế hoạch trước khi xem phương án.")
         return real_plan(
-            "first_plan", target_total=target_total, preference=preference,
+            "first_plan", term_id=term_id, target_total=target_total, preference=preference,
             availability_request=availability_request, include_internal=True, account=account,
         )
     if base_result.get("data_source") in {"SP1-STORE-V2", "OPERATIONAL-DATASET"}:
@@ -849,6 +867,7 @@ def _review_context(
     availability_request: dict | None = None,
     *, source: str = "synthetic",
     account: AccountPlanScoring | None = None,
+    term_id: str | None = None,
 ) -> _ReviewContext:
     """Validate a client-held base result and rebuild trusted planner state for it."""
     if not isinstance(base_result, dict):
@@ -875,7 +894,7 @@ def _review_context(
     if isinstance(target_total, bool) or not isinstance(target_total, int) or not 0 <= target_total <= 100:
         raise ValueError("base_result requested_total_target is invalid")
     # The student's own availability (same schema as /personalized/plan); None = the fixture default.
-    internal = _review_internal(preference, base_result, target_total, availability_request, source, account)
+    internal = _review_internal(preference, base_result, target_total, availability_request, source, account, term_id)
     planner_input = internal.pop("_planner_input")
     engine = internal.pop("_engine")
     score_callback = internal.pop("_score_callback")
@@ -975,6 +994,7 @@ def remove_planned_activity(
     availability_request: dict | None = None,
     *, source: str = "synthetic",
     account: AccountPlanScoring | None = None,
+    term_id: str | None = None,
 ) -> dict:
     """Remove one activity and re-score the rest; nothing replaces it.
 
@@ -983,7 +1003,7 @@ def remove_planned_activity(
     compensating activity. The result may be below the target: that is reported
     through ``target_met=False`` and ``warnings=["BELOW_TARGET"]``, not as an error.
     """
-    context = _review_context(preference, base_result, remove_activity_id, availability_request, source=source, account=account)
+    context = _review_context(preference, base_result, remove_activity_id, availability_request, source=source, account=account, term_id=term_id)
     remaining = [item for item in context.selected_rows if item["activity_id"] != remove_activity_id]
     planner_input = _seed_previous_plan(context, remaining)
     _cancel(planner_input, remove_activity_id)
@@ -1009,13 +1029,14 @@ def what_if_skip_planned_activity(
     availability_request: dict | None = None,
     *, source: str = "synthetic",
     account: AccountPlanScoring | None = None,
+    term_id: str | None = None,
 ) -> dict:
     """Preview the plan if ``skip_activity_id`` is skipped; nothing is applied.
 
     ``what_if_skip`` runs with a KEEP_TIME request for every remaining selected
     activity, so SP3 only adds compensating activities and never moves the others.
     """
-    context = _review_context(preference, base_result, skip_activity_id, availability_request, source=source, account=account)
+    context = _review_context(preference, base_result, skip_activity_id, availability_request, source=source, account=account, term_id=term_id)
     planner_input = _seed_previous_plan(context, context.selected_rows)
     # The skipped activity keeps its previous block but is no longer a keep request.
     planner_input["keep_requests"] = [
@@ -1087,6 +1108,7 @@ def list_swap_alternatives(
     availability_request: dict | None = None,
     *, source: str = "synthetic",
     account: AccountPlanScoring | None = None,
+    term_id: str | None = None,
 ) -> dict:
     """List valid replacements for ``remove_activity_id``, best first.
 
@@ -1100,7 +1122,7 @@ def list_swap_alternatives(
     """
     if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= REVIEW_MAX_LIMIT:
         raise ValueError(f"limit must be an integer from 1 to {REVIEW_MAX_LIMIT}")
-    context = _review_context(preference, base_result, remove_activity_id, availability_request, source=source, account=account)
+    context = _review_context(preference, base_result, remove_activity_id, availability_request, source=source, account=account, term_id=term_id)
     base_projected = context.base_summary.get("projected_total")
     if isinstance(base_projected, bool) or not isinstance(base_projected, (int, float)):
         raise ValueError("base_result has no projected total")
@@ -1137,7 +1159,7 @@ def list_swap_alternatives(
         try:
             preview = preview_personalized_swap(
                 preference, base_result, remove_activity_id, activity_id,
-                availability_request=availability_request, source=source, account=account, internal=shared,
+                availability_request=availability_request, source=source, account=account, internal=shared, term_id=term_id,
             )
         except ValueError as exc:
             reject(activity_id, "SWAP_REJECTED", str(exc))

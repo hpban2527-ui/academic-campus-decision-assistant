@@ -24,7 +24,7 @@ def test_sp1_catalog_preserves_review_status():
     assert body["source_dataset"]["matched_reviewed_activities"] == 16
     assert len(body["source_dataset"]["missing_reviewed_activity_ids"]) == 4
     assert body["unstructured_new_posts"] == 173
-    assert body["term"]["id"] == "HK3_2025_2026"
+    assert body["term"]["id"] == "SYNTHETIC-DEMO"  # an independent test scenario, not a semester
     assert all(item["publication_status"] == "REVIEW_REQUIRED" for item in body["activities"])
     assert all(item["score_binding_verified"] is False for item in body["activities"])
     assert all(item["data_qa"]["activity_id"] == item["activity"]["activity_id"] for item in body["activities"])

@@ -9,6 +9,7 @@ import subprocess
 import pytest
 
 from api.sp3_real import real_plan_options
+from api.term_clock import list_terms
 from personalization.models import StudentPreference
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,7 +24,7 @@ def real_options():
         "limits": {"max_activities": None, "max_duration_minutes": None, "max_fee": None},
         "strategy": "BALANCED",
     }
-    options = real_plan_options(StudentPreference.model_validate(preference), target_total=85)["options"]
+    options = real_plan_options(StudentPreference.model_validate(preference), term_id="HK1_2026_2027", target_total=85)["options"]
     assert all(option.get("result") for option in options)
     return preference, options
 
@@ -37,7 +38,8 @@ def test_quota_recovery_preserves_accounts_and_planner_snapshots(real_options, s
     preference, options = real_options
     result = subprocess.run(
         ["node", "tests/review_dashboard_runtime.cjs"], cwd=ROOT,
-        input=json.dumps({"scenario": scenario, "mobile": mobile, "preference": preference, "options": options}),
+        input=json.dumps({"scenario": scenario, "mobile": mobile, "preference": preference, "options": options,
+                          "clocks": [clock.as_dict() for clock in list_terms()]}),
         text=True, encoding="utf-8", capture_output=True, timeout=30,
     )
     assert result.returncode == 0, result.stdout + result.stderr

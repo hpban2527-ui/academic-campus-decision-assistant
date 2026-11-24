@@ -24,6 +24,7 @@ def _announcement(case_number: int = 1, *, has_evidence: bool = True):
         "raw_content": c["raw_content"],
         "has_evidence": has_evidence,
         "rule_override": "R19",
+        "term_id": "HK1_2026_2027",
     }
 
 

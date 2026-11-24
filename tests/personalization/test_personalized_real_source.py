@@ -8,7 +8,7 @@ client = TestClient(server.app)
 
 def test_personalized_plan_on_real_store(valid_preference_payload):
     response = client.post(
-        "/api/sp3/personalized/plan?source=real",
+        "/api/sp3/personalized/plan?source=real&term_id=HK1_2026_2027",
         json={"confirmed": True, "preference": valid_preference_payload, "total_target": 80, "busy_intervals": []},
     )
     assert response.status_code == 200, response.text

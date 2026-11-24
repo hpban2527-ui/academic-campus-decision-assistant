@@ -194,7 +194,7 @@ def test_server_boot_id_cookie_health_and_lifespan_session_wipe(tmp_path, monkey
     ephemeral_file.write_text('{"schema_version": 3, "session_scores": {"STALE": {}}}', encoding="utf-8")
     monkeypatch.setattr(server, "SESSION_FILE", ephemeral_file)
     monkeypatch.setattr(server, "session_scores", {"STALE": {"current": {"C1": 10}, "projected": {"C1": 0}}})
-    monkeypatch.delenv("UNILIFE_PERSIST_SESSION", raising=False)
+    monkeypatch.setenv("UNILIFE_PERSIST_SESSION", "0")
 
     with TestClient(app) as client:
         # Startup lifespan must wipe any stale on-disk or in-memory session state
