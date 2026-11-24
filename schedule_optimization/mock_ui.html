@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SP3 Schedule Optimization — Mock UI & Benchmark Lab</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel-alt: #172033;
+      --border: #334155;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --purple: #a78bfa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel-alt);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    header h1 { margin: 0; font-size: 1.2rem; color: #f8fafc; }
+    header p { margin: 2px 0 0; font-size: 0.85rem; color: var(--muted); }
+    main { max-width: 1320px; margin: 0 auto; padding: 20px 24px 48px; display: grid; gap: 20px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .card h2 { margin: 0 0 12px; font-size: 1rem; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+    label { display: flex; flex-direction: column; gap: 5px; font-size: 0.8rem; color: var(--muted); }
+    select, input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+    }
+    button {
+      background: var(--accent);
+      color: #082f49;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    button.secondary { background: #334155; color: var(--text); }
+    button:disabled { opacity: 0.55; cursor: wait; }
+    .desc { font-size: 0.84rem; color: var(--muted); margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { padding: 9px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; }
+    tr.clickable { cursor: pointer; }
+    tr.clickable:hover { background: rgba(56, 189, 248, 0.08); }
+    tr.selected-row { background: rgba(56, 189, 248, 0.16); }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 600;
+    }
+    .b-green { background: rgba(34, 197, 94, 0.18); color: #4ade80; }
+    .b-amber { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+    .b-red { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+    .b-blue { background: rgba(56, 189, 248, 0.18); color: #7dd3fc; }
+    .b-purple { background: rgba(167, 139, 250, 0.18); color: #c4b5fd; }
+    .split { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+    @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
+    .activity-item {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .activity-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .activity-time { font-size: 0.8rem; color: var(--accent); margin-top: 4px; font-family: monospace; }
+    .activity-reasons { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+    .bar-wrap { margin-bottom: 10px; }
+    .bar-head { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 3px; }
+    .bar-track { height: 10px; background: var(--bg); border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); }
+    .status-line { font-size: 0.82rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>SP3 Schedule Suggestion Optimization — Mock UI & Benchmark Lab</h1>
+      <p>Standalone test harness comparing Exact B&amp;B, Greedy, Beam v1, and Guided v2 + Local Search</p>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <button id="btnRunBench" class="secondary">Run Full Benchmark Suite</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1. Test Scenario &amp; Parameters</h2>
+      <div class="controls">
+        <label>Scenario
+          <select id="selScenario"></select>
+        </label>
+        <label>Personalization Strategy
+          <select id="selStrategy">
+            <option value="BALANCED">BALANCED</option>
+            <option value="MINIMUM_EFFORT">MINIMUM_EFFORT</option>
+            <option value="PREFERENCE_FIRST">PREFERENCE_FIRST</option>
+          </select>
+        </label>
+        <label>Total DRL Target
+          <input id="inpTarget" type="number" step="1" min="0" max="100" />
+        </label>
+        <label>Max Evaluations Budget
+          <input id="inpBudget" type="number" step="20" min="20" max="4096" value="400" />
+        </label>
+        <label>What-If Skip Activity
+          <select id="selSkip"><option value="">(None)</option></select>
+        </label>
+        <button id="btnCompare">Compare Algorithms</button>
+      </div>
+      <div id="scenarioDesc" class="desc"></div>
+    </section>
+
+    <section class="card">
+      <h2>2. Algorithm Comparison Table <span id="cmpStatus" class="status-line"></span></h2>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Status</th>
+              <th>Score</th>
+              <th>Cat Gap</th>
+              <th>|S|</th>
+              <th>Pref</th>
+              <th>Duration (m)</th>
+              <th>Utility</th>
+              <th>Set Changes</th>
+              <th>Evals</th>
+              <th>Latency (ms)</th>
+              <th>Contract</th>
+            </tr>
+          </thead>
+          <tbody id="cmpBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="split">
+      <div class="card">
+        <h2>3. Scheduled Activities Inspector <span id="inspMethod" class="badge b-blue"></span></h2>
+        <div id="activityList"></div>
+      </div>
+      <div class="card">
+        <h2>4. Projected DRL Category Breakdown</h2>
+        <div id="catBars"></div>
+        <div id="warningsBox" style="margin-top:14px; font-size:0.8rem; color:var(--muted);"></div>
+      </div>
+    </section>
+
+    <section class="card" id="benchSection" style="display:none;">
+      <h2>5. Full Inner Scheduler Scalability Benchmark (Exact DP vs Fast v1 vs Fast v2)</h2>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>k (Flexible)</th>
+              <th>DP States (2^k)</th>
+              <th>Exact DP (ms)</th>
+              <th>Exact DP Mem (KB)</th>
+              <th>Fast v1 (ms)</th>
+              <th>Fast v2 (ms)</th>
+              <th>Status (v2)</th>
+            </tr>
+          </thead>
+          <tbody id="schedBenchBody"></tbody>
+        </table>
+      </div>
+      <div id="schedBenchNotes" class="desc"></div>
+    </section>
+  </main>
+
+  <script>
+    let scenarios = [];
+    let lastCompare = null;
+
+    function fmtTime(iso) {
+      return iso.replace("T", " ").slice(0, 16);
+    }
+
+    async function loadScenarios() {
+      const res = await fetch("/api/scenarios");
+      const data = await res.json();
+      scenarios = data.scenarios;
+      const sel = document.getElementById("selScenario");
+      sel.innerHTML = scenarios.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+      sel.addEventListener("change", syncScenarioDefaults);
+      syncScenarioDefaults();
+      await runCompare();
+    }
+
+    function syncScenarioDefaults() {
+      const id = document.getElementById("selScenario").value;
+      const sc = scenarios.find(s => s.id === id);
+      if (!sc) return;
+      document.getElementById("selStrategy").value = sc.default_strategy;
+      document.getElementById("inpTarget").value = sc.default_total_target ?? 80;
+      document.getElementById("scenarioDesc").textContent =
+        `${sc.description} | Baseline: ${sc.baseline_total} | Targets: ${JSON.stringify(sc.category_targets)}`;
+      const skip = document.getElementById("selSkip");
+      skip.innerHTML = `<option value="">(None)</option>` +
+        sc.candidates.slice(0, 40).map(c => `<option value="${c.activity_id}">${c.activity_id} — ${c.title}</option>`).join("");
+    }
+
+    async function runCompare() {
+      const btn = document.getElementById("btnCompare");
+      btn.disabled = true;
+      document.getElementById("cmpStatus").textContent = "Running...";
+      try {
+        const body = {
+          scenario_id: document.getElementById("selScenario").value,
+          strategy: document.getElementById("selStrategy").value,
+          total_target: Number(document.getElementById("inpTarget").value),
+          max_evaluations: Number(document.getElementById("inpBudget").value),
+          skip_activity_id: document.getElementById("selSkip").value || null,
+        };
+        const res = await fetch("/api/compare", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        lastCompare = await res.json();
+        renderCompare();
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function renderCompare() {
+      const tbody = document.getElementById("cmpBody");
+      const rows = lastCompare.results || [];
+      document.getElementById("cmpStatus").textContent =
+        `— Click any row to inspect its scheduled blocks (${rows.length} methods)`;
+      tbody.innerHTML = rows.map((r, idx) => `
+        <tr class="clickable" data-idx="${idx}">
+          <td><strong>${r.method}</strong>${r.optimality_proven ? ' <span class="badge b-purple">EXACT</span>' : ''}</td>
+          <td><span class="badge ${r.status === 'TARGET_MET' ? 'b-green' : 'b-amber'}">${r.status}</span></td>
+          <td>${r.projected_total.toFixed(1)}</td>
+          <td>${r.category_gap.toFixed(1)}</td>
+          <td>${r.selected_count}</td>
+          <td>${r.pref_matches}</td>
+          <td>${Math.round(r.duration_min)}</td>
+          <td>${r.utility === null ? '—' : r.utility.toFixed(1)}</td>
+          <td>${r.set_changes}</td>
+          <td>${r.evaluated_subsets}</td>
+          <td>${r.latency_ms.toFixed(2)}</td>
+          <td><span class="badge ${r.contract_valid ? 'b-green' : 'b-red'}">${r.contract_valid ? 'PASS' : 'FAIL'}</span></td>
+        </tr>
+      `).join("");
+      tbody.querySelectorAll("tr").forEach(tr => {
+        tr.addEventListener("click", () => selectMethod(Number(tr.dataset.idx)));
+      });
+      selectMethod(rows.length - 1);
+    }
+
+    function selectMethod(idx) {
+      const rows = lastCompare.results || [];
+      const r = rows[idx];
+      if (!r) return;
+      document.querySelectorAll("#cmpBody tr").forEach((tr, i) => {
+        tr.classList.toggle("selected-row", i === idx);
+      });
+      document.getElementById("inspMethod").textContent = r.method;
+      const list = document.getElementById("activityList");
+      if (!r.selected_activities.length) {
+        list.innerHTML = `<div class="desc">No activities selected.</div>`;
+      } else {
+        list.innerHTML = r.selected_activities.map(a => {
+          const times = a.scheduled_blocks.map(b => `${fmtTime(b.start)} → ${fmtTime(b.end)}`).join(" | ");
+          const reasons = a.reasons.map(x => x.message).join(" • ");
+          const chgClass = a.change === "KEPT" ? "b-green" : (a.change === "MOVED" ? "b-amber" : "b-blue");
+          return `
+            <div class="activity-item">
+              <div class="activity-top">
+                <div><strong>${a.activity_id}</strong> — ${a.title}</div>
+                <div>
+                  <span class="badge b-purple">${a.schedule_type}</span>
+                  <span class="badge ${chgClass}">${a.change}</span>
+                </div>
+              </div>
+              <div class="activity-time">${times}</div>
+              <div class="activity-reasons">${reasons}</div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const cats = Object.keys(r.projected_by_category).sort();
+      const targets = lastCompare.category_targets || {};
+      const caps = { C1: 30, C2: 25, C3: 25, C4: 25, C5: 10 };
+      document.getElementById("catBars").innerHTML = cats.map(c => {
+        const val = Number(r.projected_by_category[c] || 0);
+        const base = Number(r.baseline_by_category[c] || 0);
+        const cap = caps[c] || 30;
+        const pct = Math.min(100, (val / cap) * 100);
+        const tgt = targets[c] !== undefined ? ` | Target: ${targets[c]}` : "";
+        return `
+          <div class="bar-wrap">
+            <div class="bar-head">
+              <span><strong>${c}</strong> (base ${base} → <strong>${val}</strong> / ${cap}${tgt})</span>
+              <span>+${(val - base).toFixed(1)}</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+          </div>
+        `;
+      }).join("");
+      document.getElementById("warningsBox").innerHTML =
+        `<strong>Contract Warnings:</strong> ` + (r.warnings || []).map(w => w.code).join(", ");
+    }
+
+    async function runFullBenchmark() {
+      const btn = document.getElementById("btnRunBench");
+      btn.disabled = true;
+      btn.textContent = "Running Benchmark...";
+      try {
+        const res = await fetch("/api/benchmark");
+        const data = await res.json();
+        const sec = document.getElementById("benchSection");
+        sec.style.display = "block";
+        const body = document.getElementById("schedBenchBody");
+        body.innerHTML = data.scheduler.scalability.map(s => `
+          <tr>
+            <td><strong>k = ${s.k}</strong></td>
+            <td>${s.dp_states === null ? 'Capped (>16)' : s.dp_states.toLocaleString()}</td>
+            <td>${s.exact_dp_ms === null ? '—' : s.exact_dp_ms.toFixed(3)}</td>
+            <td>${s.exact_dp_kb === null ? '—' : s.exact_dp_kb.toFixed(1)}</td>
+            <td>${s.fast_v1_ms.toFixed(3)}</td>
+            <td><strong>${s.fast_v2_ms.toFixed(3)}</strong></td>
+            <td><span class="badge b-green">${s.fast_v2_status}</span></td>
+          </tr>
+        `).join("");
+        const tw = data.scheduler.tight_windows_k14;
+        const rp = data.scheduler.replan_k24;
+        document.getElementById("schedBenchNotes").textContent =
+          `Tight Windows (k=14, 20 instances): Exact DP ${tw.exact_dp_scheduled}/20, Fast v1 ${tw.fast_v1_scheduled}/20, Fast v2 ${tw.fast_v2_scheduled}/20 | ` +
+          `Replan Above Cap (k=24): Fast v1 time_changes=${rp.fast_v1_time_changes} (${rp.fast_v1_ms}ms) vs Fast v2 time_changes=${rp.fast_v2_time_changes} (${rp.fast_v2_ms}ms).`;
+        sec.scrollIntoView({ behavior: "smooth" });
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Run Full Benchmark Suite";
+      }
+    }
+
+    document.getElementById("btnCompare").addEventListener("click", runCompare);
+    document.getElementById("btnRunBench").addEventListener("click", runFullBenchmark);
+    loadScenarios();
+  </script>
+</body>
+</html>
