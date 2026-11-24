@@ -8592,8 +8592,7 @@
     // The backend demo always simulates cancelling this activity on top of the replanned schedule.
     const WHAT_IF_SKIP_ACTIVITY_ID = 'QUIZ-L';
 
-    // ---- Data source switch: synthetic MVP fixture (default) or the real SP1 v2 store ----
-    let SP3_SOURCE = 'synthetic';
+    let SP3_SOURCE = 'real';
     // A source saved by an older page ('real_live', removed) falls back to the real store.
     try { const saved = localStorage.getItem('sp3Source'); if (saved === 'real' || saved === 'real_live') SP3_SOURCE = 'real'; } catch (e) { /* storage unavailable */ }
     function sp3Query() { return SP3_SOURCE === 'synthetic' ? '' : '?source=' + SP3_SOURCE; }
@@ -8950,7 +8949,16 @@
       C4: 'Hoạt động cộng đồng', C5: 'Cán bộ lớp & CLB'
     };
 
-    const AVAILABILITY_DEFAULT_WEEK_START = '2026-11-09';
+    // The one demo "today" of the UI (keep equal to DEMO_TODAY in src/api/demo_clock.py).
+    const DEMO_TODAY_ISO = '2026-10-25';
+    // The busy calendar opens on the Monday of the demo week (19/10/2026).
+    const AVAILABILITY_DEFAULT_WEEK_START = (() => {
+      const day = new Date(`${DEMO_TODAY_ISO}T00:00:00Z`);
+      day.setUTCDate(day.getUTCDate() - ((day.getUTCDay() + 6) % 7));
+      return day.toISOString().slice(0, 10);
+    })();
+    // The availability API contract keeps its own anchor week (sp3_real maps effective_from 2026-11-09 to the planning window).
+    const AVAILABILITY_CONTRACT_WEEK_START = '2026-11-09';
     const AVAILABILITY_DAYS = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
     const AVAILABILITY_PERIODS = [
       { key: 'morning', label: 'Sáng', time: '07:00–12:00', start: '07:00', end: '12:00' },
@@ -9295,8 +9303,11 @@
       const policyDefaultBlocks = dayNames.map(day => ({ day_of_week: day, start_time: '07:00', end_time: '21:00' }));
       const extraWeeklyAvailable = (currentProfileDraft.weekly_intervals || []).filter(item => item.kind === 'available');
       const availableExceptionDays = new Map();
+      // The real store plans from the demo day (the backend maps effective_from 2026-11-09 to its window start),
+      // so extra free days from DEMO_TODAY_ISO on must be kept, not only those after 2026-11-09.
+      const exceptionsFrom = SP3_SOURCE === 'real' ? DEMO_TODAY_ISO : effectiveFrom;
       (currentProfileDraft.exceptions || []).filter(item => item.kind === 'available').forEach(item => {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(item.date || '') || item.date < effectiveFrom || item.date > effectiveUntil) return;
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(item.date || '') || item.date < exceptionsFrom || item.date > effectiveUntil) return;
         if (!item.start || !item.end || item.start >= item.end) return;
         let blocks = availableExceptionDays.get(item.date);
         if (!blocks) {
@@ -9313,7 +9324,7 @@
       return {
         availability_version: 'sp3-availability/0.2',
         timezone: 'Asia/Ho_Chi_Minh',
-        week_start: AVAILABILITY_DEFAULT_WEEK_START,
+        week_start: AVAILABILITY_CONTRACT_WEEK_START,
         apply_scope: 'SEMESTER_WEEKLY',
         effective_from: effectiveFrom,
         effective_until: effectiveUntil,
@@ -11387,7 +11398,7 @@
           };
 
           const TIMELINE_DAY_NAMES = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-          const TIMELINE_SIMULATED_TODAY = new Date('2026-10-25T00:00:00+07:00');
+          const TIMELINE_SIMULATED_TODAY = new Date(`${DEMO_TODAY_ISO}T00:00:00+07:00`);
           const TIMELINE_ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
           const timelineState = {
