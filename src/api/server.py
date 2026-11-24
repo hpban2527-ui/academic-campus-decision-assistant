@@ -23,6 +23,7 @@ import secrets
 import sys
 import uuid
 from collections import OrderedDict
+from contextlib import asynccontextmanager
 from copy import deepcopy
 from datetime import datetime
 from functools import wraps
@@ -78,11 +79,25 @@ from sp2.rule_matcher import match_activity_to_rule
 DATA_DIR = ROOT_DIR / "data"
 WEB_DIR = ROOT_DIR / "web"
 SCHEMAS_DIR = ROOT_DIR / "schemas"
+SERVER_BOOT_ID = uuid.uuid4().hex
+
+
+@asynccontextmanager
+async def _app_lifespan(_app: FastAPI):
+    if os.environ.get("UNILIFE_PERSIST_SESSION") != "1":
+        _wipe_ephemeral_session()
+    try:
+        yield
+    finally:
+        if os.environ.get("UNILIFE_PERSIST_SESSION") != "1":
+            _wipe_ephemeral_session()
+
 
 app = FastAPI(
     title="HCMUS Academic Campus Decision Assistant API",
     description="Backend API integrating SP1, SP2 and SP3 availability/feasibility contracts",
     version="1.2.0",
+    lifespan=_app_lifespan,
 )
 
 app.add_middleware(
@@ -357,6 +372,17 @@ def _clear_session_state() -> None:
     student_dedupers.clear()
 
 
+@_locked_session
+def _wipe_ephemeral_session() -> None:
+    """Wipe in-memory and on-disk session data when the server starts or shuts down."""
+    _clear_session_state()
+    preference_interpret_cache.clear()
+    try:
+        SESSION_FILE.unlink(missing_ok=True)
+    except OSError as exc:
+        print(f"Warning: Failed to remove session file {SESSION_FILE}: {exc}", file=sys.stderr)
+
+
 def _load_session_from_disk() -> None:
     """Restore a previous session (survives server restarts). Falls back to a clean state."""
     data = load_json(SESSION_FILE, None)
@@ -376,7 +402,8 @@ def _load_session_from_disk() -> None:
         _clear_session_state()
 
 
-_load_session_from_disk()
+if os.environ.get("UNILIFE_PERSIST_SESSION") == "1":
+    _load_session_from_disk()
 
 # 5 Standardized E2E Test Scenarios (Shared between API and Frontend)
 E2E_SCENARIOS: dict[int, dict[str, Any]] = {
@@ -722,6 +749,7 @@ def health_check():
     rule_issues = audit_rules_config(DRL_RULES_CONFIG)
     return {
         "status": "degraded" if any(x["severity"] == "error" for x in rule_issues) else "healthy",
+        "server_boot_id": SERVER_BOOT_ID,
         "rule_audit_issues": rule_issues,
         "rule_audit_count": len(rule_issues),
         "regulation": DRL_RULES_CONFIG.get("regulation", {}).get("regulation_id", "1028/QD-KHTN-CTSV"),
@@ -2399,8 +2427,16 @@ if WEB_DIR.exists():
     def serve_index():
         index_file = WEB_DIR / "index.html"
         if index_file.exists():
-            return FileResponse(
+            response = FileResponse(
                 index_file,
                 headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
             )
+            response.set_cookie(
+                key="unilife_server_boot_id",
+                value=SERVER_BOOT_ID,
+                path="/",
+                samesite="lax",
+                httponly=False,
+            )
+            return response
         return JSONResponse({"message": "Web UI index.html not found"}, status_code=404)
