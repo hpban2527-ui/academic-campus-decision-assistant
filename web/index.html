@@ -1332,13 +1332,8 @@
         <!-- ================================================================== -->
         <!-- WORKSPACE 2: KHO HOẠT ĐỘNG, HÀNG ĐỢI RÀ SOÁT & LƯU TRỮ PHIÊN         -->
         <!-- ================================================================== -->
-        <div id="viewActivities" class="hidden space-y-6">
-          <!-- Keep the original activity review below the timeline. -->
-          <div class="flex flex-wrap gap-2 rounded-xl bg-[#0e1524] border border-[#1b2537] p-2">
-            <button id="btnSubViewTimeline" type="button" onclick="setActivitiesSubView('timeline')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">Lịch hoạt động</button>
-            <button id="btnSubViewQa" type="button" onclick="setActivitiesSubView('qa')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-300">Kho dữ liệu và rà soát</button>
-          </div>
-            <!-- ==================== SUB-VIEW 1: TIMELINE & 5-DAY CAROUSEL ==================== -->
+          <div id="viewActivities" class="hidden space-y-6">
+            <!-- ==================== TIMELINE 7-DAY VIEW ==================== -->
             <div id="activitiesTimelineSection" class="space-y-4">
 
               <!-- Filters & Quick Date Bar -->
@@ -1401,12 +1396,12 @@
                 </div>
               </div>
 
-              <!-- Main Timeline Grid & Unscheduled Tray -->
-              <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch min-h-[580px]">
+              <!-- Main Timeline -->
+              <div class="flex flex-col min-h-[580px]">
 
-                <!-- KHU VỰC 2 (9/12 COLS): DÒNG THỜI GIAN BĂNG CHUYỀN 5 NGÀY -->
+                <!-- DÒNG THỜI GIAN BĂNG CHUYỀN 7 NGÀY -->
                 <section id="timelineSectionInner"
-                  class="lg:col-span-9 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-2xl flex flex-col overflow-hidden relative min-h-[540px]">
+                  class="bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-2xl flex flex-col overflow-hidden relative min-h-[540px]">
 
                   <!-- Top Title Bar with Custom Mock Clock Legend -->
                   <div
@@ -1423,9 +1418,9 @@
                         <span>Còn hạn</span>
                       </div>
                       <div class="flex items-center gap-1.5">
-                        <img src="/static/image/activitie_storage/reg-urgent.svg" alt="Còn <24h"
+                        <img src="/static/image/activitie_storage/reg-urgent.svg" alt="Sắp hết hạn"
                           class="w-4 h-4 shrink-0 object-contain pulse-urgent drop-shadow-sm pointer-events-none select-none" />
-                        <span>Còn &lt;24h</span>
+                        <span>Sắp hết hạn</span>
                       </div>
                       <div class="flex items-center gap-1.5">
                         <img src="/static/image/activitie_storage/reg-expired.svg" alt="Hết hạn"
@@ -1435,9 +1430,10 @@
                     </div>
                   </div>
 
-                  <!-- Arrow Indicator for Focus Day (Centered at Card #3) -->
+                  <!-- Arrow Indicator for Focus Day (Centered at Card #4) -->
                   <div class="shrink-0 w-full flex justify-center pt-1.5 pb-0.5 bg-[#0e1524]">
-                    <div class="w-full grid grid-cols-5">
+                    <div class="w-full grid grid-cols-7">
+                      <div></div>
                       <div></div>
                       <div></div>
                       <div class="flex justify-center items-center">
@@ -1447,14 +1443,15 @@
                       </div>
                       <div></div>
                       <div></div>
+                      <div></div>
                     </div>
                   </div>
 
-                  <!-- 5-Day Date Headers Container (1/5 width each) -->
+                  <!-- 7-Day Date Headers Container (1/7 width each) -->
                   <div class="shrink-0 px-4 pb-2 bg-[#0e1524]">
                     <div id="timelineDateCardsContainer"
-                      class="grid grid-cols-5 bg-[#080d18] rounded-xl border border-[#1b2537] overflow-hidden shadow-inner">
-                      <!-- Dynamic 5 date cards -->
+                      class="grid grid-cols-7 bg-[#080d18] rounded-xl border border-[#1b2537] overflow-hidden shadow-inner">
+                      <!-- Dynamic 7 date cards -->
                     </div>
                   </div>
 
@@ -1463,67 +1460,30 @@
                     class="flex-1 min-h-[360px] max-h-[500px] overflow-y-auto px-4 pb-3 relative">
                     <!-- Visual column guidelines -->
                     <div id="timelineColumnBgGuides"
-                      class="absolute inset-x-4 inset-y-0 grid grid-cols-5 gap-x-2.5 p-1 pointer-events-none">
+                      class="absolute inset-x-4 inset-y-0 grid grid-cols-7 gap-x-2.5 p-1 pointer-events-none">
+                      <div class="border-r border-[#1b2537]/50 h-full"></div>
                       <div class="border-r border-[#1b2537]/50 h-full"></div>
                       <div class="border-r border-[#1b2537]/50 h-full"></div>
                       <div class="border-r border-[#1b2537]/50 bg-indigo-500/[0.03] h-full"></div>
+                      <div class="border-r border-[#1b2537]/50 h-full"></div>
                       <div class="border-r border-[#1b2537]/50 h-full"></div>
                       <div class="h-full"></div>
                     </div>
 
                     <!-- CSS Grid Container for Activity Lanes -->
-                    <div id="timelineActivityGrid" class="relative z-10 grid grid-cols-5 gap-x-2.5 gap-y-2 py-2">
+                    <div id="timelineActivityGrid" class="relative z-10 grid grid-cols-7 gap-x-2.5 gap-y-2 py-2">
                       <!-- Dynamic activity pills & continuous multi-day banners -->
                     </div>
                   </div>
 
-                  <!-- Bottom bar tips & active date label -->
-                  <div
-                    class="shrink-0 px-4 py-2 border-t border-[#1b2537] bg-[#0b101b] flex items-center justify-between text-[11px] text-slate-400">
-                    <span class="flex items-center gap-1.5">
-                      <span>💡</span> Mẹo: Lăn chuột trên thanh ngày để trượt lịch; lăn chuột trong bảng để cuộn xem
-                      danh sách; click vào sự kiện để xem chi tiết.
-                    </span>
-                    <span id="timelineActiveFocusLabel" class="font-mono text-indigo-300 font-semibold shrink-0">
-                      Đang xem: —
-                    </span>
-                  </div>
-
                 </section>
-
-                <!-- KHU VỰC 3 (3/12 COLS): KHAY HOẠT ĐỘNG CHƯA CHỐT NGÀY (start == null) -->
-                <aside class="lg:col-span-3 flex flex-col min-h-[540px]">
-                  <div
-                    class="flex-1 bg-[#0e1524] rounded-2xl border border-[#1b2537] shadow-xl flex flex-col overflow-hidden">
-
-                    <div class="p-3.5 border-b border-[#1b2537] bg-[#11192b]/40 space-y-1 shrink-0">
-                      <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-black text-white tracking-wider uppercase flex items-center gap-1.5">
-                          <span class="text-rose-400">📌</span> Chưa chốt ngày
-                        </h3>
-                        <span id="timelineUnscheduledCountBadge"
-                          class="text-xs px-2 py-0.5 rounded-full bg-rose-950/70 text-rose-300 border border-rose-500/40 font-mono font-bold">
-                          0
-                        </span>
-                      </div>
-                      <p class="text-[11px] text-slate-400 leading-tight">
-                        Mở đăng ký trước, ngày diễn ra thông báo sau
-                      </p>
-                    </div>
-
-                    <div id="timelineUnscheduledList" class="flex-1 overflow-y-auto p-3 space-y-2.5 max-h-[460px]">
-                      <!-- Dynamic unscheduled activity cards -->
-                    </div>
-
-                  </div>
-                </aside>
 
               </div>
 
             </div>
 
 
-<div id="activitiesQaSection" class="hidden space-y-6">
+            <div id="activitiesQaSection" class="hidden space-y-6" style="display:none !important">
           
           <div class="bg-[#0e1524] p-6 rounded-2xl border border-[#1b2537] shadow-xl space-y-3">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -8736,6 +8696,9 @@
       toggleMobileSidebar(false);
 
       if (tab === 'activities') {
+        if (typeof TIMELINE_SIMULATED_TODAY !== 'undefined' && typeof timelineState !== 'undefined') {
+          timelineState.focusDate = new Date(TIMELINE_SIMULATED_TODAY);
+        }
         loadActivitiesFromApi();
         loadLeadAuditFromApi();
       }
@@ -11635,7 +11598,7 @@
 
           const timelineState = {
             allActivities: [],
-            focusDate: new Date('2026-10-28T00:00:00+07:00'),
+            focusDate: new Date(TIMELINE_SIMULATED_TODAY),
             domainFilter: 'all',
             modeFilter: 'all',
             activeOnly: false,
@@ -11646,32 +11609,11 @@
           };
 
           function setActivitiesSubView(mode) {
-            timelineState.currentSubView = mode;
+            // QA sub-view removed; always stay on timeline view.
+            timelineState.currentSubView = 'timeline';
             const timelineSec = document.getElementById('activitiesTimelineSection');
-            const qaSec = document.getElementById('activitiesQaSection');
-            const btnTimeline = document.getElementById('btnSubViewTimeline');
-            const btnQa = document.getElementById('btnSubViewQa');
-
-            if (mode === 'timeline') {
-              if (timelineSec) timelineSec.classList.remove('hidden');
-              if (qaSec) qaSec.classList.add('hidden');
-              if (btnTimeline) {
-                btnTimeline.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-sm";
-              }
-              if (btnQa) {
-                btnQa.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white";
-              }
-              renderTimelineView();
-            } else {
-              if (timelineSec) timelineSec.classList.add('hidden');
-              if (qaSec) qaSec.classList.remove('hidden');
-              if (btnTimeline) {
-                btnTimeline.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white";
-              }
-              if (btnQa) {
-                btnQa.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-sm";
-              }
-            }
+            if (timelineSec) timelineSec.classList.remove('hidden');
+            renderTimelineView();
           }
 
           function syncTimelineActivities(acts) {
@@ -11718,7 +11660,25 @@
 
           function getTimelineRegistrationStatus(activity, now = TIMELINE_SIMULATED_TODAY) {
             if (!activity.registration_deadline) {
-              return { status: 'none', label: 'Không giới hạn hạn chót', colorClass: 'text-slate-400', isAvailable: true };
+              const eventEndStr = activity.end || activity.start;
+              if (eventEndStr) {
+                const eventDate = new Date(eventEndStr);
+                if (eventDate.getTime() < now.getTime()) {
+                  return { status: 'expired', label: 'Hoạt động đã kết thúc', colorClass: 'text-slate-500', isAvailable: false };
+                }
+              }
+
+              const eventStartStr = activity.start || activity.end;
+              if (eventStartStr) {
+                const eventStartDate = new Date(eventStartStr);
+                const diffStartMs = eventStartDate.getTime() - now.getTime();
+                if (diffStartMs > 0 && diffStartMs <= TIMELINE_ONE_DAY_MS) {
+                  const hoursLeft = Math.max(1, Math.round(diffStartMs / (3600 * 1000)));
+                  return { status: 'urgent', label: `Sắp diễn ra (~${hoursLeft}h)`, colorClass: 'text-rose-400', isAvailable: true };
+                }
+              }
+
+              return { status: 'available', label: 'Không giới hạn hạn chót', colorClass: 'text-emerald-400', isAvailable: true };
             }
             const deadline = new Date(activity.registration_deadline);
             const diffMs = deadline.getTime() - now.getTime();
@@ -11736,7 +11696,7 @@
 
           function renderTimelineClockSvg(status) {
             if (status === 'urgent') {
-              return `<img src="/static/image/activitie_storage/reg-urgent.svg" alt="Còn <24h" class="w-[18px] h-[18px] shrink-0 object-contain pulse-urgent drop-shadow-sm pointer-events-none select-none" />`;
+              return `<img src="/static/image/activitie_storage/reg-urgent.svg" alt="Sắp hết hạn" class="w-[18px] h-[18px] shrink-0 object-contain pulse-urgent drop-shadow-sm pointer-events-none select-none" />`;
             }
             if (status === 'available') {
               return `<img src="/static/image/activitie_storage/reg-available.svg" alt="Còn hạn" class="w-[18px] h-[18px] shrink-0 object-contain drop-shadow-sm pointer-events-none select-none" />`;
@@ -11744,15 +11704,16 @@
             return `<img src="/static/image/activitie_storage/reg-expired.svg" alt="Hết hạn" class="w-[18px] h-[18px] shrink-0 object-contain opacity-85 drop-shadow-sm pointer-events-none select-none" />`;
           }
 
-          function getTimeline5Dates() {
+          function getTimeline7Dates() {
             const dates = [];
-            for (let offset = -2; offset <= 2; offset++) {
+            for (let offset = -3; offset <= 3; offset++) {
               const d = new Date(timelineState.focusDate);
               d.setDate(timelineState.focusDate.getDate() + offset);
               dates.push(d);
             }
             return dates;
           }
+          const getTimeline5Dates = getTimeline7Dates;
 
           function filterTimelineActs() {
             const unscheduled = [];
@@ -11826,27 +11787,27 @@
 
             renderTimelineUnscheduled(unscheduled);
 
-            const fiveDays = getTimeline5Dates();
+            const sevenDays = getTimeline7Dates();
             const systemTodayIso = formatTimelineDateIso(TIMELINE_SIMULATED_TODAY);
-            const datesIsoList = fiveDays.map(d => formatTimelineDateIso(d));
+            const datesIsoList = sevenDays.map(d => formatTimelineDateIso(d));
             const windowStart = datesIsoList[0];
-            const windowEnd = datesIsoList[4];
+            const windowEnd = datesIsoList[6];
 
             const focusLabel = document.getElementById('timelineActiveFocusLabel');
             if (focusLabel) {
               focusLabel.innerText = `Đang xem: ${TIMELINE_DAY_NAMES[timelineState.focusDate.getDay()]}, ${formatTimelineShortDate(timelineState.focusDate)}/2026`;
             }
 
-            // 1. Render 5 date cards
-            cardsContainer.innerHTML = fiveDays.map((d, idx) => {
+            // 1. Render 7 date cards
+            cardsContainer.innerHTML = sevenDays.map((d, idx) => {
               const dIso = formatTimelineDateIso(d);
-              const isCenter = idx === 2;
+              const isCenter = idx === 3;
               const isToday = dIso === systemTodayIso;
               const dow = TIMELINE_DAY_NAMES[d.getDay()];
               const dm = formatTimelineShortDate(d);
 
               let cardClass = 'date-column-card p-2.5 flex flex-col items-center justify-center border-r border-[#1b2537] relative transition-all ';
-              if (idx === 4) cardClass += 'border-r-0 ';
+              if (idx === 6) cardClass += 'border-r-0 ';
 
               if (isCenter) {
                 cardClass += 'center-focus-card bg-[#162032] text-white shadow-inner ';
@@ -11874,21 +11835,21 @@
                 if (act._startDateIso in datesMap) {
                   colStart = datesMap[act._startDateIso] + 1;
                 } else if (act._startDateIso > windowStart) {
-                  colStart = 5;
+                  colStart = 7;
                 } else {
                   colStart = 1;
                 }
 
-                let colEnd = 6;
+                let colEnd = 8;
                 if (act._endDateIso in datesMap) {
                   colEnd = datesMap[act._endDateIso] + 2;
                 } else if (act._endDateIso < windowEnd) {
                   colEnd = 2;
                 } else {
-                  colEnd = 6;
+                  colEnd = 8;
                 }
 
-                colEnd = Math.max(colStart + 1, Math.min(6, colEnd));
+                colEnd = Math.max(colStart + 1, Math.min(8, colEnd));
                 act._colStart = colStart;
                 act._colEnd = colEnd;
                 act._span = colEnd - colStart;
@@ -11900,9 +11861,9 @@
 
             if (visibleActs.length === 0) {
               gridEl.innerHTML = `
-          <div class="col-span-5 h-44 flex flex-col items-center justify-center text-center p-4 text-slate-500 italic text-xs space-y-1">
+          <div class="col-span-7 h-44 flex flex-col items-center justify-center text-center p-4 text-slate-500 italic text-xs space-y-1">
             <span class="text-2xl">🔍</span>
-            <span class="font-semibold text-slate-400">Không có hoạt động nào trong 5 ngày này</span>
+            <span class="font-semibold text-slate-400">Không có hoạt động nào trong 7 ngày này</span>
             <span class="text-[11px] text-slate-600">Lăn chuột trên thanh ngày hoặc bấm Chọn ngày để xem các mốc khác</span>
           </div>
         `;
@@ -12028,14 +11989,19 @@
         `;
             }
 
+            const binding = act.score_binding || null;
+            const ptsVal = binding
+              ? `Quy tắc ${binding.rule_id}: +${binding.points_from_rules ?? '?'}đ (ước tính)`
+              : (act.points != null ? `Thông báo: +${act.points}đ` : (act.warnings ? 'Không tính vào mục tiêu điểm' : 'Chưa công bố điểm'));
+
             const fields = [
               ['Bắt đầu', act.start ? formatTimelineVietnameseDate(act.start) : 'Chưa có ngày cụ thể'],
               ['Kết thúc', act.end ? formatTimelineVietnameseDate(act.end) : (act.start ? formatTimelineVietnameseDate(act.start) + ' (Ước tính trong ngày)' : 'Chưa xác định')],
-              ['Hạn đăng ký', act.registration_deadline ? `${formatTimelineVietnameseDate(act.registration_deadline)} (${reg.label})` : 'Không giới hạn'],
+              ['Hạn đăng ký', act.registration_deadline ? `${formatTimelineVietnameseDate(act.registration_deadline)} (${reg.label})` : (reg.status === 'expired' ? 'Không giới hạn (Hoạt động đã kết thúc)' : (reg.status === 'urgent' ? `Không giới hạn (${reg.label})` : 'Không giới hạn hạn chót'))],
               ['Địa điểm', act.location || (act.mode === 'online' ? 'Trực tuyến' : '—')],
               ['Đơn vị tổ chức', act.source?.publisher || '—'],
               ['Đối tượng tham gia', (act.audience && act.audience.length > 0) ? act.audience.join(', ') : 'Sinh viên toàn trường'],
-              ['Điểm ĐRL dự kiến', act.points != null ? `+${act.points} điểm` : 'Chưa công bố điểm'],
+              ['Điểm ĐRL dự kiến', ptsVal],
               ['Điều kiện hoàn thành', act.completion_requirements || 'Tham gia đầy đủ hoạt động'],
             ];
 
@@ -12187,7 +12153,7 @@
                 timelineState.modeFilter = 'all';
                 timelineState.activeOnly = false;
                 timelineState.searchQuery = '';
-                timelineState.focusDate = new Date('2026-10-28T00:00:00+07:00');
+                timelineState.focusDate = new Date(TIMELINE_SIMULATED_TODAY);
                 renderTimelineView();
               };
             }
@@ -12215,7 +12181,8 @@
         const draftCount = catData?.unstructured_new_posts ?? newPostDrafts.length;
 
         document.getElementById("validCountBadge").innerHTML = `<span>${actCount} hoạt động</span> <span class="dev-only font-mono text-[11px] opacity-80">(Catalog)</span>`;
-        document.getElementById("sidebarActCount").innerText = actCount;
+        const sidebarActCount = document.getElementById("sidebarActCount");
+        if (sidebarActCount) sidebarActCount.innerText = actCount;
         const draftBadge = document.getElementById("sp3DraftCountBadge");
         if (draftBadge) draftBadge.innerHTML = `<span>${draftCount} bài nguồn</span> <span class="dev-only font-mono text-[11px] opacity-80">(REVIEW_REQUIRED)</span>`;
         const draftsTabBadge = document.getElementById("sp3DraftsTabBadge");
@@ -12279,7 +12246,13 @@
               `;
             }).join("");
         renderRecommendedActivities(validList);
-        syncTimelineActivities(validList.map(row => row.activity || row));
+        syncTimelineActivities(validList.map(row => {
+          const act = row.activity ? { ...row.activity } : { ...row };
+          if (row.score_binding) act.score_binding = row.score_binding;
+          if (row.warnings) act.warnings = row.warnings;
+          if (row.publication_status) act.publication_status = row.publication_status;
+          return act;
+        }));
 
         const draftsEl = document.getElementById("sp3NewDraftsList");
         if (draftsEl) {
