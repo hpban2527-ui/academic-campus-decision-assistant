@@ -122,6 +122,71 @@
     #workspaceApp.light-theme [class~="text-slate-500"] {
       color: #64748b !important;
     }
+    #workspaceApp.light-theme [class~="text-slate-600"] {
+      color: #475569 !important;
+    }
+    #workspaceApp.light-theme [class~="text-slate-700"],
+    #workspaceApp.light-theme [class~="text-slate-800"],
+    #workspaceApp.light-theme [class~="text-slate-900"] {
+      color: #334155 !important;
+    }
+    #workspaceApp.light-theme [class~="text-indigo-100"],
+    #workspaceApp.light-theme [class~="text-indigo-200"] {
+      color: #3730a3 !important;
+    }
+    #workspaceApp.light-theme [class~="text-indigo-300"],
+    #workspaceApp.light-theme [class~="text-indigo-400"] {
+      color: #4f46e5 !important;
+    }
+    #workspaceApp.light-theme [class~="text-blue-100"],
+    #workspaceApp.light-theme [class~="text-blue-200"] {
+      color: #1e40af !important;
+    }
+    #workspaceApp.light-theme [class~="text-blue-300"],
+    #workspaceApp.light-theme [class~="text-blue-400"],
+    #workspaceApp.light-theme [class~="text-cyan-300"],
+    #workspaceApp.light-theme [class~="text-cyan-400"],
+    #workspaceApp.light-theme [class~="text-sky-300"],
+    #workspaceApp.light-theme [class~="text-sky-400"] {
+      color: #0369a1 !important;
+    }
+    #workspaceApp.light-theme [class~="text-emerald-200"],
+    #workspaceApp.light-theme [class~="text-emerald-300"],
+    #workspaceApp.light-theme [class~="text-green-300"],
+    #workspaceApp.light-theme [class~="text-teal-300"] {
+      color: #047857 !important;
+    }
+    #workspaceApp.light-theme [class~="text-amber-200"],
+    #workspaceApp.light-theme [class~="text-amber-300"],
+    #workspaceApp.light-theme [class~="text-yellow-300"] {
+      color: #b45309 !important;
+    }
+    #workspaceApp.light-theme [class~="text-rose-300"],
+    #workspaceApp.light-theme [class~="text-rose-400"],
+    #workspaceApp.light-theme [class~="text-red-300"],
+    #workspaceApp.light-theme [class~="text-red-400"] {
+      color: #be123c !important;
+    }
+    #workspaceApp.light-theme [class~="text-purple-300"],
+    #workspaceApp.light-theme [class~="text-purple-400"],
+    #workspaceApp.light-theme [class~="text-violet-300"],
+    #workspaceApp.light-theme [class~="text-violet-400"] {
+      color: #6d28d9 !important;
+    }
+    /* The overview hero intentionally remains dark in light mode. Keep its
+       text readable instead of applying the white-surface color overrides. */
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-white"] {
+      color: #fff !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-slate-300"] {
+      color: #cbd5e1 !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-emerald-200"] {
+      color: #a7f3d0 !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-blue-100"] {
+      color: #dbeafe !important;
+    }
     #workspaceApp.light-theme [class*="bg-indigo-"][class~="text-white"],
     #workspaceApp.light-theme [class*="bg-emerald-"][class~="text-white"],
     #workspaceApp.light-theme [class*="bg-rose-"][class~="text-white"] {
@@ -832,39 +897,6 @@
         <!-- WORKSPACE 1: TÍNH ĐIỂM HOẠT ĐỘNG (LAYOUT CÂN ĐỐI, TO RÕ, ĐẸP MẮT)  -->
         <!-- ================================================================== -->
         <div id="viewDashboard" class="space-y-8">
-          <!-- REVIEW-DASH START -->
-            <section id="confirmedPlanDashboard" aria-labelledby="cpdTitle" class="space-y-4">
-              <div class="flex flex-wrap items-end justify-between gap-3">
-                <div>
-                  <p class="text-[11px] font-bold uppercase tracking-[.22em] text-emerald-300">KẾ HOẠCH ĐÃ CHỐT</p>
-                  <h2 id="cpdTitle" class="mt-1 text-lg sm:text-xl font-extrabold text-white">Lịch hoạt động của bạn</h2>
-                  <p id="cpdToday" class="mt-1 text-xs text-slate-400"></p>
-                </div>
-                <div id="cpdViewToggle" class="hidden inline-flex rounded-xl border border-[#2b3a54] bg-[#080d18] p-1" role="group" aria-label="Chế độ xem lịch">
-                  <button type="button" data-cpd-view="today" onclick="setConfirmedPlanView('today')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white">Hôm nay</button>
-                  <button type="button" data-cpd-view="week" onclick="setConfirmedPlanView('week')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300">Tuần</button>
-                  <button type="button" data-cpd-view="month" onclick="setConfirmedPlanView('month')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300">Tháng</button>
-                </div>
-              </div>
-              <div id="cpdBannerPending" class="hidden flex flex-col gap-2 rounded-xl border border-sky-500/40 bg-sky-950/30 p-3.5 text-sm text-sky-100 sm:flex-row sm:items-center sm:justify-between">
-                <span><b>Có kế hoạch mới chưa chốt.</b> Bạn vừa lập lại kế hoạch; lịch bên dưới vẫn là kế hoạch bạn đã chốt trước đó.</span>
-                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-500">Đến Lập lịch</button>
-              </div>
-              <div id="cpdBannerInvalid" class="hidden flex flex-col gap-2 rounded-xl border border-amber-500/40 bg-amber-950/30 p-3.5 text-sm text-amber-100 sm:flex-row sm:items-center sm:justify-between">
-                <span><b>Kế hoạch bị ảnh hưởng.</b> <span id="cpdInvalidReason"></span> Hãy lập và chốt lại kế hoạch.</span>
-                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-500">Đến Lập lịch</button>
-              </div>
-              <div id="cpdEmpty" class="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-[#2b3a54] bg-[#0e1524] p-5 sm:flex-row sm:items-center sm:justify-between">
-                <p class="text-sm text-slate-300">Bạn chưa chốt kế hoạch nào; hãy lập lịch và bấm “Xác nhận kế hoạch” để xem lịch tại đây.</p>
-                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-indigo-500">Đến Lập lịch</button>
-              </div>
-              <div id="cpdContent" class="hidden space-y-4">
-                <div id="cpdProgress"></div>
-                <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 sm:p-5"><div id="cpdCalendar"></div></div>
-                <div id="cpdDetail" class="hidden"></div>
-              </div>
-            </section>
-            <!-- REVIEW-DASH END -->
           <section id="workspaceOverview" class="space-y-6">
             <div class="relative overflow-hidden rounded-3xl border border-blue-400/20 bg-gradient-to-br from-[#101d3c] via-[#0b1429] to-[#101d3a] px-6 py-7 sm:px-8 sm:py-9 shadow-xl shadow-blue-950/20">
               <div class="absolute -right-10 -top-20 h-64 w-64 rounded-full border border-blue-300/10 bg-blue-500/5 shadow-[0_0_90px_rgba(37,99,235,0.12)]"></div>
@@ -953,6 +985,40 @@
                 </button>
               </div>
             </section>
+
+            <!-- REVIEW-DASH START -->
+            <section id="confirmedPlanDashboard" aria-labelledby="cpdTitle" class="space-y-4">
+              <div class="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-[.22em] text-emerald-300">KẾ HOẠCH ĐÃ CHỐT</p>
+                  <h2 id="cpdTitle" class="mt-1 text-lg sm:text-xl font-extrabold text-white">Lịch hoạt động của bạn</h2>
+                  <p id="cpdToday" class="mt-1 text-xs text-slate-400"></p>
+                </div>
+                <div id="cpdViewToggle" class="hidden inline-flex rounded-xl border border-[#2b3a54] bg-[#080d18] p-1" role="group" aria-label="Chế độ xem lịch">
+                  <button type="button" data-cpd-view="today" onclick="setConfirmedPlanView('today')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white">Hôm nay</button>
+                  <button type="button" data-cpd-view="week" onclick="setConfirmedPlanView('week')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300">Tuần</button>
+                  <button type="button" data-cpd-view="month" onclick="setConfirmedPlanView('month')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-300">Tháng</button>
+                </div>
+              </div>
+              <div id="cpdBannerPending" class="hidden flex flex-col gap-2 rounded-xl border border-sky-500/40 bg-sky-950/30 p-3.5 text-sm text-sky-100 sm:flex-row sm:items-center sm:justify-between">
+                <span><b>Có kế hoạch mới chưa chốt.</b> Bạn vừa lập lại kế hoạch; lịch bên dưới vẫn là kế hoạch bạn đã chốt trước đó.</span>
+                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-500">Đến Lập lịch</button>
+              </div>
+              <div id="cpdBannerInvalid" class="hidden flex flex-col gap-2 rounded-xl border border-amber-500/40 bg-amber-950/30 p-3.5 text-sm text-amber-100 sm:flex-row sm:items-center sm:justify-between">
+                <span><b>Kế hoạch bị ảnh hưởng.</b> <span id="cpdInvalidReason"></span> Hãy lập và chốt lại kế hoạch.</span>
+                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-lg bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-500">Đến Lập lịch</button>
+              </div>
+              <div id="cpdEmpty" class="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-[#2b3a54] bg-[#0e1524] p-5 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-sm text-slate-300">Bạn chưa chốt kế hoạch nào; hãy lập lịch và bấm “Xác nhận kế hoạch” để xem lịch tại đây.</p>
+                <button type="button" onclick="switchTab('plan')" class="shrink-0 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-indigo-500">Đến Lập lịch</button>
+              </div>
+              <div id="cpdContent" class="hidden space-y-4">
+                <div id="cpdProgress"></div>
+                <div class="rounded-2xl border border-[#1b2537] bg-[#0e1524] p-4 sm:p-5"><div id="cpdCalendar"></div></div>
+                <div id="cpdDetail" class="hidden"></div>
+              </div>
+            </section>
+            <!-- REVIEW-DASH END -->
 
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
               <section aria-labelledby="semesterProgressTitle" class="xl:col-span-5 rounded-2xl border border-[#1b2537] bg-[#0e1524] p-5 sm:p-6">
