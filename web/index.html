@@ -124,6 +124,16 @@
       --lt-primary-border: #C7D2FE;
       --lt-primary-text: #3730A3;
 
+      --lt-cyan: #0891B2;
+      --lt-cyan-soft: #ECFEFF;
+      --lt-cyan-border: #A5F3FC;
+      --lt-cyan-text: #0E7490;
+
+      --lt-teal: #0D9488;
+      --lt-teal-soft: #F0FDFA;
+      --lt-teal-border: #99F6E4;
+      --lt-teal-text: #115E59;
+
       --lt-info-soft: #F0F9FF;
       --lt-info-border: #BAE6FD;
       --lt-info-text: #0369A1;
@@ -147,9 +157,20 @@
       --lt-violet-border: #DDD6FE;
       --lt-violet-text: #5B21B6;
 
-      --lt-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
-      --lt-shadow-md: 0 4px 14px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --lt-radius-card: 16px;
+      --lt-radius-control: 10px;
+      --lt-radius-pill: 9999px;
+
+      --lt-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.03);
+      --lt-shadow-md: 0 6px 18px rgba(15, 23, 42, 0.07), 0 2px 4px rgba(15, 23, 42, 0.04);
       --lt-shadow-lg: 0 18px 42px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.06);
+      --lt-focus-ring: 0 0 0 3px rgba(79, 70, 229, 0.16);
+    }
+
+    /* Accessible keyboard focus rings across Light Mode controls */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(button, a, [role="tab"]):focus-visible {
+      outline: 2px solid var(--lt-primary) !important;
+      outline-offset: 2px !important;
     }
 
     /* Light scrollbars */
@@ -453,11 +474,11 @@
       color: #FFFFFF !important;
     }
 
-    /* Inline colored domain badges, gradients & month pills keep crisp white text */
+    /* Inline colored badges, gradients & month pills keep crisp white text (except semantic pastel calendar/timeline pills) */
     :is(#workspaceApp.light-theme, body.light-theme #onboardingModal, body.light-theme #activityTimelineModal) :is(
-      [style*="background-color:"][class~="text-white"],
-      [style*="background:"][class~="text-white"],
-      [class*="bg-gradient-to-"][class~="text-white"]
+      [style*="background-color:"][class~="text-white"]:not([data-event-tone]):not(.activity-pill),
+      [style*="background:"][class~="text-white"]:not([data-event-tone]):not(.activity-pill),
+      [class*="bg-gradient-to-"][class~="text-white"]:not([data-event-tone]):not(.activity-pill)
     ) {
       color: #FFFFFF !important;
     }
@@ -525,7 +546,7 @@
       background-color: var(--lt-primary-soft) !important;
       color: var(--lt-primary-text) !important;
       border-color: var(--lt-primary-border) !important;
-      box-shadow: none !important;
+      box-shadow: inset 3px 0 0 0 var(--lt-primary) !important;
     }
     #workspaceApp.light-theme .nav-btn-active svg {
       color: var(--lt-primary) !important;
@@ -548,19 +569,27 @@
     #workspaceApp.light-theme #userDropdown button:hover {
       background-color: var(--lt-surface-muted) !important;
     }
-    #workspaceApp.light-theme #btnThemeToggle:hover,
-    #workspaceApp.light-theme header button:hover:not([class~="bg-indigo-600"]) {
+    #workspaceApp.light-theme #btnThemeToggle {
+      background-color: var(--lt-primary-soft) !important;
+      border-color: var(--lt-primary-border) !important;
+      color: var(--lt-primary-text) !important;
+    }
+    #workspaceApp.light-theme #btnThemeToggle:hover {
+      background-color: var(--lt-primary-soft-strong) !important;
+    }
+    #workspaceApp.light-theme header button:hover:not([class~="bg-indigo-600"]):not(#btnThemeToggle) {
       background-color: var(--lt-surface-muted) !important;
     }
 
-    /* ---- 7. DASHBOARD HERO & OVERVIEW POLISH (Airy Light Banner instead of heavy dark block) ---- */
+    /* ---- 7. DASHBOARD HERO, KPI ACCENTS, QUICK ACTIONS, DRL TRACKER & SETTINGS ---- */
     #workspaceApp.light-theme #workspaceOverview > div.relative:first-child {
-      background: linear-gradient(135deg, #FFFFFF 0%, #F7F9FF 55%, #EEF2FF 100%) !important;
-      border-color: #DCE4F5 !important;
+      background: linear-gradient(125deg, #FFFFFF 0%, #EEF2FF 55%, #ECFEFF 100%) !important;
+      border: 1px solid #C7D2FE !important;
+      border-top: 3px solid var(--lt-primary) !important;
       box-shadow: var(--lt-shadow-sm) !important;
     }
     #workspaceApp.light-theme #workspaceOverview > div.relative:first-child > div.rounded-full {
-      border-color: rgba(79, 70, 229, 0.1) !important;
+      border-color: rgba(8, 145, 178, 0.16) !important;
       background-color: rgba(79, 70, 229, 0.04) !important;
       box-shadow: none !important;
     }
@@ -571,27 +600,398 @@
       color: var(--lt-text-secondary) !important;
     }
     #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-cyan-300"] {
-      color: var(--lt-primary) !important;
+      color: var(--lt-cyan-text) !important;
     }
     #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class*="bg-emerald-400/10"] {
-      background-color: var(--lt-success-soft) !important;
-      border-color: var(--lt-success-border) !important;
-      color: var(--lt-success-text) !important;
+      background-color: var(--lt-teal-soft) !important;
+      border-color: var(--lt-teal-border) !important;
+      color: var(--lt-teal-text) !important;
     }
     #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class*="bg-blue-300/10"] {
       background-color: var(--lt-primary-soft) !important;
       border-color: var(--lt-primary-border) !important;
       color: var(--lt-primary-text) !important;
     }
-    /* Quick action cards subtle hover lift */
-    #workspaceApp.light-theme #workspaceOverview section button.group:hover {
-      background-color: #FFFFFF !important;
-      border-color: var(--lt-primary-border) !important;
+
+    /* 4 KPI stat cards: clean white surface with curved semantic top border */
+    #workspaceApp.light-theme #workspaceOverview > div.grid > article {
+      border-radius: var(--lt-radius-card) !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.grid > article:nth-child(1) {
+      border-top: 3px solid var(--lt-primary) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.grid > article:nth-child(2) {
+      border-top: 3px solid var(--lt-teal) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.grid > article:nth-child(3) {
+      border-top: 3px solid var(--lt-cyan) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.grid > article:nth-child(4) {
+      border-top: 3px solid #D97706 !important;
+    }
+
+    /* 4 Quick-action cards: visually distinct semantic accents & purposeful icon tiles on crisp light cards */
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group {
+      border-radius: var(--lt-radius-card) !important;
+      padding: 1.125rem 1.25rem !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group > span:first-child {
+      width: 2.75rem !important;
+      height: 2.75rem !important;
+      border-radius: 12px !important;
+      border-width: 1px !important;
+      border-style: solid !important;
+      font-size: 1.25rem !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(1) {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F7F8FF 100%) !important;
+      border: 1px solid #E2E8F0 !important;
+      border-top: 3px solid var(--lt-primary) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(1) > span:first-child {
+      background-color: #EEF2FF !important;
+      border-color: #C7D2FE !important;
+      color: #4F46E5 !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(1):hover {
+      border-color: #818CF8 !important;
+      border-top-color: var(--lt-primary) !important;
       box-shadow: var(--lt-shadow-md) !important;
     }
-    /* Student Profile logo tile */
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(2) {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F2FCFE 100%) !important;
+      border: 1px solid #E2E8F0 !important;
+      border-top: 3px solid var(--lt-cyan) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(2) > span:first-child {
+      background-color: #ECFEFF !important;
+      border-color: #A5F3FC !important;
+      color: #0891B2 !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(2):hover {
+      border-color: #22D3EE !important;
+      border-top-color: var(--lt-cyan) !important;
+      box-shadow: var(--lt-shadow-md) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(3) {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F2FCF9 100%) !important;
+      border: 1px solid #E2E8F0 !important;
+      border-top: 3px solid var(--lt-teal) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(3) > span:first-child {
+      background-color: #ECFDF5 !important;
+      border-color: #99F6E4 !important;
+      color: #0D9488 !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(3):hover {
+      border-color: #2DD4BF !important;
+      border-top-color: var(--lt-teal) !important;
+      box-shadow: var(--lt-shadow-md) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(4) {
+      background: linear-gradient(180deg, #FFFFFF 0%, #FFFDF5 100%) !important;
+      border: 1px solid #E2E8F0 !important;
+      border-top: 3px solid #D97706 !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(4) > span:first-child {
+      background-color: #FFFBEB !important;
+      border-color: #FDE68A !important;
+      color: #B45309 !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview section[aria-labelledby="quickActionsTitle"] button.group:nth-child(4):hover {
+      border-color: #FBBF24 !important;
+      border-top-color: #D97706 !important;
+      box-shadow: var(--lt-shadow-md) !important;
+    }
+
+    /* Semester progress section & Confirmed plan view toggle */
+    #workspaceApp.light-theme section[aria-labelledby="semesterProgressTitle"] {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F7FCFD 100%) !important;
+      border-top: 3px solid var(--lt-cyan) !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    #workspaceApp.light-theme #overviewSemesterBar {
+      background: linear-gradient(90deg, var(--lt-primary) 0%, #06B6D4 100%) !important;
+    }
+    #workspaceApp.light-theme #cpdViewToggle {
+      background-color: var(--lt-surface-muted) !important;
+      border-color: var(--lt-border) !important;
+    }
+    #workspaceApp.light-theme #cpdViewToggle button[class~="bg-emerald-600"] {
+      background-color: var(--lt-teal) !important;
+      border-color: var(--lt-teal) !important;
+    }
+
+    /* Standardized Segmented Tab Bars across Light Mode */
+    #workspaceApp.light-theme [role="tablist"][class*="bg-[#080d18]"],
+    #workspaceApp.light-theme .inline-flex[class*="bg-[#080d18]"] {
+      background-color: var(--lt-surface-muted) !important;
+      border-color: var(--lt-border) !important;
+      border-radius: 12px !important;
+      padding: 4px !important;
+    }
+    #workspaceApp.light-theme #btnInputModePaste[aria-selected="true"],
+    #workspaceApp.light-theme #btnInputModeManual[aria-selected="true"] {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-primary-border) !important;
+      color: var(--lt-primary-text) !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    #workspaceApp.light-theme #btnInputModePaste[aria-selected="false"],
+    #workspaceApp.light-theme #btnInputModeManual[aria-selected="false"] {
+      background-color: transparent !important;
+      border-color: transparent !important;
+      color: var(--lt-text-secondary) !important;
+    }
+    #workspaceApp.light-theme #btnInputModePaste[aria-selected="false"]:hover,
+    #workspaceApp.light-theme #btnInputModeManual[aria-selected="false"]:hover {
+      background-color: rgba(255, 255, 255, 0.65) !important;
+      color: var(--lt-text-primary) !important;
+    }
+
+    /* ---- 7B. DRL TRACKER (#viewCalculator & #drlScorePanel): Clean Hierarchy, Zero Nested Box Clutter ---- */
+    #workspaceApp.light-theme #activityScoringSection button[onclick="resetForm()"],
+    #workspaceApp.light-theme #btnRunPipeline {
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+    }
+    #workspaceApp.light-theme #btnRunPipeline {
+      padding: 0.625rem 1.25rem !important;
+      font-size: 0.9375rem !important;
+      border-radius: var(--lt-radius-control) !important;
+    }
+    #workspaceApp.light-theme #activityScoringSection button[onclick="resetForm()"] {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-border-strong) !important;
+      color: var(--lt-text-body) !important;
+      border-radius: var(--lt-radius-control) !important;
+    }
+    #workspaceApp.light-theme #resDecisionBadge,
+    #workspaceApp.light-theme #overallGradeBadge,
+    #workspaceApp.light-theme #profileScheduleSaveStatus {
+      white-space: nowrap !important;
+      font-size: 11px !important;
+    }
+    #workspaceApp.light-theme #drlScorePanel > div:first-child {
+      flex-wrap: nowrap !important;
+      padding-bottom: 0.875rem !important;
+    }
+    #workspaceApp.light-theme #drlScorePanel > div:first-child h2 {
+      font-size: 1.0625rem !important;
+    }
+    /* Balanced vertical donut + wide summary bar composition (prevents cramped 4-line CTA wrapping) */
+    #workspaceApp.light-theme #drlScorePanel > div.flex.flex-col {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 1rem !important;
+      padding-top: 0.25rem !important;
+      padding-bottom: 0.25rem !important;
+    }
+    #workspaceApp.light-theme #drlScorePanel > div.flex.flex-col > div:first-child {
+      margin-left: auto !important;
+      margin-right: auto !important;
+      width: 10.75rem !important;
+      height: 10.75rem !important;
+    }
+    #workspaceApp.light-theme #drlDonutSvg {
+      width: 10.75rem !important;
+      height: 10.75rem !important;
+    }
+    #workspaceApp.light-theme #drlScorePanel > div.flex.flex-col > div:last-child {
+      width: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.75rem !important;
+    }
+    #workspaceApp.light-theme #drlScorePanel > div.flex.flex-col > div:last-child > div:first-child {
+      background: linear-gradient(135deg, #F8FAFF 0%, #F0FDFA 100%) !important;
+      border: 1px solid #DBEAFE !important;
+      border-radius: 12px !important;
+      padding: 0.875rem 1rem !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 0.625rem !important;
+    }
+    #workspaceApp.light-theme #totalProjectedSubtext {
+      color: var(--lt-text-primary) !important;
+      font-size: 0.9375rem !important;
+    }
+    #workspaceApp.light-theme #drlScorePanel > div.flex.flex-col > div:last-child > div:first-child button {
+      padding: 0.375rem 0.75rem !important;
+      border-radius: var(--lt-radius-pill) !important;
+      background-color: #FFFFFF !important;
+      border: 1px solid var(--lt-primary-border) !important;
+      color: var(--lt-primary-text) !important;
+      white-space: nowrap !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    #workspaceApp.light-theme #drlScorePanel > div.flex.flex-col > div:last-child > div:first-child button:hover {
+      background-color: var(--lt-primary-soft) !important;
+      border-color: var(--lt-primary) !important;
+    }
+    #workspaceApp.light-theme #drlScorePanel > div.flex.flex-col > div:last-child > div:last-child {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 1.25rem !important;
+      padding: 0 !important;
+    }
+    #workspaceApp.light-theme #drlScorePanel > div.flex.flex-col > div:last-child > div:last-child > div {
+      margin-top: 0 !important;
+    }
+    /* Flatten 5 nested category boxes into clean hairline-divided progress rows */
+    #workspaceApp.light-theme #categoryBarsContainer {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0 !important;
+    }
+    #workspaceApp.light-theme #categoryBarsContainer > div {
+      margin-top: 0 !important;
+    }
+    #workspaceApp.light-theme #categoryBarsContainer > div:not([class*="bg-indigo-950"]) {
+      background-color: transparent !important;
+      border: 0 !important;
+      border-bottom: 1px solid #F1F5F9 !important;
+      border-radius: 0 !important;
+      padding: 0.875rem 0.125rem !important;
+      box-shadow: none !important;
+    }
+    #workspaceApp.light-theme #categoryBarsContainer > div:not([class*="bg-indigo-950"]):hover {
+      background-color: #FAFBFD !important;
+    }
+    #workspaceApp.light-theme #categoryBarsContainer > div:last-child:not([class*="bg-indigo-950"]) {
+      border-bottom: 0 !important;
+      padding-bottom: 0.25rem !important;
+    }
+    #workspaceApp.light-theme #categoryBarsContainer > div[class*="bg-indigo-950"] {
+      background-color: var(--lt-primary-soft) !important;
+      border: 1px solid var(--lt-primary-border) !important;
+      border-radius: 12px !important;
+      padding: 0.875rem !important;
+      margin: 0.25rem 0 !important;
+      box-shadow: none !important;
+    }
+    #workspaceApp.light-theme #categoryBarsContainer span.font-mono {
+      background-color: #F1F5F9 !important;
+      border-color: #E2E8F0 !important;
+      color: var(--lt-text-secondary) !important;
+      font-size: 11px !important;
+    }
+    #workspaceApp.light-theme #categoryBarsContainer .rounded-full.overflow-hidden {
+      height: 8px !important;
+      background-color: #EEF2F6 !important;
+    }
+
+    /* ---- 7C. SETTINGS (#viewPlan / #profileSchedulePanelProfile): Grouped White Cards & Crisp Badges ---- */
+    #workspaceApp.light-theme #planDisclosure {
+      background-color: var(--lt-info-soft) !important;
+      border-color: var(--lt-info-border) !important;
+      color: var(--lt-info-text) !important;
+    }
+    #workspaceApp.light-theme #planDisclosure b {
+      color: var(--lt-text-primary) !important;
+    }
+    #workspaceApp.light-theme #profileSchedulePanelProfile {
+      background-color: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody > div.grid {
+      gap: 1.25rem !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody > div.grid > div {
+      background-color: #FFFFFF !important;
+      border: 1px solid var(--lt-border) !important;
+      border-radius: var(--lt-radius-card) !important;
+      padding: 1.375rem 1.5rem !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody > div.grid > div h3 {
+      font-size: 0.9375rem !important;
+      letter-spacing: -0.01em !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody :is(input:not([type="checkbox"]), select) {
+      font-size: 0.8125rem !important;
+      padding: 0.5625rem 0.75rem !important;
+      border-radius: var(--lt-radius-control) !important;
+    }
+    /* Option cards: stacked title + single-line readable badge (>= 11px), crisp selected vs unselected */
+    #workspaceApp.light-theme #profileScheduleProfileBody button:not(#btnSaveProfileSchedule):not([aria-pressed]):not([class*="bg-indigo-500/20"]):not([class*="bg-indigo-500/25"]) {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-border) !important;
+      color: var(--lt-text-body) !important;
+      border-radius: 12px !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody button:not(#btnSaveProfileSchedule):not([aria-pressed]):not([class*="bg-indigo-500/20"]):not([class*="bg-indigo-500/25"]):hover {
+      background-color: #F8FAFC !important;
+      border-color: var(--lt-border-strong) !important;
+      color: var(--lt-text-primary) !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody button:has(span[class*="text-[9px]"]) {
+      padding: 0.75rem 0.875rem !important;
+      border-radius: 12px !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody button:has(span[class*="text-[9px]"]) > div {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 0.45rem !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody button span[class*="text-[9px]"] {
+      font-size: 11px !important;
+      line-height: 1.25 !important;
+      padding: 2px 9px !important;
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody button:is([class*="bg-indigo-500/20"], [class*="bg-indigo-500/25"]) {
+      background-color: var(--lt-primary-soft) !important;
+      border-color: var(--lt-primary) !important;
+      border-radius: 12px !important;
+      color: #1E1B4B !important;
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.24), 0 2px 6px rgba(79, 70, 229, 0.08) !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody > div.grid > div:nth-child(4) > div.flex-wrap {
+      max-height: none !important;
+      overflow-y: visible !important;
+      gap: 0.5rem !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody button[aria-pressed] {
+      font-size: 12px !important;
+      padding: 0.3125rem 0.75rem !important;
+      border-radius: var(--lt-radius-pill) !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody button[aria-pressed="false"] {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-border) !important;
+      color: var(--lt-text-body) !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody button[aria-pressed="false"]:hover {
+      background-color: #F8FAFC !important;
+      border-color: var(--lt-primary-border) !important;
+      color: var(--lt-primary-text) !important;
+    }
+    #workspaceApp.light-theme #profileScheduleProfileBody button[aria-pressed="true"] {
+      background-color: var(--lt-primary-soft) !important;
+      border-color: var(--lt-primary) !important;
+      color: var(--lt-primary-text) !important;
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.18) !important;
+    }
+    #workspaceApp.light-theme #btnSaveProfileSchedule {
+      padding: 0.6875rem 1.5rem !important;
+      font-size: 0.8125rem !important;
+      border-radius: var(--lt-radius-control) !important;
+    }
+
+    /* Student Profile logo tile & goal progress card */
     #workspaceApp.light-theme #profileAvatarDisplay {
-      background: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%) !important;
+      background: linear-gradient(135deg, #4F46E5 0%, #0891B2 100%) !important;
       border-color: var(--lt-primary-border) !important;
       box-shadow: var(--lt-shadow-md) !important;
     }
@@ -599,10 +999,13 @@
       color: #FFFFFF !important;
     }
     #workspaceApp.light-theme #profileAvatarDisplay .text-cyan-300 {
-      color: #A5F3FC !important;
+      color: #CFFAFE !important;
+    }
+    #workspaceApp.light-theme #profileGoalBar {
+      background: linear-gradient(90deg, var(--lt-primary) 0%, var(--lt-cyan) 100%) !important;
     }
 
-    /* ---- 8. CALENDARS (Notion Calendar inspired: clean white/off-white grid, subtle hourly rules) ---- */
+    /* ---- 8. CALENDARS (Notion Calendar inspired: clean white/off-white grid, cohesive event categories) ---- */
     /* Planner & Dashboard Week Calendar */
     #workspaceApp.light-theme .plan-calendar-day {
       background-color: #FFFFFF !important;
@@ -612,15 +1015,15 @@
       background-color: #F8FAFC !important;
       background-image:
         repeating-linear-gradient(to bottom, transparent 0, transparent 47px, #E2E8F0 48px),
-        repeating-linear-gradient(135deg, rgba(148, 163, 184, 0.07) 0, rgba(148, 163, 184, 0.07) 6px, transparent 6px, transparent 14px) !important;
+        repeating-linear-gradient(135deg, rgba(148, 163, 184, 0.06) 0, rgba(148, 163, 184, 0.06) 6px, transparent 6px, transparent 14px) !important;
     }
-    /* Open (free) slots in Planner Calendar */
+    /* Open (free) slots in Planner Calendar: clean teal-mint availability */
     #workspaceApp.light-theme #planCalendarGrid [aria-label="Khung giờ rảnh"] {
-      background-color: rgba(16, 185, 129, 0.09) !important;
-      border-color: rgba(16, 185, 129, 0.32) !important;
+      background-color: rgba(13, 148, 136, 0.08) !important;
+      border-color: rgba(13, 148, 136, 0.28) !important;
     }
     #workspaceApp.light-theme #planCalendarGrid [aria-label="Khung giờ rảnh"]:hover {
-      background-color: rgba(16, 185, 129, 0.16) !important;
+      background-color: rgba(13, 148, 136, 0.15) !important;
     }
     /* Busy slots in Planner Calendar */
     #workspaceApp.light-theme #planCalendarGrid [aria-label="Khung giờ bận"] {
@@ -632,23 +1035,57 @@
     }
     /* Busy overlay in Confirmed Plan Dashboard Week Calendar */
     #workspaceApp.light-theme .cpd-busy-block {
-      background: repeating-linear-gradient(135deg, rgba(148, 163, 184, 0.22) 0 5px, rgba(241, 245, 249, 0.75) 5px 10px) !important;
+      background: repeating-linear-gradient(135deg, rgba(148, 163, 184, 0.22) 0 5px, rgba(241, 245, 249, 0.78) 5px 10px) !important;
     }
-    /* Planned Event Blocks (crisp colored cards with guaranteed readable white text) */
+    /* Planned Event Blocks: cohesive UniLife Light Mode Notion Calendar tones (Indigo, Teal, Cyan, Amber, Rose) */
     #workspaceApp.light-theme .plan-calendar-event {
-      border-color: rgba(15, 23, 42, 0.08) !important;
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
-      color: #FFFFFF !important;
+      border: 1px solid rgba(15, 23, 42, 0.1) !important;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
     }
-    #workspaceApp.light-theme .plan-calendar-event * {
-      color: #FFFFFF !important;
+    #workspaceApp.light-theme .plan-calendar-event[data-event-tone="0"] {
+      background: #EEF2FF !important;
+      border-color: #C7D2FE !important;
+      border-left: 3.5px solid #4F46E5 !important;
+      color: #1E1B4B !important;
     }
-    #workspaceApp.light-theme .plan-calendar-event [class*="text-white/75"] {
-      color: rgba(255, 255, 255, 0.88) !important;
+    #workspaceApp.light-theme .plan-calendar-event[data-event-tone="1"] {
+      background: #F0FDFA !important;
+      border-color: #99F6E4 !important;
+      border-left: 3.5px solid #0D9488 !important;
+      color: #134E4A !important;
+    }
+    #workspaceApp.light-theme .plan-calendar-event[data-event-tone="2"] {
+      background: #ECFEFF !important;
+      border-color: #A5F3FC !important;
+      border-left: 3.5px solid #0891B2 !important;
+      color: #164E63 !important;
+    }
+    #workspaceApp.light-theme .plan-calendar-event[data-event-tone="3"] {
+      background: #FFFBEB !important;
+      border-color: #FDE68A !important;
+      border-left: 3.5px solid #D97706 !important;
+      color: #78350F !important;
+    }
+    #workspaceApp.light-theme .plan-calendar-event[data-event-tone="4"] {
+      background: #FFF1F2 !important;
+      border-color: #FECDD3 !important;
+      border-left: 3.5px solid #E11D48 !important;
+      color: #881337 !important;
+    }
+    #workspaceApp.light-theme .plan-calendar-event[data-event-tone] * {
+      color: inherit !important;
+    }
+    #workspaceApp.light-theme .plan-calendar-event[data-event-tone] .plan-event-time,
+    #workspaceApp.light-theme .plan-calendar-event[data-event-tone] .plan-event-meta {
+      opacity: 0.82;
+    }
+    #workspaceApp.light-theme .plan-calendar-event:not([data-event-tone]),
+    #workspaceApp.light-theme .plan-calendar-event:not([data-event-tone]) * {
+      color: #FFFFFF !important;
     }
     #workspaceApp.light-theme .plan-calendar-event:hover {
-      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18) !important;
-      filter: brightness(1.03);
+      box-shadow: 0 5px 14px rgba(15, 23, 42, 0.14) !important;
+      filter: brightness(0.985);
     }
     #workspaceApp.light-theme .plan-calendar-event[data-compact-event="true"] {
       padding: 3px 6px !important;
@@ -678,13 +1115,13 @@
       box-shadow: var(--lt-shadow-sm) !important;
     }
     #workspaceApp.light-theme #planCalendarActivities > article:hover {
-      border-color: var(--lt-border-strong) !important;
+      border-color: var(--lt-primary-border) !important;
       box-shadow: var(--lt-shadow-md) !important;
     }
     /* Calendar legend swatches in Light Mode */
     #workspaceApp.light-theme #planCalendarLegend i.bg-emerald-900 {
-      background-color: #A7F3D0 !important;
-      border: 1px solid #10B981;
+      background-color: #99F6E4 !important;
+      border: 1px solid #0D9488;
     }
     #workspaceApp.light-theme #planCalendarLegend i.bg-slate-600 {
       background-color: #CBD5E1 !important;
@@ -710,28 +1147,28 @@
     :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) [data-busy-block][class*="bg-indigo-500/80"] {
       background-color: #EEF2FF !important;
       border-color: #C7D2FE !important;
-      border-left: 3px solid #4F46E5 !important;
-      color: #312E81 !important;
+      border-left: 3.5px solid #4F46E5 !important;
+      color: #1E1B4B !important;
       box-shadow: 0 1px 2px rgba(79, 70, 229, 0.08) !important;
     }
     :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) [data-busy-block][class*="bg-amber-500/80"] {
       background-color: #FFFBEB !important;
       border-color: #FCD34D !important;
-      border-left: 3px solid #D97706 !important;
+      border-left: 3.5px solid #D97706 !important;
       color: #78350F !important;
       box-shadow: 0 1px 2px rgba(217, 119, 6, 0.08) !important;
     }
     :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) [data-busy-block][class*="bg-rose-500/80"] {
       background-color: #FFF1F2 !important;
       border-color: #FECDD3 !important;
-      border-left: 3px solid #E11D48 !important;
+      border-left: 3.5px solid #E11D48 !important;
       color: #881337 !important;
       box-shadow: 0 1px 2px rgba(225, 29, 72, 0.08) !important;
     }
     :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) [data-busy-block="override"] {
-      background-color: #ECFDF5 !important;
-      border-color: #059669 !important;
-      color: #065F46 !important;
+      background-color: var(--lt-teal-soft) !important;
+      border-color: var(--lt-teal) !important;
+      color: var(--lt-teal-text) !important;
     }
     :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) [data-busy-block] * {
       color: inherit !important;
@@ -739,9 +1176,9 @@
 
     /* Availability picker cells (if shown) */
     #workspaceApp.light-theme .availability-cell[data-free="true"] {
-      background: #ECFDF5 !important;
-      border-color: #6EE7B7 !important;
-      color: #065F46 !important;
+      background: var(--lt-teal-soft) !important;
+      border-color: var(--lt-teal-border) !important;
+      color: var(--lt-teal-text) !important;
     }
     #workspaceApp.light-theme .availability-cell[data-free="false"] {
       background: #F1F5F9 !important;
@@ -749,16 +1186,52 @@
       color: #475569 !important;
     }
 
-    /* ---- 9. TABLES, HOVER ROWS, OPTIONS CARDS & PROGRESS BARS ---- */
+    /* ---- 9. 3 PLANNER STRATEGIES, TABLES, DISCOVERY & PROGRESS BARS ---- */
     :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) thead {
       background-color: var(--lt-surface-subtle) !important;
     }
-    :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) [data-pos-card] {
+    /* Clear visual differentiation across the 3 Planner strategy cards (Cyan / Indigo / Teal curved top border) */
+    :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) :is([data-pos-card], [data-strategy-card]) {
+      background-color: #FFFFFF !important;
+      border-radius: var(--lt-radius-card) !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) :is([data-pos-card][data-strategy="MINIMUM_EFFORT"], [data-strategy-card="MINIMUM_EFFORT"]) {
+      border-color: var(--lt-cyan-border) !important;
+      border-top: 3.5px solid var(--lt-cyan) !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) :is([data-pos-card][data-strategy="BALANCED"], [data-strategy-card="BALANCED"]) {
+      background: linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 36%) !important;
+      border-color: var(--lt-primary-border) !important;
+      border-top: 3.5px solid var(--lt-primary) !important;
+      box-shadow: var(--lt-shadow-md) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) :is([data-pos-card][data-strategy="PREFERENCE_FIRST"], [data-strategy-card="PREFERENCE_FIRST"]) {
+      border-color: var(--lt-teal-border) !important;
+      border-top: 3.5px solid var(--lt-teal) !important;
       box-shadow: var(--lt-shadow-sm) !important;
     }
     :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) [data-pos-card][class*="border-cyan-500"] {
       border-color: var(--lt-primary) !important;
-      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.18), var(--lt-shadow-md) !important;
+      border-top: 3.5px solid var(--lt-primary) !important;
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.16), var(--lt-shadow-md) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) [data-strategy-card][data-status="FAILED"] {
+      border-color: var(--lt-error-border) !important;
+      border-top: 3.5px solid var(--lt-error) !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    /* Activity Discovery: restrained amber badge on unscheduled tray & subtle header wash */
+    #workspaceApp.light-theme #timelineUnscheduledCountBadge {
+      background-color: var(--lt-warning-soft) !important;
+      border-color: var(--lt-warning-border) !important;
+      color: var(--lt-warning-text) !important;
+      font-size: 11px !important;
+      white-space: nowrap !important;
+    }
+    #workspaceApp.light-theme #timelineSectionInner > div:first-child {
+      background: linear-gradient(90deg, #F8FAFF 0%, #FFFFFF 60%) !important;
     }
     /* Progress bar tracks */
     :is(#workspaceApp.light-theme, body.light-theme #planReviewScreen) .rounded-full[class*="bg-[#080d18]"] {
@@ -1106,30 +1579,224 @@
       background-color: rgba(30, 41, 59, 0.6);
     }
 
-    /* Light Theme overrides for Activity Timeline */
-    #workspaceApp.light-theme .activity-pill,
-    #workspaceApp.light-theme .activity-pill span {
-      color: #ffffff !important;
+    /* Light Theme overrides for Activity Discovery & Timeline (soft semantic academic palette) */
+    #workspaceApp.light-theme #viewActivities > div:first-child {
+      width: fit-content !important;
+      padding: 4px !important;
+      gap: 4px !important;
+      background-color: var(--lt-surface-muted) !important;
+      border-color: var(--lt-border) !important;
+      border-radius: 12px !important;
     }
-    #workspaceApp.light-theme .activity-pill {
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
+    #workspaceApp.light-theme #activitiesTimelineSection > div:first-child {
+      padding: 0.75rem 1rem !important;
+      border-radius: var(--lt-radius-card) !important;
+      box-shadow: var(--lt-shadow-sm) !important;
     }
-    #workspaceApp.light-theme .activity-pill:hover {
-      box-shadow: 0 5px 14px rgba(15, 23, 42, 0.18) !important;
-      filter: brightness(1.04);
+    #workspaceApp.light-theme #activitiesTimelineSection > div:first-child > div:first-child {
+      gap: 0.5rem !important;
+    }
+    #workspaceApp.light-theme #activitiesTimelineSection > div:first-child > div:first-child > div:first-child {
+      min-width: 170px !important;
+      max-width: 210px !important;
+    }
+    #workspaceApp.light-theme #activitiesTimelineSection > div:first-child select,
+    #workspaceApp.light-theme #activitiesTimelineSection > div:first-child label {
+      padding-left: 0.625rem !important;
+      padding-right: 0.625rem !important;
+    }
+    #workspaceApp.light-theme #timelineBtnToday,
+    #workspaceApp.light-theme #timelineBtnOpenPicker {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-border-strong) !important;
+      color: var(--lt-text-primary) !important;
+      border-radius: var(--lt-radius-control) !important;
+    }
+    #workspaceApp.light-theme #timelineBtnToday:hover,
+    #workspaceApp.light-theme #timelineBtnOpenPicker:hover {
+      background-color: var(--lt-surface-subtle) !important;
+      border-color: var(--lt-primary-border) !important;
+    }
+    /* Balanced timeline height to reduce excessive empty space */
+    #workspaceApp.light-theme #activitiesTimelineSection > div.grid {
+      min-height: 400px !important;
+    }
+    #workspaceApp.light-theme #timelineSectionInner,
+    #workspaceApp.light-theme #activitiesTimelineSection aside {
+      min-height: 380px !important;
+    }
+    #workspaceApp.light-theme #timelineSectionInner {
+      border-radius: var(--lt-radius-card) !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    #workspaceApp.light-theme #timelineScrollBodyInner {
+      min-height: 240px !important;
+      max-height: 440px !important;
+    }
+    #workspaceApp.light-theme #timelineDateCardsContainer {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-border) !important;
+      box-shadow: none !important;
+    }
+    #workspaceApp.light-theme #timelineColumnBgGuides > div {
+      border-right-color: #EEF2F6 !important;
+    }
+    #workspaceApp.light-theme #timelineColumnBgGuides > div:nth-child(3) {
+      background-color: #F6F8FF !important;
+    }
+    #workspaceApp.light-theme .date-column-card {
+      border-right-color: var(--lt-border) !important;
     }
     #workspaceApp.light-theme .date-column-card:hover {
-      background-color: #EEF2F7 !important;
+      background-color: #F8FAFC !important;
     }
     #workspaceApp.light-theme .date-column-card.center-focus-card {
       background-color: var(--lt-primary-soft) !important;
       color: var(--lt-primary-text) !important;
+      box-shadow: inset 0 -2.5px 0 0 var(--lt-primary) !important;
     }
     #workspaceApp.light-theme .date-column-card.center-focus-card span {
       color: var(--lt-primary-text) !important;
     }
     #workspaceApp.light-theme .date-column-card.center-focus-card [class~="bg-indigo-600"] {
       color: #FFFFFF !important;
+    }
+    /* Softer semantic pastel event cards on timeline with readable 2-line titles */
+    #workspaceApp.light-theme #timelineActivityGrid {
+      gap: 0.625rem !important;
+      padding-top: 0.75rem !important;
+      padding-bottom: 0.75rem !important;
+    }
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill {
+      height: auto !important;
+      min-height: 46px !important;
+      padding: 0.5rem 0.6875rem !important;
+      border-radius: 10px !important;
+      align-items: flex-start !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill:hover {
+      box-shadow: var(--lt-shadow-md) !important;
+      filter: none !important;
+      transform: translateY(-1px);
+    }
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill,
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill * {
+      color: inherit !important;
+    }
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill > div.truncate {
+      white-space: normal !important;
+      align-items: flex-start !important;
+    }
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill span.truncate {
+      white-space: normal !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden !important;
+      line-height: 1.35 !important;
+      font-size: 12px !important;
+      font-weight: 600 !important;
+    }
+    /* Semantic domain tints for Timeline Event Pills (Academic, Skills, Volunteer, Culture, Career, Other) */
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill:is([style*="#2563eb"], [style*="rgb(37, 99, 235)"]) {
+      background-color: #EEF2FF !important;
+      border: 1px solid #C7D2FE !important;
+      border-left: 3.5px solid #4F46E5 !important;
+      color: #1E1B4B !important;
+    }
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill:is([style*="#16a34a"], [style*="rgb(22, 163, 74)"]) {
+      background-color: #ECFDF5 !important;
+      border: 1px solid #A7F3D0 !important;
+      border-left: 3.5px solid #0D9488 !important;
+      color: #065F46 !important;
+    }
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill:is([style*="#ea580c"], [style*="rgb(234, 88, 12)"]) {
+      background-color: #FFFBEB !important;
+      border: 1px solid #FDE68A !important;
+      border-left: 3.5px solid #D97706 !important;
+      color: #78350F !important;
+    }
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill:is([style*="#9333ea"], [style*="rgb(147, 51, 234)"]) {
+      background-color: #F5F3FF !important;
+      border: 1px solid #DDD6FE !important;
+      border-left: 3.5px solid #7C3AED !important;
+      color: #4C1D95 !important;
+    }
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill:is([style*="#0891b2"], [style*="rgb(8, 145, 178)"]) {
+      background-color: #ECFEFF !important;
+      border: 1px solid #A5F3FC !important;
+      border-left: 3.5px solid #0891B2 !important;
+      color: #164E63 !important;
+    }
+    #workspaceApp.light-theme #timelineActivityGrid .activity-pill:is([style*="#64748b"], [style*="rgb(100, 116, 139)"]) {
+      background-color: #F8FAFC !important;
+      border: 1px solid #CBD5E1 !important;
+      border-left: 3.5px solid #64748B !important;
+      color: #1E293B !important;
+    }
+    /* Unscheduled Tray: subtle container + crisp white event cards + soft semantic domain pills */
+    #workspaceApp.light-theme #timelineUnscheduledList {
+      background-color: var(--lt-surface-subtle) !important;
+      padding: 0.75rem !important;
+      gap: 0.625rem !important;
+    }
+    #workspaceApp.light-theme #timelineUnscheduledList > div {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-border) !important;
+      border-radius: 12px !important;
+      padding: 0.75rem 0.875rem !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    #workspaceApp.light-theme #timelineUnscheduledList > div:hover {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-primary-border) !important;
+      box-shadow: var(--lt-shadow-md) !important;
+    }
+    #workspaceApp.light-theme #timelineUnscheduledList > div span[style*="background-color:"],
+    body.light-theme #activityTimelineModal #timelineModalBadges span[style*="background-color:"] {
+      border-radius: var(--lt-radius-pill) !important;
+      padding: 2px 8px !important;
+      font-size: 11px !important;
+      border-width: 1px !important;
+      border-style: solid !important;
+      box-shadow: none !important;
+    }
+    #workspaceApp.light-theme #timelineUnscheduledList > div span:is([style*="#2563eb"], [style*="rgb(37, 99, 235)"]),
+    body.light-theme #activityTimelineModal #timelineModalBadges span:is([style*="#2563eb"], [style*="rgb(37, 99, 235)"]) {
+      background-color: #EEF2FF !important;
+      border-color: #C7D2FE !important;
+      color: #3730A3 !important;
+    }
+    #workspaceApp.light-theme #timelineUnscheduledList > div span:is([style*="#16a34a"], [style*="rgb(22, 163, 74)"]),
+    body.light-theme #activityTimelineModal #timelineModalBadges span:is([style*="#16a34a"], [style*="rgb(22, 163, 74)"]) {
+      background-color: #ECFDF5 !important;
+      border-color: #A7F3D0 !important;
+      color: #065F46 !important;
+    }
+    #workspaceApp.light-theme #timelineUnscheduledList > div span:is([style*="#ea580c"], [style*="rgb(234, 88, 12)"]),
+    body.light-theme #activityTimelineModal #timelineModalBadges span:is([style*="#ea580c"], [style*="rgb(234, 88, 12)"]) {
+      background-color: #FFFBEB !important;
+      border-color: #FDE68A !important;
+      color: #92400E !important;
+    }
+    #workspaceApp.light-theme #timelineUnscheduledList > div span:is([style*="#9333ea"], [style*="rgb(147, 51, 234)"]),
+    body.light-theme #activityTimelineModal #timelineModalBadges span:is([style*="#9333ea"], [style*="rgb(147, 51, 234)"]) {
+      background-color: #F5F3FF !important;
+      border-color: #DDD6FE !important;
+      color: #5B21B6 !important;
+    }
+    #workspaceApp.light-theme #timelineUnscheduledList > div span:is([style*="#0891b2"], [style*="rgb(8, 145, 178)"]),
+    body.light-theme #activityTimelineModal #timelineModalBadges span:is([style*="#0891b2"], [style*="rgb(8, 145, 178)"]) {
+      background-color: #ECFEFF !important;
+      border-color: #A5F3FC !important;
+      color: #0E7490 !important;
+    }
+    #workspaceApp.light-theme #timelineUnscheduledList > div span:is([style*="#64748b"], [style*="rgb(100, 116, 139)"]),
+    body.light-theme #activityTimelineModal #timelineModalBadges span:is([style*="#64748b"], [style*="rgb(100, 116, 139)"]) {
+      background-color: #F1F5F9 !important;
+      border-color: #CBD5E1 !important;
+      color: #334155 !important;
     }
 
 </style>
@@ -3415,7 +4082,7 @@
           const height = Math.max(30, ((Math.min(endMinutes, CPD_LAST_HOUR * 60) - Math.max(event.start.minutes, CPD_FIRST_HOUR * 60)) / 60) * CPD_HOUR_PX);
           const color = cpdColor(event.activityIndex);
           const compactAttr = height < 58 ? ' data-compact-event="true"' : '';
-          return `<button type="button" onclick="cpdOpenActivity('${activityToken(event.activity.activity_id)}')" title="${escapeHTML(event.activity.title)} · ${escapeHTML(cpdTimeText(event))}" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white"${compactAttr} style="top:${top}px;height:${height}px;background:${color.bg};border-left:3px solid ${color.border}">
+          return `<button type="button" onclick="cpdOpenActivity('${activityToken(event.activity.activity_id)}')" title="${escapeHTML(event.activity.title)} · ${escapeHTML(cpdTimeText(event))}" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white" data-event-tone="${event.activityIndex % 5}"${compactAttr} style="top:${top}px;height:${height}px;background:${color.bg};border-left:3px solid ${color.border}">
             <span class="plan-event-title block text-[10px] font-extrabold leading-tight line-clamp-2">${escapeHTML(event.activity.title)}</span>
             <span class="plan-event-time block mt-1 text-[9px] text-white/75 planner-number">${escapeHTML(cpdTimeText(event))}</span>
             <span class="plan-event-meta block text-[9px] text-white/75">${escapeHTML(cpdPlaceText(event.activity))}${cpdDashboardPoints(event.activity) ? ' · ' + escapeHTML(cpdDashboardPoints(event.activity)) : ''}</span>
@@ -4652,7 +5319,7 @@
       const badge = suggested ? '<span class="rounded-md border border-cyan-500/40 bg-cyan-950/50 px-2 py-0.5 text-[10px] font-bold text-cyan-200">Gợi ý</span>' : '';
       const utility = hasPreference && model.utility !== null
         ? `<p class="text-xs text-slate-300">Độ hợp sở thích <b class="text-white planner-number">${escapeHTML(Math.round(model.utility * 100) / 100)}</b></p>` : '';
-      return `<article data-pos-card="${model.index}" class="flex flex-col gap-3 rounded-2xl border ${suggested ? 'border-cyan-500/50' : 'border-[#1b2537]'} bg-[#0e1524] p-4 sm:p-5">
+      return `<article data-pos-card="${model.index}" data-strategy="${escapeHTML(model.strategy || '')}" class="flex flex-col gap-3 rounded-2xl border ${suggested ? 'border-cyan-500/50' : 'border-[#1b2537]'} bg-[#0e1524] p-4 sm:p-5">
         <div class="flex items-start justify-between gap-2"><h3 class="text-base font-extrabold text-white">${escapeHTML(name)}</h3>${badge}</div>
         ${info ? `<p class="text-xs text-slate-400">${escapeHTML(info.text)}</p>` : ''}
         <p class="text-3xl font-black text-white planner-number">${model.projected !== null ? escapeHTML(model.projected) + 'đ' : '—'} <span class="text-sm font-bold text-slate-500">/ mục tiêu ${target !== null ? escapeHTML(target) + 'đ' : '—'}</span></p>
@@ -11754,7 +12421,8 @@
             const previewStyle = block.previewRemoved ? 'background:rgba(127,29,29,.55);border:2px dashed #fb7185;opacity:.75' : previewAdded ? 'background:rgba(6,95,70,.95);border:2px solid #34d399' : `background:${color.bg};border-left:3px solid ${color.border}`;
             const eventHeight = Math.max(30, style.height);
             const compactAttr = eventHeight < 58 ? ' data-compact-event="true"' : '';
-            return `<button type="button" title="${escapeHTML(title)} · ${time}" onclick="openPlannedActivityDetails(activityFromToken('${activityToken(block.activity.activity_id)}'))" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white"${compactAttr} style="top:${style.top}px;height:${eventHeight}px;${previewStyle};z-index:3">
+            const toneAttr = (!block.previewRemoved && !previewAdded) ? ` data-event-tone="${block.activityIndex % 5}"` : '';
+            return `<button type="button" title="${escapeHTML(title)} · ${time}" onclick="openPlannedActivityDetails(activityFromToken('${activityToken(block.activity.activity_id)}'))" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white"${toneAttr}${compactAttr} style="top:${style.top}px;height:${eventHeight}px;${previewStyle};z-index:3">
               <span class="plan-event-tag block text-[9px] font-black">${block.previewRemoved ? 'BỎ' : previewAdded ? 'THÊM' : 'PLANNED'}</span><span class="plan-event-title block text-[10px] font-extrabold leading-tight line-clamp-2">${escapeHTML(title)}</span>
               <span class="plan-event-time block mt-1 text-[9px] text-white/75 planner-number">${time}</span>
             </button>`;
