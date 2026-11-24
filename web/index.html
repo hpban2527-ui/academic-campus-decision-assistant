@@ -1826,6 +1826,39 @@
       #cpdDetail { grid-column: 1 / -1; }
     }
   </style>
+
+  <style>
+    #sidebarHoverLabel { display: none; }
+    @media (min-width: 1024px) {
+      #workspaceApp #sidebarNav {
+        position: relative;
+        width: 44px;
+        padding: 0;
+        overflow: hidden;
+        transition: width .2s ease;
+      }
+      #sidebarNav > :not(#sidebarHoverLabel) { display: none; }
+      #sidebarHoverLabel {
+        display: block;
+        position: absolute;
+        top: 22px;
+        left: 12px;
+        line-height: 1;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        color: #94a3b8;
+        white-space: nowrap;
+      }
+      #workspaceApp #sidebarNav:hover,
+      #workspaceApp #sidebarNav:focus-within { width: 280px; padding: 20px; overflow-y: auto; }
+      #sidebarNav:hover > :not(#sidebarHoverLabel),
+      #sidebarNav:focus-within > :not(#sidebarHoverLabel) { display: block; }
+      #sidebarNav:hover #sidebarHoverLabel,
+      #sidebarNav:focus-within #sidebarHoverLabel { display: none; }
+    }
+    #workspaceApp main { min-width: 0; }
+  </style>
 </head>
 <body class="min-h-screen antialiased bg-[#080c14] text-slate-100 selection:bg-indigo-900 selection:text-white">
 
@@ -1990,7 +2023,7 @@
     <!-- Left: Mobile Menu Toggle + App Identity & Mode Switcher -->
     <div class="flex items-center gap-3 sm:gap-5">
       <!-- Mobile Sidebar Toggle Button -->
-      <button id="btnMobileMenuToggle" onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-1 rounded-xl text-slate-400 hover:text-white hover:bg-[#11192b] transition" aria-label="Mở danh mục điều hướng">
+      <button id="btnMobileMenuToggle" onclick="toggleMobileSidebar()" aria-controls="sidebarNav" aria-expanded="true" title="Mở thanh điều hướng" class="lg:hidden p-2 -ml-1 rounded-xl text-slate-400 hover:text-white hover:bg-[#11192b] transition" aria-label="Mở danh mục điều hướng">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
 
@@ -2103,7 +2136,8 @@
     <!-- ====================================================================== -->
     <!-- 2. LEFT SIDEBAR NAVIGATION (RESPONSIVE OFF-CANVAS TRÊN MOBILE)         -->
     <!-- ====================================================================== -->
-    <aside id="sidebarNav" class="fixed inset-y-0 left-0 z-40 w-72 sm:w-80 bg-[#0b101b] border-r border-[#1b2537] flex flex-col justify-between shrink-0 overflow-y-auto p-5 select-none transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-250 ease-out shadow-2xl lg:shadow-none">
+    <aside id="sidebarNav" class="fixed inset-y-0 left-0 z-40 w-72 sm:w-80 bg-[#0b101b] border-r border-[#1b2537] flex flex-col justify-between shrink-0 overflow-y-auto p-5 select-none transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-250 ease-out shadow-2xl lg:shadow-none" tabindex="0" aria-label="Không gian làm việc, rê chuột hoặc nhấn Tab để mở">
+      <span id="sidebarHoverLabel" aria-hidden="true">☰</span>
 
       <div class="space-y-6">
         <div>
