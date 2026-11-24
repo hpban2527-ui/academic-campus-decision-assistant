@@ -22,6 +22,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from datetime import date, timedelta
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -268,9 +269,10 @@ def review_flow(page: Cdp) -> None:
 
     plan = change_review_and_confirm(page, "review_desktop", False)
 
-    # Change the busy schedule: the plan is flagged as affected.
-    page.js("""(() => { customBusyIntervals.push({ start: '2026-11-09T08:00:00+07:00', end: '2026-11-09T12:00:00+07:00' });
-      persistCurrentUserData(); renderConfirmedPlanDashboard(); })()""")
+    # Change the busy schedule (the morning of the plan's first day): the plan is flagged as affected.
+    first_day = plan["activities"][0]["scheduled_blocks"][0]["start"][:10]
+    page.js(f"""(() => {{ customBusyIntervals.push({{ start: '{first_day}T08:00:00+07:00', end: '{first_day}T12:00:00+07:00' }});
+      persistCurrentUserData(); renderConfirmedPlanDashboard(); }})()""")
     assert visible(page, "cpdBannerInvalid")
     assert "Kế hoạch bị ảnh hưởng" in page.js("document.getElementById('cpdBannerInvalid').innerText")
     page.shot("review_5_invalidated")
@@ -508,19 +510,23 @@ def after_onboarding(page: Cdp, mssv_saved: str, mssv_retry: str) -> None:
 
 
 def real_source_clock(page: Cdp) -> None:
-    """The dashboard's "Hom nay" follows the confirmed plan's source: the real store's demo date is 2026-10-25 (api.demo_clock)."""
+    """The dashboard's "Hom nay" follows the confirmed plan: the real store plans on the clock of the selected term."""
     register(page, "Real clock", "RVW2030")
     page.js("""(async () => {
-      const response = await fetch('/api/sp3/demo/plan?source=real', { method: 'POST',
+      const response = await fetch('/api/sp3/demo/plan?source=real&term_id=' + termClock.term_id, { method: 'POST',
         headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario: 'first_plan', total_target: 80, busy_intervals: [] }) });
       confirmConfirmedPlan(await response.json(), 'Kho thật');
       switchTab('dashboard');
     })()""")
     header = page.js("document.getElementById('cpdToday').innerText")
-    assert "01/10/2026" in header, header
+    clock = page.js("JSON.parse(JSON.stringify(termClock))")
+    simulated = clock["as_of"][:10]
+    assert f"{simulated[8:10]}/{simulated[5:7]}/{simulated[:4]}" in header, header
     agenda = page.js("document.getElementById('cpdCalendar').innerText")
-    # Every real activity starts more than a week after that date, so today's agenda is empty.
-    assert "Hoạt động gần nhất diễn ra vào" in agenda and "25/10/2026" in agenda, agenda
+    # The term starts on a weekend and the first real activity is more than a week later: today's agenda is empty
+    # and offers the way to the first activity, which only moves the visible range.
+    assert "Hoạt động gần nhất diễn ra vào" in agenda and "Đến hoạt động đầu tiên" in agenda, agenda
+    assert page.js("termClock.as_of") == clock["as_of"]
     page.shot("review_8_real_clock")
 
 
@@ -577,8 +583,8 @@ def completion_flow(page: Cdp) -> None:
     retry = page.js("""(async () => {
         const reply = await fetch('/api/sp3/confirmed-plan/complete', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({student_id: currentStudent.student_id, plan_version: cpdCompletionState.version,
-                                  activity_id: 'SEM-A', affirmed: true})
+            body: JSON.stringify({student_id: currentStudent.student_id, term_id: cpdCompletionState.termId,
+                                  plan_version: cpdCompletionState.version, activity_id: 'SEM-A', affirmed: true})
         });
         return (await reply.json()).scores;
     })()""")
@@ -595,11 +601,12 @@ def main() -> int:
     profile = tempfile.mkdtemp(prefix="review-dash-")
     session_file = Path(profile) / "test-session.json"
     session_file.write_text(json.dumps({
-        "schema_version": 3,
-        "session_scores": {"RVW2050": {
+        "schema_version": 4,
+        # The completion flow plans on the synthetic scenario, which has its own scoreboard key.
+        "session_scores": {"RVW2050": {"SYNTHETIC-DEMO": {
             "current": {"C1": 22, "C2": 15, "C3": 10, "C4": 10, "C5": 0},
             "projected": {"C1": 0, "C2": 0, "C3": 0, "C4": 0, "C5": 0},
-        }},
+        }}},
     }), encoding="utf-8")
     env = {
         **os.environ, "PYTHONPATH": str(ROOT / "src"), "UNILIFE_SESSION_FILE": str(session_file),
@@ -681,24 +688,35 @@ def main() -> int:
         assert "còn 80đ" not in page.js("document.getElementById('cpdContent').innerText").lower()
         assert page.js("document.getElementById('overviewDrlScore').offsetParent === null"), "old overview cards stay hidden"
 
-        # 3. Today view: the demo date, not the system date.
+        # 3. Today view: the simulated day of the term, not the system date. The term starts on a weekend and the
+        # first planned activity is more than a week later, so the agenda is empty and offers the way to it.
+        as_of = stored["as_of"][:10]
         header = page.js("document.getElementById('cpdToday').innerText")
-        assert stored["as_of"][:10][8:10] + "/" + stored["as_of"][:10][5:7] in header, header
+        assert as_of[8:10] + "/" + as_of[5:7] in header, header
         agenda = page.js("document.getElementById('cpdCalendar').innerText")
-        for activity in stored["activities"]:
-            assert activity["title"] in agenda, activity["title"]
-        assert "Hạn đăng ký" in agenda
+        first_day = min(block["start"][:10] for activity in stored["activities"] for block in activity["scheduled_blocks"])
+        last_agenda_day = (date.fromisoformat(as_of) + timedelta(days=6)).isoformat()
+        if first_day > last_agenda_day:
+            assert "Hoạt động gần nhất diễn ra vào" in agenda and "Đến hoạt động đầu tiên" in agenda, agenda
+            page.js("document.querySelector('#cpdCalendar [data-first-activity]').click()")
+            assert page.js("termClock.as_of") == stored["as_of"], "the button moves the view only, never the clock"
+            page.js("setConfirmedPlanView('today')")
+            page.js("cpdAnchor = null; renderConfirmedPlanDashboard()")
+        else:
+            for activity in stored["activities"]:
+                assert activity["title"] in agenda, activity["title"]
+            assert "Hạn đăng ký" in agenda
         page.shot("3_today_agenda")
 
         # 4. Week view with a faded busy schedule, then month view.
-        page.js("""(() => { customBusyIntervals.push({ start: '2026-11-10T13:00:00+07:00', end: '2026-11-10T16:00:00+07:00' });
-          persistCurrentUserData(); setConfirmedPlanView('week'); })()""")
+        page.js(f"""(() => {{ customBusyIntervals.push({{ start: '{first_day}T13:00:00+07:00', end: '{first_day}T16:00:00+07:00' }});
+          persistCurrentUserData(); setConfirmedPlanView('week'); }})()""")
         busy_blocks = page.js("document.querySelectorAll('#cpdCalendar [title=\"Lịch bận của bạn\"]').length")
         assert busy_blocks >= 1, "busy schedule must be drawn as a faded background"
         assert page.js("document.querySelectorAll('#cpdCalendar .plan-calendar-event').length") >= 1
         page.shot("4_week_view")
         page.js("setConfirmedPlanView('month')")
-        assert "Tháng 11/2026" in page.js("document.getElementById('cpdCalendar').innerText")
+        assert f"Tháng {as_of[5:7]}/{as_of[:4]}" in page.js("document.getElementById('cpdCalendar').innerText")
         page.shot("5_month_view")
 
         # 5. An availability change after confirming marks the plan as affected.
@@ -721,7 +739,7 @@ def main() -> int:
         assert not page.js("document.getElementById('viewPlan').classList.contains('hidden')"), "banner button opens Lập lịch"
 
         # 7. Click an event: the detail panel opens with the activity's fields.
-        page.js("switchTab('dashboard'); setConfirmedPlanView('today')")
+        page.js("switchTab('dashboard'); cpdAnchor = null; setConfirmedPlanView('week')")  # the Today agenda is empty at the term start
         page.js("document.querySelector('#cpdCalendar button[onclick^=\"cpdOpenActivity\"]').click()")
         assert visible(page, "cpdDetail")
         detail = page.js("document.getElementById('cpdDetail').innerText")
@@ -730,6 +748,8 @@ def main() -> int:
 
         # 8. Confirming again shows what changes first, then replaces the plan and clears both banners.
         page.js("switchTab('plan'); runSp3Planner();")
+        page.wait("!document.getElementById('btnRunPlanner').disabled && !!planStages.first")
+        close_options(page)
         page.js("document.getElementById('btnConfirmPlan').click()")
         assert visible(page, "planDiffModal"), "a diff must be shown before replacing a confirmed plan"
         page.js("document.getElementById('btnConfirmDiff').click()")

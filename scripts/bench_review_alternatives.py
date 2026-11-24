@@ -64,7 +64,7 @@ def synthetic_options(preference: StudentPreference) -> list[dict]:
 
 
 def real_options(preference: StudentPreference) -> list[dict]:
-    return real_plan_options(preference, target_total=80)["options"]
+    return real_plan_options(preference, term_id="HK1_2026_2027", target_total=80)["options"]
 
 
 SOURCES = {
