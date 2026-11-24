@@ -1852,3 +1852,119 @@ function visibleViews() {
         "dropdownClosed": True,
         "mobileClosed": True,
     }
+
+
+def test_light_mode_design_tokens_modal_sync_and_dark_mode_isolation() -> None:
+    """Verify Light Mode redesign tokens, calendar classes, contrast-safe selectors,
+    and Light <-> Dark toggling without altering Dark Mode.
+    """
+    html = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+
+    # Reusable Light Mode tokens scoped under .light-theme
+    for token in (
+        "--lt-app-bg: #F5F7FB;",
+        "--lt-surface: #FFFFFF;",
+        "--lt-surface-subtle: #F8FAFC;",
+        "--lt-border: #E2E8F0;",
+        "--lt-text-primary: #172033;",
+        "--lt-primary: #4F46E5;",
+        "--lt-success: #047857;",
+        "--lt-warning: #B45309;",
+        "--lt-error: #BE123C;",
+    ):
+        assert token in html
+
+    # Prevent regression of white-text-on-pale-purple wildcard bug
+    assert '#workspaceApp.light-theme [class*="bg-indigo-"][class~="text-white"]' not in html
+
+    # Calendar dark inline stripes moved to CSS classes so Light Mode overrides cleanly while Dark Mode stays identical
+    assert "plan-calendar-day-unknown" in html
+    assert "cpd-busy-block" in html
+    assert 'style="background:repeating-linear-gradient(135deg,#080d18' not in html
+    assert "#workspaceApp.light-theme #drlDonutSvg > circle" in html
+
+    # Runtime Light -> Dark -> Light toggle syncs workspaceApp, body, and documentElement
+    js = r"""
+const fs = require('fs');
+const vm = require('vm');
+const html = fs.readFileSync('web/index.html', 'utf8');
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
+
+const elements = new Map();
+function makeEl(id) {
+  if (!elements.has(id)) {
+    const classes = new Set();
+    elements.set(id, {
+      id, value: '', innerText: '', textContent: '', innerHTML: '',
+      checked: false, disabled: false, hidden: false, style: {}, dataset: {}, className: '',
+      classList: {
+        add: (...c) => c.forEach(x => classes.add(x)),
+        remove: (...c) => c.forEach(x => classes.delete(x)),
+        toggle: (c, f) => { if (f === undefined) { classes.has(c) ? classes.delete(c) : classes.add(c); } else if (f) classes.add(c); else classes.delete(c); },
+        contains: c => classes.has(c)
+      },
+      setAttribute(k, v) { this[k] = v; },
+      getAttribute(k) { return this[k]; },
+      focus() {}, scrollIntoView() {}, scrollTo() {},
+      querySelector() { return makeEl(id + ':q'); },
+      querySelectorAll() { return []; },
+      appendChild() {}
+    });
+  }
+  return elements.get(id);
+}
+
+const storage = new Map();
+const bodyEl = makeEl('body');
+const docEl = makeEl('html');
+const sandbox = {
+  console, Math, Date, JSON, Set, Map, Array, Object, Number, String, Boolean, RegExp, Promise, Error,
+  parseInt, parseFloat, isNaN, encodeURIComponent, decodeURIComponent, btoa, atob, escape, unescape,
+  setTimeout: () => 0, clearTimeout: () => {}, requestAnimationFrame: cb => cb(),
+  localStorage: {
+    getItem: k => storage.has(k) ? storage.get(k) : null,
+    setItem: (k, v) => storage.set(k, String(v)),
+    removeItem: k => storage.delete(k)
+  },
+  document: {
+    readyState: 'complete',
+    body: bodyEl,
+    documentElement: docEl,
+    getElementById: id => makeEl(id),
+    querySelector: () => makeEl('qs'),
+    querySelectorAll: () => [],
+    addEventListener: () => {},
+    createElement: () => makeEl('dyn_' + Math.random())
+  },
+  window: { addEventListener: () => {}, scrollTo: () => {}, innerWidth: 1440 },
+  tailwind: {},
+  navigator: { clipboard: { writeText: async () => {} } },
+  fetch: async () => ({ ok: false, json: async () => ({}) }),
+  alert: () => {}, confirm: () => true,
+};
+sandbox.window.document = sandbox.document;
+sandbox.window.localStorage = sandbox.localStorage;
+vm.createContext(sandbox);
+vm.runInContext(scripts, sandbox);
+
+const snap = () => ({
+  ws: sandbox.document.getElementById('workspaceApp').classList.contains('light-theme'),
+  body: bodyEl.classList.contains('light-theme'),
+  html: docEl.classList.contains('light-theme'),
+  saved: storage.get('unilife_theme'),
+  label: sandbox.document.getElementById('themeToggleLabel').textContent,
+});
+
+sandbox.setTheme('light', true);
+const onLight = snap();
+sandbox.toggleTheme();
+const onDark = snap();
+sandbox.toggleTheme();
+const backLight = snap();
+console.log(JSON.stringify({ onLight, onDark, backLight }));
+"""
+    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    res = json.loads(raw)
+    assert res["onLight"] == {"ws": True, "body": True, "html": True, "saved": "light", "label": "Tối"}
+    assert res["onDark"] == {"ws": False, "body": False, "html": False, "saved": "dark", "label": "Sáng"}
+    assert res["backLight"] == {"ws": True, "body": True, "html": True, "saved": "light", "label": "Tối"}

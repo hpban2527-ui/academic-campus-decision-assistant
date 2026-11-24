@@ -86,129 +86,705 @@
       opacity: 1;
       transform: translateY(0);
     }
+    /* =========================================================================
+       UNILIFE LIGHT MODE DESIGN SYSTEM (Linear + Notion Calendar inspired)
+       Strictly scoped to .light-theme; Dark Mode remains 100% unchanged.
+       ========================================================================= */
+    :root.light-theme,
     #workspaceApp.light-theme {
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
+      color-scheme: light;
+      --lt-app-bg: #F5F7FB;
+      --lt-surface: #FFFFFF;
+      --lt-surface-subtle: #F8FAFC;
+      --lt-surface-muted: #F1F5F9;
+      --lt-surface-hover: #EEF2F7;
+      --lt-border: #E2E8F0;
+      --lt-border-strong: #CBD5E1;
+      --lt-text-primary: #172033;
+      --lt-text-body: #334155;
+      --lt-text-secondary: #475569;
+      --lt-text-muted: #64748B;
+
+      --lt-primary: #4F46E5;
+      --lt-primary-hover: #4338CA;
+      --lt-primary-soft: #EEF2FF;
+      --lt-primary-soft-strong: #E0E7FF;
+      --lt-primary-border: #C7D2FE;
+      --lt-primary-text: #3730A3;
+
+      --lt-info-soft: #F0F9FF;
+      --lt-info-border: #BAE6FD;
+      --lt-info-text: #0369A1;
+
+      --lt-success: #047857;
+      --lt-success-soft: #ECFDF5;
+      --lt-success-border: #A7F3D0;
+      --lt-success-text: #065F46;
+
+      --lt-warning: #B45309;
+      --lt-warning-soft: #FFFBEB;
+      --lt-warning-border: #FCD34D;
+      --lt-warning-text: #92400E;
+
+      --lt-error: #BE123C;
+      --lt-error-soft: #FFF1F2;
+      --lt-error-border: #FECDD3;
+      --lt-error-text: #9F1239;
+
+      --lt-violet-soft: #F5F3FF;
+      --lt-violet-border: #DDD6FE;
+      --lt-violet-text: #5B21B6;
+
+      --lt-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+      --lt-shadow-md: 0 4px 14px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --lt-shadow-lg: 0 18px 42px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(15, 23, 42, 0.06);
     }
-    #workspaceApp.light-theme [class*="bg-[#0b101b]"],
-    #workspaceApp.light-theme [class*="bg-[#0e1524]"],
-    #workspaceApp.light-theme [class*="bg-[#080d18]"],
-    #workspaceApp.light-theme [class*="bg-[#0c1220]"],
-    #workspaceApp.light-theme [class*="bg-[#11192b]"] {
-      background-color: #fff !important;
+
+    /* Light scrollbars */
+    html.light-theme ::-webkit-scrollbar-track,
+    #workspaceApp.light-theme ::-webkit-scrollbar-track {
+      background: #F5F7FB;
     }
-    #workspaceApp.light-theme [class*="bg-[#080c14]"] {
-      background-color: #f1f5f9 !important;
+    html.light-theme ::-webkit-scrollbar-thumb,
+    #workspaceApp.light-theme ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
     }
-    #workspaceApp.light-theme [class*="bg-[#162032]"] {
-      background-color: #e2e8f0 !important;
+    html.light-theme ::-webkit-scrollbar-thumb:hover,
+    #workspaceApp.light-theme ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
     }
-    #workspaceApp.light-theme [class*="border-[#1b2537]"],
-    #workspaceApp.light-theme [class*="border-[#223046]"],
-    #workspaceApp.light-theme [class*="border-[#2b3a54]"] {
-      border-color: #cbd5e1 !important;
+
+    /* Root app canvas & fullscreen light dialogs */
+    #workspaceApp.light-theme,
+    body.light-theme #planOptionsScreen,
+    body.light-theme #planReviewScreen {
+      background-color: var(--lt-app-bg) !important;
+      color: var(--lt-text-primary) !important;
     }
-    #workspaceApp.light-theme [class~="text-white"],
-    #workspaceApp.light-theme [class~="text-slate-100"] {
-      color: #0f172a !important;
+
+    /* Light modal backdrops (scrim instead of opaque black wall) */
+    body.light-theme #loginModal,
+    body.light-theme #welcomeModal,
+    body.light-theme #planDiffModal,
+    body.light-theme #smartSwapModal,
+    body.light-theme #activityTimelineModal,
+    body.light-theme #onboardingModal {
+      background-color: rgba(15, 23, 42, 0.45) !important;
+      color: var(--lt-text-primary);
     }
-    #workspaceApp.light-theme [class~="text-slate-200"] {
-      color: #334155 !important;
+
+    /* ---- 1. SURFACES & BORDERS (Crisp 3-tier hierarchy: App #F5F7FB -> Card #FFFFFF -> Subtle #F8FAFC) ---- */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) [class*="bg-[#080c14]"] {
+      background-color: var(--lt-app-bg) !important;
     }
-    #workspaceApp.light-theme [class~="text-slate-300"] {
-      color: #475569 !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-[#0b101b]"],
+      [class*="bg-[#0e1524]"],
+      [class*="bg-[#0b1120]"],
+      [class*="bg-[#0c1220]"]
+    ) {
+      background-color: var(--lt-surface) !important;
     }
-    #workspaceApp.light-theme [class~="text-slate-400"],
-    #workspaceApp.light-theme [class~="text-slate-500"] {
-      color: #64748b !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-[#080d18]"],
+      [class*="bg-[#090e1a]"],
+      [class*="bg-[#070b14]"],
+      [class*="bg-[#11192b]"],
+      [class*="bg-[#131d31]"],
+      [class*="bg-[#18233a]"]
+    ) {
+      background-color: var(--lt-surface-subtle) !important;
     }
-    #workspaceApp.light-theme [class~="text-slate-600"] {
-      color: #475569 !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-[#162032]"],
+      [class*="bg-[#1b2537]"],
+      [class*="bg-[#1f2d46]"],
+      [class~="bg-slate-700"],
+      [class~="bg-slate-800"],
+      [class~="bg-slate-900"],
+      [class*="bg-slate-700/"],
+      [class*="bg-slate-800/"],
+      [class*="bg-slate-900/"]
+    ) {
+      background-color: var(--lt-surface-muted) !important;
     }
-    #workspaceApp.light-theme [class~="text-slate-700"],
-    #workspaceApp.light-theme [class~="text-slate-800"],
-    #workspaceApp.light-theme [class~="text-slate-900"] {
-      color: #334155 !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class*="bg-black/25"], [class*="bg-black/30"]) {
+      background-color: rgba(15, 23, 42, 0.08) !important;
     }
-    #workspaceApp.light-theme [class~="text-indigo-100"],
-    #workspaceApp.light-theme [class~="text-indigo-200"] {
-      color: #3730a3 !important;
+
+    /* Subtle borders & dividers instead of heavy shadows */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="border-[#151e30]"],
+      [class*="border-[#1b2537]"],
+      [class*="border-[#223046]"],
+      [class*="border-[#2b3a54]"],
+      [class*="border-[#33445f]"],
+      [class*="border-slate-700"],
+      [class*="border-slate-800"]
+    ) {
+      border-color: var(--lt-border) !important;
     }
-    #workspaceApp.light-theme [class~="text-indigo-300"],
-    #workspaceApp.light-theme [class~="text-indigo-400"] {
-      color: #4f46e5 !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) [class*="divide-[#1b2537]"] > :not([hidden]) ~ :not([hidden]) {
+      border-color: var(--lt-border) !important;
     }
-    #workspaceApp.light-theme [class~="text-blue-100"],
-    #workspaceApp.light-theme [class~="text-blue-200"] {
-      color: #1e40af !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="shadow-xl"], [class~="shadow-lg"]) {
+      box-shadow: var(--lt-shadow-sm) !important;
     }
-    #workspaceApp.light-theme [class~="text-blue-300"],
-    #workspaceApp.light-theme [class~="text-blue-400"],
-    #workspaceApp.light-theme [class~="text-cyan-300"],
-    #workspaceApp.light-theme [class~="text-cyan-400"],
-    #workspaceApp.light-theme [class~="text-sky-300"],
-    #workspaceApp.light-theme [class~="text-sky-400"] {
-      color: #0369a1 !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) [class~="shadow-2xl"] {
+      box-shadow: var(--lt-shadow-lg) !important;
     }
-    #workspaceApp.light-theme [class~="text-emerald-200"],
-    #workspaceApp.light-theme [class~="text-emerald-300"],
-    #workspaceApp.light-theme [class~="text-green-300"],
-    #workspaceApp.light-theme [class~="text-teal-300"] {
-      color: #047857 !important;
+
+    /* ---- 2. TYPOGRAPHY & CONTRAST (>= 4.5:1 normal text, >= 3:1 large text) ---- */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-white"], [class~="text-slate-100"]) {
+      color: var(--lt-text-primary) !important;
     }
-    #workspaceApp.light-theme [class~="text-amber-200"],
-    #workspaceApp.light-theme [class~="text-amber-300"],
-    #workspaceApp.light-theme [class~="text-yellow-300"] {
-      color: #b45309 !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) [class~="text-slate-200"] {
+      color: var(--lt-text-body) !important;
     }
-    #workspaceApp.light-theme [class~="text-rose-300"],
-    #workspaceApp.light-theme [class~="text-rose-400"],
-    #workspaceApp.light-theme [class~="text-red-300"],
-    #workspaceApp.light-theme [class~="text-red-400"] {
-      color: #be123c !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) [class~="text-slate-300"] {
+      color: var(--lt-text-secondary) !important;
     }
-    #workspaceApp.light-theme [class~="text-purple-300"],
-    #workspaceApp.light-theme [class~="text-purple-400"],
-    #workspaceApp.light-theme [class~="text-violet-300"],
-    #workspaceApp.light-theme [class~="text-violet-400"] {
-      color: #6d28d9 !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-slate-400"], [class~="text-slate-500"], [class~="text-slate-600"]) {
+      color: var(--lt-text-muted) !important;
     }
-    /* The overview hero intentionally remains dark in light mode. Keep its
-       text readable instead of applying the white-surface color overrides. */
-    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-white"] {
-      color: #fff !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-slate-700"], [class~="text-slate-800"], [class~="text-slate-900"], [class~="text-slate-950"]) {
+      color: var(--lt-text-primary) !important;
     }
-    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-slate-300"] {
-      color: #cbd5e1 !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-indigo-100"], [class~="text-indigo-200"], [class*="text-indigo-100/"]) {
+      color: var(--lt-primary-text) !important;
     }
-    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-emerald-200"] {
-      color: #a7f3d0 !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-indigo-300"], [class~="text-indigo-400"]) {
+      color: var(--lt-primary) !important;
     }
-    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-blue-100"] {
-      color: #dbeafe !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-blue-100"], [class~="text-blue-200"], [class~="text-sky-100"], [class~="text-sky-200"], [class~="text-cyan-100"], [class~="text-cyan-200"]) {
+      color: var(--lt-info-text) !important;
     }
-    #workspaceApp.light-theme [class*="bg-indigo-"][class~="text-white"],
-    #workspaceApp.light-theme [class*="bg-emerald-"][class~="text-white"],
-    #workspaceApp.light-theme [class*="bg-rose-"][class~="text-white"] {
-      color: #fff !important;
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-blue-300"], [class~="text-blue-400"], [class~="text-cyan-300"], [class~="text-cyan-400"], [class~="text-sky-300"], [class~="text-sky-400"]) {
+      color: #0369A1 !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-emerald-100"], [class~="text-emerald-200"], [class~="text-emerald-300"], [class~="text-emerald-400"], [class~="text-green-300"], [class~="text-teal-300"]) {
+      color: var(--lt-success) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-amber-100"], [class*="text-amber-100/"], [class~="text-amber-200"], [class*="text-amber-200/"], [class~="text-amber-300"], [class~="text-amber-400"], [class~="text-yellow-300"]) {
+      color: var(--lt-warning-text) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-rose-100"], [class~="text-rose-200"], [class~="text-rose-300"], [class~="text-rose-400"], [class~="text-red-300"], [class~="text-red-400"]) {
+      color: var(--lt-error) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is([class~="text-purple-200"], [class~="text-purple-300"], [class~="text-purple-400"], [class~="text-violet-200"], [class~="text-violet-300"], [class~="text-violet-400"]) {
+      color: var(--lt-violet-text) !important;
+    }
+
+    /* ---- 3. SEMANTIC TINTED BADGES, BANNERS & SELECTED OPTION CARDS (No muddy dark-950 fills!) ---- */
+    /* Indigo soft / selected states */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-indigo-950"],
+      [class*="bg-indigo-900"],
+      [class*="bg-indigo-400/10"],
+      [class*="bg-indigo-500/10"],
+      [class*="bg-indigo-500/15"]
+    ) {
+      background-color: var(--lt-primary-soft) !important;
+      border-color: var(--lt-primary-border) !important;
+      color: var(--lt-primary-text) !important;
+    }
+    /* Selected option cards / chips / radio pills (strong clear selected state, NEVER white text on pale purple!) */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-indigo-500/20"],
+      [class*="bg-indigo-500/25"],
+      [class*="bg-indigo-600/20"]
+    ) {
+      background-color: var(--lt-primary-soft-strong) !important;
+      border-color: var(--lt-primary) !important;
+      color: var(--lt-primary-text) !important;
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.2) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-indigo-500/20"],
+      [class*="bg-indigo-500/25"],
+      [class*="bg-indigo-600/20"],
+      [class*="bg-indigo-950"]
+    ) :is(span, b, strong, div, p) {
+      color: inherit;
+    }
+
+    /* Emerald / Success tinted pills & banners */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-emerald-950"],
+      [class*="bg-emerald-900"],
+      [class*="bg-emerald-800"],
+      [class*="bg-emerald-400/10"],
+      [class*="bg-emerald-500/10"],
+      [class*="bg-emerald-500/15"],
+      [class*="bg-emerald-500/20"],
+      [class*="bg-emerald-500/25"]
+    ) {
+      background-color: var(--lt-success-soft) !important;
+      border-color: var(--lt-success-border) !important;
+      color: var(--lt-success-text) !important;
+    }
+
+    /* Amber / Warning tinted pills & banners */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-amber-950"],
+      [class*="bg-amber-900"],
+      [class*="bg-amber-500/15"],
+      [class*="bg-amber-500/20"],
+      [class*="bg-amber-500/30"]
+    ) {
+      background-color: var(--lt-warning-soft) !important;
+      border-color: var(--lt-warning-border) !important;
+      color: var(--lt-warning-text) !important;
+    }
+
+    /* Rose / Error tinted pills & banners */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-rose-950"],
+      [class*="bg-rose-500/10"],
+      [class*="bg-rose-500/15"],
+      [class*="bg-rose-500/20"]
+    ) {
+      background-color: var(--lt-error-soft) !important;
+      border-color: var(--lt-error-border) !important;
+      color: var(--lt-error-text) !important;
+    }
+
+    /* Sky / Cyan / Blue tinted pills & banners */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-sky-950"],
+      [class*="bg-sky-900"],
+      [class*="bg-cyan-950"],
+      [class*="bg-blue-500/10"],
+      [class*="bg-blue-500/15"],
+      [class*="bg-sky-500/15"],
+      [class*="bg-cyan-500/15"]
+    ) {
+      background-color: var(--lt-info-soft) !important;
+      border-color: var(--lt-info-border) !important;
+      color: var(--lt-info-text) !important;
+    }
+
+    /* Violet tinted pills & banners */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class*="bg-violet-950"],
+      [class*="bg-violet-900"],
+      [class*="bg-violet-500/15"]
+    ) {
+      background-color: var(--lt-violet-soft) !important;
+      border-color: var(--lt-violet-border) !important;
+      color: var(--lt-violet-text) !important;
+    }
+
+    /* ---- 4. SOLID ACTION BUTTONS & SOLID BADGES (White text ONLY on solid dark/saturated fills) ---- */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class~="bg-indigo-600"],
+      [class~="bg-indigo-700"]
+    ) {
+      background-color: var(--lt-primary) !important;
+      border-color: var(--lt-primary) !important;
+      color: #FFFFFF !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) [class~="bg-indigo-600"]:hover {
+      background-color: var(--lt-primary-hover) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class~="bg-emerald-600"],
+      [class~="bg-emerald-700"]
+    ) {
+      background-color: var(--lt-success) !important;
+      border-color: var(--lt-success) !important;
+      color: #FFFFFF !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) [class~="bg-emerald-600"]:hover {
+      background-color: #065F46 !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class~="bg-sky-600"],
+      [class~="bg-sky-700"],
+      [class~="bg-blue-600"]
+    ) {
+      background-color: #0284C7 !important;
+      border-color: #0284C7 !important;
+      color: #FFFFFF !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class~="bg-rose-600"],
+      [class~="bg-rose-700"]
+    ) {
+      background-color: var(--lt-error) !important;
+      border-color: var(--lt-error) !important;
+      color: #FFFFFF !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class~="bg-amber-600"],
+      [class~="bg-amber-700"]
+    ) {
+      background-color: var(--lt-warning) !important;
+      border-color: var(--lt-warning) !important;
+      color: #FFFFFF !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) [class~="bg-amber-500"] {
+      background-color: #D97706 !important;
+      color: #FFFFFF !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      [class~="bg-indigo-600"],
+      [class~="bg-indigo-700"],
+      [class~="bg-emerald-600"],
+      [class~="bg-emerald-700"],
+      [class~="bg-sky-600"],
+      [class~="bg-blue-600"],
+      [class~="bg-rose-600"],
+      [class~="bg-amber-600"],
+      [class~="bg-amber-500"]
+    ) * {
+      color: #FFFFFF !important;
+    }
+
+    /* Inline colored domain badges, gradients & month pills keep crisp white text */
+    :is(#workspaceApp.light-theme, body.light-theme #onboardingModal, body.light-theme #activityTimelineModal) :is(
+      [style*="background-color:"][class~="text-white"],
+      [style*="background:"][class~="text-white"],
+      [class*="bg-gradient-to-"][class~="text-white"]
+    ) {
+      color: #FFFFFF !important;
+    }
+
+    /* DRL Donut SVG empty track in Light Mode */
+    #workspaceApp.light-theme #drlDonutSvg > circle[stroke="#162032"] {
+      stroke: #E2E8F0 !important;
+    }
+
+    /* Disabled states */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) button:disabled {
+      opacity: 0.52;
+      cursor: not-allowed;
+    }
+
+    /* ---- 5. FORMS, INPUTS, SELECTS, CHECKBOXES & DROPDOWNS ---- */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(
+      input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([class~="bg-transparent"]),
+      select,
+      textarea
+    ) {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-border-strong) !important;
+      color: var(--lt-text-primary) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(input, select, textarea):read-only:not(select) {
+      background-color: var(--lt-surface-muted) !important;
+      border-color: var(--lt-border) !important;
+      color: var(--lt-text-secondary) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(input, select, textarea)::placeholder {
+      color: #94A3B8 !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) :is(input:not([type="checkbox"]):not([type="radio"]):not([class~="bg-transparent"]), select, textarea):focus {
+      border-color: var(--lt-primary) !important;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14) !important;
+      background-color: #FFFFFF !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) select option {
+      background-color: #FFFFFF;
+      color: #172033;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) input[type="checkbox"] {
+      accent-color: var(--lt-primary);
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-border-strong) !important;
+    }
+    /* Transparent inline inputs inside Manual Activity cards */
+    #workspaceApp.light-theme #activityManualPanel input[class~="bg-transparent"] {
+      background-color: transparent !important;
+      color: var(--lt-text-primary) !important;
+    }
+
+    /* ---- 6. HEADER, SIDEBAR & NAVIGATION (Clean Linear aesthetic) ---- */
+    #workspaceApp.light-theme > header {
+      background-color: rgba(255, 255, 255, 0.94) !important;
+      border-bottom-color: var(--lt-border) !important;
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04) !important;
+    }
+    #workspaceApp.light-theme #sidebarNav {
+      background-color: #FFFFFF !important;
+      border-right-color: var(--lt-border) !important;
     }
     #workspaceApp.light-theme .nav-btn-active {
-      background-color: #dbeafe !important;
-      color: #1d4ed8 !important;
-      border-color: #60a5fa !important;
+      background-color: var(--lt-primary-soft) !important;
+      color: var(--lt-primary-text) !important;
+      border-color: var(--lt-primary-border) !important;
       box-shadow: none !important;
     }
+    #workspaceApp.light-theme .nav-btn-active svg {
+      color: var(--lt-primary) !important;
+    }
     #workspaceApp.light-theme .nav-btn-inactive {
-      background-color: #fff !important;
-      color: #475569 !important;
-      border-color: #cbd5e1 !important;
+      background-color: transparent !important;
+      color: var(--lt-text-secondary) !important;
+      border-color: transparent !important;
     }
     #workspaceApp.light-theme .nav-btn-inactive:hover {
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
+      background-color: var(--lt-surface-muted) !important;
+      color: var(--lt-text-primary) !important;
+      border-color: transparent !important;
     }
-    #workspaceApp.light-theme [class*="divide-[#1b2537]"] > :not([hidden]) ~ :not([hidden]) {
-      border-color: #cbd5e1 !important;
+    #workspaceApp.light-theme #userDropdown {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-border) !important;
+      box-shadow: var(--lt-shadow-lg) !important;
+    }
+    #workspaceApp.light-theme #userDropdown button:hover {
+      background-color: var(--lt-surface-muted) !important;
+    }
+    #workspaceApp.light-theme #btnThemeToggle:hover,
+    #workspaceApp.light-theme header button:hover:not([class~="bg-indigo-600"]) {
+      background-color: var(--lt-surface-muted) !important;
+    }
+
+    /* ---- 7. DASHBOARD HERO & OVERVIEW POLISH (Airy Light Banner instead of heavy dark block) ---- */
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F7F9FF 55%, #EEF2FF 100%) !important;
+      border-color: #DCE4F5 !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child > div.rounded-full {
+      border-color: rgba(79, 70, 229, 0.1) !important;
+      background-color: rgba(79, 70, 229, 0.04) !important;
+      box-shadow: none !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-white"] {
+      color: var(--lt-text-primary) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-slate-300"] {
+      color: var(--lt-text-secondary) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class~="text-cyan-300"] {
+      color: var(--lt-primary) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class*="bg-emerald-400/10"] {
+      background-color: var(--lt-success-soft) !important;
+      border-color: var(--lt-success-border) !important;
+      color: var(--lt-success-text) !important;
+    }
+    #workspaceApp.light-theme #workspaceOverview > div.relative:first-child [class*="bg-blue-300/10"] {
+      background-color: var(--lt-primary-soft) !important;
+      border-color: var(--lt-primary-border) !important;
+      color: var(--lt-primary-text) !important;
+    }
+    /* Quick action cards subtle hover lift */
+    #workspaceApp.light-theme #workspaceOverview section button.group:hover {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-primary-border) !important;
+      box-shadow: var(--lt-shadow-md) !important;
+    }
+    /* Student Profile logo tile */
+    #workspaceApp.light-theme #profileAvatarDisplay {
+      background: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%) !important;
+      border-color: var(--lt-primary-border) !important;
+      box-shadow: var(--lt-shadow-md) !important;
+    }
+    #workspaceApp.light-theme #profileAvatarDisplay span {
+      color: #FFFFFF !important;
+    }
+    #workspaceApp.light-theme #profileAvatarDisplay .text-cyan-300 {
+      color: #A5F3FC !important;
+    }
+
+    /* ---- 8. CALENDARS (Notion Calendar inspired: clean white/off-white grid, subtle hourly rules) ---- */
+    /* Planner & Dashboard Week Calendar */
+    #workspaceApp.light-theme .plan-calendar-day {
+      background-color: #FFFFFF !important;
+      background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 47px, #E2E8F0 48px) !important;
+    }
+    #workspaceApp.light-theme .plan-calendar-day.plan-calendar-day-unknown {
+      background-color: #F8FAFC !important;
+      background-image:
+        repeating-linear-gradient(to bottom, transparent 0, transparent 47px, #E2E8F0 48px),
+        repeating-linear-gradient(135deg, rgba(148, 163, 184, 0.07) 0, rgba(148, 163, 184, 0.07) 6px, transparent 6px, transparent 14px) !important;
+    }
+    /* Open (free) slots in Planner Calendar */
+    #workspaceApp.light-theme #planCalendarGrid [aria-label="Khung giờ rảnh"] {
+      background-color: rgba(16, 185, 129, 0.09) !important;
+      border-color: rgba(16, 185, 129, 0.32) !important;
+    }
+    #workspaceApp.light-theme #planCalendarGrid [aria-label="Khung giờ rảnh"]:hover {
+      background-color: rgba(16, 185, 129, 0.16) !important;
+    }
+    /* Busy slots in Planner Calendar */
+    #workspaceApp.light-theme #planCalendarGrid [aria-label="Khung giờ bận"] {
+      background: repeating-linear-gradient(135deg, #F1F5F9 0 5px, #E2E8F0 5px 10px) !important;
+      border-color: #CBD5E1 !important;
+    }
+    #workspaceApp.light-theme #planCalendarGrid [aria-label="Khung giờ bận"] span {
+      color: #475569 !important;
+    }
+    /* Busy overlay in Confirmed Plan Dashboard Week Calendar */
+    #workspaceApp.light-theme .cpd-busy-block {
+      background: repeating-linear-gradient(135deg, rgba(148, 163, 184, 0.22) 0 5px, rgba(241, 245, 249, 0.75) 5px 10px) !important;
+    }
+    /* Planned Event Blocks (crisp colored cards with guaranteed readable white text) */
+    #workspaceApp.light-theme .plan-calendar-event {
+      border-color: rgba(15, 23, 42, 0.08) !important;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
+      color: #FFFFFF !important;
+    }
+    #workspaceApp.light-theme .plan-calendar-event * {
+      color: #FFFFFF !important;
+    }
+    #workspaceApp.light-theme .plan-calendar-event [class*="text-white/75"] {
+      color: rgba(255, 255, 255, 0.88) !important;
+    }
+    #workspaceApp.light-theme .plan-calendar-event:hover {
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18) !important;
+      filter: brightness(1.03);
+    }
+    #workspaceApp.light-theme .plan-calendar-event[data-compact-event="true"] {
+      padding: 3px 6px !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    #workspaceApp.light-theme .plan-calendar-event[data-compact-event="true"] .plan-event-tag,
+    #workspaceApp.light-theme .plan-calendar-event[data-compact-event="true"] .plan-event-meta {
+      display: none;
+    }
+    #workspaceApp.light-theme .plan-calendar-event[data-compact-event="true"] .plan-event-title {
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #workspaceApp.light-theme .plan-calendar-event[data-compact-event="true"] .plan-event-time {
+      margin-top: 1px !important;
+      line-height: 1.1;
+    }
+    /* Activity sidebar list cards in Planner Calendar */
+    #workspaceApp.light-theme #planCalendarActivities > article {
+      background-color: #FFFFFF !important;
+      border-color: var(--lt-border) !important;
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    #workspaceApp.light-theme #planCalendarActivities > article:hover {
+      border-color: var(--lt-border-strong) !important;
+      box-shadow: var(--lt-shadow-md) !important;
+    }
+    /* Calendar legend swatches in Light Mode */
+    #workspaceApp.light-theme #planCalendarLegend i.bg-emerald-900 {
+      background-color: #A7F3D0 !important;
+      border: 1px solid #10B981;
+    }
+    #workspaceApp.light-theme #planCalendarLegend i.bg-slate-600 {
+      background-color: #CBD5E1 !important;
+      border: 1px solid #94A3B8;
+    }
+    #workspaceApp.light-theme #planCalendarLegend i.border-slate-700 {
+      background-color: #F8FAFC !important;
+      border-color: #CBD5E1 !important;
+    }
+
+    /* Personal 15-min Drag-to-Select Busy Calendar (Settings & Onboarding) */
+    :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) .onboarding-cal-col {
+      background-color: #FFFFFF !important;
+      background-image:
+        repeating-linear-gradient(to bottom, transparent 0, transparent 23px, rgba(226, 232, 240, 0.65) 24px),
+        repeating-linear-gradient(to bottom, transparent 0, transparent 47px, #CBD5E1 48px) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) .onboarding-drag-ghost {
+      border-color: var(--lt-primary) !important;
+      background: rgba(79, 70, 229, 0.14) !important;
+    }
+    /* Personal calendar busy blocks: high-contrast Notion Calendar pastel + strong left accent */
+    :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) [data-busy-block][class*="bg-indigo-500/80"] {
+      background-color: #EEF2FF !important;
+      border-color: #C7D2FE !important;
+      border-left: 3px solid #4F46E5 !important;
+      color: #312E81 !important;
+      box-shadow: 0 1px 2px rgba(79, 70, 229, 0.08) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) [data-busy-block][class*="bg-amber-500/80"] {
+      background-color: #FFFBEB !important;
+      border-color: #FCD34D !important;
+      border-left: 3px solid #D97706 !important;
+      color: #78350F !important;
+      box-shadow: 0 1px 2px rgba(217, 119, 6, 0.08) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) [data-busy-block][class*="bg-rose-500/80"] {
+      background-color: #FFF1F2 !important;
+      border-color: #FECDD3 !important;
+      border-left: 3px solid #E11D48 !important;
+      color: #881337 !important;
+      box-shadow: 0 1px 2px rgba(225, 29, 72, 0.08) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) [data-busy-block="override"] {
+      background-color: #ECFDF5 !important;
+      border-color: #059669 !important;
+      color: #065F46 !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #onboardingModal) [data-busy-block] * {
+      color: inherit !important;
+    }
+
+    /* Availability picker cells (if shown) */
+    #workspaceApp.light-theme .availability-cell[data-free="true"] {
+      background: #ECFDF5 !important;
+      border-color: #6EE7B7 !important;
+      color: #065F46 !important;
+    }
+    #workspaceApp.light-theme .availability-cell[data-free="false"] {
+      background: #F1F5F9 !important;
+      border-color: #CBD5E1 !important;
+      color: #475569 !important;
+    }
+
+    /* ---- 9. TABLES, HOVER ROWS, OPTIONS CARDS & PROGRESS BARS ---- */
+    :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) thead {
+      background-color: var(--lt-surface-subtle) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) [data-pos-card] {
+      box-shadow: var(--lt-shadow-sm) !important;
+    }
+    :is(#workspaceApp.light-theme, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen) [data-pos-card][class*="border-cyan-500"] {
+      border-color: var(--lt-primary) !important;
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.18), var(--lt-shadow-md) !important;
+    }
+    /* Progress bar tracks */
+    :is(#workspaceApp.light-theme, body.light-theme #planReviewScreen) .rounded-full[class*="bg-[#080d18]"] {
+      background-color: #E2E8F0 !important;
+    }
+    /* Interactive hover states on neutral outline buttons */
+    :is(#workspaceApp.light-theme, body.light-theme #loginModal, body.light-theme #onboardingModal, body.light-theme #welcomeModal, body.light-theme #planOptionsScreen, body.light-theme #planReviewScreen, body.light-theme #planDiffModal, body.light-theme #smartSwapModal, body.light-theme #activityTimelineModal) button:is([class*="hover:bg-[#162032]"], [class*="hover:bg-[#11192b]"], [class*="hover:bg-[#18233a]"], [class*="hover:bg-slate-800"]):hover {
+      background-color: var(--lt-surface-hover) !important;
+      color: var(--lt-text-primary) !important;
+    }
+
+    /* Onboarding & Review step indicator polish */
+    body.light-theme #onboardingModal [id^="onboardingStepMarker"][class*="bg-indigo-500/15"] {
+      background-color: var(--lt-primary-soft) !important;
+      border-color: var(--lt-primary) !important;
+      color: var(--lt-primary-text) !important;
+      box-shadow: none !important;
+    }
+    body.light-theme #onboardingModal [id^="onboardingStepMarker"][class*="bg-emerald-500/10"] {
+      background-color: var(--lt-success-soft) !important;
+      border-color: var(--lt-success-border) !important;
+      color: var(--lt-success-text) !important;
+    }
+    body.light-theme #onboardingModal [id^="onboardingStepMarker"][class*="bg-[#080d18]"] {
+      background-color: var(--lt-surface-subtle) !important;
+      border-color: var(--lt-border) !important;
+      color: var(--lt-text-muted) !important;
+    }
+
+    /* Ensure readable activity detail & calendar event spacing */
+    .plan-calendar-event {
+      line-height: 1.25;
+    }
+    .plan-calendar-day-unknown {
+      background: repeating-linear-gradient(135deg, #080d18, #080d18 10px, #0b111e 10px, #0b111e 20px);
+    }
+    .cpd-busy-block {
+      background: repeating-linear-gradient(135deg, rgba(100, 116, 139, .22) 0 6px, rgba(100, 116, 139, .07) 6px 12px);
     }
     .galaxy-page {
       min-height: 100vh;
@@ -523,14 +1099,25 @@
     #workspaceApp.light-theme .activity-pill span {
       color: #ffffff !important;
     }
-
-    #workspaceApp.light-theme .date-column-card:hover {
-      background-color: rgba(226, 232, 240, 0.7) !important;
+    #workspaceApp.light-theme .activity-pill {
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
     }
-
+    #workspaceApp.light-theme .activity-pill:hover {
+      box-shadow: 0 5px 14px rgba(15, 23, 42, 0.18) !important;
+      filter: brightness(1.04);
+    }
+    #workspaceApp.light-theme .date-column-card:hover {
+      background-color: #EEF2F7 !important;
+    }
     #workspaceApp.light-theme .date-column-card.center-focus-card {
-      background-color: #e0e7ff !important;
-      color: #1e1b4b !important;
+      background-color: var(--lt-primary-soft) !important;
+      color: var(--lt-primary-text) !important;
+    }
+    #workspaceApp.light-theme .date-column-card.center-focus-card span {
+      color: var(--lt-primary-text) !important;
+    }
+    #workspaceApp.light-theme .date-column-card.center-focus-card [class~="bg-indigo-600"] {
+      color: #FFFFFF !important;
     }
 
 </style>
@@ -2815,7 +3402,7 @@
         if (to <= from) return '';
         const top = ((from - first) / 60) * CPD_HOUR_PX;
         const height = ((to - from) / 60) * CPD_HOUR_PX;
-        return `<div class="absolute left-0 right-0 pointer-events-none" title="Lịch bận của bạn" style="top:${top}px;height:${height}px;background:repeating-linear-gradient(135deg,rgba(100,116,139,.22) 0 6px,rgba(100,116,139,.07) 6px 12px)"></div>`;
+        return `<div class="cpd-busy-block absolute left-0 right-0 pointer-events-none" title="Lịch bận của bạn" style="top:${top}px;height:${height}px"></div>`;
       }).join('');
     }
 
@@ -2839,10 +3426,11 @@
           const endMinutes = event.end.date === date ? event.end.minutes : CPD_LAST_HOUR * 60;
           const height = Math.max(30, ((Math.min(endMinutes, CPD_LAST_HOUR * 60) - Math.max(event.start.minutes, CPD_FIRST_HOUR * 60)) / 60) * CPD_HOUR_PX);
           const color = cpdColor(event.activityIndex);
-          return `<button type="button" onclick="cpdOpenActivity('${activityToken(event.activity.activity_id)}')" title="${escapeHTML(event.activity.title)} · ${escapeHTML(cpdTimeText(event))}" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white" style="top:${top}px;height:${height}px;background:${color.bg};border-left:3px solid ${color.border}">
-            <span class="block text-[10px] font-extrabold leading-tight line-clamp-2">${escapeHTML(event.activity.title)}</span>
-            <span class="block mt-1 text-[9px] text-white/75 planner-number">${escapeHTML(cpdTimeText(event))}</span>
-            <span class="block text-[9px] text-white/75">${escapeHTML(cpdPlaceText(event.activity))}${cpdDashboardPoints(event.activity) ? ' · ' + escapeHTML(cpdDashboardPoints(event.activity)) : ''}</span>
+          const compactAttr = height < 58 ? ' data-compact-event="true"' : '';
+          return `<button type="button" onclick="cpdOpenActivity('${activityToken(event.activity.activity_id)}')" title="${escapeHTML(event.activity.title)} · ${escapeHTML(cpdTimeText(event))}" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white"${compactAttr} style="top:${top}px;height:${height}px;background:${color.bg};border-left:3px solid ${color.border}">
+            <span class="plan-event-title block text-[10px] font-extrabold leading-tight line-clamp-2">${escapeHTML(event.activity.title)}</span>
+            <span class="plan-event-time block mt-1 text-[9px] text-white/75 planner-number">${escapeHTML(cpdTimeText(event))}</span>
+            <span class="plan-event-meta block text-[9px] text-white/75">${escapeHTML(cpdPlaceText(event.activity))}${cpdDashboardPoints(event.activity) ? ' · ' + escapeHTML(cpdDashboardPoints(event.activity)) : ''}</span>
           </button>`;
         }).join('');
         return `<div class="plan-calendar-day relative border-l border-[#1b2537]">${cpdBusyBlocks(busy, date)}${items}</div>`;
@@ -2856,7 +3444,7 @@
           <div class="grid bg-[#0b101b] border-b border-[#1b2537]" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div></div>${headers}</div>
           <div class="grid" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div class="relative bg-[#080d18]" style="height:${hours * CPD_HOUR_PX}px">${hourLabels}</div>${columns}</div>
         </div></div>
-        <p class="text-[11px] text-slate-500"><span class="inline-block h-2.5 w-4 align-middle rounded-sm" style="background:repeating-linear-gradient(135deg,rgba(100,116,139,.5) 0 3px,rgba(100,116,139,.15) 3px 6px)"></span> Nền mờ là lịch bận bạn đã khai (chỉ để xem).</p>
+        <p class="text-[11px] text-slate-500"><span class="cpd-busy-block inline-block h-2.5 w-4 align-middle rounded-sm border border-[#2b3a54]"></span> Nền mờ là lịch bận bạn đã khai (chỉ để xem).</p>
       </div>`;
     }
 
@@ -4617,7 +5205,9 @@
       const button = document.getElementById("btnThemeToggle");
       const icon = document.getElementById("themeToggleIcon");
       const label = document.getElementById("themeToggleLabel");
-      workspace.classList.toggle("light-theme", light);
+      if (workspace) workspace.classList.toggle("light-theme", light);
+      document.body?.classList?.toggle("light-theme", light);
+      document.documentElement?.classList?.toggle("light-theme", light);
       if (icon) icon.textContent = light ? "☾" : "☀";
       if (label) label.textContent = light ? "Tối" : "Sáng";
       if (button) {
@@ -10463,12 +11053,14 @@
             const time = `${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}–${String(end.getHours()).padStart(2, '0')}:${String(end.getMinutes()).padStart(2, '0')}`;
             const previewAdded = calendarPreviewChange?.result === data && (calendarPreviewChange.added_activity_ids || []).includes(block.activity.activity_id);
             const previewStyle = block.previewRemoved ? 'background:rgba(127,29,29,.55);border:2px dashed #fb7185;opacity:.75' : previewAdded ? 'background:rgba(6,95,70,.95);border:2px solid #34d399' : `background:${color.bg};border-left:3px solid ${color.border}`;
-            return `<button type="button" title="${escapeHTML(title)} · ${time}" onclick="openPlannedActivityDetails(activityFromToken('${activityToken(block.activity.activity_id)}'))" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white" style="top:${style.top}px;height:${Math.max(30, style.height)}px;${previewStyle};z-index:3">
-              <span class="block text-[9px] font-black">${block.previewRemoved ? 'BỎ' : previewAdded ? 'THÊM' : 'PLANNED'}</span><span class="block text-[10px] font-extrabold leading-tight line-clamp-2">${escapeHTML(title)}</span>
-              <span class="block mt-1 text-[9px] text-white/75 planner-number">${time}</span>
+            const eventHeight = Math.max(30, style.height);
+            const compactAttr = eventHeight < 58 ? ' data-compact-event="true"' : '';
+            return `<button type="button" title="${escapeHTML(title)} · ${time}" onclick="openPlannedActivityDetails(activityFromToken('${activityToken(block.activity.activity_id)}'))" class="plan-calendar-event rounded-lg px-2 py-1.5 text-left text-white"${compactAttr} style="top:${style.top}px;height:${eventHeight}px;${previewStyle};z-index:3">
+              <span class="plan-event-tag block text-[9px] font-black">${block.previewRemoved ? 'BỎ' : previewAdded ? 'THÊM' : 'PLANNED'}</span><span class="plan-event-title block text-[10px] font-extrabold leading-tight line-clamp-2">${escapeHTML(title)}</span>
+              <span class="plan-event-time block mt-1 text-[9px] text-white/75 planner-number">${time}</span>
             </button>`;
           }).join('');
-          return `<div class="plan-calendar-day relative border-l border-[#1b2537]" style="background:repeating-linear-gradient(135deg,#080d18,#080d18 10px,#0b111e 10px,#0b111e 20px)">${openSlots}${busySlots}${events}</div>`;
+          return `<div class="plan-calendar-day plan-calendar-day-unknown relative border-l border-[#1b2537]">${openSlots}${busySlots}${events}</div>`;
         }).join('');
         grid.innerHTML = `<div class="plan-calendar-board"><div class="grid bg-[#0b101b] border-b border-[#1b2537]" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div></div>${dayHeaders}</div><div class="grid" style="grid-template-columns:56px repeat(7,minmax(96px,1fr))"><div class="relative h-[672px] bg-[#080d18]">${hourLabels}</div>${dayColumns}</div></div>`;
       }
