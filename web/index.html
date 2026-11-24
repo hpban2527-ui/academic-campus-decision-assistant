@@ -551,11 +551,10 @@
             </a>
             <div class="galaxy-task-dropdown">
               <div class="galaxy-task-dropdown-panel">
-                <button type="button" onclick="showWorkspace('activities', 'discover')"><span class="block text-sm font-semibold">Khám phá hoạt động</span><span class="block text-xs text-slate-400 mt-0.5">Sự kiện và workshop phù hợp</span></button>
+                <button type="button" onclick="showWorkspace('activities')"><span class="block text-sm font-semibold">Khám phá hoạt động</span><span class="block text-xs text-slate-400 mt-0.5">Sự kiện và workshop phù hợp</span></button>
                 <button type="button" onclick="showWorkspace('calculator', 'tracker')"><span class="block text-sm font-semibold">Theo dõi điểm rèn luyện</span><span class="block text-xs text-slate-400 mt-0.5">Điểm số và tiến độ của bạn</span></button>
                 <button type="button" onclick="showWorkspace('plan')"><span class="block text-sm font-semibold">Lập lịch thông minh</span><span class="block text-xs text-slate-400 mt-0.5">Lên kế hoạch theo thời gian rảnh</span></button>
                 <button type="button" onclick="showWorkspace('calculator', 'calculate')"><span class="block text-sm font-semibold">Tính điểm hoạt động</span><span class="block text-xs text-slate-400 mt-0.5">Đánh giá theo quy chế ĐRL</span></button>
-                <button type="button" onclick="showWorkspace('activities')"><span class="block text-sm font-semibold">Kho hoạt động</span><span class="block text-xs text-slate-400 mt-0.5">Tra cứu bài đăng đã thu thập</span></button>
                 <button type="button" onclick="showWorkspace('snapshot')"><span class="block text-sm font-semibold">Điểm học vụ</span><span class="block text-xs text-slate-400 mt-0.5">Kết quả học tập và GPA</span></button>
               </div>
             </div>
@@ -641,11 +640,10 @@
           <p class="text-slate-400 mt-4">Khám phá những công cụ giúp cuộc sống đại học dễ dàng hơn.</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <button type="button" onclick="showWorkspace('activities', 'discover')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">✦</div><h3 class="text-xl font-bold mb-3">Khám phá hoạt động</h3><p class="text-sm text-slate-400 leading-relaxed">Tìm kiếm sự kiện, workshop và các hoạt động phù hợp với sở thích.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Khám phá ngay ↗</div></button>
+          <button type="button" onclick="showWorkspace('activities')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">✦</div><h3 class="text-xl font-bold mb-3">Khám phá hoạt động</h3><p class="text-sm text-slate-400 leading-relaxed">Tìm kiếm sự kiện, workshop, theo dõi dòng thời gian 7 ngày và tra cứu hoạt động đã kiểm duyệt.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Khám phá ngay ↗</div></button>
           <button type="button" onclick="showWorkspace('calculator', 'tracker')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">◈</div><h3 class="text-xl font-bold mb-3">Theo dõi điểm rèn luyện</h3><p class="text-sm text-slate-400 leading-relaxed">Theo dõi điểm rèn luyện, tiêu chí và tiến độ hoàn thành.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Theo dõi ngay ↗</div></button>
           <button type="button" onclick="showWorkspace('plan')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">⌘</div><h3 class="text-xl font-bold mb-3">Lập lịch thông minh</h3><p class="text-sm text-slate-400 leading-relaxed">Sắp xếp lịch trình và lựa chọn hoạt động phù hợp với thời gian.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Lập kế hoạch ↗</div></button>
           <button type="button" onclick="showWorkspace('calculator', 'calculate')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">◎</div><h3 class="text-xl font-bold mb-3">Tính điểm hoạt động</h3><p class="text-sm text-slate-400 leading-relaxed">Chấm điểm chi tiết từng hoạt động dựa trên quy chế 75 quy tắc.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Tính điểm ngay ↗</div></button>
-          <button type="button" onclick="showWorkspace('activities')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">⌁</div><h3 class="text-xl font-bold mb-3">Kho hoạt động</h3><p class="text-sm text-slate-400 leading-relaxed">Tra cứu danh sách tổng hợp các bài đăng, sự kiện đã thu thập và kiểm duyệt.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Mở kho hoạt động ↗</div></button>
           <button type="button" onclick="showWorkspace('snapshot')" class="galaxy-feature-card rounded-2xl p-7 text-left"><div class="text-3xl mb-6">✧</div><h3 class="text-xl font-bold mb-3">Điểm học vụ</h3><p class="text-sm text-slate-400 leading-relaxed">Theo dõi kết quả học tập, GPA học kỳ và tiến độ tích lũy.</p><div class="text-blue-400 text-sm mt-6 font-semibold">Xem kết quả ↗</div></button>
         </div>
       </div>
@@ -810,9 +808,12 @@
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 11.5 12 4l9 7.5M5.5 10v9.5h13V10M9 19.5v-6h6v6"/></svg>
               <span class="text-sm font-bold">Tổng quan</span>
             </button>
-            <button id="tabBtnDiscoverActivities" onclick="switchTab('activities', 'discover')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
-              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="m16 16 4 4"/></svg>
-              <span class="text-sm font-bold">Khám phá hoạt động</span>
+            <button id="tabBtnDiscoverActivities" onclick="switchTab('activities', 'discover')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="m16 16 4 4"/></svg>
+                <span class="text-sm font-bold">Khám phá hoạt động</span>
+              </div>
+              <span id="sidebarActCount" class="text-xs font-bold px-2 py-0.5 rounded-full bg-[#162032] text-slate-300 border border-[#223046]">20</span>
             </button>
 
             <button id="tabBtnDrlTracker" onclick="switchTab('calculator', 'tracker')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
@@ -823,14 +824,6 @@
             <button id="tabBtnCalculator" onclick="switchTab('calculator', 'calculate')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
               <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
               <span class="text-sm font-bold">Tính điểm hoạt động</span>
-            </button>
-
-            <button id="tabBtnActivities" onclick="switchTab('activities')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                <span class="text-sm font-bold">Kho hoạt động</span>
-              </div>
-              <span id="sidebarActCount" class="text-xs font-bold px-2 py-0.5 rounded-full bg-[#162032] text-slate-300 border border-[#223046]">20</span>
             </button>
 
             <button id="tabBtnSnapshot" onclick="switchTab('snapshot')" class="nav-btn-inactive w-full px-4 py-3 rounded-xl border text-left transition flex items-center gap-3">
@@ -2127,7 +2120,7 @@
   </div>
   <!-- REVIEW-DASH END -->
   <!-- REVIEW-DASH START -->
-  <div id="planDiffModal"class="hidden fixed inset-0 z-[108] flex items-center justify-center bg-black/70 p-4" role="dialog" aria-modal="true" aria-labelledby="planDiffTitle">
+  <div id="planDiffModal" class="hidden fixed inset-0 z-[108] flex items-center justify-center bg-black/70 p-4" role="dialog" aria-modal="true" aria-labelledby="planDiffTitle">
     <div class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-[#2b3a54] bg-[#0e1524] p-5">
       <h2 id="planDiffTitle" class="text-lg font-extrabold text-white">Thay kế hoạch đã chốt?</h2>
       <div id="planDiffBody" class="mt-3"></div>
@@ -5223,7 +5216,7 @@
         .slice(0, 3);
 
       if (!recommendations.length) {
-        container.innerHTML = `<p class="md:col-span-3 rounded-xl border border-dashed border-[#223046] bg-[#080d18] p-4 text-xs text-slate-400">Chưa có hoạt động gợi ý. Hãy mở Kho hoạt động để xem danh sách mới nhất.</p>`;
+        container.innerHTML = `<p class="md:col-span-3 rounded-xl border border-dashed border-[#223046] bg-[#080d18] p-4 text-xs text-slate-400">Chưa có hoạt động gợi ý. Hãy mở Khám phá hoạt động để xem danh sách mới nhất.</p>`;
         return;
       }
 
@@ -8665,7 +8658,7 @@
       const taskTabButtons = {
         dashboard: ['tabBtnDashboard'],
         calculator: ['tabBtnCalculator', 'tabBtnDrlTracker'],
-        activities: ['tabBtnActivities', 'tabBtnDiscoverActivities'],
+        activities: ['tabBtnDiscoverActivities'],
       };
       const activeTaskButton = action === 'tracker'
         ? 'tabBtnDrlTracker'
@@ -8679,7 +8672,7 @@
         const devClass = (t === 'testSuites' || t === 'inspector') ? 'dev-only ' : '';
         const buttonIds = taskTabButtons[t] || ['tabBtn' + capitalize(t)];
         const selectedButton = t === tab
-          ? (buttonIds.includes(activeTaskButton) ? activeTaskButton : 'tabBtn' + capitalize(t))
+          ? (buttonIds.includes(activeTaskButton) ? activeTaskButton : buttonIds[0])
           : null;
         if (view) {
           view.classList.toggle('hidden', t !== tab);
@@ -11519,7 +11512,7 @@
             btnSave.innerHTML = `<span class="text-amber-300 font-bold">Đã gửi vào hàng đợi duyệt ✓</span>`;
           }
           if (saveText) {
-            saveText.innerHTML = `<b>Đã ghi nhận!</b> Bài đăng đã được chuyển vào Hàng đợi rà soát trong Kho hoạt động.`;
+            saveText.innerHTML = `<b>Đã ghi nhận!</b> Bài đăng đã được chuyển vào Hàng đợi rà soát trong Khám phá hoạt động.`;
           }
         } else {
           const catId = commitData.category_id || sp2.category_id;
