@@ -2362,7 +2362,7 @@
         const state = reviewDashReadState();
         if (state && state.plan) {
           state.data.pending_plan_notice = true;
-          localStorage.setItem(localUserDataKey(state.mssv), JSON.stringify(state.data));
+          writeLocalUserData(state.mssv, state.data);
           renderConfirmedPlanDashboard();
         }
       } catch (error) {
@@ -2463,7 +2463,7 @@
         data.profile.completed_onboarding = true;
         data.profile.onboarding_started = false;
       }
-      localStorage.setItem(localUserDataKey(mssv), JSON.stringify(data));
+      writeLocalUserData(mssv, data);
       if (typeof rdOnboardingActive === 'function' && rdOnboardingActive()) {
         currentProfileDraft.completed_onboarding = true;
         currentProfileDraft.onboarding_started = false;
@@ -3024,7 +3024,7 @@
       const points = dashboard ? cpdDashboardPoints(activity) : cpdPointsText(activity);
       const status = dashboard && cpdCompletionState?.progress?.activities?.[activity.activity_id];
       const completed = status?.status === 'COMPLETED';
-      const condition = status ? status.condition : activity.completion_requirements;
+      const condition = status ? status.condition : prvCompletionText(activity.completion_requirements);
       const action = dashboard ? `cpdOpenChange('${token}')` : `prvOpenChange('${token}')`;
       const link = /^https?:\/\//i.test(String(activity.source_url || ''))
         ? `<a href="${escapeHTML(activity.source_url)}" target="_blank" rel="noopener noreferrer" class="font-bold text-cyan-300 hover:text-cyan-200">Xem bài đăng gốc ↗</a>` : '';
@@ -3248,6 +3248,46 @@
       return Boolean(prvDraft?.preference || activePlanPreference || confirmedPreference);
     }
 
+    // Highlights of a review row. Dates are compared with the plan's demo clock (as_of), never the system date.
+    function prvDeadlineInfo(iso, asOf) {
+      const text = iso ? cpdDeadlineText(iso) : '';
+      if (!text) return null;
+      const deadline = Date.parse(iso);
+      const now = Date.parse(asOf || '');
+      if (!Number.isFinite(deadline) || !Number.isFinite(now)) return { text, left: '', urgent: false };
+      const days = Math.ceil((deadline - now) / 86400000);
+      if (days < 0) return { text, left: 'đã hết hạn', urgent: true };
+      return { text, left: days === 0 ? 'hôm nay' : `còn ${days} ngày`, urgent: days <= 3 };
+    }
+
+    var PRV_TASK_LABELS = {
+      quiz: 'Làm bài quiz', check_in: 'Điểm danh (check-in)', check_out: 'Điểm danh ra về (check-out)',
+      form: 'Điền form', proof_upload: 'Nộp minh chứng', minimum_duration: 'Tham gia đủ thời lượng',
+      min_duration: 'Tham gia đủ thời lượng', other: 'Yêu cầu khác (xem bài gốc)'
+    };
+
+    // completion_requirements is the post's own requirement: 'NOT_STATED' / 'UNKNOWN', or a JSON list of
+    // {type, threshold, unit, deadline}. Nothing is shown when the post states nothing.
+    function prvCompletionText(raw) {
+      if (!raw || raw === 'NOT_STATED' || raw === 'UNKNOWN') return '';
+      let items;
+      try { items = JSON.parse(raw); } catch (error) { return String(raw); }
+      if (!Array.isArray(items)) return String(raw);
+      const parts = [];
+      items.forEach(item => {
+        if (!item || typeof item !== 'object') return;
+        const threshold = Number.isFinite(Number(item.threshold)) && item.threshold !== null ? Number(item.threshold) : null;
+        const ofMatch = typeof item.unit === 'string' ? item.unit.match(/^of (\d+) (questions|sessions)$/) : null;
+        let text = PRV_TASK_LABELS[item.type] || PRV_TASK_LABELS.other;
+        if (item.type === 'quiz' && threshold !== null && item.unit === 'percent') text = `Làm bài quiz đạt từ ${threshold}%`;
+        else if (item.type === 'quiz' && threshold !== null && ofMatch) text = `Làm bài quiz đúng từ ${threshold}/${ofMatch[1]} câu`;
+        else if (threshold !== null && ofMatch && ofMatch[2] === 'sessions') text = `Tham gia từ ${threshold}/${ofMatch[1]} buổi`;
+        if (item.deadline) text += ` (hạn ${cpdDeadlineText(item.deadline) || item.deadline})`;
+        if (!parts.includes(text)) parts.push(text);
+      });
+      return parts.join(' · ');
+    }
+
     function prvListHtml(activities, summary) {
       const steps = prvDraft.steps;
       const changedRows = new Map();
@@ -3261,24 +3301,52 @@
       });
       const present = new Set(activities.map(item => item.activity_id));
       const disabled = prvDraft.busy || !prvCanEdit() ? 'disabled' : '';
+      const asOf = prvDraft.result?.plan?.context?.as_of || prvDraft.result?.as_of || null;
+      const breakdown = new Map((prvDraft.result?.personalization?.selected_breakdown || []).map(row => [row.activity_id, row]));
       const rows = activities.map(activity => {
         const token = activityToken(activity.activity_id);
         const mark = changedRows.get(activity.activity_id);
-        const points = cpdPointsText(activity);
-        const badges = [
-          mark ? `<span class="rounded-md border border-emerald-500/40 bg-emerald-950/50 px-2 py-0.5 text-[10px] font-bold text-emerald-300">${escapeHTML(mark.label)}${mark.note ? ' ' + escapeHTML(mark.note) : ''}</span>` : '',
-          mark && mark.stepId ? `<button type="button" onclick="prvUndo(${mark.stepId})" class="text-[10px] font-bold text-amber-300">Hoàn tác</button>` : '',
-          activity.completion_requirements ? `<span title="${escapeHTML(activity.completion_requirements)}" class="text-[10px] text-violet-200">Nhiệm vụ hoàn thành</span>` : '',
-          activity.registration_deadline ? `<span class="text-[10px] text-amber-200">⚑ Hạn đăng ký ${escapeHTML(cpdDeadlineText(activity.registration_deadline))}</span>` : ''
+        const first = activity.scheduled_blocks[0];
+        const start = first && cpdVn(first.start);
+        const end = first && cpdVn(first.end);
+        const dateTile = start
+          ? `<div class="text-[10px] font-bold uppercase tracking-wide text-indigo-300">${escapeHTML(AVAILABILITY_DAYS[(cpdWeekday(start.date) + 6) % 7])}</div>
+             <div class="text-2xl font-black leading-none text-white planner-number">${escapeHTML(start.date.slice(8, 10))}</div>
+             <div class="text-[10px] font-semibold text-indigo-200">Th${escapeHTML(String(Number(start.date.slice(5, 7))))}</div>`
+          : '<div class="text-[11px] font-bold leading-tight text-indigo-200">Thời gian linh hoạt</div>';
+        const more = activity.scheduled_blocks.length > 1 ? ` · +${activity.scheduled_blocks.length - 1} buổi` : '';
+        const timeChip = start && end
+          ? `<span class="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/40 bg-sky-950/40 px-2.5 py-1 text-xs font-bold text-sky-100">🕒 ${escapeHTML(start.time)}–${escapeHTML(end.time)}${escapeHTML(more)}</span>`
+          : '';
+        const place = cpdPlaceText(activity);
+        const placeChip = `<span title="${escapeHTML(place)}" class="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-slate-500/40 bg-slate-800/50 px-2.5 py-1 text-xs font-bold text-slate-100"><span class="shrink-0">${activity.mode === 'online' ? '💻' : '📍'}</span><span class="truncate max-w-[18rem]">${escapeHTML(place)}</span></span>`;
+        const pointsChip = activity.effective_gain != null
+          ? `<span class="inline-flex items-center gap-2 rounded-lg border border-emerald-400/50 bg-emerald-500/15 px-2.5 py-1"><span class="text-base font-black leading-none text-emerald-300 planner-number">+${escapeHTML(String(activity.effective_gain))}đ</span>${activity.criterion ? `<span class="text-xs font-bold text-emerald-100">${escapeHTML(PLAN_CAT_LABELS[activity.criterion] || activity.criterion)}${PLAN_CAT_FULL[activity.criterion] ? ' · ' + escapeHTML(PLAN_CAT_FULL[activity.criterion]) : ''}</span>` : ''}</span>`
+          : '';
+        const deadline = prvDeadlineInfo(activity.registration_deadline, asOf);
+        const deadlineChip = deadline
+          ? `<span class="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${deadline.urgent ? 'border-rose-500/60 bg-rose-950/50 text-rose-100' : 'border-amber-500/50 bg-amber-950/40 text-amber-100'}">⚑ Hạn đăng ký ${escapeHTML(deadline.text)}${deadline.left ? ` <span class="${deadline.urgent ? 'text-rose-300' : 'text-amber-300'}">· ${escapeHTML(deadline.left)}</span>` : ''}</span>`
+          : '';
+        const tasks = prvCompletionText(activity.completion_requirements);
+        const taskBox = tasks
+          ? `<div class="mt-2 rounded-lg border border-violet-500/40 bg-violet-950/40 px-3 py-2 text-xs text-violet-100"><span class="font-extrabold text-violet-200">✔ Nhiệm vụ hoàn thành:</span> ${escapeHTML(tasks)}</div>`
+          : '';
+        const match = prvPrimaryMatch(breakdown.get(activity.activity_id)?.matches);
+        const matchChip = match ? `<span class="inline-flex items-center gap-1 rounded-lg border border-pink-500/40 bg-pink-950/30 px-2.5 py-1 text-xs font-bold text-pink-100">♥ Hợp sở thích · ${escapeHTML(match)}</span>` : '';
+        const changeBadges = [
+          mark ? `<span class="rounded-md border border-emerald-500/40 bg-emerald-950/50 px-2 py-0.5 text-[11px] font-bold text-emerald-300">${escapeHTML(mark.label)}${mark.note ? ' ' + escapeHTML(mark.note) : ''}</span>` : '',
+          mark && mark.stepId ? `<button type="button" onclick="prvUndo(${mark.stepId})" class="text-[11px] font-bold text-amber-300">Hoàn tác</button>` : ''
         ].join('');
         const mobilePanel = prvDraft.panel.mode === 'change' && prvDraft.panel.activityId === activity.activity_id && prvChangeIsMobile();
-        return `<article data-review-row="${token}" class="rounded-xl border border-[#223046] bg-[#080d18] p-3.5">
-          <div class="flex flex-wrap items-start gap-3">
-            <div class="w-32 shrink-0 text-xs font-extrabold leading-snug text-indigo-300 planner-number">${escapeHTML(prvWhen(activity))}</div>
-            <div class="min-w-0 flex-1 basis-48">
-              <button type="button" onclick="prvShowDetail('${token}')" class="text-left text-sm font-extrabold text-white hover:text-cyan-300">${escapeHTML(activity.title)}</button>
-              <div class="mt-1 flex flex-wrap gap-x-3 text-[11px] text-slate-400"><span>${escapeHTML(cpdPlaceText(activity))}</span>${points ? `<span class="font-bold text-emerald-300">${escapeHTML(points)}</span>` : ''}</div>
-              <div class="mt-1.5 flex flex-wrap items-center gap-1.5">${badges}</div>
+        return `<article data-review-row="${token}" class="rounded-2xl border ${mark ? 'border-emerald-500/50' : 'border-[#223046]'} bg-[#080d18] p-4 transition hover:border-indigo-500/60">
+          <div class="flex flex-wrap items-start gap-4">
+            <div class="w-16 shrink-0 rounded-xl border border-indigo-500/40 bg-indigo-950/40 px-1.5 py-2 text-center">${dateTile}</div>
+            <div class="min-w-0 flex-1 basis-56">
+              ${changeBadges ? `<div class="mb-1.5 flex flex-wrap items-center gap-2">${changeBadges}</div>` : ''}
+              <button type="button" onclick="prvShowDetail('${token}')" title="${escapeHTML(activity.title)}" class="line-clamp-2 text-left text-base font-extrabold leading-snug text-white hover:text-cyan-300">${escapeHTML(activity.title)}</button>
+              <div class="mt-2 flex flex-wrap items-center gap-2">${pointsChip}${timeChip}${placeChip}</div>
+              ${deadlineChip || matchChip ? `<div class="mt-2 flex flex-wrap items-center gap-2">${deadlineChip}${matchChip}</div>` : ''}
+              ${taskBox}
             </div>
             <div data-review-actions class="shrink-0"><button id="prv-change-${token}" type="button" ${disabled} aria-label="Thay đổi ${escapeHTML(activity.title)}" onclick="prvOpenChange('${token}')" class="rounded-lg border border-indigo-500/50 px-3 py-1.5 text-xs font-bold text-indigo-200 hover:bg-indigo-950/50 disabled:opacity-40">Thay đổi</button></div>
           </div>${mobilePanel ? `<div class="mt-3">${prvChangePanelHtml(activities)}</div>` : ''}
@@ -4078,7 +4146,7 @@
       const data = readLocalUserData(currentStudent.student_id);
       data.onboarding_status = 'IN_PROGRESS'; data.onboarding_step = onboardingStep;
       data.profile.completed_onboarding = false; data.profile.onboarding_started = true;
-      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      writeLocalUserData(currentStudent.student_id, data);
     }
 
     function rdOnboardingFooter() {
@@ -4162,10 +4230,12 @@
       // A new build must never resume an older plan after changed profile inputs or a failed request.
       planStages.first = null; planStages.replan = null; planStages.whatif = null;
       currentPlannerData = null; cachedPlanOptions = []; currentPlanStage = 'first';
-      rdOnboardingSetStep(4);
-      persistCurrentUserData();
-      document.getElementById('inputPlanTarget').value = target;
-      try { await runSp3Planner(); }
+      try {
+        rdOnboardingSetStep(4);
+        persistCurrentUserData();
+        document.getElementById('inputPlanTarget').value = target;
+        await runSp3Planner();
+      }
       catch (error) { if (rdOnboardingFlow === flow && request === flow.request) rdOnboardingPlanFailed(error.message); }
       if (!rdOnboardingActive() || rdOnboardingFlow !== flow || request !== flow.request) return;
       flow.busy = false;
@@ -4902,7 +4972,7 @@
         data.profile.drl_target = Math.max(0, Math.min(100, Number(profile.goal.target_score)));
       }
       data.updated_at = new Date().toISOString();
-      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      writeLocalUserData(currentStudent.student_id, data);
     }
 
     function setProfileTab(tab) {
@@ -5196,6 +5266,102 @@
       return `unilife_data_${mssv}`;
     }
 
+    // Planner snapshots repeat the whole catalog in options, stages and the confirmed result.
+    // Store identical top-level payloads once, then restore independent copies for the controllers.
+    // Profile, scores and the confirmed calendar keep their existing on-disk shape.
+    function mapLocalPlannerSnapshots(data, transform) {
+      const mapped = { ...data };
+      if (data.confirmed_plan_result) mapped.confirmed_plan_result = transform(data.confirmed_plan_result);
+      if (data.planner) {
+        const planner = mapped.planner = { ...data.planner };
+        if (planner.plan_stages) planner.plan_stages = Object.fromEntries(
+          Object.entries(planner.plan_stages).map(([stage, result]) => [stage, result ? transform(result) : result]));
+        if (Array.isArray(planner.cached_plan_options)) planner.cached_plan_options = planner.cached_plan_options.map(
+          option => option.result ? { ...option, result: transform(option.result) } : { ...option });
+        if (planner.custom_plan_backup) planner.custom_plan_backup = transform(planner.custom_plan_backup);
+      }
+      return mapped;
+    }
+
+    function serializeLocalUserData(data) {
+      const plain = JSON.stringify(data);
+      if (plain.length < 32768) return plain;
+      const values = [], indices = new Map();
+      function intern(value) {
+        const signature = JSON.stringify(value);
+        if (!indices.has(signature)) {
+          indices.set(signature, values.length);
+          values.push(value);
+        }
+        return indices.get(signature);
+      }
+      const packed = mapLocalPlannerSnapshots(data, result => ({
+        $plan: intern(Object.entries(result).map(([field, value]) => [field, intern(value)]))
+      }));
+      packed._planner_payloads = { version: 1, values };
+      const compact = JSON.stringify(packed);
+      return compact.length < plain.length ? compact : plain;
+    }
+
+    function deserializeLocalUserData(saved) {
+      if (!saved?._planner_payloads) return saved; // Existing uncompressed accounts remain readable.
+      const pool = saved._planner_payloads;
+      if (pool.version !== 1 || !Array.isArray(pool.values)) throw new Error('Dữ liệu kế hoạch đã lưu không hợp lệ.');
+      function valueAt(index) {
+        if (!Number.isInteger(index) || index < 0 || index >= pool.values.length) {
+          throw new Error('Dữ liệu kế hoạch đã lưu không hợp lệ.');
+        }
+        return pool.values[index];
+      }
+      const data = mapLocalPlannerSnapshots(saved, reference => {
+        const fields = valueAt(reference.$plan);
+        if (!Array.isArray(fields)) throw new Error('Dữ liệu kế hoạch đã lưu không hợp lệ.');
+        return Object.fromEntries(fields.map(([field, index]) => [field, JSON.parse(JSON.stringify(valueAt(index)))]));
+      });
+      delete data._planner_payloads;
+      return data;
+    }
+
+    function isLocalStorageQuotaError(error) {
+      return error?.name === 'QuotaExceededError' || error?.name === 'NS_ERROR_DOM_QUOTA_REACHED'
+        || error?.code === 22 || error?.code === 1014;
+    }
+
+    function writeLocalUserData(mssv, data) {
+      const key = localUserDataKey(mssv);
+      const serialized = serializeLocalUserData(data);
+      try {
+        localStorage.setItem(key, serialized);
+        return;
+      } catch (error) {
+        if (!isLocalStorageQuotaError(error)) throw error;
+      }
+      // The quota is shared by accounts on this origin. Losslessly compact older records;
+      // never clear storage, remove an account or discard its confirmed plan to make room.
+      const keys = [];
+      for (let index = 0; index < localStorage.length; index += 1) {
+        const otherKey = localStorage.key(index);
+        if (otherKey?.startsWith('unilife_data_') && otherKey !== key) keys.push(otherKey);
+      }
+      for (const otherKey of keys) {
+        try {
+          const previous = localStorage.getItem(otherKey);
+          const compact = serializeLocalUserData(deserializeLocalUserData(JSON.parse(previous)));
+          if (compact.length >= previous.length) continue;
+          localStorage.setItem(otherKey, compact);
+        } catch (error) {
+          continue; // Leave malformed or unwritable records untouched.
+        }
+        try {
+          localStorage.setItem(key, serialized);
+          return;
+        } catch (error) {
+          if (!isLocalStorageQuotaError(error)) throw error;
+        }
+      }
+      throw new Error('Trình duyệt không còn đủ dung lượng để lưu tài khoản. Hãy giải phóng dung lượng của trang rồi thử lại. Dữ liệu đã lưu vẫn được giữ.');
+    }
+
     function createDefaultLocalUserData(mssv, isNewRegistration = false) {
       return {
         schema_version: 2,
@@ -5305,7 +5471,7 @@
         saved_activities: Array.isArray(saved.saved_activities) ? saved.saved_activities : [],
         planner: { ...defaults.planner, ...(saved.planner || {}) }
       };
-      if (needsMigration) localStorage.setItem(localUserDataKey(mssv), JSON.stringify(migrated));
+      if (needsMigration) writeLocalUserData(mssv, migrated);
       return migrated;
     }
 
@@ -5313,10 +5479,10 @@
       const raw = localStorage.getItem(localUserDataKey(mssv));
       if (!raw) {
         const fresh = createDefaultLocalUserData(mssv);
-        localStorage.setItem(localUserDataKey(mssv), JSON.stringify(fresh));
+        writeLocalUserData(mssv, fresh);
         return fresh;
       }
-      const saved = JSON.parse(raw);
+      const saved = deserializeLocalUserData(JSON.parse(raw));
       if (!saved || typeof saved !== "object" || Array.isArray(saved)) {
         throw new Error(`Dữ liệu tài khoản ${mssv} trong trình duyệt không hợp lệ.`);
       }
@@ -6409,7 +6575,7 @@
         custom_plan_backup: customPlanBackup ? JSON.parse(JSON.stringify(customPlanBackup)) : null
       };
       saved.updated_at = new Date().toISOString();
-      localStorage.setItem(localUserDataKey(mssv), JSON.stringify(saved));
+      writeLocalUserData(mssv, saved);
       renderWorkspaceOverview();
     }
 
@@ -6533,7 +6699,7 @@
         busy_schedule: { ...data.profile.busy_schedule, ...onboardingDraft.profile.busy_schedule }
       };
       data.updated_at = new Date().toISOString();
-      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      writeLocalUserData(currentStudent.student_id, data);
     }
 
     function beginOnboarding(user) {
@@ -6560,7 +6726,7 @@
           : slot;
       });
       accountData.profile.onboarding_started = true;
-      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(accountData));
+      writeLocalUserData(currentStudent.student_id, accountData);
       onboardingDraft = {
         full_name: currentStudent.full_name,
         student_id: currentStudent.student_id,
@@ -7896,7 +8062,7 @@
       data.onboarding_step = withPlanReview ? 4 : 3;
       // REVIEW-DASH END
       data.planner.target_total = profile.goal.target_score;
-      localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+      writeLocalUserData(currentStudent.student_id, data);
       currentProfileDraft = JSON.parse(JSON.stringify(data.profile));
       restoreOnboardingBusySchedule(currentProfileDraft.busy_schedule, data);
       syncConfirmedPreferenceFromProfile("onboarding");
@@ -8039,7 +8205,7 @@
         };
         const accountData = createDefaultLocalUserData(mssv, true);
         accountData.profile.profile.full_name = fullName;
-        localStorage.setItem(localUserDataKey(mssv), JSON.stringify(accountData));
+        writeLocalUserData(mssv, accountData);
         localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify([...users, user]));
         beginOnboarding(user);
       } catch (error) {
@@ -8572,7 +8738,7 @@
         const data = readLocalUserData(currentStudent.student_id);
         data.profile.drl_target = num;
         if (data.profile.goal) data.profile.goal.target_score = num;
-        localStorage.setItem(localUserDataKey(currentStudent.student_id), JSON.stringify(data));
+        writeLocalUserData(currentStudent.student_id, data);
       }
       markPlanStale();
       persistCurrentUserData();

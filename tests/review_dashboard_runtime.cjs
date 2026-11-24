@@ -8,6 +8,8 @@ const storage = new Map();
 const elements = new Map();
 const requests = [];
 let failWrites = false;
+let storageQuota = Infinity;
+let quotaFailures = 0;
 const listeners = new Map();
 const timers = new Map();
 const intervals = new Map();
@@ -47,7 +49,18 @@ const sandbox = { console, Date, Math, JSON, Set, Map, Array, Object, Number, St
   addEventListener() {}, removeEventListener() {}, requestAnimationFrame: callback => callback(), scrollTo() {},
   alert() {}, confirm: () => true,
   localStorage: { getItem: key => storage.has(key) ? storage.get(key) : null,
-    setItem(key, value) { if (failWrites) throw new Error('Synthetic storage failure'); storage.set(key, String(value)); },
+    get length() { return storage.size; }, key: index => [...storage.keys()][index] ?? null,
+    setItem(key, value) {
+      if (failWrites) throw new Error('Synthetic storage failure');
+      value = String(value);
+      let size = 2 * (key.length + value.length);
+      for (const [storedKey, storedValue] of storage) if (storedKey !== key) size += 2 * (storedKey.length + storedValue.length);
+      if (size > storageQuota) {
+        quotaFailures += 1;
+        const error = new Error('Setting the value exceeded the quota.'); error.name = 'QuotaExceededError'; throw error;
+      }
+      storage.set(key, value);
+    },
     removeItem: key => storage.delete(key) },
   document: { readyState: 'loading', body: element('body'), activeElement: element('initialFocus'),
     getElementById: element, querySelector: () => null, querySelectorAll: () => [],
@@ -85,6 +98,47 @@ for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
 const run = code => vm.runInContext(code, sandbox);
 const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
 (async () => {
+  // Reproduce an origin already filled by legacy real-source planner snapshots.
+  let legacyAccount = null;
+  if (input.scenario === 'storage' || input.scenario === 'onboarding_quota') {
+    legacyAccount = sandbox.createDefaultLocalUserData('LEGACY-DEMO');
+    legacyAccount.confirmed_plan_result = input.options[1].result;
+    legacyAccount.planner.cached_plan_options = input.options;
+    legacyAccount.planner.plan_stages = {first: input.options[1].result, replan: null, whatif: null};
+    legacyAccount.planner.custom_plan_backup = input.options[0].result;
+    legacyAccount.profile.avatar_data_url = 'data:image/png;base64,keep-avatar';
+    legacyAccount.saved_activities = [{activity_id: 'preserve-saved-activity'}];
+    storage.set('unilife_data_LEGACY-DEMO', JSON.stringify(legacyAccount));
+    storage.set('unrelated-app', 'preserve-unrelated-data');
+    storageQuota = 2 * JSON.stringify(legacyAccount).length + 65536;
+  }
+  if (input.scenario === 'storage') {
+    const original = JSON.stringify(legacyAccount);
+    const compact = sandbox.serializeLocalUserData(legacyAccount);
+    assert.ok(compact.length < original.length / 2, 'real planner payloads should be substantially smaller');
+    const restored = sandbox.deserializeLocalUserData(JSON.parse(compact));
+    assert.equal(JSON.stringify(restored), original, 'all results, offers, scores and profile data survive');
+    restored.planner.cached_plan_options[1].result.plan.status = 'MUTATED';
+    assert.equal(restored.planner.plan_stages.first.plan.status, input.options[1].result.plan.status);
+    assert.equal(restored.confirmed_plan_result.plan.status, input.options[1].result.plan.status);
+    assert.equal(JSON.stringify(legacyAccount), original, 'serialization must not mutate live state');
+    const small = sandbox.createDefaultLocalUserData('SMALL');
+    assert.equal(sandbox.serializeLocalUserData(small), JSON.stringify(small));
+    const next = JSON.parse(original); next.student_id = 'NEXT-DEMO';
+    sandbox.writeLocalUserData('NEXT-DEMO', next);
+    assert.ok(quotaFailures > 0, 'exercise actual quota recovery');
+    assert.equal(JSON.stringify(sandbox.readLocalUserData('LEGACY-DEMO')), original);
+    assert.equal(JSON.stringify(sandbox.readLocalUserData('NEXT-DEMO')), JSON.stringify(next));
+    assert.equal(storage.get('unrelated-app'), 'preserve-unrelated-data');
+    assert.equal(sandbox.isLocalStorageQuotaError({code: 1014}), true);
+    assert.equal(sandbox.isLocalStorageQuotaError(new Error('different failure')), false);
+    const beforeFailure = storage.get('unilife_data_NEXT-DEMO');
+    storageQuota = 1;
+    assert.throws(() => sandbox.writeLocalUserData('NEXT-DEMO', {...next, updated_at:'unsaved'}), /dung lượng/);
+    assert.equal(storage.get('unilife_data_NEXT-DEMO'), beforeFailure);
+    assert.equal(JSON.stringify(sandbox.readLocalUserData('NEXT-DEMO')), JSON.stringify(next));
+    console.log(JSON.stringify({passed:true,scenario:input.scenario,raw:original.length,compact:compact.length})); return;
+  }
   if (input.scenario?.startsWith('onboarding')) {
     const settle = async () => { for (let i = 0; i < 80; i++) await Promise.resolve(); };
     const user = {student_id:'25127881', full_name:'Onboarding reviewer', major:'CNTT'};
@@ -105,6 +159,15 @@ const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
     assert.equal(element('onboardingNextButton').textContent, 'Lập lịch & review');
     element('workspaceApp').classList.add('hidden');
     if (input.scenario === 'onboarding_stale') input.holdOptions = true;
+    if (input.scenario === 'onboarding_quota_blocked') {
+      storageQuota = 1;
+      await sandbox.rdOnboardingBuildPlan();
+      assert.equal(run('rdOnboardingFlow.busy'), false, 'an initial storage error must release the loading state');
+      assert.ok(element('onboardingPlanError').textContent.includes('dung lượng'));
+      assert.equal(element('onboardingRetryPlan').classList.contains('hidden'), false);
+      storageQuota = Infinity;
+      sandbox.previousOnboardingStep();
+    }
     sandbox.nextOnboardingStep();
     const calls = () => requests.filter(x => x.url.includes('/personalized/options'));
     if (input.scenario === 'onboarding_stale') {
@@ -206,6 +269,17 @@ const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
     assert.equal(element('planOptionsScreen').parentNode.id, 'body');
     assert.equal(element('planReviewScreen').parentNode.id, 'body');
     assert.equal(element('planOptionsScreen').getAttribute('aria-modal'), 'true');
+    if (input.scenario === 'onboarding_quota') {
+      assert.ok(quotaFailures > 0, 'quota must be hit during the actual onboarding flow');
+      assert.equal(JSON.stringify(sandbox.readLocalUserData('LEGACY-DEMO')), JSON.stringify(legacyAccount));
+      assert.equal(JSON.stringify(sandbox.readLocalUserData(user.student_id).confirmed_plan_result), JSON.stringify(input.options[1].result));
+      sandbox.reviewDashCloseAccountDialogs();
+      sandbox.restoreLocalPlannerState(sandbox.readLocalUserData(user.student_id));
+      assert.equal(run('currentPlannerData.plan.plan_version'), input.options[1].result.plan.plan_version);
+      assert.equal(run('cachedPlanOptions.length'), input.options.length);
+      assert.equal(JSON.stringify(sandbox.cpdResultForConfirmed(sandbox.reviewDashReadState())), JSON.stringify(input.options[1].result));
+      assert.equal(storage.get('unrelated-app'), 'preserve-unrelated-data');
+    }
     console.log(JSON.stringify({passed:true,scenario:input.scenario}));return;
   }
   run(`currentStudent = {student_id: 'SYN-REVIEW-01', full_name: 'Synthetic reviewer'};
