@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from functools import lru_cache, partial
 from typing import Any
 
+from api.demo_clock import DEMO_AS_OF
 from api.lead_contract import canonical_url
 from sp2.drl_engine import evaluate_rule_conditions
 from sp3.projected_scorer import InMemoryScoringData, ProjectedScorer
@@ -28,7 +29,8 @@ def timestamp(value: str | None) -> datetime | None:
 
 
 def completion_clock() -> datetime:
-    return timestamp(os.environ.get("UNILIFE_COMPLETION_AS_OF")) or datetime.now().astimezone()
+    # The demo runs on one fixed clock (api.demo_clock); the environment override is for tests and scripts.
+    return timestamp(os.environ.get("UNILIFE_COMPLETION_AS_OF")) or timestamp(DEMO_AS_OF)
 
 
 def _canonical_url(value: str | None) -> str | None:

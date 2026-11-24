@@ -508,7 +508,7 @@ def after_onboarding(page: Cdp, mssv_saved: str, mssv_retry: str) -> None:
 
 
 def real_source_clock(page: Cdp) -> None:
-    """The dashboard's "Hom nay" follows the confirmed plan's source: the real store's demo date is 2026-10-01."""
+    """The dashboard's "Hom nay" follows the confirmed plan's source: the real store's demo date is 2026-10-25 (api.demo_clock)."""
     register(page, "Real clock", "RVW2030")
     page.js("""(async () => {
       const response = await fetch('/api/sp3/demo/plan?source=real', { method: 'POST',

@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import re
 
-from api import sp3_real, sp3_service
+from api import demo_clock, plan_completion, sp3_real, sp3_service
 
 HTML = (Path(__file__).resolve().parents[1] / "web" / "index.html").read_text(encoding="utf-8")
 
@@ -22,7 +22,7 @@ def _synthetic_clock() -> str:
 
 def test_synthetic_and_real_sources_use_different_demo_dates() -> None:
     assert _day(_synthetic_clock()) == date(2026, 11, 8)
-    assert _day(sp3_real.AS_OF) == date(2026, 10, 1)
+    assert _day(sp3_real.AS_OF) == date(2026, 10, 25)
 
 
 def test_plan_results_carry_the_clock_the_dashboard_reads() -> None:
@@ -45,8 +45,8 @@ def test_synthetic_demo_student_has_nothing_today_but_everything_ahead() -> None
     assert min(blocks) == date(2026, 11, 9) and (min(blocks) - today).days <= 6  # inside the 7-day agenda
 
 
-def test_real_demo_student_has_nothing_in_the_first_week() -> None:
-    """The real store's first planned activity is more than a week after its demo date."""
+def test_real_demo_plan_starts_on_or_after_the_demo_day() -> None:
+    """The real store plans from the demo day: nothing before it, and "Hom nay" can show today's agenda."""
     today = _day(sp3_real.AS_OF)
     blocks = [
         _day(block["start"])
@@ -54,7 +54,15 @@ def test_real_demo_student_has_nothing_in_the_first_week() -> None:
         for block in item["scheduled_blocks"]
     ]
     assert blocks and min(blocks) >= today
-    assert (min(blocks) - today).days > 6  # so "Hom nay" falls back to "next activity on ..."
+    assert sp3_real.WINDOW_START[:10] == today.isoformat()
+
+
+def test_one_demo_clock_everywhere(monkeypatch) -> None:
+    """Planner, planning window, completion clock and the UI all use the same demo day."""
+    monkeypatch.delenv("UNILIFE_COMPLETION_AS_OF", raising=False)
+    assert sp3_real.AS_OF == demo_clock.DEMO_AS_OF
+    assert plan_completion.completion_clock().isoformat() == demo_clock.DEMO_AS_OF
+    assert f"const DEMO_TODAY_ISO = '{demo_clock.DEMO_TODAY}';" in HTML
 
 
 def test_dashboard_code_never_reads_the_system_date() -> None:

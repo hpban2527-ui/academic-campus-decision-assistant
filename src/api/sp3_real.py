@@ -12,7 +12,7 @@ student eligibility, term scope, the score binding, the registration deadline an
 
 What is real: the activities (from announcements), the score bindings (rule-based or reviewed) and the
 encoded regulation. What is synthetic: the student (K24, standard program, FIT), the baseline facts and
-the free time. The planner clock is a labelled historical demo clock (2026-10-01): many announcements
+the free time. The planner clock is the labelled demo clock (api.demo_clock, 2026-10-25): many announcements
 are in the past, and dates are never rewritten to make a plan non-empty. Nothing is an official award.
 """
 
@@ -26,6 +26,7 @@ from copy import deepcopy
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+from api.demo_clock import DEMO_AS_OF, DEMO_WINDOW_START
 from api.plan_completion import AccountPlanScoring
 from personalization.models import PlanningStrategy, StudentPreference
 from personalization.planner_adapter import prepare_personalized_planner_input
@@ -46,10 +47,10 @@ FIXTURE = ROOT / "tests" / "sp3" / "fixtures" / "main_flow_integration.json"
 DATA_SOURCE = "OPERATIONAL-DATASET"
 TERM = {"id": "HK1_2026_2027", "start": "2026-08-29", "end": "2026-11-15"}
 # Labelled historical demo clock: the planner looks at the rest of HK1 from this date.
-AS_OF = "2026-10-01T08:00:00+07:00"
+AS_OF = DEMO_AS_OF
 CLOCK = {"as_of": AS_OF, "label": "historical_demo_clock",
          "note": "Announcements are from a past semester; the demo plans as of this date. Dates are not shifted."}
-WINDOW_START = "2026-10-01T00:00:00+07:00"
+WINDOW_START = DEMO_WINDOW_START
 WINDOW_END = "2026-11-16T00:00:00+07:00"
 DAY_START_HOUR, DAY_END_HOUR = 7, 21
 STUDENT_ID = "synthetic-student-k24"
