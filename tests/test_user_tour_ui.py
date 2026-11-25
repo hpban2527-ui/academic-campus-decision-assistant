@@ -104,9 +104,11 @@ def _check_js_delimiter_balance(source: str) -> None:
 
 def test_index_html_loads_user_tour_in_head_preserving_last_inline_script() -> None:
     html = INDEX_HTML.read_text(encoding="utf-8")
-    tag = '<script src="/static/user_tour.js" defer></script>'
+    # A ?v= query is allowed (cache-busting after edits to user_tour.js).
+    tags = re.findall(r'<script src="/static/user_tour\.js(?:\?v=[\w.-]+)?" defer></script>', html)
 
-    assert html.count(tag) == 1
+    assert len(tags) == 1
+    tag = tags[0]
     head_close = html.index("</head>")
     assert html.index(tag) < head_close, "External script tag must stay inside <head> before </head>."
 
