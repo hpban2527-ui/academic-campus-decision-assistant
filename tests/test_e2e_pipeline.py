@@ -47,6 +47,7 @@ def payload(case_id: int, *, simulate_demo: bool = False) -> dict:
         "has_evidence": c["evidence"],
         "rule_override": c["rule_override"],
         "simulate_demo": simulate_demo,
+        "term_id": "HK1_2026_2027",
     }
     if c.get("current_category_scores") is not None:
         result["current_category_scores"] = c["current_category_scores"]
@@ -64,7 +65,7 @@ def test_backend_loads_real_team_data_and_exposes_rule_audit():
 
 
 def test_demo_profile_has_authentic_category_caps_and_demo_label():
-    info = client.get("/api/profile").json()
+    info = client.get("/api/profile", params={"term_id": "HK1_2026_2027"}).json()
     assert info["demo_only"] is True
     assert info["official_score_verified"] is False
     caps = {k: v["max"] for k, v in info["category_scores"].items()}
@@ -267,7 +268,7 @@ def test_conflicting_rule_cannot_be_saved_as_demo_credit():
     response = client.post("/api/commit", json=c)
     assert response.status_code == 200, response.text
     assert response.json()["kind"] == "review"
-    scores = client.get("/api/scores", params={"student_id": "25127242"}).json()
+    scores = client.get("/api/scores", params={"student_id": "25127242", "term_id": "HK1_2026_2027"}).json()
     assert scores["total_confirmed"] == 50
     assert scores["total_projected"] == 0
 

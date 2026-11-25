@@ -93,10 +93,10 @@ def test_fixed_event_without_start_time_is_kept_with_a_reason_and_never_schedule
     from api import sp3_real
     blocked = [r for r in dataset["records"] if "missing_fixed_start_time" in r["reasons"]]
     assert blocked, "the corpus contains date-only events"
-    catalog = sp3_real.real_catalog()
+    catalog = sp3_real.real_catalog(term_id="HK1_2026_2027")
     usable = {row["activity"]["activity_id"] for row in catalog["activities"]}
     excluded = {e["post_id"]: e for e in catalog["excluded"]}
-    plan = sp3_real.real_plan("first_plan", target_total=80)
+    plan = sp3_real.real_plan("first_plan", term_id="HK1_2026_2027", target_total=80)
     candidates = {c["activity"]["activity_id"] for c in plan["feasibility"]["candidates"]}
     for record in blocked:
         assert record["sp3_activity"] is None and record["sp3_schedule"] is None
@@ -139,7 +139,7 @@ def test_a_planned_quiz_gets_a_full_sitting_inside_its_window(dataset):
     from api import sp3_real
     flexible = {r["post_id"]: r for r in ready(dataset) if r["sp3_schedule"]["type"] == "FLEXIBLE_WINDOW"}
     assert flexible
-    plan = sp3_real.real_plan("first_plan", target_total=100)["plan"]
+    plan = sp3_real.real_plan("first_plan", term_id="HK1_2026_2027", target_total=100)["plan"]
     planned = [a for a in plan["selected_activities"] if a["activity_id"] in flexible]
     assert planned, "the demo plan uses at least one flexible quiz"
     for item in planned:
@@ -188,7 +188,7 @@ def test_unbound_activity_does_not_count_toward_the_target(dataset):
     from api import sp3_real
     unbound = {r["post_id"] for r in ready(dataset) if r["binding"] is None}
     assert unbound
-    result = sp3_real.real_plan("first_plan", target_total=100)
+    result = sp3_real.real_plan("first_plan", term_id="HK1_2026_2027", target_total=100)
     for candidate in result["feasibility"]["candidates"]:
         if candidate["activity"]["activity_id"] in unbound:
             assert candidate["score_binding_ref"] is None
@@ -261,10 +261,10 @@ def test_post_190_goes_through_the_real_update_path_to_the_api(tmp_path, monkeyp
     assert record["acceptance"]["evidence"]["window_open"]
     from api import sp3_real
     monkeypatch.setenv("UNILIFE_ACTIVITY_DATASET", str(out))
-    catalog = sp3_real.real_catalog()
+    catalog = sp3_real.real_catalog(term_id="HK1_2026_2027")
     assert catalog["dataset"]["dataset_version"] == data["dataset_version"]
     assert post["post_id"] in {row["activity"]["activity_id"] for row in catalog["activities"]}
-    plan = sp3_real.real_plan("first_plan", target_total=80)
+    plan = sp3_real.real_plan("first_plan", term_id="HK1_2026_2027", target_total=80)
     assert plan["dataset"]["dataset_version"] == data["dataset_version"]
     assert post["post_id"] in {c["activity"]["activity_id"] for c in plan["feasibility"]["candidates"]}
 
@@ -402,11 +402,11 @@ def test_evidence_of_effective_values_is_grounded_in_the_source(dataset, corpus)
 
 def test_api_catalog_and_plan_read_the_same_dataset_version(dataset):
     from api import sp3_real
-    catalog = sp3_real.real_catalog()
-    plan = sp3_real.real_plan("first_plan", target_total=80)
+    catalog = sp3_real.real_catalog(term_id="HK1_2026_2027")
+    plan = sp3_real.real_plan("first_plan", term_id="HK1_2026_2027", target_total=80)
     assert catalog["dataset"]["dataset_version"] == plan["dataset"]["dataset_version"] == op.load_dataset()["dataset_version"]
     assert catalog["activity_count"] + len(catalog["excluded"]) == dataset["summary"]["posts"]
-    assert plan["clock"]["label"] == "historical_demo_clock"
+    assert plan["clock"]["label"] == "term_clock" and plan["clock"]["as_of"] == plan["as_of"]
 
 
 # ---------------------------------------------------------------- plausibility, unknown fields, pending post

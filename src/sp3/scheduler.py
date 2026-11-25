@@ -71,6 +71,7 @@ def schedule_set(
     keep: Iterable[str] = (),
     max_flexible_per_set: int = MAX_FLEXIBLE_PER_SET,
     fast_flexible: bool = False,
+    fast_mode: str = "v2",
 ) -> ScheduleResult:
     """Schedule every activity of ``activities`` together, or prove it impossible.
 
@@ -145,11 +146,18 @@ def schedule_set(
             elif outcome[0]:
                 held, placement = outcome
     else:
-        placement = _place_greedy_edf(items, free)
-        if placement is None:
-            return ScheduleResult(ScheduleStatus.UNDETERMINED, reason="Heuristic placement could not determine a valid schedule.")
-        held = ()
-        minimal = False
+        if fast_mode == "v1":
+            placement = _place_greedy_edf_v1(items, free)
+            if placement is None:
+                return ScheduleResult(ScheduleStatus.UNDETERMINED, reason="Heuristic placement could not determine a valid schedule.")
+            held = ()
+            minimal = False
+        else:
+            keepable = [item for item in items if item.activity_id in previous and _fits_previous(item, previous[item.activity_id], free)]
+            held, placement = _place_fast_v2_with_replan(items, keepable, previous, free)
+            if placement is None:
+                return ScheduleResult(ScheduleStatus.UNDETERMINED, reason="Heuristic placement could not determine a valid schedule.")
+            minimal = False
 
     zone = window_start.tzinfo
     held_ids = {item.activity_id for item in held}
@@ -303,14 +311,33 @@ def _keep_most(
     return (), {}
 
 
-def _place_greedy_edf(
+def _carve_interval(free: tuple[list[int], list[int]], begin: int, end: int) -> None:
+    """Remove [begin, end) in-place from a sorted, disjoint free interval list."""
+    starts, ends = free
+    pos = bisect_left(ends, end)
+    if pos >= len(starts) or starts[pos] > begin or ends[pos] < end:
+        return
+    s, e = starts[pos], ends[pos]
+    if s == begin and e == end:
+        starts.pop(pos)
+        ends.pop(pos)
+    elif s == begin:
+        starts[pos] = end
+    elif e == end:
+        ends[pos] = begin
+    else:
+        ends[pos] = begin
+        starts.insert(pos + 1, end)
+        ends.insert(pos + 1, e)
+
+
+def _place_greedy_edf_v1(
     items: Sequence[_Flexible],
     free: tuple[list[int], list[int]],
 ) -> dict[str, tuple[int, int]] | None:
-    """Fast O(k^2) placement using multi-rule dispatch (Earliest Finish, EDF, Least Slack)."""
+    """Baseline v1 multi-rule dispatch (ECT, static EDF, LSF, ERT) kept for benchmark comparison."""
     if not items:
         return {}
-    # Rule 1: Left-shifted dynamic Earliest-Completion-Time + Earliest-Deadline tie-break
     remaining = list(enumerate(items))
     cursor = min(item.start for item in items)
     placement: dict[str, tuple[int, int]] = {}
@@ -336,7 +363,6 @@ def _place_greedy_edf(
     if ok and len(placement) == len(items):
         return placement
 
-    # Rule 2 & 3: Interval-carving with Earliest Deadline First (EDF) and Least Slack First
     indexed = list(enumerate(items))
     orders = (
         sorted(indexed, key=lambda pair: (pair[1].end, pair[1].start, pair[1].duration, -pair[0])),
@@ -356,3 +382,139 @@ def _place_greedy_edf(
         else:
             return carved
     return None
+
+
+def _place_greedy_edf(
+    items: Sequence[_Flexible],
+    free: tuple[list[int], list[int]],
+) -> dict[str, tuple[int, int]] | None:
+    """Fast v2 placement: Dynamic Available-EDF, Dynamic ECT, and O(log|F|) Interval Carving."""
+    if not items:
+        return {}
+
+    # Rule 1: Dynamic Available-EDF (Jackson's rule adapted for release times and free gaps).
+    # Among remaining items whose earliest feasible start is <= the earliest possible finish,
+    # pick the one with the tightest deadline (smallest item.end).
+    cur_free = (list(free[0]), list(free[1]))
+    remaining = list(enumerate(items))
+    avail_edf: dict[str, tuple[int, int]] = {}
+    ok = True
+    while remaining:
+        fits: list[tuple[int, int, int, _Flexible]] = []
+        min_finish: int | None = None
+        for idx, item in remaining:
+            begin = _earliest_fit(item, item.start, cur_free)
+            if begin is None:
+                ok = False
+                break
+            finish = begin + item.duration
+            if min_finish is None or finish < min_finish:
+                min_finish = finish
+            fits.append((begin, finish, idx, item))
+        if not ok or min_finish is None:
+            break
+        eligible = [entry for entry in fits if entry[0] <= min_finish]
+        if not eligible:
+            eligible = fits
+        # Tightest deadline first, then earliest finish, then earliest start, then smaller ID.
+        chosen_begin, chosen_finish, chosen_idx, chosen_item = min(
+            eligible,
+            key=lambda e: (e[3].end, e[1], e[0], e[2]),
+        )
+        avail_edf[chosen_item.activity_id] = (chosen_begin, chosen_finish)
+        _carve_interval(cur_free, chosen_begin, chosen_finish)
+        remaining = [(i, it) for i, it in remaining if i != chosen_idx]
+    if ok and len(avail_edf) == len(items):
+        return avail_edf
+
+    # Rule 2: Left-shifted dynamic Earliest-Completion-Time + Earliest-Deadline tie-break
+    remaining = list(enumerate(items))
+    cursor = min(item.start for item in items)
+    placement: dict[str, tuple[int, int]] = {}
+    ok = True
+    while remaining:
+        best_choice: tuple[int, int, int, int, _Flexible] | None = None
+        for idx, item in remaining:
+            begin = _earliest_fit(item, cursor, free)
+            if begin is None:
+                ok = False
+                break
+            finish = begin + item.duration
+            candidate_key = (finish, item.end, -idx, begin, item)
+            if best_choice is None or candidate_key[:3] < best_choice[:3]:
+                best_choice = candidate_key
+        if not ok or best_choice is None:
+            break
+        finish, _, neg_idx, begin, chosen_item = best_choice
+        chosen_idx = -neg_idx
+        placement[chosen_item.activity_id] = (begin, finish)
+        cursor = finish
+        remaining = [(i, it) for i, it in remaining if i != chosen_idx]
+    if ok and len(placement) == len(items):
+        return placement
+
+    # Rules 3-5: Fast O(k * log|F|) interval-carving with EDF, Least Slack First, Earliest Release
+    indexed = list(enumerate(items))
+    orders = (
+        sorted(indexed, key=lambda pair: (pair[1].end, pair[1].start, pair[1].duration, pair[0])),
+        sorted(indexed, key=lambda pair: (pair[1].end - pair[1].start - pair[1].duration, pair[1].end, pair[0])),
+        sorted(indexed, key=lambda pair: (pair[1].start, pair[1].end, pair[1].duration, pair[0])),
+    )
+    for order in orders:
+        cur_free = (list(free[0]), list(free[1]))
+        carved: dict[str, tuple[int, int]] = {}
+        for _, item in order:
+            begin = _earliest_fit(item, item.start, cur_free)
+            if begin is None:
+                break
+            end = begin + item.duration
+            carved[item.activity_id] = (begin, end)
+            _carve_interval(cur_free, begin, end)
+        else:
+            return carved
+    return None
+
+
+def _place_fast_v2_with_replan(
+    items: Sequence[_Flexible],
+    keepable: Sequence[_Flexible],
+    previous: Mapping[str, tuple[Interval, ...]],
+    free: tuple[list[int], list[int]],
+) -> tuple[tuple[_Flexible, ...], dict[str, tuple[int, int]] | None]:
+    """Fast v2 placement that greedily preserves non-overlapping previous blocks during replan."""
+    if keepable:
+        # Greedily select a maximal non-overlapping set of previous blocks (earliest-end first).
+        candidates = sorted(
+            (
+                (_us(previous[item.activity_id][0][0]), _us(previous[item.activity_id][0][1]), item)
+                for item in keepable
+            ),
+            key=lambda entry: (entry[1], entry[0], entry[2].activity_id),
+        )
+        non_overlapping: list[tuple[int, int, _Flexible]] = []
+        last_end: int | None = None
+        for begin, end, item in candidates:
+            if last_end is None or begin >= last_end:
+                non_overlapping.append((begin, end, item))
+                last_end = end
+
+        # Try holding all non-overlapping previous blocks first; if that blocks the rest,
+        # try holding the first half, then the second half, before falling back to full replan.
+        attempts: list[list[tuple[int, int, _Flexible]]] = [non_overlapping]
+        if len(non_overlapping) > 1:
+            mid = len(non_overlapping) // 2
+            attempts.append(non_overlapping[:mid])
+            attempts.append(non_overlapping[mid:])
+
+        for group in attempts:
+            held_ids = {item.activity_id for _, _, item in group}
+            rest = [item for item in items if item.activity_id not in held_ids]
+            cur_free = (list(free[0]), list(free[1]))
+            for begin, end, _ in group:
+                _carve_interval(cur_free, begin, end)
+            placement = _place_greedy_edf(rest, cur_free)
+            if placement is not None:
+                return tuple(item for _, _, item in group), placement
+
+    placement = _place_greedy_edf(items, free)
+    return (), placement

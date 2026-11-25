@@ -121,7 +121,7 @@ Keys added next to the existing ones; the keys owned by others (`profile`, `cano
 ```
 
 `as_of` and `confirmed_plan_basis` are additions to the agreed field list: `as_of` is the planner's demo clock
-(`plan.context.as_of`, 2026-11-08 for the synthetic fixture, 2026-10-01 for the real store), used as "today" so
+(`plan.context.as_of`, 2026-11-08 for the synthetic fixture, 2026-10-25 for the real store, `api.demo_clock`), used as "today" so
 the UI never reads the system date; `confirmed_plan_basis` holds fingerprints of `canonical_availability`
 (without `weekly_participation_hours`, which the planner never receives) and `confirmed_preference`.
 
@@ -192,9 +192,10 @@ and `invalidated` and refreshes the dashboard; "Giu ke hoach cu" leaves everythi
 planner journey are demo scenarios and offer neither button.
 
 The dashboard's "today" is `confirmed_plan.as_of`, the demo clock of the plan's source: 2026-11-08 for the
-synthetic fixture and 2026-10-01 for the real store (`api.sp3_real.AS_OF`). For the synthetic demo student nothing is
+synthetic fixture and 2026-10-25 for the real store (`api.sp3_real.AS_OF`). For the synthetic demo student nothing is
 planned on 2026-11-08 itself; the agenda shows the registration deadlines due that evening and the activities of
-09-12 Nov. For the real store the first planned activity is 2026-10-25, so "Hom nay" shows "next activity on ...".
+09-12 Nov. The real store plans from its demo day (2026-10-25, `api.demo_clock`), which is also the completion
+clock, so "Hom nay" can list activities of that day and nothing after it counts as done.
 
 Browser flow (register, plan, review, swap, remove, confirm, busy change, replan, diff, confirm, real-store clock):
 `scripts/verify_review_dashboard_e2e.py`.
@@ -205,6 +206,14 @@ Browser flow (register, plan, review, swap, remove, confirm, busy change, replan
 - Replacement previews keep every other planned activity at its time (`KEEP_TIME`), so an alternative that
   needs a slot the kept blocks occupy is rejected (`SWAP_REJECTED`) instead of reshuffling the plan.
 - A replacement may pull in compensating activities (`extra_added_activity_ids`); the UI should show them.
+
+### Performance (alternatives on the real source)
+
+`list_swap_alternatives` builds the review context once and shares it with every candidate preview, and a candidate
+whose 1-for-1 swap already meets the target skips the budgeted search (BALANCED / MINIMUM_EFFORT with a previous plan:
+every extra activity adds a set change, so the required set ranks first). Output is unchanged except the planner's
+`search` block, which no UI reads. `_REVIEW_FAST_PATHS = False` restores the old path;
+`tests/personalization/test_review_alternatives_speed.py` compares both, `scripts/bench_review_alternatives.py` times them.
 
 ## Open points
 

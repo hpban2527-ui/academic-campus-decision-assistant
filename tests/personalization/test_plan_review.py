@@ -381,7 +381,7 @@ def test_alternatives_endpoint(valid_preference_payload):
     ).status_code == 422
     assert client.post(
         "/api/sp3/personalized/alternatives", json=_request(valid_preference_payload, base),
-        params={"source": "real"},
+        params={"source": "real", "term_id": "HK1_2026_2027"},
     ).status_code == 422
     unconfirmed = _request(valid_preference_payload, base) | {"confirmed_profile": False}
     assert client.post("/api/sp3/personalized/alternatives", json=unconfirmed).status_code == 422
@@ -417,7 +417,7 @@ def test_what_if_endpoint(valid_preference_payload):
     assert response.status_code == 200, response.text
     assert response.json()["kind"] == "WHAT_IF_SKIP"
     assert client.post(
-        "/api/sp3/personalized/what-if-skip", json=payload, params={"source": "real"}
+        "/api/sp3/personalized/what-if-skip", json=payload, params={"source": "real", "term_id": "HK1_2026_2027"}
     ).status_code == 422
 
 

@@ -12,8 +12,9 @@ student eligibility, term scope, the score binding, the registration deadline an
 
 What is real: the activities (from announcements), the score bindings (rule-based or reviewed) and the
 encoded regulation. What is synthetic: the student (K24, standard program, FIT), the baseline facts and
-the free time. The planner clock is a labelled historical demo clock (2026-10-01): many announcements
-are in the past, and dates are never rewritten to make a plan non-empty. Nothing is an official award.
+the free time. The planner clock is the simulated clock of the selected term (api.term_clock): the first day
+of the term. Announcements are never shifted to make a plan non-empty, and one term has one clock for planning,
+review and scoring. Nothing is an official award.
 """
 
 from __future__ import annotations
@@ -27,6 +28,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from api.plan_completion import AccountPlanScoring
+from api.term_clock import TermClock, get_term, term_for_date
 from personalization.models import PlanningStrategy, StudentPreference
 from personalization.planner_adapter import prepare_personalized_planner_input
 from personalization.scoring import ActivityFeatures
@@ -44,20 +46,15 @@ DATA = ROOT / "data"
 FIXTURE = ROOT / "tests" / "sp3" / "fixtures" / "main_flow_integration.json"
 
 DATA_SOURCE = "OPERATIONAL-DATASET"
-TERM = {"id": "HK1_2026_2027", "start": "2026-08-29", "end": "2026-11-15"}
-# Labelled historical demo clock: the planner looks at the rest of HK1 from this date.
-AS_OF = "2026-10-01T08:00:00+07:00"
-CLOCK = {"as_of": AS_OF, "label": "historical_demo_clock",
-         "note": "Announcements are from a past semester; the demo plans as of this date. Dates are not shifted."}
-WINDOW_START = "2026-10-01T00:00:00+07:00"
-WINDOW_END = "2026-11-16T00:00:00+07:00"
 DAY_START_HOUR, DAY_END_HOUR = 7, 21
 STUDENT_ID = "synthetic-student-k24"
 BASELINE_REF = "synthetic-baseline-k24"
 PROFILE = {"cohort": "K24", "program": "standard", "faculty": "FIT"}
 
 _lock = threading.Lock()
-_cache: dict = {"key": None, "data": None}
+# "file" is the dataset identity (path, mtime, size), "base" its term-independent preparation, and "terms" the
+# per-term views keyed by (file, term_id, clock_version): planning HK3 never reuses what was prepared for HK1.
+_cache: dict = {"file": None, "base": None, "terms": {}}
 
 
 def dataset_path() -> Path:
@@ -68,9 +65,17 @@ def _json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _term_scope(start: str) -> str:
+def _term_scope(start: str, clock: TermClock) -> str:
+    """An activity belongs to a term by its own start date; its dates are never rewritten."""
     day = date.fromisoformat(start[:10])
-    return "IN_SCOPE" if date.fromisoformat(TERM["start"]) <= day <= date.fromisoformat(TERM["end"]) else "OUT_OF_SCOPE"
+    inside = date.fromisoformat(clock.term_start) <= day <= date.fromisoformat(clock.term_end)
+    return "IN_SCOPE" if inside else "OUT_OF_SCOPE"
+
+
+def clock_info(clock: TermClock) -> dict:
+    return {"as_of": clock.as_of, "label": "term_clock", "term_id": clock.term_id,
+            "clock_version": clock.clock_version,
+            "note": "The simulation clock sets the current time for this request."}
 
 
 def _prepare(dataset: dict) -> dict:
@@ -87,7 +92,6 @@ def _prepare(dataset: dict) -> dict:
     evidence = {
         "term_verified": None,
         "eligibility_by_activity": {r["post_id"]: audience_rules.eligibility(r["audience"], PROFILE) for r in ready},
-        "term_scope_by_activity": {r["post_id"]: _term_scope(r["sp3_activity"]["start"]) for r in ready},
         # Data readiness was checked by the user-agreed policy against the source (not by a person).
         "source_review_by_activity": {r["post_id"]: True for r in ready},
         "schedule_by_activity": {r["post_id"]: deepcopy(r["sp3_schedule"]) for r in ready},
@@ -109,16 +113,22 @@ def _prepare(dataset: dict) -> dict:
     }
 
 
-def _load_base() -> dict:
-    """The prepared dataset; reloaded as a whole when the file is replaced."""
+def _load_base(term_id: str) -> dict:
+    """The prepared dataset for one term; reloaded as a whole when the file is replaced."""
+    clock = get_term(term_id)
     path = dataset_path()
     stat = path.stat()
-    key = (str(path), stat.st_mtime_ns, stat.st_size)
+    file_key = (str(path), stat.st_mtime_ns, stat.st_size)
     with _lock:
-        if _cache["key"] != key:
-            _cache["data"] = _prepare(_json(path))
-            _cache["key"] = key
-        return _cache["data"]
+        if _cache["file"] != file_key:
+            _cache.update(file=file_key, base=_prepare(_json(path)), terms={})
+        key = (file_key, clock.term_id, clock.clock_version)
+        if key not in _cache["terms"]:
+            base = _cache["base"]
+            scope = {r["post_id"]: _term_scope(r["sp3_activity"]["start"], clock) for r in base["ready"]}
+            _cache["terms"][key] = {**base, "clock": clock,
+                                    "evidence": {**base["evidence"], "term_scope_by_activity": scope}}
+        return _cache["terms"][key]
 
 
 def _score_callback(data: dict):
@@ -129,17 +139,20 @@ def _messages(codes: list[str]) -> list[dict]:
     return [{"code": code, "message": message(code)} for code in codes]
 
 
-def dataset_info(data: dict | None = None) -> dict:
-    data = data or _load_base()
+def dataset_info(data: dict) -> dict:
     ds = data["dataset"]
     return {"path": str(dataset_path().relative_to(ROOT)) if ROOT in dataset_path().parents else str(dataset_path()),
             "dataset_version": ds["dataset_version"], "generated_at": ds["generated_at"],
             "schema": ds["schema"], "activity_contract": ds["activity_contract"], "summary": ds["summary"]}
 
 
-def real_catalog() -> dict:
-    """Schedulable activities with warnings, and every other post with its reasons (same dataset version)."""
-    data = _load_base()
+def real_catalog(*, term_id: str, clock: TermClock | None = None) -> dict:
+    """Schedulable activities with warnings, and every other post with its reasons (same dataset version).
+
+    Every row says whether its own start date falls inside the selected term (term_scope).
+    """
+    data = _load_base(term_id)
+    clock = clock or data["clock"]
     rows = []
     for record in data["ready"]:
         activity = record["sp3_activity"]
@@ -149,7 +162,8 @@ def real_catalog() -> dict:
                  else "No supported score rule: not counted toward the point target")
         rows.append({
             "activity": activity,
-            "data_qa": {"status": record["status"], "semester": TERM["id"], "notes": notes},
+            "data_qa": {"status": record["status"], "semester": term_for_date(activity["start"]), "notes": notes},
+            "term_scope": data["evidence"]["term_scope_by_activity"][record["post_id"]],
             "publication_status": "SCHEDULABLE" if binding else "SCHEDULABLE_NO_SCORE_BINDING",
             "score_binding_verified": False,
             "score_binding": ({"rule_id": binding["rule_id"], "binding_ref": binding["binding_ref"],
@@ -188,8 +202,11 @@ def real_catalog() -> dict:
         "data_source": DATA_SOURCE,
         "dataset": info,
         "live_published": {},
-        "term": TERM,
-        "clock": CLOCK,
+        "term": {"id": clock.term_id, "label": clock.term_label, "start": clock.term_start, "end": clock.term_end},
+        "term_id": clock.term_id,
+        "as_of": clock.as_of,
+        "clock_version": clock.clock_version,
+        "clock": clock_info(clock),
         "source_dataset": {"path": info["path"], "total_posts": info["summary"]["posts"],
                            "status": "OPERATIONAL_DATASET", "handed_over": len(rows),
                            "bound": sum(1 for r in rows if r["score_binding"])},
@@ -204,13 +221,15 @@ def real_catalog() -> dict:
     }
 
 
-def _free_time(busy: list[dict[str, str]]) -> list[dict[str, str]]:
-    day = datetime.fromisoformat(WINDOW_START)
-    end = datetime.fromisoformat(WINDOW_END)
+def _free_time(busy: list[dict[str, str]], clock: TermClock) -> list[dict[str, str]]:
+    start = datetime.fromisoformat(clock.window_start)
+    day = start.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = datetime.fromisoformat(clock.window_end)
     cover = sorted((datetime.fromisoformat(b["start"]), datetime.fromisoformat(b["end"])) for b in busy)
     out = []
     while day < end:
-        cursor, stop = day + timedelta(hours=DAY_START_HOUR), day + timedelta(hours=DAY_END_HOUR)
+        cursor = max(start, day + timedelta(hours=DAY_START_HOUR))
+        stop = min(end, day + timedelta(hours=DAY_END_HOUR))
         for s, e in cover:
             if e <= cursor or s >= stop:
                 continue
@@ -254,6 +273,7 @@ def _previous(plan: dict | None) -> dict | None:
 def _step(name: str, target_total: int, busy: list[dict[str, str]], previous: dict | None,
           preference: StudentPreference | None, data: dict, availability_request: dict | None = None,
           account: AccountPlanScoring | None = None) -> dict:
+    clock = data["clock"]
     resolved_availability = None
     if (
         isinstance(availability_request, dict)
@@ -265,25 +285,17 @@ def _step(name: str, target_total: int, busy: list[dict[str, str]], previous: di
         free = _subtract_busy(resolved_availability["available_intervals"], busy)
         calendar_version = resolved_availability["calendar_version"]
     elif availability_request is not None:
-        normalized_request = deepcopy(availability_request) if isinstance(availability_request, dict) else availability_request
-        if (
-            isinstance(normalized_request, dict)
-            and normalized_request.get("apply_scope") == "SEMESTER_WEEKLY"
-            and isinstance(normalized_request.get("effective_from"), str)
-            and normalized_request.get("effective_from") == "2026-11-09"
-        ):
-            normalized_request["effective_from"] = WINDOW_START[:10]
         resolved_availability = resolve_availability(
-            normalized_request, window_start=WINDOW_START, window_end=WINDOW_END
+            availability_request, window_start=clock.window_start, window_end=clock.window_end
         )
         free = _subtract_busy(resolved_availability["available_intervals"], busy)
         calendar_version = resolved_availability["calendar_version"]
     else:
-        free = _free_time(busy)
+        free = _free_time(busy, clock)
         calendar_version = f"synthetic-free-{len(busy)}-busy"
     context = {
-        "student_id": STUDENT_ID, "term_id": TERM["id"], "window_start": WINDOW_START, "window_end": WINDOW_END,
-        "as_of": AS_OF, "timezone": "Asia/Ho_Chi_Minh", "baseline_ref": BASELINE_REF,
+        "student_id": STUDENT_ID, "term_id": clock.term_id, "window_start": clock.window_start,
+        "window_end": clock.window_end, "as_of": clock.as_of, "timezone": clock.timezone, "baseline_ref": BASELINE_REF,
         "dataset_version": data["dataset"]["dataset_version"], "ruleset_version": data["scoring"]["ruleset_version"],
         "calendar_version": calendar_version,
     }
@@ -343,7 +355,7 @@ def _activity_notes(data: dict, plan: dict) -> dict:
             for item in plan["selected_activities"] if item["activity_id"] in by_id}
 
 
-def real_plan(scenario: str, *, target_total: int | None = None, busy_intervals: list[dict[str, str]] | None = None,
+def real_plan(scenario: str, *, term_id: str, target_total: int | None = None, busy_intervals: list[dict[str, str]] | None = None,
               preference: StudentPreference | None = None, availability_request: dict | None = None,
               include_internal: bool = False, account: AccountPlanScoring | None = None) -> dict:
     """first_plan / replan (first planned slot becomes busy) / what_if_skip (skip a replanned activity)."""
@@ -353,7 +365,10 @@ def real_plan(scenario: str, *, target_total: int | None = None, busy_intervals:
         raise ValueError("target_total must be an integer from 0 to 100")
     target = 80 if target_total is None else target_total
     busy = list(busy_intervals or [])
-    data = _load_base()  # One operational dataset snapshot for every step of this request.
+    data = _load_base(term_id)
+    if account and account.clock:
+        data = {**data, "clock": account.clock}
+    clock = data["clock"]
     first = _step("first_plan", target, busy, None, preference, data, availability_request, account)
     skip_id = None
     if scenario == "first_plan":
@@ -393,9 +408,11 @@ def real_plan(scenario: str, *, target_total: int | None = None, busy_intervals:
                     "generated_at": data["dataset"]["generated_at"]},
         "live_published": {},
         "scenario": ("personalized_" if preference is not None else "") + scenario,
-        "term": TERM["id"],
-        "as_of": AS_OF,
-        "clock": CLOCK,
+        "term": clock.term_id,
+        "term_id": clock.term_id,
+        "as_of": clock.as_of,
+        "clock_version": clock.clock_version,
+        "clock": clock_info(clock),
         "requested_total_target": target,
         "what_if_skip_activity_id": skip_id,
         "simulated_change": _block_of(first["plan"]) if scenario != "first_plan" else [],
@@ -450,6 +467,7 @@ def _plan_minutes(plan: dict) -> int:
 def real_plan_options(
     preference: StudentPreference,
     *,
+    term_id: str,
     target_total: int = 80,
     busy_intervals: list[dict[str, str]] | None = None,
     availability_request: dict | None = None,
@@ -463,7 +481,7 @@ def real_plan_options(
             candidate = preference.model_copy(update={"strategy": PlanningStrategy(strategy)})
             candidate = StudentPreference.model_validate(candidate.model_dump())
             result = real_plan(
-                "first_plan", target_total=target_total, busy_intervals=busy_intervals,
+                "first_plan", term_id=term_id, target_total=target_total, busy_intervals=busy_intervals,
                 preference=candidate, availability_request=availability_request,
                 account=account,
             )
@@ -487,10 +505,14 @@ def real_plan_options(
             "plan": plan, "result": result,
         })
     ready_count = sum(1 for item in options if item.get("status") == "READY")
+    clock = account.clock if account and account.clock else get_term(term_id)
     return {
         "options": options,
         "attempted": attempted,
         "deduplicated": 0,
         "message": None if ready_count else "Không có chiến lược nào tạo được lịch hợp lệ với dữ liệu hiện tại.",
         "source": "real",
+        "term_id": clock.term_id,
+        "as_of": clock.as_of,
+        "clock_version": clock.clock_version,
     }

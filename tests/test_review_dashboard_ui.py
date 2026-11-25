@@ -64,7 +64,7 @@ def test_planner_rerun_sets_a_notice_and_never_writes_the_confirmed_plan() -> No
 
 
 def test_dashboard_ui_elements_and_texts() -> None:
-    for text in ("Xác nhận kế hoạch", "Có kế hoạch mới chưa chốt", "Kế hoạch bị ảnh hưởng", "Đến Lập lịch",
+    for text in ("Xác nhận kế hoạch", "Có kế hoạch mới chưa chốt", "Kế hoạch bị ảnh hưởng", "Đến Lộ trình",
                  "Hôm nay", "Tuần", "Tháng", "TIẾN ĐỘ THEO KẾ HOẠCH", "Bạn chưa chốt kế hoạch nào"):
         assert text in HTML, text
     for element in ("confirmedPlanDashboard", "cpdBannerPending", "cpdBannerInvalid", "cpdEmpty", "cpdContent",
@@ -73,9 +73,9 @@ def test_dashboard_ui_elements_and_texts() -> None:
     assert "setConfirmedPlanView" in HTML and "cpdView = 'today'" in HTML  # default view
 
 
-def test_dashboard_uses_the_planner_clock_and_computes_no_scores() -> None:
+def test_dashboard_uses_the_simulation_clock_and_computes_no_scores() -> None:
     block = HTML.split("var cpdView", 1)[1].split("</script>", 1)[0]
-    assert "cpdVn(plan.as_of).date" in block
+    assert "cpdSimulationToday(plan)" in block and "termClock.as_of : plan.as_of" in block
     # No system-date based "today": the only `new Date()` calls stamp storage times.
     assert block.count("new Date()") == block.count("new Date().toISOString()") == 2
     assert "Date.now" not in block
@@ -108,9 +108,9 @@ def test_review_screen_entry_and_layout() -> None:
     # One panel replaces the summary on desktop and is inserted under its row on mobile.
     assert "lg:grid-cols-[minmax(0,1fr)_380px]" in HTML
     body = _review_script()
-    for text in ("Thay đổi", "Nếu bỏ hoạt động này:", "Bỏ, không thay", "Nhiệm vụ hoàn thành", "Hạn đăng ký", "Đã đổi", "Hoàn tác",
+    for text in ("Thay đổi", "Nếu bỏ:", "Bỏ, không thay", "Nhiệm vụ hoàn thành", "Hạn đăng ký", "Đã đổi", "Hoàn tác",
                  "Khôi phục phương án gốc", "Xác nhận kế hoạch", "Đạt mục tiêu", "Chưa đạt mục tiêu",
-                 "Xem thêm", "Không có hoạt động thay thế hợp lịch.", "Thay bằng (vẫn đạt mục tiêu):", "Thử lại"):
+                 "Xem thêm", "Không có hoạt động thay thế hợp lịch.", "Thay thế để đủ điểm:", "Thử lại"):
         assert text in body, text
 
 
@@ -123,7 +123,7 @@ def test_one_change_entry_and_shared_panel_contract() -> None:
     for dead in ("prvLoadAlternatives", "prvPreviewRemoval", "prvApplyInline", "prvCloseInline"):
         assert dead not in HTML
     panel = HTML.split("function prvChangePanelHtml", 1)[1].split("function prvRestoreChangeFocus", 1)[0]
-    assert "data.before.projected_total" in panel and "data.projected_total" in panel
+    assert "data.target_total" in panel and "data.projected_total" in panel
     assert "items.slice(0, PRV_ALT_VISIBLE)" in panel
     assert "extra.length >= 2" in panel and "reviewDashFilteredReasons" in panel
     assert 'tabindex="-1"' in panel and "prvCancelChange()" in panel
@@ -136,7 +136,7 @@ def test_one_change_entry_and_shared_panel_contract() -> None:
 
 def test_review_calls_use_the_student_availability_and_the_review_endpoints() -> None:
     body = _review_script()
-    assert "availability: plannerAvailabilityPayload()" in body
+    assert "availability: plannerAvailabilityPayload(prvDraft.source)" in body
     for path in ("/api/sp3/personalized/alternatives", "/api/sp3/personalized/what-if-skip",
                  "/api/sp3/personalized/swap-preview"):
         assert path in body
@@ -165,3 +165,15 @@ def test_browser_end_to_end() -> None:
         cwd=ROOT, env={**os.environ, "PYTHONPATH": str(ROOT / "src")}, capture_output=True, text=True, timeout=300,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_dashboard_order_fixed_semester_and_inline_onboarding_confirmation() -> None:
+    overview = HTML.split('id="workspaceOverview"', 1)[1].split('id="viewCalculator"', 1)[0]
+    assert overview.index('id="confirmedPlanDashboard"') < overview.index('id="dashboardWelcomeName"')
+    assert overview.index('id="recommendedActivitiesList"') < overview.index('id="quickActionsTitle"')
+    assert '<select id="termSelectHeader"' not in HTML
+    assert '<select id="psSemester"' not in HTML
+    assert '<select id="profileSemester"' not in HTML
+    assert "updateOnboardingProfileField('semester', this.value)" in HTML
+    assert '#onboardingModal #prvPanel [onclick="prvConfirm()"] { display: none' not in HTML
+    assert 'next.hidden = onboardingStep >= 4;' in HTML

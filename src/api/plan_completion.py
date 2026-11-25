@@ -8,17 +8,18 @@ import os
 import re
 from copy import deepcopy
 from datetime import datetime, timedelta
-from functools import lru_cache, partial
+from functools import lru_cache
 from typing import Any
 
 from api.lead_contract import canonical_url
-from sp2.drl_engine import evaluate_rule_conditions
+from api.term_clock import TermClock, as_of_of
+from sp2.drl_engine import DRLEngineError, evaluate_rule_conditions
 from sp3.projected_scorer import InMemoryScoringData, ProjectedScorer
 from sp3.scorer_adapter import ScorerAdapter
 
 
 def timestamp(value: str | None) -> datetime | None:
-    if not value:
+    if not isinstance(value, str) or not value:
         return None
     try:
         parsed = datetime.fromisoformat(value)
@@ -27,8 +28,8 @@ def timestamp(value: str | None) -> datetime | None:
     return parsed if parsed.utcoffset() is not None else None
 
 
-def completion_clock() -> datetime:
-    return timestamp(os.environ.get("UNILIFE_COMPLETION_AS_OF")) or datetime.now().astimezone()
+def completion_clock(term_id: str, clock: TermClock | None = None) -> datetime:
+    return timestamp(os.environ.get("UNILIFE_COMPLETION_AS_OF")) or timestamp(clock.as_of if clock else as_of_of(term_id))
 
 
 def _canonical_url(value: str | None) -> str | None:
@@ -68,12 +69,7 @@ class CompletionCatalog:
         meta = self.metadata.get(activity_id, {})
         requirements = meta.get("completion_requirements", [])
         requirement_types = {row.get("type") for row in requirements}
-        mode = activity["mode"]
-        if mode not in {"offline", "online"} or "proof_upload" in requirement_types:
-            return {"status": "UNSUPPORTED"}
         quiz = "quiz" in requirement_types
-        if mode == "online" and not quiz:
-            return {"status": "NEEDS_REVIEW" if not requirements else "UNSUPPORTED"}
 
         binding = self.bindings.get(activity_id, {})
         rule = self.rules.get(binding.get("rule_id"), {})
@@ -89,13 +85,12 @@ class CompletionCatalog:
         if end is None:
             return {"status": "MISSING_END"}
         thresholds = [_quiz_threshold(row) for row in requirements if row.get("type") == "quiz" and row.get("threshold") is not None]
-        if None in thresholds:
-            return {"status": "NEEDS_REVIEW"}
         conditions = [_REQUIREMENT_LABELS[row["type"]] for row in requirements if row.get("type") in _REQUIREMENT_LABELS]
-        if mode == "offline":
-            question = "Bạn đã tham gia hoạt động này"
-        else:
-            question = "Bạn đã tham gia làm quiz"
+        if None in thresholds:
+            conditions.append("đạt yêu cầu của bài quiz")
+        thresholds = [value for value in thresholds if value is not None]
+        # Completion is a student affirmation, not an upload or quiz verification service.
+        question = "Bạn đã tham gia làm quiz" if quiz else "Bạn đã hoàn thành hoạt động này"
         if thresholds:
             question += " và đạt " + ", ".join(thresholds)
         if conditions:
@@ -113,16 +108,17 @@ class CompletionCatalog:
     def _completion_end(self, activity: dict, meta: dict) -> datetime | None:
         defaults = meta.get("time_defaults", {})
         derived_end = meta.get("derived", {}).get("end", "")
+        if activity["mode"] == "offline" and ("window_open" in defaults or "window_close" in defaults):
+            return None
+        schedule = self.evidence.get("schedule_by_activity", {}).get(activity["activity_id"], {})
+        if schedule.get("type") == "FIXED":
+            ends = [timestamp(block.get("end")) for block in schedule.get("fixed_blocks", [])]
+            return max(ends) if ends and all(ends) else None
         if activity["mode"] == "offline":
-            if "window_open" in defaults or "window_close" in defaults:
-                return None
-            schedule = self.evidence.get("schedule_by_activity", {}).get(activity["activity_id"], {})
-            if schedule.get("type") == "FIXED":
-                return timestamp(schedule["fixed_blocks"][0]["end"])
             if derived_end.startswith("start_plus_duration:default_"):
                 return None
             start, end = timestamp(activity.get("start")), timestamp(activity.get("end"))
-            return end if start and end and start.date() == end.date() and start < end else None
+            return end if start and end and start < end else None
 
         # A date stated by the source closes at the end of that date. A
         # suggested duration for doing the quiz does not establish its deadline.
@@ -139,6 +135,7 @@ _REQUIREMENT_LABELS = {
     "check_out": "điểm danh cuối buổi",
     "survey": "hoàn thành khảo sát",
     "full_attendance": "tham gia đầy đủ",
+    "proof_upload": "hoàn thành yêu cầu minh chứng",
 }
 
 
@@ -154,11 +151,11 @@ def _quiz_threshold(requirement: dict) -> str | None:
     return f"{threshold} {unit}"
 
 
-def completion_catalog(source: str) -> CompletionCatalog:
+def completion_catalog(source: str, term_id: str | None = None) -> CompletionCatalog:
     if source == "real":
         from api.sp3_real import _load_base
 
-        data = _load_base()
+        data = _load_base(term_id)
         # Use the same current operational snapshot as real-source planning.
         metadata = {
             record["post_id"]: {
@@ -171,6 +168,67 @@ def completion_catalog(source: str) -> CompletionCatalog:
         return CompletionCatalog(data["scoring"], data["planner"], data["evidence"], metadata)
 
     return _synthetic_completion_catalog()
+
+
+def _number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _clean(value: float | int) -> float | int:
+    return int(value) if float(value).is_integer() else value
+
+
+def _apply_category_offsets(result: dict, config: dict, record: dict, offsets: dict[str, float]) -> dict:
+    """Add trusted per-category offsets to an SP2 result outside the locked SP2 engine.
+
+    Offsets cover points already on the scoreboard whose rule facts are unavailable. Each offset is added to the
+    category's raw (pre-cap) score, then the category cap and the total clamp are re-applied exactly as
+    sp2.drl_engine.evaluate_rule_conditions does: score = min(raw, cap) when raw > 0.
+    """
+    if not offsets:
+        return result
+    scoring = config["scoring_model"]
+    caps = {
+        str(item.get("category_id")): item.get("max_score")
+        for item in scoring.get("category_caps", [])
+        if isinstance(item, dict)
+    }
+    rows = [dict(row) for row in result["category_scores"]]
+    by_id = {row["category_id"]: row for row in rows}
+    for category, offset in offsets.items():
+        if category not in caps or not _number(offset):
+            raise DRLEngineError("category score offsets must be numeric and name a configured category")
+        row = by_id.get(category)
+        if row is None:
+            row = {"category_id": category, "raw_score": 0, "cap": caps[category], "score": 0}
+            rows.append(row)
+            by_id[category] = row
+        raw = row["raw_score"] + offset
+        cap = caps[category]
+        row["raw_score"] = _clean(raw)
+        row["score"] = _clean(min(raw, cap) if _number(cap) and raw > 0 else raw)
+
+    rule_points_total = sum(row["score"] for row in rows)
+    raw_total = record.get("current_confirmed_score", 0) + record.get("eligible_extra_points", 0) + rule_points_total
+    maximum = scoring.get("max_total_score", scoring.get("semester_score_max", 100))
+    minimum = scoring.get("semester_score_min", 0)
+    return {
+        **result,
+        "category_scores": rows,
+        "rule_points_total": _clean(rule_points_total),
+        "raw_total_before_cap": _clean(raw_total),
+        "final_score": _clean(min(maximum, max(minimum, raw_total))),
+    }
+
+
+def _engine_with_offsets(offsets: dict[str, float]):
+    """SP2 engine callable for ProjectedScorer: unchanged SP2 evaluation, then the account offsets."""
+
+    def engine(config: dict, record: dict) -> dict:
+        result = evaluate_rule_conditions(config, record, apply_default_awards=True)
+        return _apply_category_offsets(result, config, record, offsets)
+
+    return engine
 
 
 @lru_cache(maxsize=1)
@@ -190,14 +248,16 @@ def _synthetic_completion_catalog() -> CompletionCatalog:
 class AccountPlanScoring:
     """Apply the same trusted facts and scoreboard to replanning and completion."""
 
-    def __init__(self, catalog: CompletionCatalog, student_id: str, current: dict, entries: list[dict], term: str):
+    def __init__(self, catalog: CompletionCatalog, student_id: str, current: dict, entries: list[dict], term: str,
+                 clock: TermClock | None = None):
         self.catalog = catalog
         self.student_id = student_id
+        self.clock = clock
         base = deepcopy(catalog.planner["baseline"])
         caps = base["category_caps"]
         self.entries = {
             activity_id: entry for entry in reversed(entries)
-            if (not entry.get("term_id") or entry["term_id"] == term)
+            if entry.get("term_id") == term  # an entry without a term belongs to no term
             and (entry.get("completion_status") == "COMPLETED" or entry.get("confirmed_added", 0) > 0)
             and (activity_id := catalog.entry_activity_id(entry))
         }
@@ -219,7 +279,7 @@ class AccountPlanScoring:
             for category, value in scores.items()
             if (raw_score := raw.get(category, 0)) != value
         }
-        self.engine = partial(evaluate_rule_conditions, apply_default_awards=True, category_score_offsets=offsets)
+        self.engine = _engine_with_offsets(offsets)
         self.baseline = {
             **base, "category_scores": scores,
             "total_score": min(base["max_total_score"], sum(scores.values())),

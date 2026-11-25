@@ -23,6 +23,7 @@ import secrets
 import sys
 import uuid
 from collections import OrderedDict
+from contextlib import asynccontextmanager
 from copy import deepcopy
 from datetime import datetime
 from functools import wraps
@@ -48,6 +49,18 @@ from api.dedup_review import possible_duplicates
 from api.lead_contract import ACTIVITY_FIELDS, audit_dataset, canonical_url, prepare_publication
 from api.plan_completion import AccountPlanScoring, completion_catalog, completion_clock, timestamp
 from api.reviewed_pipeline import evaluate_reviewed_activity, fingerprint
+from api.term_clock import (
+    SYNTHETIC_TERM_ID,
+    TermClock,
+    UNASSIGNED_TERM_ID,
+    UnknownTermError,
+    as_of_of,
+    clock_at_date,
+    get_term,
+    list_terms,
+    state_term,
+    term_for_date,
+)
 from personalization import (
     ConfirmedPreferenceSaveRequest,
     InterpretPreferenceRequest,
@@ -78,11 +91,25 @@ from sp2.rule_matcher import match_activity_to_rule
 DATA_DIR = ROOT_DIR / "data"
 WEB_DIR = ROOT_DIR / "web"
 SCHEMAS_DIR = ROOT_DIR / "schemas"
+SERVER_BOOT_ID = uuid.uuid4().hex
+
+
+@asynccontextmanager
+async def _app_lifespan(_app: FastAPI):
+    if os.environ.get("UNILIFE_PERSIST_SESSION") == "0":
+        _wipe_ephemeral_session()
+    try:
+        yield
+    finally:
+        if os.environ.get("UNILIFE_PERSIST_SESSION") == "0":
+            _wipe_ephemeral_session()
+
 
 app = FastAPI(
     title="HCMUS Academic Campus Decision Assistant API",
     description="Backend API integrating SP1, SP2 and SP3 availability/feasibility contracts",
     version="1.2.0",
+    lifespan=_app_lifespan,
 )
 
 app.add_middleware(
@@ -217,22 +244,23 @@ SESSION_DIR = SESSION_FILE.parent
 SESSION_DIR.mkdir(parents=True, exist_ok=True)
 SESSION_LOCK = RLock()
 PLAN_OFFER_KEY = secrets.token_bytes(32)
-# The app has one scoreboard for this academic semester. Both SP3 demo
-# sources exercise that semester, even though the synthetic context labels it differently.
-SCORE_TERM_ID = "HK1_2026_2027"
-# Version 3 replaces the old synthetic 69-point baseline with the opening score
-# calculated from default_awarded rules.  Older demo sessions are intentionally not
-# restored because their absolute category scores include the obsolete baseline.
-SESSION_SCHEMA_VERSION = 3
+# Term-scoped state (scoreboard, confirmed plan, points history) is keyed by (student, term_id), where the
+# term is a configured semester or the synthetic test scenario (api.term_clock). Version 3 replaced the old
+# synthetic 69-point baseline with the opening score calculated from default_awarded rules; version 4 adds the
+# term level. Version 3 files are migrated by _normalize_session; older ones are not restored.
+SESSION_SCHEMA_VERSION = 4
+READABLE_SESSION_VERSIONS = (3, SESSION_SCHEMA_VERSION)
 
 # Committed (saved) activities across students, newest first.
 session_committed: list[dict[str, Any]] = []
-# Per-student saved scores: {student_id: {"current": {Cx: n}, "projected": {Cx: n}}}
-session_scores: dict[str, dict[str, dict[str, float]]] = {}
-# Per-student preference snapshots confirmed in the UI.  The AI's unconfirmed
-# draft is intentionally never persisted.
+# Saved scores per student and term: {student_id: {term_id: {"current": {Cx: n}, "projected": {Cx: n}}}}
+session_scores: dict[str, dict[str, dict[str, dict[str, float]]]] = {}
+# Per-student preference snapshots confirmed in the UI (general preferences: keyed by student only).
+# The AI's unconfirmed draft is intentionally never persisted.
 session_preferences: dict[str, dict[str, Any]] = {}
-session_confirmed_plans: dict[str, dict[str, Any]] = {}
+# The confirmed plan per student and term: {student_id: {term_id: plan}}
+session_confirmed_plans: dict[str, dict[str, dict[str, Any]]] = {}
+session_simulation_dates: dict[str, dict[str, str]] = {}
 # Successful interpretations are safe to reuse because temperature is zero and
 # deterministic normalization runs before this boundary. Keep the cache small
 # and process-local; confirmed preferences remain stored separately per student.
@@ -255,10 +283,37 @@ def _default_student_scores() -> dict[str, dict[str, float]]:
     }
 
 
-def _get_student_scores(student_id: str) -> dict[str, dict[str, float]]:
-    if student_id not in session_scores:
-        session_scores[student_id] = _default_student_scores()
-    return session_scores[student_id]
+def _get_student_scores(student_id: str, term_id: str) -> dict[str, dict[str, float]]:
+    terms = session_scores.setdefault(student_id, {})
+    if term_id not in terms:
+        terms[term_id] = _default_student_scores()
+    return terms[term_id]
+
+
+def _require_term(term_id: str | None, *, real_only: bool = False) -> str:
+    """The validated state key of a request: a configured term (or the synthetic scenario unless real_only)."""
+    if term_id is None:
+        raise HTTPException(status_code=422, detail="term_id is required; see GET /api/terms")
+    try:
+        return get_term(term_id).term_id if real_only else state_term(term_id)
+    except UnknownTermError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+def _plan_term_id(source: str, term_id: str | None) -> str:
+    """The synthetic scenario has its own clock; the real store plans in the requested term."""
+    return SYNTHETIC_TERM_ID if source == "synthetic" else _require_term(term_id, real_only=True)
+
+
+def _effective_clock(term_id: str, student_id: str | None = None) -> TermClock:
+    term = get_term(term_id)
+    with SESSION_LOCK:
+        saved_date = session_simulation_dates.get(student_id, {}).get(term_id)
+    return clock_at_date(term, saved_date) if saved_date else term
+
+
+def _clock_metadata(clock: TermClock) -> dict[str, str]:
+    return {"term_id": clock.term_id, "as_of": clock.as_of, "clock_version": clock.clock_version}
 
 
 def _get_student_deduper(student_id: str) -> PostDeduplicator:
@@ -273,8 +328,8 @@ def _session_activities() -> list[dict[str, Any]]:
     return saved + list(ACTIVITIES_DATA)
 
 
-def _scores_payload(student_id: str) -> dict[str, Any]:
-    state = session_scores.get(student_id) or _default_student_scores()
+def _scores_payload(student_id: str, term_id: str) -> dict[str, Any]:
+    state = session_scores.get(student_id, {}).get(term_id) or _default_student_scores()
     categories = {}
     for cid, meta in CATEGORY_META.items():
         categories[cid] = {
@@ -287,6 +342,9 @@ def _scores_payload(student_id: str) -> dict[str, Any]:
     total_projected = sum(c["projected"] for c in categories.values())
     return {
         "student_id": student_id,
+        "term_id": term_id,
+        **({"as_of": as_of_of(term_id)} if term_id == SYNTHETIC_TERM_ID
+           else _clock_metadata(_effective_clock(term_id, student_id))),
         "category_scores": categories,
         "total_confirmed": _clean_num(total_current),
         "total_projected": _clean_num(total_projected),
@@ -297,10 +355,11 @@ def _scores_payload(student_id: str) -> dict[str, Any]:
                 "completion_status", "confirmed_at",
             )}
             for c in session_committed
-            if c.get("kind") == "score" and c.get("student_id") == student_id
+            if c.get("kind") == "score" and c.get("student_id") == student_id and c.get("term_id") == term_id
         ],
         "is_baseline": not any(
-            c.get("kind") == "score" and c.get("student_id") == student_id for c in session_committed
+            c.get("kind") == "score" and c.get("student_id") == student_id and c.get("term_id") == term_id
+            for c in session_committed
         ),
         "baseline_source": "DRL_DEFAULT_AWARDS",
         "default_applied_rules": DEFAULT_APPLIED_RULES,
@@ -329,6 +388,7 @@ def _save_session_to_disk(*, strict: bool = False) -> None:
             "session_scores": session_scores,
             "confirmed_preferences": session_preferences,
             "confirmed_plans": session_confirmed_plans,
+            "simulation_dates": session_simulation_dates,
             "committed": session_committed,
             "review_queue": review_queue,
             # Read-only convenience view for humans opening the file.
@@ -348,25 +408,90 @@ def _save_session_to_disk(*, strict: bool = False) -> None:
             temporary.unlink(missing_ok=True)
 
 
-def _clear_session_state() -> None:
+def _clear_session_state(*, preserve_simulation_dates: bool = False) -> None:
     session_committed.clear()
     session_scores.clear()
     session_preferences.clear()
     session_confirmed_plans.clear()
+    if not preserve_simulation_dates:
+        session_simulation_dates.clear()
     review_queue.clear()
     student_dedupers.clear()
+
+
+@_locked_session
+def _wipe_ephemeral_session() -> None:
+    """Wipe in-memory and on-disk session data when the server starts or shuts down."""
+    _clear_session_state()
+    preference_interpret_cache.clear()
+    try:
+        SESSION_FILE.unlink(missing_ok=True)
+    except OSError as exc:
+        print(f"Warning: Failed to remove session file {SESSION_FILE}: {exc}", file=sys.stderr)
+
+
+def _known_term(term_id: Any) -> bool:
+    try:
+        state_term(term_id)
+    except UnknownTermError:
+        return False
+    return True
+
+
+def _normalize_session(data: dict) -> tuple[dict, dict, list]:
+    """(scores, confirmed plans, committed) of a session file, keyed by (student, term).
+
+    Legacy data without a term is assigned to a term only by stored evidence: a plan's context.term_id, or an
+    activity's own dates. Anything else is kept aside under UNASSIGNED_TERM_ID, which no request ever reads.
+    """
+    committed = [dict(entry) for entry in (data.get("committed") or []) if isinstance(entry, dict)]
+    for entry in committed:
+        term = entry.get("term_id")
+        if entry.get("kind") == "score" and term != UNASSIGNED_TERM_ID and not _known_term(term):
+            start = (entry.get("catalog_entry") or {}).get("start")
+            entry["term_id"] = term_for_date(start) or UNASSIGNED_TERM_ID
+    scores: dict[str, dict[str, Any]] = {}
+    plans: dict[str, dict[str, Any]] = {}
+    legacy = data.get("schema_version") == 3
+    for student, state in (data.get("session_scores") or {}).items():
+        if legacy:
+            # Version 3: one scoreboard per student. It belongs to a term only if every score entry of
+            # that student names the same term.
+            terms = {e["term_id"] for e in committed if e.get("kind") == "score" and e.get("student_id") == student}
+            term = terms.pop() if len(terms) == 1 else UNASSIGNED_TERM_ID
+            state = {term if _known_term(term) else UNASSIGNED_TERM_ID: state}
+        if isinstance(state, dict):
+            scores[student] = {t: v for t, v in state.items() if isinstance(v, dict) and "current" in v}
+    for student, saved in (data.get("confirmed_plans") or {}).items():
+        if legacy:
+            term = ((saved or {}).get("context") or {}).get("term_id") if isinstance(saved, dict) else None
+            saved = {term if _known_term(term) else UNASSIGNED_TERM_ID: saved}
+        if isinstance(saved, dict):
+            plans[student] = {t: v for t, v in saved.items() if isinstance(v, dict) and "plan_version" in v}
+    return scores, plans, committed
 
 
 def _load_session_from_disk() -> None:
     """Restore a previous session (survives server restarts). Falls back to a clean state."""
     data = load_json(SESSION_FILE, None)
-    if not isinstance(data, dict) or data.get("schema_version") != SESSION_SCHEMA_VERSION:
+    if not isinstance(data, dict) or data.get("schema_version") not in READABLE_SESSION_VERSIONS:
         return
     try:
-        session_scores.update(data.get("session_scores") or {})
+        scores, plans, committed = _normalize_session(data)
+        session_scores.update(scores)
         session_preferences.update(data.get("confirmed_preferences") or {})
-        session_confirmed_plans.update(data.get("confirmed_plans") or {})
-        session_committed.extend(data.get("committed") or [])
+        session_confirmed_plans.update(plans)
+        overrides = data.get("simulation_dates")
+        for student_id, dates in (overrides.items() if isinstance(overrides, dict) else ()):
+            if not isinstance(dates, dict):
+                continue
+            for term_id, value in dates.items():
+                try:
+                    clock_at_date(get_term(term_id), value)
+                except (ValueError, TypeError):
+                    continue
+                session_simulation_dates.setdefault(student_id, {})[term_id] = value
+        session_committed.extend(committed)
         review_queue.extend(data.get("review_queue") or [])
         for c in session_committed:
             if c.get("kind") == "score" and c.get("raw_content"):
@@ -376,7 +501,11 @@ def _load_session_from_disk() -> None:
         _clear_session_state()
 
 
-_load_session_from_disk()
+if os.environ.get("UNILIFE_PERSIST_SESSION") != "0":
+    _load_session_from_disk()
+
+# The E2E announcements are "posted" on the first day of HK1 (its simulated now), not on a fixed demo date.
+E2E_POST_DATE = get_term("HK1_2026_2027").term_start
 
 # 5 Standardized E2E Test Scenarios (Shared between API and Frontend)
 E2E_SCENARIOS: dict[int, dict[str, Any]] = {
@@ -390,7 +519,7 @@ E2E_SCENARIOS: dict[int, dict[str, Any]] = {
         "post_id": "pfbid01_pccc_new_2026",
         "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
         "platform": "facebook",
-        "date_posted": "2026-10-25",
+        "date_posted": E2E_POST_DATE,
         "url": "https://www.facebook.com/osa.hcmus/posts/pccc_training_2026",
         "evidence": False,
         "rule_override": "auto",
@@ -425,7 +554,7 @@ Link đăng ký: https://forms.gle/pccc2026hcmus""",
         "post_id": "pfbid09bloodDonation2026hcmus",
         "publisher": "Hội Sinh Viên Trường ĐH Khoa học Tự nhiên",
         "platform": "facebook",
-        "date_posted": "2026-10-25",
+        "date_posted": E2E_POST_DATE,
         "url": "https://www.facebook.com/hsv.hcmus/posts/blood2026",
         "evidence": True,
         "rule_override": "auto",
@@ -461,7 +590,7 @@ Quyền lợi: Cộng 10 điểm rèn luyện theo quy chế khi hoàn thành hi
         "post_id": "pfbid03onlineMissingReqD16",
         "publisher": "Trung tâm Hướng nghiệp & Tư vấn việc làm HCMUS",
         "platform": "facebook",
-        "date_posted": "2026-10-25",
+        "date_posted": E2E_POST_DATE,
         "url": "https://www.facebook.com/career.hcmus/posts/webinar303",
         "evidence": False,
         "rule_override": "auto",
@@ -496,7 +625,7 @@ Lệ phí: Miễn phí. Không bắt buộc.""",
         "post_id": "pfbid04capLimitTestC3",
         "publisher": "Đoàn Trường ĐH Khoa học Tự nhiên",
         "platform": "facebook",
-        "date_posted": "2026-10-25",
+        "date_posted": E2E_POST_DATE,
         "url": "https://www.facebook.com/doantruong.hcmus/posts/olympicmaclenin",
         "evidence": True,
         "rule_override": "R3101",
@@ -533,7 +662,7 @@ Link đăng ký: https://forms.gle/olympic2026""",
         "post_id": "pfbid02buJY8Rrn2XezSWbCNxpUnfSHX4yDYWi5EgXbngmL1FKiEE47XQarhqVqb4WjERECl",
         "publisher": "Phòng Công tác Sinh viên - Trường Đại học Khoa học Tự nhiên",
         "platform": "facebook",
-        "date_posted": "2026-10-25",
+        "date_posted": E2E_POST_DATE,
         "url": "https://www.facebook.com/osa.hcmus/posts/pfbid02buJY8Rrn2XezSWbCNxpUnfSH",
         "evidence": True,
         "rule_override": "auto",
@@ -564,7 +693,9 @@ class EvaluationRequest(BaseModel):
     post_id: str = Field(default="")
     publisher: str = Field(default="P.CTSV ĐH KHTN")
     platform: str = Field(default="facebook")
-    date_posted: str = Field(default="2026-10-25")
+    # An empty date_posted means "posted on the first day of the selected term" (its simulated now).
+    date_posted: str = Field(default="")
+    term_id: Optional[str] = Field(default=None)
     url: str = Field(default="https://www.facebook.com/osa.hcmus/posts/example")
     raw_content: str = Field(...)
     has_evidence: bool = Field(default=False)
@@ -722,6 +853,7 @@ def health_check():
     rule_issues = audit_rules_config(DRL_RULES_CONFIG)
     return {
         "status": "degraded" if any(x["severity"] == "error" for x in rule_issues) else "healthy",
+        "server_boot_id": SERVER_BOOT_ID,
         "rule_audit_issues": rule_issues,
         "rule_audit_count": len(rule_issues),
         "regulation": DRL_RULES_CONFIG.get("regulation", {}).get("regulation_id", "1028/QD-KHTN-CTSV"),
@@ -749,9 +881,63 @@ def get_students_list():
     ]
 
 
+@app.get("/api/terms")
+def get_terms():
+    """The configured semesters with their simulated clocks (dates come from data/config/semesters.json)."""
+    return {"terms": [clock.as_dict() for clock in list_terms()]}
+
+
+@app.get("/api/clock")
+@_locked_session
+def get_term_clock(term_id: str | None = None, student_id: str | None = None):
+    term = _require_term(term_id, real_only=True)
+    student = _validated_student_id(student_id) if student_id is not None else None
+    return _effective_clock(term, student).as_dict()
+
+
+class AdvanceClockRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+    student_id: str
+    term_id: str
+    date: str
+
+
+@app.post("/api/clock/advance")
+@_locked_session
+def advance_term_clock(req: AdvanceClockRequest):
+    student = _validated_student_id(req.student_id)
+    term = get_term(_require_term(req.term_id, real_only=True))
+    try:
+        proposed = clock_at_date(term, req.date)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    current = _effective_clock(term.term_id, student)
+    proposed_time, current_time = timestamp(proposed.as_of), timestamp(current.as_of)
+    if proposed_time < current_time:
+        raise HTTPException(409, detail={
+            "message": "Chỉ có thể chuyển ngày mô phỏng về sau.", "clock": current.as_dict(),
+        })
+    if proposed_time == current_time:
+        return current.as_dict()
+
+    saved = session_simulation_dates.setdefault(student, {})
+    previous = saved.get(term.term_id)
+    saved[term.term_id] = req.date
+    try:
+        _save_session_to_disk(strict=True)
+    except OSError as exc:
+        if previous is None:
+            saved.pop(term.term_id)
+        else:
+            saved[term.term_id] = previous
+        raise HTTPException(503, detail="Chưa lưu được ngày mô phỏng. Hãy thử lại.") from exc
+    return proposed.as_dict()
+
+
 @app.get("/api/profile")
 @_locked_session
-def get_student_profile(student_id: Optional[str] = None):
+def get_student_profile(student_id: Optional[str] = None, term_id: Optional[str] = None):
+    term = _require_term(term_id)
     target_id = student_id or DEFAULT_STUDENT_ID
     matched_student = next(
         (s for s in STUDENT_PROFILES if s.get("student_id") == target_id),
@@ -769,7 +955,7 @@ def get_student_profile(student_id: Optional[str] = None):
         major = "Công nghệ Thông tin"
         gpa = 4.0
 
-    scores = _scores_payload(target_id)
+    scores = _scores_payload(target_id, term)
     cat_scores = scores["category_scores"]
     total_confirmed = scores["total_confirmed"]
     return {
@@ -778,7 +964,7 @@ def get_student_profile(student_id: Optional[str] = None):
         "class": class_name,
         "major": major,
         "gpa": gpa,
-        "term": "HK1/2026-2027",
+        "term": term,
         "category_scores": cat_scores,
         "verified_activities_count": 0,
         "total_confirmed_score": total_confirmed,
@@ -821,9 +1007,9 @@ def get_activities():
 
 @app.get("/api/scores")
 @_locked_session
-def get_student_scores(student_id: Optional[str] = None):
-    """Saved score board of a student in the current session (source of truth for the UI)."""
-    return _scores_payload(student_id or DEFAULT_STUDENT_ID)
+def get_student_scores(student_id: Optional[str] = None, term_id: Optional[str] = None):
+    """Saved score board of a student for one term in the current session (source of truth for the UI)."""
+    return _scores_payload(student_id or DEFAULT_STUDENT_ID, _require_term(term_id))
 
 
 @app.get("/api/e2e-cases")
@@ -835,7 +1021,7 @@ def get_e2e_cases():
 @_locked_session
 def reset_session_state():
     """Wipe saved activities, saved scores and review queue back to the initial baseline."""
-    _clear_session_state()
+    _clear_session_state(preserve_simulation_dates=True)
     _save_session_to_disk()
     return {"status": "success", "message": "Session reset to initial catalog"}
 
@@ -845,6 +1031,7 @@ def _check_post_duplicate(
     req_url: str,
     raw_content: str,
     student_id: str,
+    term_id: str,
 ) -> tuple[bool, Optional[str], float, Optional[str], Optional[str]]:
     """Duplicate check against (1) baseline collected posts and (2) posts this student already SAVED.
 
@@ -857,7 +1044,7 @@ def _check_post_duplicate(
     for entry in session_committed:
         if (
             entry.get("student_id") != student_id
-            or entry.get("term_id") != SCORE_TERM_ID
+            or entry.get("term_id") != term_id
             or entry.get("completion_status") != "COMPLETED"
         ):
             continue
@@ -907,9 +1094,11 @@ def evaluate_announcement(req: EvaluationRequest):
     - simulate_demo=True: Demo Simulation Mode (DEMO_ONLY).
       Runs SP1 -> 14-field candidate -> simulated approval -> real SP2 engine (evaluate_reviewed_activity / evaluate_progress).
     """
+    term_id = _require_term(req.term_id)
+    posted_date = req.date_posted or as_of_of(term_id)[:10]
     source = {"publisher": req.publisher, "platform": req.platform, "URL_post": req.url}
     try:
-        drafts = extract(req.raw_content, source, posted_date=req.date_posted)
+        drafts = extract(req.raw_content, source, posted_date=posted_date)
         if not drafts:
             raise HTTPException(status_code=422, detail="No activity detected in announcement")
         raw_draft = drafts[0]
@@ -925,7 +1114,7 @@ def evaluate_announcement(req: EvaluationRequest):
     current_activity_id = rec["activity_id"]
     student_id = req.student_id or DEFAULT_STUDENT_ID
     detected_duplicate, dup_match_id, dup_sim, dup_source, dup_match_kind = _check_post_duplicate(
-        req.post_id, req.url, req.raw_content, student_id
+        req.post_id, req.url, req.raw_content, student_id, term_id
     )
     catalog_match = bool(
         detected_duplicate
@@ -945,6 +1134,7 @@ def evaluate_announcement(req: EvaluationRequest):
                 c for c in session_committed
                 if c.get("commit_id") == dup_match_id
                 and c.get("student_id") == student_id
+                and c.get("term_id") == term_id
                 and c.get("kind") == "score"
                 and not c.get("confirmed_added")
             ),
@@ -1054,7 +1244,7 @@ def evaluate_announcement(req: EvaluationRequest):
     # Baseline = explicit scores from the caller (dev batch runner / tests) or, by default,
     # the student's SAVED score board in this session (single source of truth).
     uses_session_scores = req.current_category_scores is None
-    student_state = _get_student_scores(student_id)
+    student_state = _get_student_scores(student_id, term_id)
     if uses_session_scores:
         flat_baseline = _extract_flat_baseline_scores(dict(student_state["current"]))
     else:
@@ -1374,6 +1564,7 @@ def commit_evaluation(req: CommitRequest):
         raise HTTPException(status_code=422, detail="Saving always uses the server-side score board.")
 
     result = evaluate_announcement(req)
+    term_id = _require_term(req.term_id)
     sp2 = result["sp2"]
     commit = result.get("commit") or {}
     kind = commit.get("kind")
@@ -1400,19 +1591,19 @@ def commit_evaluation(req: CommitRequest):
             "activity_id": rec.get("activity_id"),
             "title": rec.get("title") or "Thông báo cần rà soát",
             "flags": result["sp1"]["meta"].get("flags", []) or ["rule_needs_review"],
-            "date_posted": req.date_posted,
+            "date_posted": req.date_posted or as_of_of(term_id)[:10],
             "url": rec.get("source", {}).get("URL_post"),
             "fingerprint": _review_fingerprint(req.raw_content),
             "submitted_at": _now_iso(),
         }
         review_queue.append(entry)
         _save_session_to_disk()
-        return {"status": "queued", "kind": "review", "entry": entry, "scores": _scores_payload(student_id)}
+        return {"status": "queued", "kind": "review", "entry": entry, "scores": _scores_payload(student_id, term_id)}
 
     # kind == "score"
     category_id = sp2["category_id"]
     cap = sp2["category_cap"]
-    state = _get_student_scores(student_id)
+    state = _get_student_scores(student_id, term_id)
     confirmed_added = sp2.get("confirmed_added") or 0
     projected_added = sp2.get("projected_added") or 0
     upgrade_id = commit.get("upgrade_of")
@@ -1455,14 +1646,14 @@ def commit_evaluation(req: CommitRequest):
             "category_id": category_id,
             "confirmed_added": confirmed_added,
             "projected_added": 0,
-            "scores": _scores_payload(student_id),
+            "scores": _scores_payload(student_id, term_id),
         }
 
     entry = {
         "commit_id": commit_id,
         "kind": "score",
         "student_id": student_id,
-        "term_id": SCORE_TERM_ID,
+        "term_id": term_id,
         "activity_id": rec.get("activity_id"),
         "title": rec.get("title"),
         "category_id": category_id,
@@ -1487,7 +1678,7 @@ def commit_evaluation(req: CommitRequest):
         "category_id": category_id,
         "confirmed_added": confirmed_added,
         "projected_added": projected_added,
-        "scores": _scores_payload(student_id),
+        "scores": _scores_payload(student_id, term_id),
     }
 
 
@@ -1603,25 +1794,32 @@ def interpret_profile_assistant(req: ProfileAssistantInterpretRequest):
 
 class AvailabilityResolveRequest(BaseModel):
     availability: dict[str, Any]
-    window_start: str
-    window_end: str
+    # With term_id the window is the term's planning window; without it the caller states both ends.
+    term_id: Optional[str] = None
+    student_id: Optional[str] = None
+    window_start: Optional[str] = None
+    window_end: Optional[str] = None
 
 
 @app.post("/api/sp3/availability/resolve")
 def resolve_sp3_availability(req: AvailabilityResolveRequest):
     """Expand a UI week template without persisting or inferring free time."""
 
+    student = _validated_student_id(req.student_id) if req.student_id is not None else None
+    clock = _effective_clock(_require_term(req.term_id, real_only=True), student) if req.term_id is not None else None
+    start = clock.window_start if clock else req.window_start
+    end = clock.window_end if clock else req.window_end
+    if start is None or end is None:
+        raise HTTPException(status_code=422, detail="term_id or both window_start and window_end are required")
     try:
-        resolved = resolve_availability(
-            req.availability,
-            window_start=req.window_start,
-            window_end=req.window_end,
-        )
+        resolved = resolve_availability(req.availability, window_start=start, window_end=end)
     except (AvailabilityContractError, ValueError, TypeError) as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+    term_fields = _clock_metadata(clock) if clock else {}
     return {
         "mode": "DEMO_ONLY",
         "persistent": False,
+        **term_fields,
         **resolved,
     }
 
@@ -1649,7 +1847,7 @@ def evaluate_end_to_end_demo(req: DemoPipelineRequest):
     meta = candidate["meta"]
 
     is_dup, dup_id, dup_sim, _dup_source, _dup_kind = _check_post_duplicate(
-        case["post_id"], case["url"], case["raw_content"], activity["activity_id"]
+        case["post_id"], case["url"], case["raw_content"], activity["activity_id"], SYNTHETIC_TERM_ID
     )
     meta["is_duplicate"] = is_dup
 
@@ -1765,7 +1963,7 @@ from api.sp3_real import (
     real_plan_options as _sp3_real_options,
 )
 
-# ?source=real switches the SP3 screens to the SP1 v2 store (HK1 2026-2027, synthetic student).
+# ?source=real switches the SP3 screens to the SP1 v2 store (the term of ?term_id=, synthetic student).
 # The default stays the synthetic MVP fixture so existing demos and tests are unchanged.
 # The app only reads committed data files; new announcements arrive through the admin batch
 # (scripts/update_activity_data.py, docs/OPERATIONAL_DATA_PIPELINE.md), never through a model call at runtime.
@@ -1779,16 +1977,18 @@ def _sp3_source(source: str) -> str:
 
 
 @_locked_session
-def _account_planning(student_id: str | None, source: str) -> AccountPlanScoring | None:
+def _account_planning(student_id: str | None, source: str, term_id: str) -> AccountPlanScoring | None:
+    """The account's scoreboard and history for one term; term_id is already the plan's state key."""
     if student_id is None:
         return None
     student_id = _validated_student_id(student_id)
-    state = session_scores.get(student_id) or _default_student_scores()
+    state = session_scores.get(student_id, {}).get(term_id) or _default_student_scores()
     entries = [
         entry for entry in session_committed
         if entry.get("student_id") == student_id and entry.get("kind") == "score"
     ]
-    return AccountPlanScoring(completion_catalog(source), student_id, dict(state["current"]), entries, SCORE_TERM_ID)
+    clock = None if term_id == SYNTHETIC_TERM_ID else _effective_clock(term_id, student_id)
+    return AccountPlanScoring(completion_catalog(source, term_id), student_id, dict(state["current"]), entries, term_id, clock)
 
 
 def _offer_plan(result: dict, source: str, account: AccountPlanScoring | None) -> dict:
@@ -1807,6 +2007,9 @@ def _offer_plan(result: dict, source: str, account: AccountPlanScoring | None) -
         "context": plan["context"],
         "target_total": result["requested_total_target"],
         "activity_ids": [row["activity_id"] for row in rows],
+        "schedule": {row["activity_id"]: row["scheduled_blocks"] for row in rows},
+        "based_on": plan.get("based_on"),
+        "clock_version": result.get("clock_version"),
     }
     payload = json.dumps(snapshot, separators=(",", ":")).encode()
     signature = hmac.digest(PLAN_OFFER_KEY, payload, "sha256")
@@ -1817,27 +2020,34 @@ def _offer_plan(result: dict, source: str, account: AccountPlanScoring | None) -
 class ConfirmPlanRequest(BaseModel):
     model_config = {"extra": "forbid"}
     student_id: str = Field(min_length=1, max_length=64)
+    term_id: str = Field(min_length=1, max_length=64)
     offer: str = Field(min_length=1, max_length=8192)
 
 
 class CompletePlanActivityRequest(BaseModel):
     model_config = {"extra": "forbid"}
     student_id: str = Field(min_length=1, max_length=64)
+    term_id: str = Field(min_length=1, max_length=64)
     plan_version: str = Field(min_length=1, max_length=64)
     activity_id: str = Field(min_length=1, max_length=150)
     affirmed: Literal[True]
 
 
-def _confirmed_plan(student_id: str, plan_version: str) -> dict:
-    plan = session_confirmed_plans.get(student_id)
-    if not plan or plan["plan_version"] != plan_version:
-        raise HTTPException(404, detail="Kế hoạch này chưa được đồng bộ hoặc đã được thay thế.")
-    return plan
+def _confirmed_plan(student_id: str, term_id: str, plan_version: str) -> dict:
+    plans = session_confirmed_plans.get(student_id, {})
+    plan = plans.get(term_id)
+    if plan and plan["plan_version"] == plan_version:
+        return plan
+    # The same version saved under another term is a term mismatch, not a missing plan.
+    if any(other["plan_version"] == plan_version for key, other in plans.items() if key != UNASSIGNED_TERM_ID):
+        raise HTTPException(409, detail="Kế hoạch này thuộc học kỳ khác. Hãy chọn đúng học kỳ của kế hoạch.")
+    raise HTTPException(404, detail="Kế hoạch này chưa được đồng bộ hoặc đã được thay thế.")
 
 
 def _plan_progress(plan: dict) -> dict:
-    account = _account_planning(plan["student_id"], plan["source"])
-    now = completion_clock()
+    term_id = plan["context"]["term_id"]
+    account = _account_planning(plan["student_id"], plan["source"], term_id)
+    now = completion_clock(term_id, account.clock)
     statuses = {}
     remaining = []
     for activity_id in plan["activity_ids"]:
@@ -1866,6 +2076,7 @@ def _plan_progress(plan: dict) -> dict:
         "official_award_verified": False,
         "plan_version": plan["plan_version"],
         "term_id": plan["context"]["term_id"],
+        **(_clock_metadata(account.clock) if account.clock else {}),
         "as_of": now.isoformat(),
         "activities": statuses,
         "past_completions": past_completions,
@@ -1893,42 +2104,55 @@ def save_confirmed_plan(req: ConfirmPlanRequest):
         raise HTTPException(409, detail="Kế hoạch đã hết hiệu lực. Hãy lập lại kế hoạch.") from exc
     if plan["student_id"] != student_id:
         raise HTTPException(403, detail="Kế hoạch thuộc tài khoản khác.")
+    term_id = plan["context"]["term_id"]
+    if req.term_id != term_id:
+        raise HTTPException(409, detail="Kế hoạch này thuộc học kỳ khác. Hãy lập lại kế hoạch cho học kỳ đang chọn.")
+    student_plans = session_confirmed_plans.setdefault(student_id, {})
+    previous = student_plans.get(term_id)
+    if previous == plan:
+        return _plan_progress(previous)
+    if term_id != SYNTHETIC_TERM_ID:
+        clock = _effective_clock(term_id, student_id)
+        if (timestamp(plan["context"]["as_of"]) != timestamp(clock.as_of)
+                or plan.get("clock_version") != clock.clock_version):
+            raise HTTPException(409, detail="Ngày mô phỏng đã thay đổi. Hãy lập lại kế hoạch trước khi chốt.")
     progress = _plan_progress(plan)
-    previous = session_confirmed_plans.get(student_id)
-    session_confirmed_plans[student_id] = plan
+    student_plans[term_id] = plan
     try:
         _save_session_to_disk(strict=True)
     except OSError as exc:
         if previous is None:
-            session_confirmed_plans.pop(student_id)
+            student_plans.pop(term_id)
         else:
-            session_confirmed_plans[student_id] = previous
+            student_plans[term_id] = previous
         raise HTTPException(503, detail="Chưa lưu được kế hoạch. Hãy thử lại.") from exc
     return progress
 
 
 @app.get("/api/sp3/confirmed-plan/progress")
 @_locked_session
-def get_confirmed_plan_progress(student_id: str, plan_version: str):
+def get_confirmed_plan_progress(student_id: str, plan_version: str, term_id: Optional[str] = None):
     student_id = _validated_student_id(student_id)
-    return {**_plan_progress(_confirmed_plan(student_id, plan_version)), "scores": _scores_payload(student_id)}
+    term = _require_term(term_id)
+    return {**_plan_progress(_confirmed_plan(student_id, term, plan_version)), "scores": _scores_payload(student_id, term)}
 
 
 @app.post("/api/sp3/confirmed-plan/complete")
 @_locked_session
 def complete_plan_activity(req: CompletePlanActivityRequest):
     student_id = _validated_student_id(req.student_id)
-    plan = _confirmed_plan(student_id, req.plan_version)
+    term_id = _require_term(req.term_id)
+    plan = _confirmed_plan(student_id, term_id, req.plan_version)
     activity_id = req.activity_id
     if activity_id not in plan["activity_ids"]:
         raise HTTPException(404, detail="Hoạt động không thuộc kế hoạch đã xác nhận.")
-    account = _account_planning(student_id, plan["source"])
+    account = _account_planning(student_id, plan["source"], term_id)
     if activity_id in account.entries:
-        return {"progress": _plan_progress(plan), "scores": _scores_payload(student_id)}
+        return {"progress": _plan_progress(plan), "scores": _scores_payload(student_id, term_id)}
     catalog = account.catalog
     if activity_id not in catalog.activities:
         raise HTTPException(409, detail="Hoạt động cần được rà soát trước khi ghi điểm.")
-    now = completion_clock()
+    now = completion_clock(term_id, account.clock)
     eligibility = catalog.eligibility(activity_id, now)
     if eligibility["status"] != "READY":
         raise HTTPException(409, detail=eligibility)
@@ -1941,11 +2165,11 @@ def complete_plan_activity(req: CompletePlanActivityRequest):
     prior_index = next((
         idx for idx, entry in enumerate(session_committed)
         if entry.get("kind") == "score" and entry.get("student_id") == student_id
-        and entry.get("term_id", SCORE_TERM_ID) == SCORE_TERM_ID
+        and entry.get("term_id") == term_id
         and catalog.entry_activity_id(entry) == activity_id
     ), None)
     prior = session_committed[prior_index] if prior_index is not None else None
-    before = session_scores.get(student_id)
+    before = session_scores.get(student_id, {}).get(term_id)
     state = deepcopy(before or _default_student_scores())
     state["current"][category] = result["category_after"][category]
     affected_categories = {category, prior["category_id"]} if prior else {category}
@@ -1953,17 +2177,18 @@ def complete_plan_activity(req: CompletePlanActivityRequest):
         projected = sum(
             saved.get("projected_added") or 0 for saved in session_committed
             if saved is not prior and saved.get("kind") == "score" and saved.get("student_id") == student_id
-            and saved.get("term_id", SCORE_TERM_ID) == SCORE_TERM_ID and saved.get("category_id") == affected
+            and saved.get("term_id") == term_id and saved.get("category_id") == affected
         )
         room = max(0, account.baseline["category_caps"][affected] - state["current"][affected])
         state["projected"][affected] = _clean_num(min(projected, room))
     activity = catalog.activities[activity_id]
+    saved_at = _now_iso()
     entry = {
         **(prior or {}),
         "commit_id": prior["commit_id"] if prior else f"commit_{uuid.uuid4().hex[:10]}",
         "kind": "score",
         "student_id": student_id,
-        "term_id": SCORE_TERM_ID,
+        "term_id": term_id,
         "activity_id": activity_id,
         "title": activity["title"],
         "category_id": category,
@@ -1971,15 +2196,15 @@ def complete_plan_activity(req: CompletePlanActivityRequest):
         "projected_added": 0,
         "completion_status": "COMPLETED",
         "confirmation_source": "STUDENT_SELF_CONFIRMATION",
-        "confirmed_at": now.isoformat(),
-        "committed_at": prior["committed_at"] if prior else now.isoformat(),
+        "confirmed_at": saved_at,
+        "committed_at": prior["committed_at"] if prior else saved_at,
         "source_urls": sorted(catalog.sources[activity_id]),
         "catalog_entry": {
             **activity, "rule_id": award["rule_id"], "saved_by": student_id,
             "points_awarded": f"+{points}đ (Tự xác nhận)",
         },
     }
-    session_scores[student_id] = state
+    session_scores.setdefault(student_id, {})[term_id] = state
     if prior_index is None:
         session_committed.insert(0, entry)
     else:
@@ -1989,9 +2214,9 @@ def complete_plan_activity(req: CompletePlanActivityRequest):
         _save_session_to_disk(strict=True)
     except Exception as exc:
         if before is None:
-            session_scores.pop(student_id)
+            session_scores[student_id].pop(term_id)
         else:
-            session_scores[student_id] = before
+            session_scores[student_id][term_id] = before
         if prior_index is None:
             session_committed.pop(0)
         else:
@@ -1999,7 +2224,7 @@ def complete_plan_activity(req: CompletePlanActivityRequest):
         if isinstance(exc, OSError):
             raise HTTPException(503, detail="Chưa lưu được kết quả. Hãy thử lại.") from exc
         raise
-    return {"progress": progress, "scores": _scores_payload(student_id)}
+    return {"progress": progress, "scores": _scores_payload(student_id, term_id)}
 
 
 class SP3DemoPlanRequest(BaseModel):
@@ -2009,33 +2234,41 @@ class SP3DemoPlanRequest(BaseModel):
 
 
 @app.get("/api/sp3/catalog")
-def get_sp3_catalog(source: str = "synthetic"):
+def get_sp3_catalog(source: str = "synthetic", term_id: str | None = None, student_id: str | None = None):
     """Read SP1 activity records and QA without awarding points."""
     if _sp3_source(source) == "real":
-        return _sp3_real_catalog()
+        term = _plan_term_id(source, term_id)
+        student = _validated_student_id(student_id) if student_id is not None else None
+        return _sp3_real_catalog(term_id=term, clock=_effective_clock(term, student))
     return _sp3_catalog()
 
 
 @app.post("/api/sp3/demo/plan")
-def run_sp3_demo_plan(req: SP3DemoPlanRequest, source: str = "synthetic", student_id: str | None = None):
+def run_sp3_demo_plan(req: SP3DemoPlanRequest, source: str = "synthetic", student_id: str | None = None,
+                      term_id: str | None = None):
     """Read-only complete SP1-format -> feasibility -> planner -> SP2 demo."""
+    term = _plan_term_id(_sp3_source(source), term_id)
     try:
-        account = _account_planning(student_id, _sp3_source(source))
+        account = _account_planning(student_id, source, term)
         plan = _sp3_real_plan if source == "real" else _sp3_demo_plan
+        extra = {"term_id": term} if source == "real" else {}
         return _offer_plan(plan(
-            req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals, account=account,
+            req.scenario, target_total=req.total_target, busy_intervals=req.busy_intervals, account=account, **extra,
         ), source, account)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.post("/api/sp3/personalized/plan")
-def run_sp3_personalized_plan(req: PersonalizedPlanRequest, source: str = "synthetic", student_id: str | None = None):
+def run_sp3_personalized_plan(req: PersonalizedPlanRequest, source: str = "synthetic", student_id: str | None = None,
+                              term_id: str | None = None):
     """Rank the demo SP3 schedule using a student-confirmed preference only."""
 
+    term = _plan_term_id(_sp3_source(source), term_id)
     try:
-        account = _account_planning(student_id, _sp3_source(source))
+        account = _account_planning(student_id, source, term)
         plan = _sp3_real_plan if source == "real" else _sp3_personalized_plan
+        extra = {"term_id": term} if source == "real" else {}
         return _offer_plan(plan(
             preference=req.preference,
             scenario=req.scenario,
@@ -2043,26 +2276,31 @@ def run_sp3_personalized_plan(req: PersonalizedPlanRequest, source: str = "synth
             busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
             availability_request=req.availability,
             account=account,
+            **extra,
         ), source, account)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.post("/api/sp3/personalized/options")
-def run_sp3_personalized_options(req: PersonalizedPlanRequest, source: str = "synthetic", student_id: str | None = None):
+def run_sp3_personalized_options(req: PersonalizedPlanRequest, source: str = "synthetic", student_id: str | None = None,
+                                 term_id: str | None = None):
     """Return all distinct feasible strategy results in one cacheable response."""
 
     if req.scenario != "first_plan":
         raise HTTPException(status_code=422, detail="plan options are available for first_plan only")
+    term = _plan_term_id(_sp3_source(source), term_id)
     try:
-        account = _account_planning(student_id, _sp3_source(source))
+        account = _account_planning(student_id, source, term)
         options = _sp3_real_options if source == "real" else _sp3_personalized_options
+        extra = {"term_id": term} if source == "real" else {}
         response = options(
             req.preference,
             target_total=req.total_target,
             busy_intervals=[item.model_dump(mode="json") for item in req.busy_intervals],
             availability_request=req.availability,
             account=account,
+            **extra,
         )
         for option in response["options"]:
             if option.get("result"):
@@ -2103,53 +2341,61 @@ def _account_review_base(result: dict, account: AccountPlanScoring | None) -> di
 
 
 def _offer_preview(preview: dict, source: str, account: AccountPlanScoring | None) -> dict:
-    _offer_plan(preview["result"], source, account)
+    result = _offer_plan(preview["result"], source, account)
+    if source == "real":
+        preview.update({key: result[key] for key in ("term_id", "as_of", "clock_version")})
     return preview
 
 
 @app.post("/api/sp3/personalized/swap-preview")
-def preview_sp3_smart_swap(req: SmartSwapRequest, source: str = "synthetic", student_id: str | None = None):
+def preview_sp3_smart_swap(req: SmartSwapRequest, source: str = "synthetic", student_id: str | None = None,
+                           term_id: str | None = None):
     """Preview a whole-plan rescored swap; never persists or applies it."""
 
     resolved_source = _sp3_source(source)
+    term = _plan_term_id(resolved_source, term_id)
     try:
-        account = _account_planning(student_id, resolved_source)
+        account = _account_planning(student_id, resolved_source, term)
         return _offer_preview(_sp3_preview_swap(
             req.preference,
             _account_review_base(req.base_result, account),
             req.remove_activity_id,
             req.add_activity_id,
-            source=resolved_source, availability_request=req.availability, account=account,
+            source=resolved_source, availability_request=req.availability, account=account, term_id=term,
         ), resolved_source, account)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.post("/api/sp3/personalized/add-preview")
-def preview_sp3_addition(req: CalendarActivityChangeRequest, source: str = "synthetic", student_id: str | None = None):
+def preview_sp3_addition(req: CalendarActivityChangeRequest, source: str = "synthetic", student_id: str | None = None,
+                         term_id: str | None = None):
     """Preview a fixed-time calendar addition through whole-plan SP3 validation."""
 
     resolved_source = _sp3_source(source)
+    term = _plan_term_id(resolved_source, term_id)
     try:
-        account = _account_planning(student_id, resolved_source)
+        account = _account_planning(student_id, resolved_source, term)
         return _offer_preview(_sp3_preview_addition(
             req.preference, _account_review_base(req.base_result, account), req.activity_id,
-            source=resolved_source, availability_request=req.availability, account=account,
+            source=resolved_source, availability_request=req.availability, account=account, term_id=term,
         ), resolved_source, account)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.post("/api/sp3/personalized/remove-preview")
-def preview_sp3_removal(req: CalendarActivityChangeRequest, source: str = "synthetic", student_id: str | None = None):
+def preview_sp3_removal(req: CalendarActivityChangeRequest, source: str = "synthetic", student_id: str | None = None,
+                        term_id: str | None = None):
     """Preview an activity removal and SP3 replan without persisting it."""
 
     resolved_source = _sp3_source(source)
+    term = _plan_term_id(resolved_source, term_id)
     try:
-        account = _account_planning(student_id, resolved_source)
+        account = _account_planning(student_id, resolved_source, term)
         return _offer_preview(_sp3_preview_removal(
             req.preference, _account_review_base(req.base_result, account), req.activity_id,
-            source=resolved_source, availability_request=req.availability, account=account,
+            source=resolved_source, availability_request=req.availability, account=account, term_id=term,
         ), resolved_source, account)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -2179,33 +2425,39 @@ def _sp3_review_backend(source: str) -> None:
 
 
 @app.post("/api/sp3/personalized/alternatives")
-def list_sp3_swap_alternatives(req: SwapAlternativesRequest, source: str = "synthetic", student_id: str | None = None):
+def list_sp3_swap_alternatives(req: SwapAlternativesRequest, source: str = "synthetic", student_id: str | None = None,
+                               term_id: str | None = None):
     """Valid replacements for one planned activity, best first; never persists anything."""
 
     _sp3_review_backend(source)
+    term = _plan_term_id(source, term_id)
     try:
-        account = _account_planning(student_id, source)
+        account = _account_planning(student_id, source, term)
         response = _sp3_list_alternatives(
             req.preference, _account_review_base(req.base_result, account), req.remove_activity_id, req.limit,
-            availability_request=req.availability, source=source, account=account,
+            availability_request=req.availability, source=source, account=account, term_id=term,
         )
         for item in response["items"]:
             _offer_preview(item["preview"], source, account)
+        if source == "real":
+            response.update(_clock_metadata(account.clock if account else get_term(term)))
         return response
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @app.post("/api/sp3/personalized/what-if-skip")
-def preview_sp3_what_if_skip(req: PlanReviewRequest, source: str = "synthetic", student_id: str | None = None):
+def preview_sp3_what_if_skip(req: PlanReviewRequest, source: str = "synthetic", student_id: str | None = None,
+                             term_id: str | None = None):
     """Plan if one activity is skipped; the others keep their times. Never persists anything."""
 
     _sp3_review_backend(source)
+    term = _plan_term_id(source, term_id)
     try:
-        account = _account_planning(student_id, source)
+        account = _account_planning(student_id, source, term)
         return _offer_preview(_sp3_what_if_skip(
             req.preference, _account_review_base(req.base_result, account), req.remove_activity_id,
-            availability_request=req.availability, source=source, account=account,
+            availability_request=req.availability, source=source, account=account, term_id=term,
         ), source, account)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -2399,8 +2651,16 @@ if WEB_DIR.exists():
     def serve_index():
         index_file = WEB_DIR / "index.html"
         if index_file.exists():
-            return FileResponse(
+            response = FileResponse(
                 index_file,
                 headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
             )
+            response.set_cookie(
+                key="unilife_server_boot_id",
+                value=SERVER_BOOT_ID,
+                path="/",
+                samesite="lax",
+                httponly=False,
+            )
+            return response
         return JSONResponse({"message": "Web UI index.html not found"}, status_code=404)

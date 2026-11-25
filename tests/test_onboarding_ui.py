@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -12,13 +13,29 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
-from api.sp3_real import real_plan_options
+from api.sp3_real import real_plan_options as _real_plan_options
 from api.sp3_service import personalized_plan_options
 from personalization.models import StudentPreference
 from personalization.scoring import ActivityFeatures, PreferenceUtilityEngine
 from sp3.availability import resolve_availability
 
 HTML = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+
+
+def real_plan_options(*args, **kwargs):
+    return _real_plan_options(*args, term_id="HK1_2026_2027", **kwargs)
+
+
+def with_terms(js: str) -> str:
+    """The page loads the semester clock from the API; the sandbox gets the same clocks, selected = the latest term."""
+    from api.term_clock import list_terms
+
+    clocks = json.dumps([clock.as_dict() for clock in list_terms()])
+    pattern = r"vm\.runInContext\((?:mainScript|scripts), sandbox\);"
+    found = list(re.finditer(pattern, js))
+    assert len(found) == 1
+    init = f"vm.runInContext('termList = {clocks}; applyTermClock(termList[termList.length - 1]);', sandbox);"
+    return js[:found[0].end()] + "\n" + init + js[found[0].end():]
 
 
 def test_dashboard_assistant_is_replaced_by_one_time_onboarding_and_profile_editor() -> None:
@@ -40,7 +57,7 @@ def test_dashboard_assistant_is_replaced_by_one_time_onboarding_and_profile_edit
 
 
 def test_profile_schedule_workspace_and_local_migration_are_present() -> None:
-    assert "Hồ sơ & Lịch" in HTML
+    assert "Cài đặt" in HTML
     for marker in (
         'id="profileScheduleTabProfile"',
         'id="profileScheduleTabSchedule"',
@@ -133,8 +150,8 @@ vm.runInContext(mainScript, sandbox);
   sandbox.localStorage.setItem('unilife_users', JSON.stringify([user]));
   sandbox.beginOnboarding(user);
   sandbox.updateOnboardingProfileField('faculty', 'Khoa CNTT');
-  sandbox.toggleOnboardingBusySlot('class|2026-11-09|morning');
-  sandbox.toggleOnboardingBusySlot('work|2026-11-11|evening');
+  sandbox.toggleOnboardingBusySlot('class|2026-10-26|morning');
+  sandbox.toggleOnboardingBusySlot('work|2026-10-28|evening');
   sandbox.setOnboardingSemesterBusy(true);
   sandbox.updateOnboardingGoalField('target_score', 90);
   sandbox.updateOnboardingGoalField('format', 'Trực tuyến');
@@ -160,7 +177,7 @@ vm.runInContext(mainScript, sandbox);
   // 2. Add unrelated manual weekly rule, legacy exception, and unrelated preference fields
   vm.runInContext(`
     currentProfileDraft.weekly_intervals.push({ kind: 'busy', weekday: 4, start: '13:00', end: '15:00', recurrence: 'weekly', source: 'manual', confirmed: true });
-    currentProfileDraft.exceptions.push({ date: '2026-11-15', kind: 'busy', start: '09:00', end: '11:00', source: 'manual', confirmed: true });
+    currentProfileDraft.exceptions.push({ date: '2026-11-01', kind: 'busy', start: '09:00', end: '11:00', source: 'manual', confirmed: true });
     confirmedPreference.campus_preferences = [{ campus_id: 'NVC', weight: 4 }];
     confirmedPreference.hard_exclusions = { campus_ids: ['DONG_HOA'], modes: [], time_slots: [] };
     confirmedPreference.topic_preferences[0].weight = 3;
@@ -168,7 +185,7 @@ vm.runInContext(mainScript, sandbox);
     persistCurrentUserData();
   `, sandbox);
 
-  // 3. Remove one onboarding busy slot (work|2026-11-11|evening -> weekday 2) & reload
+  // 3. Remove one onboarding busy slot (work|2026-10-28|evening -> weekday 2) & reload
   vm.runInContext(`
     const idx = currentProfileDraft.weekly_intervals.findIndex(item => item.source === 'busy_schedule' && item.weekday === 2);
     removeProfileWeeklyInterval(idx);
@@ -237,7 +254,7 @@ vm.runInContext(mainScript, sandbox);
   }));
 })();
 """
-    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    raw = subprocess.check_output(["node"], input=with_terms(js), cwd=ROOT, text=True, encoding="utf-8")
     res = json.loads(raw)
 
     # 1. Onboarding initial state
@@ -246,31 +263,32 @@ vm.runInContext(mainScript, sandbox);
     assert [c["category_id"] for c in res["afterOnboarding"]["categories"]] == ["C1", "C4"]
     assert [m["mode"] for m in res["afterOnboarding"]["modes"]] == ["online"]
     assert len(res["afterOnboarding"]["weekly"]) == 2
-    assert res["afterOnboarding"]["busyCount"] == 52
+    # Monday mornings and Wednesday evenings repeat over the term (2026-08-29..2026-11-15): 11 Mondays + 11 Wednesdays.
+    assert res["afterOnboarding"]["busyCount"] == 22
 
     # 3. After removing one busy slot: only Monday morning (busy_schedule) + Friday manual rule remain
-    assert res["afterRemoveSlot"]["slots"] == ["class|2026-11-09|morning"]
+    assert res["afterRemoveSlot"]["slots"] == ["class|2026-10-26|morning"]
     assert len(res["afterRemoveSlot"]["weekly"]) == 2
     assert {(w["weekday"], w["source"]) for w in res["afterRemoveSlot"]["weekly"]} == {(0, "busy_schedule"), (4, "manual")}
     assert len(res["afterRemoveSlot"]["exceptions"]) == 1
-    assert res["afterRemoveSlot"]["exceptions"][0]["date"] == "2026-11-15"
+    assert res["afterRemoveSlot"]["exceptions"][0]["date"] == "2026-11-01"
     # Ensure no Wednesday 17:00-21:00 busy interval remains
     assert not any("T17:00:00+07:00" in b["start"] for b in res["afterRemoveSlot"]["busyIntervals"])
 
     # 4. After toggling semester recurrence OFF: busy_schedule weekly rule removed, manual weekly rule preserved, single-date exception added
     assert [(w["weekday"], w["source"]) for w in res["afterToggleOff"]["weekly"]] == [(4, "manual")]
     assert {(e["date"], e["source"]) for e in res["afterToggleOff"]["exceptions"]} == {
-        ("2026-11-15", "manual"),
-        ("2026-11-09", "busy_schedule"),
+        ("2026-11-01", "manual"),
+        ("2026-10-26", "busy_schedule"),
     }
-    # Monday morning should only appear on 2026-11-09, not on 2026-11-16
-    assert any(b["start"] == "2026-11-09T07:00:00+07:00" for b in res["afterToggleOff"]["busyIntervals"])
-    assert not any(b["start"] == "2026-11-16T07:00:00+07:00" for b in res["afterToggleOff"]["busyIntervals"])
+    # Monday morning should only appear on 2026-10-26, not on 2026-11-02
+    assert any(b["start"] == "2026-10-26T07:00:00+07:00" for b in res["afterToggleOff"]["busyIntervals"])
+    assert not any(b["start"] == "2026-11-02T07:00:00+07:00" for b in res["afterToggleOff"]["busyIntervals"])
 
     # 5. After toggling semester recurrence back ON: busy_schedule exception removed, weekly restored, no duplicates
     assert {(w["weekday"], w["source"]) for w in res["afterToggleOn"]["weekly"]} == {(0, "busy_schedule"), (4, "manual")}
-    assert [(e["date"], e["source"]) for e in res["afterToggleOn"]["exceptions"]] == [("2026-11-15", "manual")]
-    assert any(b["start"] == "2026-11-16T07:00:00+07:00" for b in res["afterToggleOn"]["busyIntervals"])
+    assert [(e["date"], e["source"]) for e in res["afterToggleOn"]["exceptions"]] == [("2026-11-01", "manual")]
+    assert any(b["start"] == "2026-11-02T07:00:00+07:00" for b in res["afterToggleOn"]["busyIntervals"])
     starts = [(b["start"], b["end"]) for b in res["afterToggleOn"]["busyIntervals"]]
     assert len(starts) == len(set(starts))
 
@@ -363,7 +381,7 @@ vm.runInContext(mainScript, sandbox);
   sandbox.beginOnboarding(user);
   vm.runInContext("onboardingStep = 2; renderOnboardingStep();", sandbox);
 
-  // 1. Real pointer drag on Monday (2026-11-09): 08:15 (60px) -> 10:45 (180px)
+  // 1. Real pointer drag on Monday (2026-10-26): 08:15 (60px) -> 10:45 (180px)
   // 07:00 = 0px, 48px/hr => 08:15 = 1.25*48 = 60px, 10:45 = 3.75*48 = 180px
   vm.runInContext(`
     const fakeCol = {
@@ -373,23 +391,23 @@ vm.runInContext(mainScript, sandbox);
     };
     setOnboardingSemesterBusy(true);
     setOnboardingBusyCategory('class');
-    startOnboardingGridDrag({ button: 0, clientY: 160, pointerId: 1, currentTarget: fakeCol, target: fakeCol }, '2026-11-09', 0);
+    startOnboardingGridDrag({ button: 0, clientY: 160, pointerId: 1, currentTarget: fakeCol, target: fakeCol }, '2026-10-26', 0);
     moveOnboardingGridDrag({ clientY: 280 });
     endOnboardingGridDrag({ clientY: 280 });
 
     // Drag a second block in 'work' category on Wednesday: 18:30 (552px) -> 20:15 (636px)
     setOnboardingBusyCategory('work');
-    startOnboardingGridDrag({ button: 0, clientY: 652, pointerId: 2, currentTarget: fakeCol, target: fakeCol }, '2026-11-11', 2);
+    startOnboardingGridDrag({ button: 0, clientY: 652, pointerId: 2, currentTarget: fakeCol, target: fakeCol }, '2026-10-28', 2);
     moveOnboardingGridDrag({ clientY: 736 });
     endOnboardingGridDrag({ clientY: 736 });
   `, sandbox);
 
-  // 2. Edit the work block to 18:15-20:00, then add a partial/full override on 2026-11-16 (available 08:15-10:45) and one-off busy on 2026-11-14 (14:15-16:00)
+  // 2. Edit the work block to 18:15-20:00, then add a partial/full override on 2026-11-02 (available 08:15-10:45) and one-off busy on 2026-10-31 (14:15-16:00)
   vm.runInContext(`
     const workEntry = onboardingDraft.profile.busy_schedule.entries.find(e => e.category === 'work');
     updateOnboardingBusyEntry(workEntry.id, { start: '18:15', end: '20:00' });
-    overrideOnboardingRecurringBlock('2026-11-16', '08:15', '10:45', 'class');
-    addOnboardingBusyOverride({ date: '2026-11-14', kind: 'busy', start: '14:15', end: '16:00', category: 'personal' });
+    overrideOnboardingRecurringBlock('2026-11-02', '08:15', '10:45', 'class');
+    addOnboardingBusyOverride({ date: '2026-10-31', kind: 'busy', start: '14:15', end: '16:00', category: 'personal' });
     setOnboardingWeeklyHours('6.5');
     onboardingDraft.profile.goal.target_score = 88;
     onboardingDraft.profile.goal.topics = ['Công nghệ'];
@@ -405,7 +423,7 @@ vm.runInContext(mainScript, sandbox);
     target: Number(document.getElementById('inputPlanTarget').value)
   })`);
 
-  // 3. Test one-off week mode (applies_to_semester = false): only 2026-11-09 & 2026-11-11 should be busy, NOT 2026-11-23
+  // 3. Test one-off week mode (applies_to_semester = false): only 2026-10-26 & 2026-10-28 should be busy, NOT 2026-11-09
   vm.runInContext(`
     currentProfileDraft.busy_schedule.applies_to_semester = false;
     syncBusyScheduleAndIntervals(currentProfileDraft);
@@ -420,7 +438,7 @@ vm.runInContext(mainScript, sandbox);
   console.log(JSON.stringify({ recurringSnap, oneOffSnap }));
 })();
 """
-    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    raw = subprocess.check_output(["node"], input=with_terms(js), cwd=ROOT, text=True, encoding="utf-8")
     res = json.loads(raw)
 
     rec = res["recurringSnap"]
@@ -431,38 +449,38 @@ vm.runInContext(mainScript, sandbox);
         ("work", "18:15", "20:00"),
     ]
     busy = rec["availability"]["busy_intervals"]
-    # Monday 2026-11-09 and 2026-11-23 are busy 08:15-10:45, but 2026-11-16 was overridden to available!
+    # Monday 2026-10-26 and 2026-11-09 are busy 08:15-10:45, but 2026-11-02 was overridden to available!
+    assert any(b["start"] == "2026-10-26T08:15:00+07:00" and b["end"] == "2026-10-26T10:45:00+07:00" for b in busy)
+    assert not any(b["start"].startswith("2026-11-02T08:15") for b in busy)
     assert any(b["start"] == "2026-11-09T08:15:00+07:00" and b["end"] == "2026-11-09T10:45:00+07:00" for b in busy)
-    assert not any(b["start"].startswith("2026-11-16T08:15") for b in busy)
-    assert any(b["start"] == "2026-11-23T08:15:00+07:00" and b["end"] == "2026-11-23T10:45:00+07:00" for b in busy)
-    # One-off busy exception on Saturday 2026-11-14 14:15-16:00 is present
-    assert any(b["start"] == "2026-11-14T14:15:00+07:00" and b["end"] == "2026-11-14T16:00:00+07:00" for b in busy)
+    # One-off busy exception on Saturday 2026-10-31 14:15-16:00 is present
+    assert any(b["start"] == "2026-10-31T14:15:00+07:00" and b["end"] == "2026-10-31T16:00:00+07:00" for b in busy)
     # Available override preserves the full 07:00-21:00 template in resolved SP3 availability
     resolved = resolve_availability(
         rec["availability"],
-        window_start="2026-11-09T00:00:00+07:00",
-        window_end="2026-11-23T23:59:59+07:00",
+        window_start="2026-10-26T00:00:00+07:00",
+        window_end="2026-11-09T23:59:59+07:00",
     )
     avail = resolved["available_intervals"]
-    day_09 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-09")]
-    day_16 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-16")]
-    day_23 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-23")]
+    day_09 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-10-26")]
+    day_16 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-02")]
+    day_23 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-09")]
     assert day_09 == [
+        ("2026-10-26T07:00:00+07:00", "2026-10-26T08:15:00+07:00"),
+        ("2026-10-26T10:45:00+07:00", "2026-10-26T21:00:00+07:00"),
+    ]
+    assert day_16 == [("2026-11-02T07:00:00+07:00", "2026-11-02T21:00:00+07:00")]
+    assert day_23 == [
         ("2026-11-09T07:00:00+07:00", "2026-11-09T08:15:00+07:00"),
         ("2026-11-09T10:45:00+07:00", "2026-11-09T21:00:00+07:00"),
     ]
-    assert day_16 == [("2026-11-16T07:00:00+07:00", "2026-11-16T21:00:00+07:00")]
-    assert day_23 == [
-        ("2026-11-23T07:00:00+07:00", "2026-11-23T08:15:00+07:00"),
-        ("2026-11-23T10:45:00+07:00", "2026-11-23T21:00:00+07:00"),
-    ]
 
-    # One-off week mode: no weekly_intervals, 2026-11-09 busy, 2026-11-23 free
+    # One-off week mode: no weekly_intervals, 2026-10-26 busy, 2026-11-09 free
     one_off = res["oneOffSnap"]
     assert one_off["weekly"] == []
     one_off_busy = one_off["availability"]["busy_intervals"]
-    assert any(b["start"] == "2026-11-09T08:15:00+07:00" for b in one_off_busy)
-    assert not any(b["start"] == "2026-11-23T08:15:00+07:00" for b in one_off_busy)
+    assert any(b["start"] == "2026-10-26T08:15:00+07:00" for b in one_off_busy)
+    assert not any(b["start"] == "2026-11-09T08:15:00+07:00" for b in one_off_busy)
 
     # SP3 synthetic & real accept the exact payload
     pref = StudentPreference.model_validate(rec["preference"])
@@ -576,7 +594,7 @@ vm.runInContext(mainScript, sandbox);
   console.log(JSON.stringify({ initialReady, afterQ1, afterQ4, afterBackForward, finalState }));
 })();
 """
-    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    raw = subprocess.check_output(["node"], input=with_terms(js), cwd=ROOT, text=True, encoding="utf-8")
     res = json.loads(raw)
 
     assert res["initialReady"] == {"ready": False, "activeQ": 1, "nextDisabled": True, "topicCount": 19}
@@ -656,7 +674,7 @@ vm.runInContext(mainScript, sandbox);
 (async () => {
   const snap = expr => JSON.parse(JSON.stringify(vm.runInContext(expr, sandbox)));
 
-  // User A: DRL target = 0, two recurring busy blocks on Monday (08:15-10:45 & 14:00-16:00), override 08:15-10:45 on 2026-11-16, campus = only_nvc
+  // User A: DRL target = 0, two recurring busy blocks on Monday (08:15-10:45 & 14:00-16:00), override 08:15-10:45 on 2026-11-02, campus = only_nvc
   const userA = { student_id: '25127000', full_name: 'Zero Target NVC', class: '25CTT1', major: 'CNTT' };
   sandbox.localStorage.setItem('unilife_data_' + userA.student_id, JSON.stringify(sandbox.createDefaultLocalUserData(userA.student_id, true)));
   sandbox.localStorage.setItem('unilife_users', JSON.stringify([userA]));
@@ -664,9 +682,9 @@ vm.runInContext(mainScript, sandbox);
   vm.runInContext(`
     nextOnboardingStep();
     setOnboardingSemesterBusy(true);
-    addOnboardingBusyEntry({ category: 'class', weekday: 0, date: '2026-11-09', start: '08:15', end: '10:45' });
-    addOnboardingBusyEntry({ category: 'work', weekday: 0, date: '2026-11-09', start: '14:00', end: '16:00' });
-    overrideOnboardingRecurringBlock('2026-11-16', '08:15', '10:45', 'class');
+    addOnboardingBusyEntry({ category: 'class', weekday: 0, date: '2026-10-26', start: '08:15', end: '10:45' });
+    addOnboardingBusyEntry({ category: 'work', weekday: 0, date: '2026-10-26', start: '14:00', end: '16:00' });
+    overrideOnboardingRecurringBlock('2026-11-02', '08:15', '10:45', 'class');
     nextOnboardingStep();
     document.getElementById('onboardingCustomTargetInput').value = '0';
     confirmOnboardingCustomTarget();
@@ -711,27 +729,27 @@ vm.runInContext(mainScript, sandbox);
   console.log(JSON.stringify({ stateA, stateB }));
 })();
 """
-    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    raw = subprocess.check_output(["node"], input=with_terms(js), cwd=ROOT, text=True, encoding="utf-8")
     res = json.loads(raw)
 
-    # 1. Verify actual resolved SP3 available_intervals on 2026-11-16 preserve all other free hours (07:00-14:00 & 16:00-21:00)
+    # 1. Verify actual resolved SP3 available_intervals on 2026-11-02 preserve all other free hours (07:00-14:00 & 16:00-21:00)
     state_a = res["stateA"]
     resolved = resolve_availability(
         state_a["availability"],
-        window_start="2026-11-09T00:00:00+07:00",
-        window_end="2026-11-23T23:59:59+07:00",
+        window_start="2026-10-26T00:00:00+07:00",
+        window_end="2026-11-09T23:59:59+07:00",
     )
     avail = resolved["available_intervals"]
-    day_09 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-09")]
-    day_16 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-16")]
+    day_09 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-10-26")]
+    day_16 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-02")]
     assert day_09 == [
-        ("2026-11-09T07:00:00+07:00", "2026-11-09T08:15:00+07:00"),
-        ("2026-11-09T10:45:00+07:00", "2026-11-09T14:00:00+07:00"),
-        ("2026-11-09T16:00:00+07:00", "2026-11-09T21:00:00+07:00"),
+        ("2026-10-26T07:00:00+07:00", "2026-10-26T08:15:00+07:00"),
+        ("2026-10-26T10:45:00+07:00", "2026-10-26T14:00:00+07:00"),
+        ("2026-10-26T16:00:00+07:00", "2026-10-26T21:00:00+07:00"),
     ]
     assert day_16 == [
-        ("2026-11-16T07:00:00+07:00", "2026-11-16T14:00:00+07:00"),
-        ("2026-11-16T16:00:00+07:00", "2026-11-16T21:00:00+07:00"),
+        ("2026-11-02T07:00:00+07:00", "2026-11-02T14:00:00+07:00"),
+        ("2026-11-02T16:00:00+07:00", "2026-11-02T21:00:00+07:00"),
     ]
 
     # 2. Verify DRL target 0 is preserved everywhere
@@ -853,7 +871,7 @@ vm.runInContext(mainScript, sandbox);
   vm.runInContext(`
     nextOnboardingStep();
     setOnboardingSemesterBusy(true);
-    addOnboardingBusyEntry({ category: 'class', weekday: 0, date: '2026-11-09', start: '08:00', end: '10:00' });
+    addOnboardingBusyEntry({ category: 'class', weekday: 0, date: '2026-10-26', start: '08:00', end: '10:00' });
     setOnboardingWeeklyHours('5');
     nextOnboardingStep();
     selectOnboardingTargetPreset(80);
@@ -878,7 +896,6 @@ vm.runInContext(mainScript, sandbox);
     document.getElementById('psFaculty').value = 'Khoa Toán - Tin';
     document.getElementById('psCohort').value = '2024';
     document.getElementById('psProgram').value = 'Chất lượng cao';
-    document.getElementById('psSemester').value = 'HK3 · 2025–2026';
     document.getElementById('psDrlTarget').value = '92';
     psSelectCategory('C4');
     psSelectMode('online_only');
@@ -887,13 +904,13 @@ vm.runInContext(mainScript, sandbox);
     saveProfileScheduleEdits();
   `, sandbox);
 
-  // 4. Attach an existing plan with a scheduled activity on Tuesday 2026-11-10 09:00-11:00, then drag a conflicting busy block in Lịch tab
+  // 4. Attach an existing plan with a scheduled activity on Tuesday 2026-10-27 09:00-11:00, then drag a conflicting busy block in Lịch tab
   vm.runInContext(`
     const existingPlan = {
       plan: {
         selected_activities: [{
           activity_id: 'SEM-A',
-          scheduled_blocks: [{ start: '2026-11-10T09:00:00+07:00', end: '2026-11-10T11:00:00+07:00' }]
+          scheduled_blocks: [{ start: '2026-10-27T09:00:00+07:00', end: '2026-10-27T11:00:00+07:00' }]
         }]
       },
       feasibility: { candidates: [{ activity: { activity_id: 'SEM-A', title: 'Hội thảo Khoa học' } }] }
@@ -902,8 +919,8 @@ vm.runInContext(mainScript, sandbox);
     currentPlannerData = existingPlan;
     planInputsDirty = false;
     setProfileScheduleTab('schedule');
-    addOnboardingBusyEntry({ category: 'work', weekday: 1, date: '2026-11-10', start: '08:30', end: '10:30' }, 'profile');
-    overrideOnboardingRecurringBlock('2026-11-16', '08:00', '10:00', 'class', 'profile');
+    addOnboardingBusyEntry({ category: 'work', weekday: 1, date: '2026-10-27', start: '08:30', end: '10:30' }, 'profile');
+    overrideOnboardingRecurringBlock('2026-11-02', '08:00', '10:00', 'class', 'profile');
   `, sandbox);
   const conflictSnap = snap(`({
     dirty: planInputsDirty,
@@ -925,7 +942,7 @@ vm.runInContext(mainScript, sandbox);
   console.log(JSON.stringify({ onScheduleTab, onProfileTab, conflictSnap, reloaded }));
 })();
 """
-    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    raw = subprocess.check_output(["node"], input=with_terms(js), cwd=ROOT, text=True, encoding="utf-8")
     res = json.loads(raw)
 
     assert res["onScheduleTab"] == {"tab": "schedule", "profileHidden": True, "scheduleHidden": False}
@@ -941,7 +958,8 @@ vm.runInContext(mainScript, sandbox);
     rel = res["reloaded"]
     assert rel["target"] == 92
     assert rel["profile"]["faculty"] == "Khoa Toán - Tin"
-    assert rel["profile"]["semester"] == "HK3 · 2025–2026"
+    # The semester is the selected term: its id is stored in the profile and the label follows it.
+    assert (rel["profile"]["term_id"], rel["profile"]["semester"]) == ("HK1_2026_2027", "HK1 \u00b7 2026\u20132027")
     # Unrelated fields preserved!
     assert rel["profile"]["score_history"] == [{"semester": "HK2 2025-2026", "score": 86}]
     assert rel["profile"]["avatar_data_url"] == "data:image/png;base64,abc"
@@ -951,20 +969,20 @@ vm.runInContext(mainScript, sandbox);
     assert rel["preference"]["hard_exclusions"]["campus_ids"] == ["DONG_HOA", "OTHER"]
     assert set(t["topic_id"] for t in rel["preference"]["topic_preferences"]) == {"technology", "volunteer"}
 
-    # Resolved SP3 availability honors both the new Tuesday busy block AND the Monday 2026-11-16 available override
+    # Resolved SP3 availability honors both the new Tuesday busy block AND the Monday 2026-11-02 available override
     resolved = resolve_availability(
         rel["availability"],
-        window_start="2026-11-09T00:00:00+07:00",
-        window_end="2026-11-17T23:59:59+07:00",
+        window_start="2026-10-26T00:00:00+07:00",
+        window_end="2026-11-03T23:59:59+07:00",
     )
     avail = resolved["available_intervals"]
-    tue_10 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-10")]
-    mon_16 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-16")]
+    tue_10 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-10-27")]
+    mon_16 = [(i["start"], i["end"]) for i in avail if i["start"].startswith("2026-11-02")]
     assert tue_10 == [
-        ("2026-11-10T07:00:00+07:00", "2026-11-10T08:30:00+07:00"),
-        ("2026-11-10T10:30:00+07:00", "2026-11-10T21:00:00+07:00"),
+        ("2026-10-27T07:00:00+07:00", "2026-10-27T08:30:00+07:00"),
+        ("2026-10-27T10:30:00+07:00", "2026-10-27T21:00:00+07:00"),
     ]
-    assert mon_16 == [("2026-11-16T07:00:00+07:00", "2026-11-16T21:00:00+07:00")]
+    assert mon_16 == [("2026-11-02T07:00:00+07:00", "2026-11-02T21:00:00+07:00")]
 
 
 
@@ -1082,7 +1100,7 @@ vm.runInContext(mainScript, sandbox);
   console.log(JSON.stringify({{ realCardsHtml, mixedHtml, selectedAfterMixed, onReview, afterBack }}));
 }})();
 """
-    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    raw = subprocess.check_output(["node"], input=with_terms(js), cwd=ROOT, text=True, encoding="utf-8")
     res = json.loads(raw)
 
     for strategy in ("MINIMUM_EFFORT", "BALANCED", "PREFERENCE_FIRST"):
@@ -1220,7 +1238,7 @@ vm.runInContext(mainScript, sandbox);
   }}));
 }})();
 """
-    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    raw = subprocess.check_output(["node"], input=with_terms(js), cwd=ROOT, text=True, encoding="utf-8")
     res = json.loads(raw)
 
     assert 'data-review-action="change" onclick=' in res["reviewHtml"]
@@ -1368,7 +1386,7 @@ vm.runInContext(mainScript, sandbox);
   console.log(JSON.stringify({ norm, migratedProgram: migrated.profile.program, migratedScores: migrated.profile.score_history, afterWelcome, tabIsolation, reloadedProgram }));
 })();
 """
-    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    raw = subprocess.check_output(["node"], input=with_terms(js), cwd=ROOT, text=True, encoding="utf-8")
     res = json.loads(raw)
 
     assert res["norm"] == {
@@ -1547,7 +1565,7 @@ function subviewState() {
     addOnboardingBusyEntry({
       category: 'class',
       title: 'Thực hành CTDL',
-      date: '2026-11-09',
+      date: '2026-10-26',
       weekday: 0,
       start: '09:00',
       end: '11:00',
@@ -1570,7 +1588,7 @@ function subviewState() {
       score_summary: { baseline_total: 0, projected_total: 80, gain_total: 80, official_baseline_verified: false },
       selected_activities: [{
         activity_id: 'ACT-MON',
-        scheduled_blocks: [{ start: '2026-11-09T09:30:00+07:00', end: '2026-11-09T10:30:00+07:00' }]
+        scheduled_blocks: [{ start: '2026-10-26T09:30:00+07:00', end: '2026-10-26T10:30:00+07:00' }]
       }]
     },
     availability: { available_intervals: [] },
@@ -1632,7 +1650,7 @@ function subviewState() {
   }));
 })();
 """
-    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    raw = subprocess.check_output(["node"], input=with_terms(js), cwd=ROOT, text=True, encoding="utf-8")
     res = json.loads(raw)
 
     assert res["fetchAfterSwitchToPlan"] == 0
@@ -1671,15 +1689,300 @@ function subviewState() {
     # Verify saved canonical_availability actually removes Mon 09:00-11:00 in Python SP3 resolve_availability
     resolved = resolve_availability(
         res["canonicalAvailability"],
-        window_start="2026-11-09T00:00:00+07:00",
-        window_end="2026-11-09T23:59:59+07:00",
+        window_start="2026-10-26T00:00:00+07:00",
+        window_end="2026-10-26T23:59:59+07:00",
     )
     mon_slots = [
         (iv["start"], iv["end"])
         for iv in resolved["available_intervals"]
-        if iv["start"].startswith("2026-11-09")
+        if iv["start"].startswith("2026-10-26")
     ]
     assert mon_slots == [
-        ("2026-11-09T07:00:00+07:00", "2026-11-09T09:00:00+07:00"),
-        ("2026-11-09T11:00:00+07:00", "2026-11-09T21:00:00+07:00"),
+        ("2026-10-26T07:00:00+07:00", "2026-10-26T09:00:00+07:00"),
+        ("2026-10-26T11:00:00+07:00", "2026-10-26T21:00:00+07:00"),
     ]
+
+
+def test_sidebar_settings_footer_and_dropdown_profile_navigation() -> None:
+    """Verify navigation-only update:
+    - tabBtnProfile removed from left sidebar, viewProfile preserved.
+    - userDropdown preserves single 'Hồ sơ sinh viên' button calling switchTab('profile').
+    - tabBtnPlan moved to bottom-left sidebar footer with gear icon and 'Cài đặt' label.
+    - viewPlan header renamed to 'Cài đặt' while keeping internal Hồ sơ / Lịch tabs.
+    - Runtime dropdown navigation, Settings navigation, active state, page isolation & mobile sidebar.
+    """
+    html = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+
+    # 1. Sidebar & dropdown static structure
+    dropdown_start = html.index('id="userDropdown"')
+    sidebar_start = html.index('id="sidebarNav"')
+    sidebar_end = html.index("</aside>", sidebar_start)
+    dropdown_html = html[dropdown_start:sidebar_start]
+    sidebar_html = html[sidebar_start:sidebar_end]
+
+    assert 'id="tabBtnProfile"' not in sidebar_html
+    assert 'id="viewProfile"' in html
+    assert dropdown_html.count("switchTab('profile')") == 1
+    assert "Hồ sơ sinh viên" in dropdown_html
+
+    # Sidebar uses flex-col justify-between so footer stays near bottom on desktop and scrollable on mobile
+    assert "flex flex-col justify-between" in sidebar_html
+    assert "overflow-y-auto" in sidebar_html
+
+    nav_end = sidebar_html.index("</nav>")
+    footer_start = sidebar_html.index('id="sidebarFooter"')
+    assert footer_start > nav_end
+    footer_html = sidebar_html[footer_start:]
+    assert "border-t" in footer_html
+    assert 'id="tabBtnPlan"' in footer_html
+    assert 'onclick="switchTab(\'plan\')"' in footer_html
+    assert "Cài đặt" in footer_html
+    assert "M10.325 4.317" in footer_html  # gear icon path
+    assert 'id="tabBtnPlan"' not in sidebar_html[:nav_end]
+
+    # viewPlan header renamed to Cài đặt while preserving internal Hồ sơ / Lịch tabs
+    view_plan_start = html.index('id="viewPlan"')
+    view_profile_start = html.index('id="viewProfile"')
+    view_plan_html = html[view_plan_start:view_profile_start]
+    assert ">Cài đặt " in view_plan_html
+    assert ">Hồ sơ & Lịch " not in view_plan_html
+    assert 'id="profileScheduleTabProfile"' in view_plan_html
+    assert 'id="profileScheduleTabSchedule"' in view_plan_html
+
+    # 2. Runtime navigation, active state, page isolation & mobile sidebar behavior
+    js = r"""
+const fs = require('fs');
+const vm = require('vm');
+const html = fs.readFileSync('web/index.html', 'utf8');
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
+
+const elements = new Map();
+function makeEl(id) {
+  if (!elements.has(id)) {
+    const classes = new Set();
+    if (id === 'sidebarNav') classes.add('-translate-x-full');
+    if (id === 'sidebarBackdrop') classes.add('hidden');
+    if (id === 'userDropdown') classes.add('hidden');
+    elements.set(id, {
+      id, value: id === 'inputPlanTarget' ? '80' : '', innerText: '', textContent: '', innerHTML: '',
+      checked: false, disabled: false, hidden: false, style: {}, dataset: {},
+      className: '',
+      classList: {
+        add: (...c) => c.forEach(x => classes.add(x)),
+        remove: (...c) => c.forEach(x => classes.delete(x)),
+        toggle: (c, f) => { if (f === undefined) { classes.has(c) ? classes.delete(c) : classes.add(c); } else if (f) classes.add(c); else classes.delete(c); },
+        contains: c => classes.has(c)
+      },
+      setAttribute(k, v) { this[k] = v; },
+      getAttribute(k) { return this[k]; },
+      focus() {}, scrollIntoView() {}, scrollTo() {},
+      querySelector() { return makeEl(id + ':q'); },
+      querySelectorAll() { return []; },
+      appendChild() {}
+    });
+  }
+  return elements.get(id);
+}
+
+const storage = new Map();
+const sandbox = {
+  console, Math, Date, JSON, Set, Map, Array, Object, Number, String, Boolean, RegExp, Promise, Error,
+  parseInt, parseFloat, isNaN, encodeURIComponent, decodeURIComponent, btoa, atob, escape, unescape,
+  setTimeout: () => 0, clearTimeout: () => {}, requestAnimationFrame: cb => cb(),
+  localStorage: {
+    getItem: k => storage.has(k) ? storage.get(k) : null,
+    setItem: (k, v) => storage.set(k, String(v)),
+    removeItem: k => storage.delete(k)
+  },
+  document: {
+    readyState: 'complete',
+    body: { classList: { toggle() {}, add() {}, remove() {} }, style: {}, appendChild() {} },
+    getElementById: id => id === 'tabBtnProfile' ? null : makeEl(id),
+    querySelector: () => makeEl('qs'),
+    querySelectorAll: () => [],
+    addEventListener: () => {},
+    createElement: () => makeEl('dyn_' + Math.random())
+  },
+  window: { addEventListener: () => {}, scrollTo: () => {}, innerWidth: 390 },
+  tailwind: {},
+  navigator: { clipboard: { writeText: async () => {} } },
+  fetch: async () => ({ ok: false, json: async () => ({}) }),
+  alert: () => {}, confirm: () => true,
+};
+sandbox.window.document = sandbox.document;
+sandbox.window.localStorage = sandbox.localStorage;
+vm.createContext(sandbox);
+vm.runInContext(scripts, sandbox);
+
+const allTabs = ['dashboard', 'profile', 'calculator', 'activities', 'snapshot', 'plan', 'testSuites', 'inspector'];
+function visibleViews() {
+  return allTabs.filter(t => {
+    const el = sandbox.document.getElementById('view' + sandbox.capitalize(t));
+    return !el.classList.contains('hidden') && !el.hidden;
+  });
+}
+
+(async () => {
+  await vm.runInContext("currentStudent = { student_id: '25127444', full_name: 'Nav Footer Tester', major: 'CNTT' }; applyCurrentStudent(currentStudent);", sandbox);
+
+  // Open mobile sidebar, then click Settings (tabBtnPlan -> switchTab('plan'))
+  sandbox.toggleMobileSidebar(true);
+  const mobileOpen = !sandbox.document.getElementById('sidebarNav').classList.contains('-translate-x-full');
+  sandbox.switchTab('plan');
+  const afterPlan = {
+    visible: visibleViews(),
+    planBtnActive: sandbox.document.getElementById('tabBtnPlan').className.includes('nav-btn-active'),
+    dashBtnInactive: sandbox.document.getElementById('tabBtnDashboard').className.includes('nav-btn-inactive'),
+    mobileClosed: sandbox.document.getElementById('sidebarNav').classList.contains('-translate-x-full'),
+  };
+
+  // Navigate to Student Profile via top-right userDropdown
+  sandbox.toggleUserDropdown();
+  const dropdownOpen = !sandbox.document.getElementById('userDropdown').classList.contains('hidden');
+  sandbox.switchTab('profile');
+  sandbox.document.getElementById('userDropdown').classList.add('hidden');
+  const afterProfile = {
+    visible: visibleViews(),
+    planBtnInactive: sandbox.document.getElementById('tabBtnPlan').className.includes('nav-btn-inactive'),
+    dashBtnInactive: sandbox.document.getElementById('tabBtnDashboard').className.includes('nav-btn-inactive'),
+    dropdownClosed: sandbox.document.getElementById('userDropdown').classList.contains('hidden'),
+    mobileClosed: sandbox.document.getElementById('sidebarNav').classList.contains('-translate-x-full'),
+  };
+
+  console.log(JSON.stringify({ mobileOpen, afterPlan, dropdownOpen, afterProfile }));
+})();
+"""
+    raw = subprocess.check_output(["node"], input=with_terms(js), cwd=ROOT, text=True, encoding="utf-8")
+    res = json.loads(raw)
+
+    assert res["mobileOpen"] is True
+    assert res["afterPlan"] == {
+        "visible": ["plan"],
+        "planBtnActive": True,
+        "dashBtnInactive": True,
+        "mobileClosed": True,
+    }
+    assert res["dropdownOpen"] is True
+    assert res["afterProfile"] == {
+        "visible": ["profile"],
+        "planBtnInactive": True,
+        "dashBtnInactive": True,
+        "dropdownClosed": True,
+        "mobileClosed": True,
+    }
+
+
+def test_light_mode_design_tokens_modal_sync_and_dark_mode_isolation() -> None:
+    """Verify Light Mode redesign tokens, calendar classes, contrast-safe selectors,
+    and Light <-> Dark toggling without altering Dark Mode.
+    """
+    html = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
+
+    # Reusable Light Mode tokens scoped under .light-theme
+    for token in (
+        "--lt-app-bg: #F5F7FB;",
+        "--lt-surface: #FFFFFF;",
+        "--lt-surface-subtle: #F8FAFC;",
+        "--lt-border: #E2E8F0;",
+        "--lt-text-primary: #172033;",
+        "--lt-primary: #4F46E5;",
+        "--lt-success: #047857;",
+        "--lt-warning: #B45309;",
+        "--lt-error: #BE123C;",
+    ):
+        assert token in html
+
+    # Prevent regression of white-text-on-pale-purple wildcard bug
+    assert '#workspaceApp.light-theme [class*="bg-indigo-"][class~="text-white"]' not in html
+
+    # Calendar dark inline stripes moved to CSS classes so Light Mode overrides cleanly while Dark Mode stays identical
+    assert "plan-calendar-day-unknown" in html
+    assert "cpd-busy-block" in html
+    assert 'style="background:repeating-linear-gradient(135deg,#080d18' not in html
+    assert "#workspaceApp.light-theme #drlDonutSvg > circle" in html
+
+    # Runtime Light -> Dark -> Light toggle syncs workspaceApp, body, and documentElement
+    js = r"""
+const fs = require('fs');
+const vm = require('vm');
+const html = fs.readFileSync('web/index.html', 'utf8');
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
+
+const elements = new Map();
+function makeEl(id) {
+  if (!elements.has(id)) {
+    const classes = new Set();
+    elements.set(id, {
+      id, value: '', innerText: '', textContent: '', innerHTML: '',
+      checked: false, disabled: false, hidden: false, style: {}, dataset: {}, className: '',
+      classList: {
+        add: (...c) => c.forEach(x => classes.add(x)),
+        remove: (...c) => c.forEach(x => classes.delete(x)),
+        toggle: (c, f) => { if (f === undefined) { classes.has(c) ? classes.delete(c) : classes.add(c); } else if (f) classes.add(c); else classes.delete(c); },
+        contains: c => classes.has(c)
+      },
+      setAttribute(k, v) { this[k] = v; },
+      getAttribute(k) { return this[k]; },
+      focus() {}, scrollIntoView() {}, scrollTo() {},
+      querySelector() { return makeEl(id + ':q'); },
+      querySelectorAll() { return []; },
+      appendChild() {}
+    });
+  }
+  return elements.get(id);
+}
+
+const storage = new Map();
+const bodyEl = makeEl('body');
+const docEl = makeEl('html');
+const sandbox = {
+  console, Math, Date, JSON, Set, Map, Array, Object, Number, String, Boolean, RegExp, Promise, Error,
+  parseInt, parseFloat, isNaN, encodeURIComponent, decodeURIComponent, btoa, atob, escape, unescape,
+  setTimeout: () => 0, clearTimeout: () => {}, requestAnimationFrame: cb => cb(),
+  localStorage: {
+    getItem: k => storage.has(k) ? storage.get(k) : null,
+    setItem: (k, v) => storage.set(k, String(v)),
+    removeItem: k => storage.delete(k)
+  },
+  document: {
+    readyState: 'complete',
+    body: bodyEl,
+    documentElement: docEl,
+    getElementById: id => makeEl(id),
+    querySelector: () => makeEl('qs'),
+    querySelectorAll: () => [],
+    addEventListener: () => {},
+    createElement: () => makeEl('dyn_' + Math.random())
+  },
+  window: { addEventListener: () => {}, scrollTo: () => {}, innerWidth: 1440 },
+  tailwind: {},
+  navigator: { clipboard: { writeText: async () => {} } },
+  fetch: async () => ({ ok: false, json: async () => ({}) }),
+  alert: () => {}, confirm: () => true,
+};
+sandbox.window.document = sandbox.document;
+sandbox.window.localStorage = sandbox.localStorage;
+vm.createContext(sandbox);
+vm.runInContext(scripts, sandbox);
+
+const snap = () => ({
+  ws: sandbox.document.getElementById('workspaceApp').classList.contains('light-theme'),
+  body: bodyEl.classList.contains('light-theme'),
+  html: docEl.classList.contains('light-theme'),
+  saved: storage.get('unilife_theme'),
+  label: sandbox.document.getElementById('themeToggleLabel').textContent,
+});
+
+sandbox.setTheme('light', true);
+const onLight = snap();
+sandbox.toggleTheme();
+const onDark = snap();
+sandbox.toggleTheme();
+const backLight = snap();
+console.log(JSON.stringify({ onLight, onDark, backLight }));
+"""
+    raw = subprocess.check_output(["node"], input=js, cwd=ROOT, text=True, encoding="utf-8")
+    res = json.loads(raw)
+    assert res["onLight"] == {"ws": True, "body": True, "html": True, "saved": "light", "label": "Tối"}
+    assert res["onDark"] == {"ws": False, "body": False, "html": False, "saved": "dark", "label": "Sáng"}
+    assert res["backLight"] == {"ws": True, "body": True, "html": True, "saved": "light", "label": "Tối"}

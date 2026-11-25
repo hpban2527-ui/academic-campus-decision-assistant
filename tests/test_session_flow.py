@@ -58,11 +58,12 @@ def body(raw: str, *, evidence: bool = True, post_id: str = "custom_post_1") -> 
         "has_evidence": evidence,
         "student_id": STUDENT,
         "simulate_demo": True,
+        "term_id": "HK1_2026_2027",
     }
 
 
 def scores() -> dict:
-    return get_student_scores(student_id=STUDENT)
+    return get_student_scores(student_id=STUDENT, term_id="HK1_2026_2027")
 
 
 def test_preview_twice_is_not_a_duplicate_and_records_nothing():

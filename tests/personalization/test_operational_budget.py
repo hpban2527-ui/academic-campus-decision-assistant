@@ -8,7 +8,7 @@ from personalization.scoring import ActivityFeatures, PreferenceUtilityEngine
 
 def test_unknown_fee_is_hard_excluded_under_a_budget_and_never_selected(valid_preference_payload):
     payload = dict(valid_preference_payload, limits={"max_activities": 6, "max_duration_minutes": 2000, "max_fee": 0})
-    result = sp3_real.real_plan("first_plan", target_total=80, preference=StudentPreference.model_validate(payload))
+    result = sp3_real.real_plan("first_plan", term_id="HK1_2026_2027", target_total=80, preference=StudentPreference.model_validate(payload))
     fees = {c["activity"]["activity_id"]: c["activity"]["fee"] for c in result["feasibility"]["candidates"]}
     excluded = {item["activity_id"]: item["reasons"] for item in result["personalization"]["hard_excluded"]}
     status = {c["activity"]["activity_id"]: c["feasibility"]["status"] for c in result["feasibility"]["candidates"]}

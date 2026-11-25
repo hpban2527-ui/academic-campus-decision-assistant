@@ -11,6 +11,7 @@ import pytest
 
 from api import server
 from api.sp3_real import DATA_SOURCE, real_plan, real_plan_options
+from api.term_clock import list_terms
 from api.sp3_service import (
     list_swap_alternatives, personalized_plan_options, preview_personalized_swap,
     preview_personalized_removal, remove_planned_activity, what_if_skip_planned_activity,
@@ -52,18 +53,18 @@ def test_real_review_routes_and_both_remove_routes_use_one_contract(review_case)
     payload, _, _, _ = review_case
     payload["limits"]["max_fee"] = None
     preference = StudentPreference.model_validate(payload)
-    base = real_plan("first_plan", target_total=80, preference=preference)
+    base = real_plan("first_plan", term_id="HK1_2026_2027", target_total=80, preference=preference)
     removed = base["plan"]["selected_activities"][0]["activity_id"]
     common = dict(confirmed_profile=True, preference=payload, base_result=base)
-    swap = server.preview_sp3_smart_swap(server.SmartSwapRequest(**common, remove_activity_id=removed, add_activity_id=None), source="real")
-    direct = server.preview_sp3_removal(server.CalendarActivityChangeRequest(**common, activity_id=removed), source="real")
+    swap = server.preview_sp3_smart_swap(server.SmartSwapRequest(**common, remove_activity_id=removed, add_activity_id=None), source="real", term_id="HK1_2026_2027")
+    direct = server.preview_sp3_removal(server.CalendarActivityChangeRequest(**common, activity_id=removed), source="real", term_id="HK1_2026_2027")
     assert swap == direct
     assert swap["result"]["data_source"] == DATA_SOURCE
     assert swap["added_activity_ids"] == []
-    alternatives = list_swap_alternatives(preference, base, removed, source="real")
+    alternatives = list_swap_alternatives(preference, base, removed, source="real", term_id="HK1_2026_2027")
     assert alternatives["status"] == "ALTERNATIVES"
     assert all(item["preview"]["result"]["checker_violations"] == 0 for item in alternatives["items"])
-    what_if = what_if_skip_planned_activity(preference, base, removed, source="real")
+    what_if = what_if_skip_planned_activity(preference, base, removed, source="real", term_id="HK1_2026_2027")
     assert what_if["result"]["data_source"] == DATA_SOURCE
 
 
@@ -143,6 +144,7 @@ def test_multi_activity_suggestion_uses_a_real_engine_preview(valid_preference_p
 
 def _run_panel_controllers(data):
     root = Path(__file__).resolve().parents[2]
+    data = {**data, "clocks": [clock.as_dict() for clock in list_terms()]}
     output = subprocess.run(["node", "tests/review_dashboard_runtime.cjs"], cwd=root,
                             input=json.dumps(data), text=True, encoding="utf-8", capture_output=True, timeout=25)
     assert output.returncode == 0, output.stdout + output.stderr
@@ -174,12 +176,12 @@ def test_operational_source_uses_real_review_routes_even_if_global_selector_chan
     payload, _, _, _ = review_case
     payload["limits"]["max_fee"] = None
     preference = StudentPreference.model_validate(payload)
-    options = real_plan_options(preference, target_total=80)["options"]
+    options = real_plan_options(preference, term_id="HK1_2026_2027", target_total=80)["options"]
     base = options[1]["result"]
     activity_id = base["plan"]["selected_activities"][0]["activity_id"]
     data = {"preference": payload, "options": options, "mobile": mobile,
             "scenario": "real_source", "activityId": activity_id,
-            "alternatives": list_swap_alternatives(preference, base, activity_id, source="real", limit=10),
-            "impact": remove_planned_activity(preference, base, activity_id, source="real"),
-            "suggestion": what_if_skip_planned_activity(preference, base, activity_id, source="real")}
+            "alternatives": list_swap_alternatives(preference, base, activity_id, source="real", term_id="HK1_2026_2027", limit=10),
+            "impact": remove_planned_activity(preference, base, activity_id, source="real", term_id="HK1_2026_2027"),
+            "suggestion": what_if_skip_planned_activity(preference, base, activity_id, source="real", term_id="HK1_2026_2027")}
     _run_panel_controllers(data)

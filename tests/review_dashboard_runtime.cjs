@@ -8,6 +8,8 @@ const storage = new Map();
 const elements = new Map();
 const requests = [];
 let failWrites = false;
+let storageQuota = Infinity;
+let quotaFailures = 0;
 const listeners = new Map();
 const timers = new Map();
 const intervals = new Map();
@@ -47,7 +49,18 @@ const sandbox = { console, Date, Math, JSON, Set, Map, Array, Object, Number, St
   addEventListener() {}, removeEventListener() {}, requestAnimationFrame: callback => callback(), scrollTo() {},
   alert() {}, confirm: () => true,
   localStorage: { getItem: key => storage.has(key) ? storage.get(key) : null,
-    setItem(key, value) { if (failWrites) throw new Error('Synthetic storage failure'); storage.set(key, String(value)); },
+    get length() { return storage.size; }, key: index => [...storage.keys()][index] ?? null,
+    setItem(key, value) {
+      if (failWrites) throw new Error('Synthetic storage failure');
+      value = String(value);
+      let size = 2 * (key.length + value.length);
+      for (const [storedKey, storedValue] of storage) if (storedKey !== key) size += 2 * (storedKey.length + storedValue.length);
+      if (size > storageQuota) {
+        quotaFailures += 1;
+        const error = new Error('Setting the value exceeded the quota.'); error.name = 'QuotaExceededError'; throw error;
+      }
+      storage.set(key, value);
+    },
     removeItem: key => storage.delete(key) },
   document: { readyState: 'loading', body: element('body'), activeElement: element('initialFocus'),
     getElementById: element, querySelector: () => null, querySelectorAll: () => [],
@@ -83,16 +96,67 @@ for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
   if (!/\bsrc\s*=/.test(match[1]) && match[2].trim()) vm.runInContext(match[2], sandbox);
 }
 const run = code => vm.runInContext(code, sandbox);
-const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
+// The page loads its semester clocks from the API; the Python caller passes the same ones (api.term_clock)
+// and the sandbox selects the latest term, like a new account.
+const termClocks = input.clocks;
+run(`termList = ${JSON.stringify(termClocks)}; applyTermClock(termList[termList.length - 1]);`);
+// Accounts are stored split by term: read them through the page, as the page does.
+const readAccount = id => JSON.parse(JSON.stringify(sandbox.readLocalUserData(id)));
+const saved = () => readAccount('SYN-REVIEW-01');
 (async () => {
+  // Reproduce an origin already filled by legacy real-source planner snapshots.
+  let legacyAccount = null;
+  if (input.scenario === 'storage' || input.scenario === 'onboarding_quota') {
+    legacyAccount = sandbox.createDefaultLocalUserData('LEGACY-DEMO');
+    legacyAccount.confirmed_plan_result = input.options[1].result;
+    legacyAccount.planner.cached_plan_options = input.options;
+    legacyAccount.planner.plan_stages = {first: input.options[1].result, replan: null, whatif: null};
+    legacyAccount.planner.custom_plan_backup = input.options[0].result;
+    legacyAccount.profile.avatar_data_url = 'data:image/png;base64,keep-avatar';
+    legacyAccount.saved_activities = [{activity_id: 'preserve-saved-activity'}];
+    storage.set('unilife_data_LEGACY-DEMO', JSON.stringify(legacyAccount));
+    storage.set('unrelated-app', 'preserve-unrelated-data');
+    storageQuota = 2 * JSON.stringify(legacyAccount).length + 65536;
+  }
+  if (input.scenario === 'storage') {
+    const original = JSON.stringify(legacyAccount);
+    const compact = sandbox.serializeLocalUserData(legacyAccount);
+    assert.ok(compact.length < original.length / 2, 'real planner payloads should be substantially smaller');
+    const restored = sandbox.deserializeLocalUserData(JSON.parse(compact));
+    assert.equal(JSON.stringify(restored), original, 'all results, offers, scores and profile data survive');
+    restored.planner.cached_plan_options[1].result.plan.status = 'MUTATED';
+    assert.equal(restored.planner.plan_stages.first.plan.status, input.options[1].result.plan.status);
+    assert.equal(restored.confirmed_plan_result.plan.status, input.options[1].result.plan.status);
+    assert.equal(JSON.stringify(legacyAccount), original, 'serialization must not mutate live state');
+    const small = sandbox.createDefaultLocalUserData('SMALL');
+    assert.equal(sandbox.serializeLocalUserData(small), JSON.stringify(small));
+    const next = JSON.parse(original); next.student_id = 'NEXT-DEMO';
+    sandbox.writeLocalUserData('NEXT-DEMO', next);
+    assert.ok(quotaFailures > 0, 'exercise actual quota recovery');
+    // The page reads an account as the view of its active term (plus the slices of the other terms: none here).
+    const plain = id => { const view = readAccount(id); assert.deepEqual(view.terms, {}); delete view.terms; return JSON.stringify(view); };
+    assert.equal(plain('LEGACY-DEMO'), original);
+    // A written account is stored split by term, so its key order may differ: compare the content.
+    assert.deepEqual(JSON.parse(plain('NEXT-DEMO')), next);
+    assert.equal(storage.get('unrelated-app'), 'preserve-unrelated-data');
+    assert.equal(sandbox.isLocalStorageQuotaError({code: 1014}), true);
+    assert.equal(sandbox.isLocalStorageQuotaError(new Error('different failure')), false);
+    const beforeFailure = storage.get('unilife_data_NEXT-DEMO');
+    storageQuota = 1;
+    assert.throws(() => sandbox.writeLocalUserData('NEXT-DEMO', {...next, updated_at:'unsaved'}), /dung lượng/);
+    assert.equal(storage.get('unilife_data_NEXT-DEMO'), beforeFailure);
+    assert.deepEqual(JSON.parse(plain('NEXT-DEMO')), next);
+    console.log(JSON.stringify({passed:true,scenario:input.scenario,raw:original.length,compact:compact.length})); return;
+  }
   if (input.scenario?.startsWith('onboarding')) {
     const settle = async () => { for (let i = 0; i < 80; i++) await Promise.resolve(); };
     const user = {student_id:'25127881', full_name:'Onboarding reviewer', major:'CNTT'};
     const key = 'unilife_data_' + user.student_id;
-    const data = () => JSON.parse(storage.get(key));
+    const data = () => readAccount(user.student_id);
     storage.set(key, JSON.stringify(sandbox.createDefaultLocalUserData(user.student_id, true)));
     storage.set('unilife_users', JSON.stringify([user]));
     sandbox.beginOnboarding(user); await settle();
+    assert.equal(element('simulationDateButton').disabled, false, 'registration enables the simulation date control');
     assert.equal(element('onboardingStepLabel').textContent, 'Bước 1 / 5');
     run(`SP3_SOURCE = 'synthetic'; onboardingStep = 3;
       selectOnboardingTargetPreset(85);
@@ -105,6 +169,15 @@ const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
     assert.equal(element('onboardingNextButton').textContent, 'Lập lịch & review');
     element('workspaceApp').classList.add('hidden');
     if (input.scenario === 'onboarding_stale') input.holdOptions = true;
+    if (input.scenario === 'onboarding_quota_blocked') {
+      storageQuota = 1;
+      await sandbox.rdOnboardingBuildPlan();
+      assert.equal(run('rdOnboardingFlow.busy'), false, 'an initial storage error must release the loading state');
+      assert.ok(element('onboardingPlanError').textContent.includes('dung lượng'));
+      assert.equal(element('onboardingRetryPlan').classList.contains('hidden'), false);
+      storageQuota = Infinity;
+      sandbox.previousOnboardingStep();
+    }
     sandbox.nextOnboardingStep();
     const calls = () => requests.filter(x => x.url.includes('/personalized/options'));
     if (input.scenario === 'onboarding_stale') {
@@ -121,7 +194,8 @@ const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
     assert.equal(calls()[0].body.total_target, 85);
     assert.equal(calls()[0].body.preference.limits.max_duration_minutes, null);
     assert.ok(calls()[0].body.preference.category_priorities.some(c => c.category_id === 'C1'));
-    assert.ok(calls()[0].body.availability.busy_intervals.some(b => b.start.includes('2026-11-09T14:00')));
+    assert.equal(calls()[0].body.availability, undefined, 'synthetic planning uses its own fixture calendar');
+    assert.ok(run('buildCanonicalAvailability()').busy_intervals.some(b => b.start.includes('2026-11-09T14:00')));
     assert.equal(data().profile.drl_target, 85);
     assert.equal(data().confirmed_plan, null);
     assert.equal(data().onboarding_status, 'IN_PROGRESS');
@@ -170,8 +244,12 @@ const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
       sandbox.reviewDashChoosePlanOption(1, 'review');
     }
     const modal = element('onboardingModal');
-    modal.querySelectorAll = () => [element('onboardingBackButton'), element('onboardingNextButton')];
-    element('onboardingNextButton').focus();
+    const backButton = element('onboardingBackButton');
+    const nextButton = element('onboardingNextButton');
+    assert.equal(nextButton.hidden, true, 'review uses its own confirm action');
+    assert.equal(backButton.hidden, false, 'back navigation remains visible');
+    modal.querySelectorAll = () => [backButton, nextButton];
+    backButton.focus();
     for (const listener of listeners.get('keydown') || []) listener({key:'Tab',preventDefault(){this.defaultPrevented=true;}});
     assert.equal(sandbox.document.activeElement.id, 'onboardingBackButton');
     if (input.scenario === 'onboarding_reload') {
@@ -206,6 +284,18 @@ const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
     assert.equal(element('planOptionsScreen').parentNode.id, 'body');
     assert.equal(element('planReviewScreen').parentNode.id, 'body');
     assert.equal(element('planOptionsScreen').getAttribute('aria-modal'), 'true');
+    if (input.scenario === 'onboarding_quota') {
+      assert.ok(quotaFailures > 0, 'quota must be hit during the actual onboarding flow');
+      const legacyView = readAccount('LEGACY-DEMO'); delete legacyView.terms;
+      assert.equal(JSON.stringify(legacyView), JSON.stringify(legacyAccount));
+      assert.equal(JSON.stringify(sandbox.readLocalUserData(user.student_id).confirmed_plan_result), JSON.stringify(input.options[1].result));
+      sandbox.reviewDashCloseAccountDialogs();
+      sandbox.restoreLocalPlannerState(sandbox.readLocalUserData(user.student_id));
+      assert.equal(run('currentPlannerData.plan.plan_version'), input.options[1].result.plan.plan_version);
+      assert.equal(run('cachedPlanOptions.length'), input.options.length);
+      assert.equal(JSON.stringify(sandbox.cpdResultForConfirmed(sandbox.reviewDashReadState())), JSON.stringify(input.options[1].result));
+      assert.equal(storage.get('unrelated-app'), 'preserve-unrelated-data');
+    }
     console.log(JSON.stringify({passed:true,scenario:input.scenario}));return;
   }
   run(`currentStudent = {student_id: 'SYN-REVIEW-01', full_name: 'Synthetic reviewer'};
@@ -277,7 +367,7 @@ const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
   assert.ok(panel().includes(String(input.impact.projected_total)));
   assert.equal(run('prvDraft.steps.length'), 0, 'previews must not edit the plan');
   if (mode === 'above_target') {
-    assert.ok(panel().includes(', vẫn đạt mục tiêu'));
+    assert.ok(panel().includes(input.impact.projected_total > input.impact.target_total ? ' — vượt mục tiêu.' : ' — đủ điểm.'));
     assert.ok(panel().includes('>Bỏ</button>'));
     assert.ok(!panel().includes('Bỏ, không thay'));
     console.log(JSON.stringify({passed:true,scenario:mode}));return;
@@ -312,7 +402,11 @@ const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
   assert.equal(call.body.limit, 10);
   assert.equal(call.body.preference.strategy, input.options[1].strategy);
   assert.equal(call.body.preference.limits.max_duration_minutes, null);
-  assert.ok(call.body.availability.weekly_blocks.length);
+  if (run('prvDraft.source') === 'synthetic') {
+    assert.equal(call.body.availability, undefined, 'synthetic review keeps the fixture calendar');
+  } else {
+    assert.ok(call.body.availability.weekly_blocks.length);
+  }
   assert.equal((panel().match(/onclick="prvApplyAlternative/g)||[]).length, Math.min(3,input.alternatives.items.length));
   if (input.alternatives.items.length > 3) {
     assert.ok(panel().includes('Xem thêm'));sandbox.prvShowAllAlternatives();
@@ -379,7 +473,7 @@ const saved = () => JSON.parse(storage.get('unilife_data_SYN-REVIEW-01'));
   sandbox.openAvailableCalendarSlot('2026-11-09T10:00:00+07:00', '2026-11-09T11:00:00+07:00');
   assert.equal(requests.length, beforeAdd);
   const empty = saved(); empty.confirmed_plan = null;
-  storage.set('unilife_data_SYN-REVIEW-01', JSON.stringify(empty));
+  sandbox.writeLocalUserData('SYN-REVIEW-01', empty);
   failWrites = true;
   await assert.rejects(sandbox.UniLifePlanReviewContract.confirmPlan({ student_id: 'SYN-REVIEW-01', strategy: 'BALANCED', result: input.options[1].result }), /storage failure/);
   failWrites = false;
