@@ -60,7 +60,7 @@ def enter_workspace(page) -> None:
     page.locator("#planOptionsScreen").wait_for(state="visible", timeout=60000)
     page.locator('[data-pos-card] [data-pos-action="review"]').first.click()
     page.locator("#planReviewScreen").wait_for(state="visible", timeout=30000)
-    page.locator("#onboardingNextButton").click()
+    page.locator('#prvPanel button[onclick="prvConfirm()"]').click()
     page.locator("#workspaceApp").wait_for(state="visible", timeout=30000)
 
 
@@ -83,7 +83,8 @@ def main() -> None:
             page.wait_for_function("document.querySelector('#backendStatusText').textContent.includes('API')", timeout=15000)
             page.evaluate("document.body.classList.add('dev-mode')")
             enter_workspace(page)
-            page.locator("#tabBtnTestSuites").click()
+            page.evaluate("switchTab('testSuites')")
+            page.locator("#viewTestSuites").wait_for(state="visible", timeout=10000)
             page.locator("[onclick='runBatchAllTests()']").click()
             page.wait_for_function(
                 "document.querySelector('#batchLogRows').textContent.includes('Ca 5')",
@@ -131,7 +132,7 @@ def main() -> None:
                 ),
             )
             page.route(
-                "**/api/sp3/catalog",
+                "**/api/sp3/catalog*",
                 lambda route: route.fulfill(
                     status=200,
                     content_type="application/json",
@@ -189,7 +190,7 @@ def main() -> None:
             enter_workspace(sp3)
 
             # Build personalized options from the current five-step profile.
-            sp3.locator("#tabBtnPlan").click()
+            sp3.evaluate("switchTab('plan')")
             def is_options_response(response):
                 return "/api/sp3/personalized/options" in response.url and response.request.method == "POST"
 
@@ -243,9 +244,11 @@ def main() -> None:
 
             # Both halves of the activity repository must remain accessible.
             sp3.evaluate("reviewDashClosePlanOptions(true); switchTab('activities'); setActivitiesSubView('timeline')")
-            assert sp3.locator("#timelineDateCardsContainer > *").count() == 5
+            sp3.wait_for_function("document.querySelector('#timelineDateCardsContainer').children.length === 7", timeout=15000)
+            assert sp3.locator("#activitiesTimelineSection").is_visible()
             sp3.evaluate("setActivitiesSubView('qa')")
-            assert not sp3.locator("#activitiesQaSection").evaluate("(el) => el.classList.contains('hidden')")
+            assert sp3.locator("#activitiesTimelineSection").is_visible()
+            assert sp3.locator("#activitiesQaSection").is_hidden()
             sp3.wait_for_function("document.querySelector('#validActivitiesList').textContent.length > 0", timeout=20000)
             sp3.screenshot(path=str(OUT / "07_activity_catalog.png"), full_page=True)
 

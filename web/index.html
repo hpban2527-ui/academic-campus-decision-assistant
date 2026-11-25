@@ -9939,6 +9939,7 @@
               has_evidence: c.evidence,
               rule_override: c.rule_override,
               student_id: currentStudent?.student_id || "25127242",
+              term_id: termClock?.term_id || defaultTermId(),
               ...(c.current_category_scores
                 ? { current_category_scores: c.current_category_scores }
                 : {}),

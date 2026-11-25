@@ -244,8 +244,12 @@ const saved = () => readAccount('SYN-REVIEW-01');
       sandbox.reviewDashChoosePlanOption(1, 'review');
     }
     const modal = element('onboardingModal');
-    modal.querySelectorAll = () => [element('onboardingBackButton'), element('onboardingNextButton')];
-    element('onboardingNextButton').focus();
+    const backButton = element('onboardingBackButton');
+    const nextButton = element('onboardingNextButton');
+    assert.equal(nextButton.hidden, true, 'review uses its own confirm action');
+    assert.equal(backButton.hidden, false, 'back navigation remains visible');
+    modal.querySelectorAll = () => [backButton, nextButton];
+    backButton.focus();
     for (const listener of listeners.get('keydown') || []) listener({key:'Tab',preventDefault(){this.defaultPrevented=true;}});
     assert.equal(sandbox.document.activeElement.id, 'onboardingBackButton');
     if (input.scenario === 'onboarding_reload') {
@@ -363,7 +367,7 @@ const saved = () => readAccount('SYN-REVIEW-01');
   assert.ok(panel().includes(String(input.impact.projected_total)));
   assert.equal(run('prvDraft.steps.length'), 0, 'previews must not edit the plan');
   if (mode === 'above_target') {
-    assert.ok(panel().includes(', vẫn đạt mục tiêu'));
+    assert.ok(panel().includes(input.impact.projected_total > input.impact.target_total ? ' — vượt mục tiêu.' : ' — đủ điểm.'));
     assert.ok(panel().includes('>Bỏ</button>'));
     assert.ok(!panel().includes('Bỏ, không thay'));
     console.log(JSON.stringify({passed:true,scenario:mode}));return;
