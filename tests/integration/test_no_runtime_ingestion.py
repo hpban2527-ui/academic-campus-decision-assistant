@@ -98,8 +98,10 @@ def test_nothing_under_src_api_imports_the_model_or_ingestion_modules():
     assert not (ROOT / "src/api/live_posts.py").exists() and not (ROOT / "src/api/live_state.py").exists()
 
 
-def test_web_page_offers_only_the_synthetic_and_real_sources():
+def test_web_page_uses_supported_source_modes_without_legacy_selector():
     page = (ROOT / "web/index.html").read_text(encoding="utf-8")
     assert '<option value="real_live">' not in page and "SP1-STORE-V2+LIVE" not in page
-    # The data-source selector was removed: the page always plans on the real store (no live source).
-    assert page.count('<option value="real"') == 0 and page.count('<option value="synthetic"') == 0
+    assert "let SP3_SOURCE = 'real';" in page
+    assert "function setSp3Source(" in page
+    assert "function sp3PlanQuery(source = SP3_SOURCE)" in page
+    assert "if (source === 'synthetic')" in page
