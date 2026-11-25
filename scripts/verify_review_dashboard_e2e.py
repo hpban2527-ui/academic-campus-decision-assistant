@@ -429,7 +429,7 @@ def confirm_now_without_a_plan(page: Cdp, mssv: str) -> None:
 def friendly_errors(page: Cdp, mssv: str) -> None:
     """Real-source planning works; an older server's 422 still receives the friendly Vietnamese mapping."""
     assert page.js("reviewDashFriendlyError('plan review is not yet available for source=real', 'real')").startswith(
-        "Chức năng này chưa hỗ trợ kho bài thật. Hãy chuyển nguồn dữ liệu sang “Dữ liệu giả lập (MVP)”")
+        "Máy chủ đang chạy chưa hỗ trợ chức năng này với kho bài thật.")
     assert page.js("reviewDashFriendlyError('Failed to fetch', 'synthetic')") == "Không kết nối được máy chủ. Hãy kiểm tra server rồi thử lại."
     assert page.js("reviewDashFriendlyError('boom')") == "Không thể lập kế hoạch: boom"
     register(page, "Real source", mssv)
@@ -446,7 +446,7 @@ def friendly_errors(page: Cdp, mssv: str) -> None:
             ? Promise.resolve(new Response(JSON.stringify({detail:'multi-strategy options are not yet available for source=real'}), {status:422,headers:{'Content-Type':'application/json'}}))
             : window.__reviewOriginalFetch(url, options);""")
         page.js("runSp3Planner()")
-        page.wait("document.getElementById('plannerEmptyState').innerText.includes('chưa hỗ trợ kho bài thật')", 40)
+        page.wait("document.getElementById('plannerEmptyState').innerText.includes('chưa hỗ trợ chức năng này với kho bài thật')", 40)
         assert not visible(page, "planOptionsScreen"), "a failed plan must not open screen 05"
     finally:
         page.js("if (window.__reviewOriginalFetch) { window.fetch = window.__reviewOriginalFetch; delete window.__reviewOriginalFetch; } SP3_SOURCE = 'synthetic';")

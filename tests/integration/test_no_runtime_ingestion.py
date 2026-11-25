@@ -101,4 +101,5 @@ def test_nothing_under_src_api_imports_the_model_or_ingestion_modules():
 def test_web_page_offers_only_the_synthetic_and_real_sources():
     page = (ROOT / "web/index.html").read_text(encoding="utf-8")
     assert '<option value="real_live">' not in page and "SP1-STORE-V2+LIVE" not in page
-    assert page.count('<option value="real"') == 2
+    # The data-source selector was removed: the page always plans on the real store (no live source).
+    assert page.count('<option value="real"') == 0 and page.count('<option value="synthetic"') == 0

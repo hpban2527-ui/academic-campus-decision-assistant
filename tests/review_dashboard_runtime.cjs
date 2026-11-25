@@ -243,11 +243,17 @@ const saved = () => readAccount('SYN-REVIEW-01');
       assert.equal(calls().length, 2);
       sandbox.reviewDashChoosePlanOption(1, 'review');
     }
+    // Step 5 confirms from the review panel: the wizard's Next button is hidden, and Tab must skip it and
+    // still wrap inside the dialog (last visible control -> first, Shift+Tab first -> last).
     const modal = element('onboardingModal');
-    modal.querySelectorAll = () => [element('onboardingBackButton'), element('onboardingNextButton')];
-    element('onboardingNextButton').focus();
-    for (const listener of listeners.get('keydown') || []) listener({key:'Tab',preventDefault(){this.defaultPrevented=true;}});
+    assert.equal(element('onboardingNextButton').hidden, true, 'step 5 confirms from the review panel');
+    const reviewConfirm = element('onboardingReviewConfirmMock'); reviewConfirm.parentNode = element('onboardingReviewHost');
+    modal.querySelectorAll = () => [element('onboardingBackButton'), element('onboardingNextButton'), reviewConfirm];
+    const tab = shiftKey => { for (const listener of listeners.get('keydown') || []) listener({key:'Tab', shiftKey, preventDefault(){this.defaultPrevented=true;}}); };
+    reviewConfirm.focus(); tab(false);
     assert.equal(sandbox.document.activeElement.id, 'onboardingBackButton');
+    tab(true);
+    assert.equal(sandbox.document.activeElement.id, 'onboardingReviewConfirmMock');
     if (input.scenario === 'onboarding_reload') {
       assert.equal(data().onboarding_step, 5);
       sandbox.reviewDashCloseAccountDialogs(); sandbox.beginOnboarding(user); await settle();
@@ -363,7 +369,9 @@ const saved = () => readAccount('SYN-REVIEW-01');
   assert.ok(panel().includes(String(input.impact.projected_total)));
   assert.equal(run('prvDraft.steps.length'), 0, 'previews must not edit the plan');
   if (mode === 'above_target') {
-    assert.ok(panel().includes(', vẫn đạt mục tiêu'));
+    // The impact line reads 'Nếu bỏ: Còn X/Yđ — đủ điểm.' (or '— vượt mục tiêu.'), never '— thiếu …' above target.
+    assert.ok(/Nếu bỏ: Còn [^<]*— (đủ điểm|vượt mục tiêu)\./.test(panel()));
+    assert.ok(!panel().includes('— thiếu'));
     assert.ok(panel().includes('>Bỏ</button>'));
     assert.ok(!panel().includes('Bỏ, không thay'));
     console.log(JSON.stringify({passed:true,scenario:mode}));return;
