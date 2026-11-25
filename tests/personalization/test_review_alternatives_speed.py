@@ -42,11 +42,15 @@ def _distinct(options: list[dict]) -> list[dict]:
     return [item for item in options if item.get("status") == "READY" and not item.get("duplicate_of")]
 
 
-def _normalised(response: dict) -> dict:
-    """The response without the planner search block."""
+def _normalised(response: dict, *, complete: bool = True) -> dict:
+    """The response without the planner search block (and without the pass-coverage fields
+    when the fast pass stopped early)."""
     copy = deepcopy(response)
     for item in copy["items"]:
         item["preview"]["result"]["plan"].pop("search")
+    if not complete:
+        for key in ("total_valid", "filtered_out", "evaluation"):
+            copy.pop(key, None)
     return copy
 
 
@@ -60,8 +64,16 @@ def _both(monkeypatch, call):
 
 def _assert_same_alternatives(reference: dict, fast: dict) -> None:
     assert [i["activity_id"] for i in fast["items"]] == [i["activity_id"] for i in reference["items"]]
-    for key in ("total_valid", "filtered_out", "required_projected_total", "target_rule", "limit"):
+    assert reference["evaluation"] == {"complete": True, "unevaluated_candidates": 0}
+    complete = fast["evaluation"]["complete"]
+    for key in ("required_projected_total", "target_rule", "limit"):
         assert fast[key] == reference[key], key
+    if complete:
+        assert fast["total_valid"] == reference["total_valid"] and fast["filtered_out"] == reference["filtered_out"]
+    else:
+        # Early stop: the listed items are the same; the pass covered fewer candidates.
+        assert len(fast["items"]) <= fast["total_valid"] <= reference["total_valid"]
+        assert all(entry in reference["filtered_out"] for entry in fast["filtered_out"])
     for ref_item, fast_item in zip(reference["items"], fast["items"]):
         ref_preview, fast_preview = ref_item["preview"], fast_item["preview"]
         ref_plan, fast_plan = ref_preview["result"]["plan"], fast_preview["result"]["plan"]
@@ -72,7 +84,7 @@ def _assert_same_alternatives(reference: dict, fast: dict) -> None:
         assert fast_plan["plan_version"] == ref_plan["plan_version"]
         for key in ("added_activity_ids", "dropped_activity_ids", "extra_added_activity_ids", "preview_id"):
             assert fast_item[key] == ref_item[key], key
-    assert _normalised(fast) == _normalised(reference)
+    assert _normalised(fast, complete=complete) == _normalised(reference, complete=complete)
 
 
 # Synthetic source: every selected activity of every distinct option --------------------
@@ -134,7 +146,8 @@ def test_synthetic_student_busy_availability_is_identical(monkeypatch, valid_pre
     _assert_same_alternatives(reference, fast)
 
 
-def test_preference_first_never_takes_the_fast_path(monkeypatch, valid_preference_payload):
+def test_preference_first_takes_the_fast_path_and_stays_identical(monkeypatch, valid_preference_payload):
+    """PREFERENCE_FIRST ranks set_changes before utility too, so a target-met 1-for-1 swap is its best plan."""
     preference = _preference(valid_preference_payload, strategy="PREFERENCE_FIRST")
     base = next(o for o in personalized_plan_options(preference, target_total=80)["options"]
                 if o["strategy"] == "PREFERENCE_FIRST")["result"]
@@ -148,16 +161,21 @@ def test_preference_first_never_takes_the_fast_path(monkeypatch, valid_preferenc
         return original(planner_input, score, **kwargs)
 
     monkeypatch.setattr(sp3_service, "build_plan", spy)
-    list_swap_alternatives(preference, base, remove_id, 10)
-    assert scored_with_budget_one and 1 not in scored_with_budget_one
+    reference, fast = _both(monkeypatch, lambda: list_swap_alternatives(preference, base, remove_id, 10))
+    assert 1 in scored_with_budget_one  # the fast path was tried for PREFERENCE_FIRST
+    _assert_same_alternatives(reference, fast)
 
-    # The same gate lets BALANCED through, so the spy above proves the strategy check, not the catalog gate.
-    balanced = _preference(valid_preference_payload, strategy="BALANCED")
-    base = next(o for o in personalized_plan_options(balanced, target_total=80)["options"]
-                if o["strategy"] == "BALANCED")["result"]
-    scored_with_budget_one.clear()
-    list_swap_alternatives(balanced, base, "SEM-A", 10)
-    assert 1 in scored_with_budget_one
+
+def test_real_source_preference_first_alternatives_are_identical(monkeypatch):
+    preference = _preference(REAL_PREFERENCES["categories+online+campus"], strategy="PREFERENCE_FIRST")
+    option = next(o for o in _distinct(real_plan_options(preference, term_id="HK1_2026_2027", target_total=80)["options"])
+                  if o["strategy"] == "PREFERENCE_FIRST")
+    base = option["result"]
+    remove_id = base["plan"]["selected_activities"][0]["activity_id"]
+    kwargs = {"source": "real", "term_id": "HK1_2026_2027"}
+    reference, fast = _both(monkeypatch, lambda: list_swap_alternatives(preference, base, remove_id, 10, **kwargs))
+    assert reference["items"], "the real source should offer alternatives for this case"
+    _assert_same_alternatives(reference, fast)
 
 
 # Direct previews keep the original path ---------------------------------------------
@@ -199,3 +217,37 @@ def test_real_source_alternatives_are_identical(monkeypatch, name):
     assert direct == first["preview"]
     removed = preview_personalized_swap(preference, base, remove_id, None, **kwargs)
     assert removed["kind"] == "REMOVE"
+
+
+def test_real_source_top_up_alternatives_are_identical(monkeypatch):
+    """Removing an activity whose points a 1-for-1 swap cannot replace: every listed item needs one
+    extra activity, found by the bounded top-up search instead of the full search."""
+    preference = _preference({
+        **REAL_BASE,
+        "topic_preferences": [{"topic_id": "artificial_intelligence", "weight": 5}, {"topic_id": "technology", "weight": 5},
+                              {"topic_id": "research", "weight": 5}],
+        "category_priorities": [{"category_id": "C1", "weight": 5}],
+        "campus_preferences": [{"campus_id": "NVC", "weight": 5}], "mode_preferences": [{"mode": "online", "weight": 5}],
+    })
+    option = next(o for o in _distinct(real_plan_options(preference, term_id="HK1_2026_2027", target_total=80)["options"])
+                  if o["strategy"] == "BALANCED")
+    base = option["result"]
+    kwargs = {"source": "real", "term_id": "HK1_2026_2027"}
+    calls = []
+    original = sp3_service._review_top_up_plan
+
+    def spy(*args, **kwargs_):
+        plan = original(*args, **kwargs_)
+        calls.append(plan is not None)
+        return plan
+
+    monkeypatch.setattr(sp3_service, "_review_top_up_plan", spy)
+    for row in base["plan"]["selected_activities"]:
+        calls.clear()
+        fast = list_swap_alternatives(preference, base, row["activity_id"], 10, **kwargs)
+        if any(calls) and fast["items"] and all(i["extra_added_activity_ids"] for i in fast["items"]):
+            reference, fast = _both(monkeypatch, lambda: list_swap_alternatives(preference, base, row["activity_id"], 10, **kwargs))
+            _assert_same_alternatives(reference, fast)
+            return
+    pytest.skip("no activity of this plan needs a top-up on the current dataset")
+

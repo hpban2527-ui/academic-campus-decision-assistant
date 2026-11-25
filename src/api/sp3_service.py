@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
@@ -630,6 +631,7 @@ def _preview_personalized_change(
         _review_clone_internal(internal) if shared
         else _review_internal(preference, base_result, target_total, availability_request, source, account, term_id)
     )
+    top_up_state = internal.pop("_top_up_state", None)  # REVIEW-DASH: shared by the previews of one request
     # REVIEW-DASH END
     planner_input = internal.pop("_planner_input")
     engine = internal.pop("_engine")
@@ -682,6 +684,13 @@ def _preview_personalized_change(
     build_options = {"preference_utility": engine.score_set, "personalization_strategy": preference.strategy.value}
     # REVIEW-DASH START: precomputed review context (needs Ngoc review)
     preview_plan = _review_fast_plan(planner_input, score_callback, build_options) if shared and _REVIEW_FAST_PATHS else None
+    if (preview_plan is None and shared and _REVIEW_FAST_PATHS
+            and (top_up_state is None or top_up_state["misses"] < _REVIEW_TOP_UP_MAX_MISSES)):
+        preview_plan = _review_top_up_plan(planner_input, score_callback, build_options)
+        if top_up_state is not None:
+            # When no single top-up works (e.g. no replacement can reach the target at all), stop
+            # trying it for this request; the full search below still runs, so results do not change.
+            top_up_state["misses"] = 0 if preview_plan is not None else top_up_state["misses"] + 1
     fast_plan = preview_plan is not None
     # REVIEW-DASH END
     if preview_plan is None:
@@ -741,6 +750,30 @@ _REVIEW_FAST_PATHS = True
 _GUIDED_SEARCH_MIN_EXTRAS = 13  # build_plan switches to _guided_search above 12 extra candidates
 
 
+class ReviewSuperseded(Exception):
+    """A newer alternatives request of the same student and term replaced this one."""
+
+
+def share_alternative_feasibility(response: dict) -> dict:
+    """Send the feasibility block once when every listed preview carries the same one.
+
+    All previews of one alternatives request come from one review context, so their
+    ``result.feasibility`` blocks are equal (about 195 KB each on the real store). The block
+    moves to ``shared.feasibility``; the page puts it back on every item
+    (reviewDashShareAlternativeFeasibility) before anything reads it. If any block differs,
+    the response is returned unchanged.
+    """
+    items = response.get("items") or []
+    blocks = [((item.get("preview") or {}).get("result") or {}).get("feasibility") for item in items]
+    if not items or any(block is None for block in blocks) or any(block != blocks[0] for block in blocks[1:]):
+        return response
+    trimmed = []
+    for item in items:
+        result = {key: value for key, value in item["preview"]["result"].items() if key != "feasibility"}
+        trimmed.append({**item, "preview": {**item["preview"], "result": result}})
+    return {**response, "shared": {"feasibility": blocks[0]}, "items": trimmed}
+
+
 def _review_clone_internal(shared: dict) -> dict:
     """A private copy of a ``_review_internal`` result that a preview may pop from and mutate.
 
@@ -770,7 +803,9 @@ def _review_fast_plan(planner_input: dict, score_callback, build_options: dict) 
         retained <= required; each added activity is outside required and therefore adds
         one set change, so any strict superset ranks behind the required set.
     ``_guided_search`` and ``_search`` only score supersets of the required set, so their
-    best plan is the required set as well. PREFERENCE_FIRST is left on the full path.
+    best plan is the required set as well. PREFERENCE_FIRST is no exception: its tuple is
+    (category_gap, total_gap, set_changes, time_changes, -utility, ...), so set_changes still
+    ranks before utility and a higher-utility superset still ranks behind the required set.
     The planner's search block (evaluated_subsets, limit_reason) differs: it reports 1 evaluation
     and a budget stop. Everything else matched in the equivalence tests and the benchmark. The
     gate on the number of extras keeps this to the budgeted _guided_search, which always ends
@@ -778,19 +813,8 @@ def _review_fast_plan(planner_input: dict, score_callback, build_options: dict) 
     (A full search that set scheduling flags could in principle add text to the developer-only
     SEARCH_INCOMPLETE warning; no UI reads it.)
     """
-    if build_options["personalization_strategy"] == "PREFERENCE_FIRST":
-        return None
-    previous = planner_input.get("previous_plan")
-    keep_ids = {item["activity_id"] for item in planner_input["keep_requests"]}
-    if not previous or not {item["activity_id"] for item in previous["selected_activities"]} <= keep_ids:
-        return None
-    included = set(planner_input["baseline"]["included_activity_ids"])
-    extras = sum(
-        1 for row in planner_input["candidates"]
-        if row["feasibility"]["status"] == "FEASIBLE" and row["participation"]["progress"] == "NOT_STARTED"
-        and row["activity"]["activity_id"] not in included and row["activity"]["activity_id"] not in keep_ids
-    )
-    if extras < _GUIDED_SEARCH_MIN_EXTRAS:
+    extras = _review_extra_count(planner_input)
+    if extras is None or extras < _GUIDED_SEARCH_MIN_EXTRAS:
         return None  # a small catalog is searched exhaustively and cheaply by the planner
     # copy_json: planner input is JSON-shaped by contract, and this copy is only a guard
     # against any mutation by the throwaway one-evaluation build.
@@ -798,6 +822,57 @@ def _review_fast_plan(planner_input: dict, score_callback, build_options: dict) 
     if plan.get("status") != "TARGET_MET" or plan.get("keep_conflicts") or plan.get("errors"):
         return None
     return plan
+
+
+def _review_extra_count(planner_input: dict) -> int | None:
+    """Candidates the planner may add on top of the required set, or None without a usable previous plan.
+
+    Same rule as planner._PlannerInput.eligible (FEASIBLE, NOT_STARTED, not already counted), minus the
+    required set: this is len(extra) in build_plan, which the top-up budget below depends on.
+    """
+    previous = planner_input.get("previous_plan")
+    keep_ids = {item["activity_id"] for item in planner_input["keep_requests"]}
+    if not previous or not {item["activity_id"] for item in previous["selected_activities"]} <= keep_ids:
+        return None
+    included = set(planner_input["baseline"]["included_activity_ids"])
+    return sum(
+        1 for row in planner_input["candidates"]
+        if row["feasibility"]["status"] == "FEASIBLE" and row["participation"]["progress"] == "NOT_STARTED"
+        and row["activity"]["activity_id"] not in included and row["activity"]["activity_id"] not in keep_ids
+    )
+
+
+# _guided_search_v2 caps its working pool at 60 candidates (planner._guided_search_v2, pool_cap).
+_REVIEW_SINGLE_ADD_POOL_MAX = 60
+# Consecutive failed top-up attempts after which one alternatives request stops trying them (speed only).
+_REVIEW_TOP_UP_MAX_MISSES = 3
+
+
+def _review_top_up_plan(planner_input: dict, score_callback, build_options: dict) -> dict | None:
+    """The best "swap + one extra activity" plan when the 1-for-1 swap misses the target, else None.
+
+    When the required set (KEEP_TIME + FORCE_INCLUDE) misses a target, the full search spends its
+    whole budget (400 evaluations) although the answer is usually the required set plus ONE extra
+    activity. _guided_search_v2 first scores the required set plus every single candidate of its
+    working pool (phase 2), and the pool holds every extra candidate when
+    min(extras, 60, max(20, budget // 2)) == extras. A budget of 2 * extras + 2 guarantees that.
+    Ranking (planner._rank) is (category_gap, total_gap, set_changes, ...) for every strategy, and
+    every extra activity adds one set change, so a target-met plan with one extra beats every
+    plan with two or more extras. Hence, if the bounded search returns a TARGET_MET plan with
+    exactly one extra, it is the best-ranked single top-up, which is also what the full search
+    returns (it scores the same singles in the same pool). Any other outcome (no target met, two
+    or more extras, more than 60 extras) returns None and the caller runs the full search.
+    """
+    extras = _review_extra_count(planner_input)
+    if extras is None or not _GUIDED_SEARCH_MIN_EXTRAS <= extras <= _REVIEW_SINGLE_ADD_POOL_MAX:
+        return None
+    plan = build_plan(copy_json(planner_input), score_callback, max_evaluations=2 * extras + 2, **build_options)
+    if plan.get("status") != "TARGET_MET" or plan.get("keep_conflicts") or plan.get("errors"):
+        return None
+    required = {item["activity_id"] for item in planner_input["keep_requests"]}
+    required |= set(planner_input["baseline"]["included_activity_ids"])
+    added = {item["activity_id"] for item in plan.get("selected_activities", [])} - required
+    return plan if len(added) == 1 else None
 
 
 def _review_internal(preference, base_result, target_total, availability_request, source, account, term_id=None):
@@ -1109,6 +1184,7 @@ def list_swap_alternatives(
     *, source: str = "synthetic",
     account: AccountPlanScoring | None = None,
     term_id: str | None = None,
+    is_superseded: Callable[[], bool] | None = None,
 ) -> dict:
     """List valid replacements for ``remove_activity_id``, best first.
 
@@ -1136,11 +1212,14 @@ def list_swap_alternatives(
     shared = None if not _REVIEW_FAST_PATHS else {
         **context.internal,
         "_planner_input": context.planner_input, "_engine": context.engine, "_score_callback": context.score_callback,
+        "_top_up_state": {"misses": 0},
     }
 
     def reject(activity_id: str, code: str, message: str) -> None:
         filtered.append({"activity_id": activity_id, "code": code, "message": message})
 
+    # Pass 1 (cheap): rule out candidates without building a plan.
+    previewable: list[dict] = []
     for row in sorted(context.planner_input["candidates"], key=lambda item: item["activity"]["activity_id"]):
         activity_id = row["activity"]["activity_id"]
         if activity_id in context.selected_ids:
@@ -1156,6 +1235,27 @@ def list_swap_alternatives(
         if missing is not None:
             reject(activity_id, "INCOMPLETE_INFO", "Incomplete planning information: " + missing + ".")
             continue
+        previewable.append(row)
+
+    # Pass 2 (expensive): one validated preview per candidate. With the fast paths on, candidates
+    # go in the order of a lower bound of their final ranking key, and the loop stops once `limit`
+    # valid items are known and no remaining candidate can rank among them (_review_rank_bound).
+    # The listed items are then exactly those of a full pass; only total_valid / filtered_out may
+    # cover fewer candidates, and "evaluation" says so.
+    if _REVIEW_FAST_PATHS:
+        bounds = _review_rank_bounds(preference, context, base_result, remove_activity_id, previewable)
+        previewable.sort(key=lambda row: bounds[row["activity"]["activity_id"]])
+    unevaluated = 0
+    for position, row in enumerate(previewable):
+        if is_superseded is not None and is_superseded():
+            # The page already ignores this answer; stop spending CPU on it.
+            raise ReviewSuperseded("a newer alternatives request replaced this one")
+        activity_id = row["activity"]["activity_id"]
+        if _REVIEW_FAST_PATHS and len(valid) >= limit:
+            valid.sort(key=_alternative_rank)
+            if bounds[activity_id] > _alternative_rank(valid[limit - 1]):
+                unevaluated = len(previewable) - position
+                break
         try:
             preview = preview_personalized_swap(
                 preference, base_result, remove_activity_id, activity_id,
@@ -1181,12 +1281,8 @@ def list_swap_alternatives(
         preview["result"]["checker_violations"] = 0  # preview_personalized_swap raises on any violation
         valid.append(_alternative_item(context, row, entry, goal, preview, remove_activity_id))
 
-    valid.sort(key=lambda item: (
-        -item["preference"]["utility"],
-        item["plan_duration_minutes"],
-        _deadline_sort_key(item["registration_deadline"]),
-        item["activity_id"],
-    ))
+    valid.sort(key=_alternative_rank)
+    filtered.sort(key=lambda item: item["activity_id"])  # the order of a full pass in activity_id order
     return {
         "status": "ALTERNATIVES",
         "remove_activity_id": remove_activity_id,
@@ -1198,7 +1294,45 @@ def list_swap_alternatives(
         "limit": limit,
         "items": valid[:limit],
         "filtered_out": filtered,
+        "evaluation": {"complete": unevaluated == 0, "unevaluated_candidates": unevaluated},
     }
+
+
+def _alternative_rank(item: dict) -> tuple:
+    """Ranking key of a listed alternative (lower is better)."""
+    return (
+        -item["preference"]["utility"],
+        item["plan_duration_minutes"],
+        _deadline_sort_key(item["registration_deadline"]),
+        item["activity_id"],
+    )
+
+
+def _review_rank_bounds(preference, context, base_result: dict, remove_activity_id: str, rows: list[dict]) -> dict:
+    """A lower bound of _alternative_rank for every candidate, computed before any preview.
+
+    * utility: the item's utility is score_activity(id, criterion) for the criterion SP2 assigns
+      in the preview; the maximum over "no criterion" and every prioritised criterion bounds it
+      from above, so -utility is bounded from below;
+    * plan duration: every kept activity is a KEEP_TIME request (same blocks), a fixed candidate
+      keeps its fixed blocks, and a top-up only adds minutes, so kept minutes + the fixed blocks
+      (0 for a flexible candidate) bound it from below;
+    * deadline and activity_id are known exactly.
+    Lexicographic comparison keeps the bound: final key >= bound key for every candidate.
+    """
+    kept = _plan_minutes({"selected_activities": [
+        item for item in base_result["plan"].get("selected_activities", []) if item["activity_id"] != remove_activity_id
+    ]})
+    criteria = [None, *(item.category_id.value for item in preference.category_priorities)]
+    bounds = {}
+    for row in rows:
+        activity_id = row["activity"]["activity_id"]
+        utility = max(context.engine.score_activity(activity_id, criterion).utility for criterion in criteria)
+        schedule = row.get("schedule") or {}
+        fixed = schedule.get("fixed_blocks") if schedule.get("type") == "FIXED" else None
+        minutes = kept + (_plan_minutes({"selected_activities": [{"scheduled_blocks": fixed}]}) if fixed else 0)
+        bounds[activity_id] = (-utility, minutes, _deadline_sort_key(row["activity"].get("registration_deadline")), activity_id)
+    return bounds
 
 
 def _alternative_item(

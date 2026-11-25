@@ -1800,7 +1800,7 @@
     }
 
 </style>
-  <script src="/static/user_tour.js" defer></script>
+  <script src="/static/user_tour.js?v=20261126-tour-focus" defer></script>
 
   <style>
     /* Keep the calendar and participation actions together in the main viewport. */
@@ -2244,7 +2244,7 @@
               </div>
             </section>
             <!-- REVIEW-DASH END -->
-            <div class="relative overflow-hidden rounded-3xl border border-blue-400/20 bg-gradient-to-br from-[#101d3c] via-[#0b1429] to-[#101d3a] px-6 py-7 sm:px-8 sm:py-9 shadow-xl shadow-blue-950/20">
+            <div id="overviewWelcomeCard" class="relative overflow-hidden rounded-3xl border border-blue-400/20 bg-gradient-to-br from-[#101d3c] via-[#0b1429] to-[#101d3a] px-6 py-7 sm:px-8 sm:py-9 shadow-xl shadow-blue-950/20">
               <div class="absolute -right-10 -top-20 h-64 w-64 rounded-full border border-blue-300/10 bg-blue-500/5 shadow-[0_0_90px_rgba(37,99,235,0.12)]"></div>
               <div class="absolute -right-1 -top-10 h-48 w-48 rounded-full border border-cyan-300/10"></div>
               <div class="relative z-10 max-w-3xl">
@@ -4916,6 +4916,7 @@
         try {
           const [path, payload] = calls[part];
           const data = await prvPost(path, payload);
+          if (part === 'alternatives') reviewDashShareAlternativeFeasibility(data);
           if (prvDraft !== draft || draft.panel !== panel || ticket !== prvSeq || panel[part].requestId !== requestIds[part]) return;
           if (part === 'alternatives' ? !Array.isArray(data.items) : !cpdIsEngineResult(data.result)) throw new Error('Máy chủ trả về bản xem trước không hợp lệ.');
           panel[part] = { loading: false, data, requestId: requestIds[part] };
@@ -5033,7 +5034,8 @@
         })
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : `Máy chủ phản hồi mã ${response.status}.`);
+      if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail
+        : (data.detail && typeof data.detail.message === 'string' ? data.detail.message : `Máy chủ phản hồi mã ${response.status}.`));
       if (!isCurrentTermResponse(data)) throw new Error('Kết quả thuộc học kỳ khác nên đã bị bỏ qua. Hãy thử lại.');
       return data;
     }
@@ -5232,6 +5234,18 @@
       BALANCED: { name: 'Cân bằng', text: 'Cân bằng giữa số giờ và mức hợp sở thích' },
       PREFERENCE_FIRST: { name: 'Theo sở thích', text: 'Ưu tiên hoạt động hợp sở thích của bạn' }
     };
+
+    // /alternatives sends the feasibility block once (server: share_alternative_feasibility);
+    // put it back on every item so a chosen preview is a complete engine result again.
+    function reviewDashShareAlternativeFeasibility(data) {
+      const shared = data && data.shared && data.shared.feasibility;
+      if (!shared || !Array.isArray(data.items)) return data;
+      data.items.forEach(item => {
+        if (item && item.preview && item.preview.result && !item.preview.result.feasibility) item.preview.result.feasibility = shared;
+      });
+      delete data.shared;
+      return data;
+    }
 
     // Maps the known API texts to Vietnamese. `withPrefix` (default true) adds "Không thể lập kế hoạch: " to
     // texts that are not recognised; the planner page already prints that title, so it passes false.
@@ -9644,6 +9658,8 @@
         }
 
         const credentials = await deriveLocalPasswordHash(password);
+        // The page loads the semester list at start-up; if the server was not ready then, load it now.
+        if (!termList.length) await loadTermList();
         const user = {
           student_id: mssv,
           full_name: fullName,
