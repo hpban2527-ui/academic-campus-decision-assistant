@@ -42,7 +42,7 @@
       id: 'overview',
       tab: 'dashboard',
       action: null,
-      selectors: ['#workspaceOverview > div:first-child', '#workspaceOverview', '#viewDashboard'],
+      selectors: ['#overviewWelcomeCard', '#workspaceOverview > div:first-child', '#workspaceOverview', '#viewDashboard'],
       badge: 'Bước 1 · Tổng quan',
       title: 'Chào mừng bạn đến với UniLife!',
       content: 'Đây là không gian Tổng quan giúp bạn theo dõi nhanh tổng điểm rèn luyện (ĐRL), số hoạt động đã tham gia, mục tiêu học kỳ và các gợi ý hoạt động nổi bật.',
@@ -55,6 +55,9 @@
       tab: 'dashboard',
       action: null,
       selectors: ['#confirmedPlanDashboard'],
+      // The section now also holds the month calendar and activity list (taller than the
+      // viewport), so only the title row, banners/empty state and progress card are lit.
+      focusSelectors: ['#confirmedPlanDashboard > div:first-child', '#cpdBannerPending', '#cpdBannerInvalid', '#cpdEmpty', '#cpdProgress'],
       badge: 'Bước 2 · Lịch đã chốt',
       title: 'Theo dõi Kế hoạch đã chốt',
       content: 'Sau khi chọn và xác nhận kế hoạch tối ưu, lịch hoạt động của bạn sẽ hiển thị tại đây theo chế độ Hôm nay / Tuần / Tháng để bạn theo dõi và xác nhận hoàn thành.',
@@ -312,6 +315,9 @@
       tab: raw.tab ? String(raw.tab) : null,
       action: raw.action ? String(raw.action) : null,
       selectors,
+      focusSelectors: Array.isArray(raw.focusSelectors)
+        ? raw.focusSelectors.filter(f => typeof f === 'string' && f.trim())
+        : [],
       badge: String(raw.badge || ('Bước ' + (idx + 1))),
       title: String(raw.title || ''),
       content: String(raw.content || ''),
@@ -762,6 +768,105 @@
     return { top: 80, left: 40, right: 440, bottom: 200, width: 400, height: 120 };
   }
 
+  // Union of the visible focus elements of a step; falls back to the anchor target.
+  function measureFocusRect(step, target) {
+    const list = step && Array.isArray(step.focusSelectors) ? step.focusSelectors : [];
+    let box = null;
+    for (let i = 0; i < list.length; i++) {
+      let el = null;
+      try {
+        el = doc.querySelector ? doc.querySelector(list[i]) : null;
+      } catch (_err) {
+        el = null;
+      }
+      if (!el || !isVisible(el)) continue;
+      const r = measureRect(el);
+      if (!(r.width > 0 && r.height > 0)) continue;
+      box = box
+        ? {
+          top: Math.min(box.top, r.top),
+          left: Math.min(box.left, r.left),
+          right: Math.max(box.right, r.right),
+          bottom: Math.max(box.bottom, r.bottom),
+        }
+        : { top: r.top, left: r.left, right: r.right, bottom: r.bottom };
+    }
+    if (!box) return measureRect(target);
+    box.width = box.right - box.left;
+    box.height = box.bottom - box.top;
+    return box;
+  }
+
+  function isScrollClipping(el) {
+    if (!el || typeof global.getComputedStyle !== 'function' || typeof el.getBoundingClientRect !== 'function') {
+      return false;
+    }
+    try {
+      const st = global.getComputedStyle(el);
+      return Boolean(st) && /(auto|scroll|hidden|clip)/.test(String(st.overflowY || '') + String(st.overflowX || ''));
+    } catch (_err) {
+      return false;
+    }
+  }
+
+  // Visible region of the target: the viewport intersected with every clipping ancestor
+  // (e.g. <main class="overflow-y-auto">), so the ring never spills over the sticky
+  // header or the semester bar when the target is partly scrolled out.
+  function visibleClipRect(el) {
+    const vw = global.innerWidth || 1280;
+    const vh = global.innerHeight || 800;
+    const clip = { top: 0, left: 0, right: vw, bottom: vh };
+    let cursor = el ? el.parentNode : null;
+    while (cursor && cursor !== doc && cursor !== doc.body && cursor !== doc.documentElement) {
+      if (isScrollClipping(cursor)) {
+        const r = cursor.getBoundingClientRect();
+        clip.top = Math.max(clip.top, r.top);
+        clip.left = Math.max(clip.left, r.left);
+        clip.right = Math.min(clip.right, r.right);
+        clip.bottom = Math.min(clip.bottom, r.bottom);
+      }
+      cursor = cursor.parentNode;
+    }
+    if (clip.right - clip.left < 40 || clip.bottom - clip.top < 40) {
+      return { top: 0, left: 0, right: vw, bottom: vh };
+    }
+    return clip;
+  }
+
+  function nearestScrollContainer(el) {
+    let cursor = el ? el.parentNode : null;
+    while (cursor && cursor !== doc && cursor !== doc.body && cursor !== doc.documentElement) {
+      if (isScrollClipping(cursor) && cursor.scrollHeight > cursor.clientHeight + 1) return cursor;
+      cursor = cursor.parentNode;
+    }
+    return null;
+  }
+
+  // Bring the focus box into view: centred when it fits, top-aligned when it is taller.
+  function scrollFocusIntoView(step, target) {
+    const rect = measureFocusRect(step, target);
+    const clip = visibleClipRect(target);
+    const margin = 16;
+    if (rect.top >= clip.top + margin && rect.bottom <= clip.bottom - margin) return false;
+
+    const behavior = prefersReducedMotion() ? 'auto' : 'smooth';
+    const container = nearestScrollContainer(target);
+    const clipH = clip.bottom - clip.top;
+    const delta = rect.height + margin * 2 <= clipH
+      ? (rect.top - clip.top) - (clipH - rect.height) / 2
+      : (rect.top - clip.top) - margin;
+
+    if (container && typeof container.scrollTo === 'function') {
+      container.scrollTo({ top: Math.max(0, container.scrollTop + delta), behavior });
+      return true;
+    }
+    if (typeof target.scrollIntoView === 'function') {
+      target.scrollIntoView({ behavior, block: 'start', inline: 'nearest' });
+      return true;
+    }
+    return false;
+  }
+
   function buildSpotlightPath(vw, vh, box) {
     const outer = `M0,0 H${vw} V${vh} H0 Z`;
     if (!box || box.width <= 0 || box.height <= 0) return outer;
@@ -798,13 +903,19 @@
 
     const vw = global.innerWidth || 1280;
     const vh = global.innerHeight || 800;
-    const raw = measureRect(state.targetEl);
+    const curStep = activeSteps[state.currentIndex] || {};
+    const raw = measureFocusRect(curStep, state.targetEl);
+    const clip = visibleClipRect(state.targetEl);
     const pad = 6;
+    const top = Math.max(raw.top - pad, clip.top + 2, 4);
+    const left = Math.max(raw.left - pad, clip.left + 2, 4);
+    const bottom = Math.min(raw.bottom + pad, clip.bottom - 2, vh - 4);
+    const right = Math.min(raw.right + pad, clip.right - 2, vw - 4);
     const box = {
-      top: clamp(raw.top - pad, 4, vh - 8),
-      left: clamp(raw.left - pad, 4, vw - 8),
-      width: Math.min(vw - 8, raw.width + pad * 2),
-      height: Math.min(vh - 8, raw.height + pad * 2),
+      top,
+      left,
+      width: Math.max(0, right - left),
+      height: Math.max(0, bottom - top),
     };
     box.right = box.left + box.width;
     box.bottom = box.top + box.height;
@@ -972,22 +1083,13 @@
     renderStepUI(index);
     positionOverlay();
 
-    if (typeof target.scrollIntoView === 'function') {
-      try {
-        const rect = measureRect(target);
-        const vh = global.innerHeight || 800;
-        if (rect.top < 16 || rect.bottom > vh - 16) {
-          target.scrollIntoView({
-            behavior: prefersReducedMotion() ? 'auto' : 'smooth',
-            block: 'center',
-            inline: 'nearest',
-          });
-          global.clearTimeout(state.repositionTimer);
-          state.repositionTimer = global.setTimeout(() => positionOverlay(), 280);
-        }
-      } catch (_err) {
-        /* ignore in minimal DOM */
+    try {
+      if (scrollFocusIntoView(activeSteps[index], target)) {
+        global.clearTimeout(state.repositionTimer);
+        state.repositionTimer = global.setTimeout(() => positionOverlay(), 320);
       }
+    } catch (_err) {
+      /* ignore in minimal DOM */
     }
   }
 
@@ -1117,7 +1219,10 @@
   }
 
   function getSteps() {
-    return activeSteps.map(step => Object.assign({}, step, { selectors: step.selectors.slice() }));
+    return activeSteps.map(step => Object.assign({}, step, {
+      selectors: step.selectors.slice(),
+      focusSelectors: (step.focusSelectors || []).slice(),
+    }));
   }
 
   function reset(studentId) {

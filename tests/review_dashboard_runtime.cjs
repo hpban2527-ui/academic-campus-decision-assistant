@@ -243,6 +243,8 @@ const saved = () => readAccount('SYN-REVIEW-01');
       assert.equal(calls().length, 2);
       sandbox.reviewDashChoosePlanOption(1, 'review');
     }
+    // Step 5 confirms from the review panel: the wizard's Next button is hidden, and Tab must skip it and
+    // still wrap inside the dialog (last visible control -> first, Shift+Tab first -> last).
     const modal = element('onboardingModal');
     const backButton = element('onboardingBackButton');
     const nextButton = element('onboardingNextButton');
@@ -318,6 +320,11 @@ const saved = () => readAccount('SYN-REVIEW-01');
   assert.equal(started.length, 3, 'all previews must start without waiting for another preview');
   await pendingChange;
   const panel = () => element(input.mobile ? 'prvList' : 'prvPanel').innerHTML;
+  if (run('!!(prvDraft.panel.alternatives && prvDraft.panel.alternatives.data)')) {
+    // The shared feasibility block was put back on every listed preview.
+    assert.equal(run('prvDraft.panel.alternatives.data.shared'), undefined);
+    assert.equal(run('prvDraft.panel.alternatives.data.items.every(i => !!i.preview.result.feasibility)'), true);
+  }
   const initialActions = element('prvList').innerHTML.match(/data-review-actions[\s\S]*?<\/div>/g) || [];
   assert.equal(initialActions.length, input.options[1].result.plan.selected_activities.length);
   for (const actions of initialActions) {

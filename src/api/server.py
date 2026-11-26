@@ -1955,6 +1955,8 @@ from api.sp3_service import (
     preview_personalized_swap as _sp3_preview_swap,
     sp1_catalog as _sp3_catalog,
     list_swap_alternatives as _sp3_list_alternatives,
+    ReviewSuperseded as _ReviewSuperseded,
+    share_alternative_feasibility as _sp3_share_alternative_feasibility,
     what_if_skip_planned_activity as _sp3_what_if_skip,
 )
 from api.sp3_real import (
@@ -2424,6 +2426,26 @@ def _sp3_review_backend(source: str) -> None:
     _sp3_source(source)
 
 
+# The latest alternatives request per (student, term, source): an older one stops between candidates.
+_REVIEW_GENERATIONS: dict[tuple[str, str, str], int] = {}
+_REVIEW_GENERATIONS_LOCK = RLock()
+
+
+def _review_superseded_check(student_id: str | None, term: str, source: str):
+    """Register a new alternatives request; the returned check is True once a newer one starts."""
+    if student_id is None:
+        return None  # anonymous requests share no key, so they never cancel each other
+    key = (student_id, term, source)
+    with _REVIEW_GENERATIONS_LOCK:
+        generation = _REVIEW_GENERATIONS.get(key, 0) + 1
+        _REVIEW_GENERATIONS[key] = generation
+
+    def superseded() -> bool:
+        with _REVIEW_GENERATIONS_LOCK:
+            return _REVIEW_GENERATIONS.get(key) != generation
+    return superseded
+
+
 @app.post("/api/sp3/personalized/alternatives")
 def list_sp3_swap_alternatives(req: SwapAlternativesRequest, source: str = "synthetic", student_id: str | None = None,
                                term_id: str | None = None):
@@ -2433,15 +2455,21 @@ def list_sp3_swap_alternatives(req: SwapAlternativesRequest, source: str = "synt
     term = _plan_term_id(source, term_id)
     try:
         account = _account_planning(student_id, source, term)
+        superseded = _review_superseded_check(account.student_id if account else None, term, source)
         response = _sp3_list_alternatives(
             req.preference, _account_review_base(req.base_result, account), req.remove_activity_id, req.limit,
             availability_request=req.availability, source=source, account=account, term_id=term,
+            is_superseded=superseded,
         )
         for item in response["items"]:
             _offer_preview(item["preview"], source, account)
         if source == "real":
             response.update(_clock_metadata(account.clock if account else get_term(term)))
-        return response
+        return _sp3_share_alternative_feasibility(response)
+    except _ReviewSuperseded as exc:
+        raise HTTPException(status_code=409, detail={
+            "code": "REVIEW_SUPERSEDED", "message": "Yêu cầu này đã được thay bằng một yêu cầu mới hơn.",
+        }) from exc
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
@@ -2644,8 +2672,21 @@ def serve_favicon():
     return Response(content=svg, media_type="image/svg+xml")
 
 
+class RevalidatingStaticFiles(StaticFiles):
+    """Static files that the browser must revalidate on every load.
+
+    Without a Cache-Control header, browsers cache /static/*.js heuristically and keep
+    running an old user_tour.js after an edit. "no-cache" still allows a cheap 304 via ETag.
+    """
+
+    def file_response(self, *args, **kwargs):
+        response = super().file_response(*args, **kwargs)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 if WEB_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(WEB_DIR)), name="static")
+    app.mount("/static", RevalidatingStaticFiles(directory=str(WEB_DIR)), name="static")
 
     @app.get("/")
     def serve_index():

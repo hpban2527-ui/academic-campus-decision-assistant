@@ -53,7 +53,7 @@ def test_card_texts_and_states() -> None:
                  "Xác nhận nguyện vọng để so sánh 3 phương án.",
                  "Một số chiến lược cho ra cùng một lịch nên đã được gộp.",
                  "Không phương án nào đạt mục tiêu", "với lịch và ràng buộc hiện tại.",
-                 "Mục tiêu ${targetText} điểm", "Dữ liệu giả lập", "Kho bài thật"):
+                 "/ mục tiêu ${", "Dữ liệu giả lập", "Kho bài thật"):
         assert text in body, text
     # The preference utility is shown only when a preference was stated.
     assert "hasPreference && model.utility !== null" in body
@@ -145,7 +145,9 @@ def test_onboarding_options_and_review_are_steps_in_the_same_dialog() -> None:
 def test_friendly_error_mapping_covers_the_source_real_422() -> None:
     body = _function("reviewDashFriendlyError")
     assert "source=real" in body and "not yet (available|supported)" in body
-    assert "Chức năng này chưa hỗ trợ kho bài thật. Hãy chuyển nguồn dữ liệu sang “Dữ liệu giả lập (MVP)” ở đầu trang Lập lịch thông minh." in body
+    # The page has no data-source selector any more, so the message must not send the student to one.
+    assert "Máy chủ đang chạy chưa hỗ trợ chức năng này với kho bài thật. Hãy khởi động lại server bằng phiên bản mới rồi thử lại." in body
+    assert "Dữ liệu giả lập (MVP)" not in body
     assert "Không kết nối được máy chủ. Hãy kiểm tra server rồi thử lại." in body
     assert "failed to fetch" in body
     assert "Không thể lập kế hoạch: ${text}" in body

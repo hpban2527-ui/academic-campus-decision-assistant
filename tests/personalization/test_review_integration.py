@@ -15,7 +15,7 @@ from api.term_clock import list_terms
 from api.sp3_service import (
     list_swap_alternatives, personalized_plan_options, preview_personalized_swap,
     preview_personalized_removal, remove_planned_activity, what_if_skip_planned_activity,
-    preview_personalized_addition,
+    preview_personalized_addition, share_alternative_feasibility,
 )
 from personalization.models import StudentPreference
 
@@ -111,7 +111,9 @@ def test_real_page_controllers_review_confirm_and_persist_without_network(review
         # Transport-level empty response: keep all scoring in untouched engine previews.
         data["alternatives"] = {**data["alternatives"], "items": []}
     if scenario == "flow":
-        edited = data["alternatives"]["items"][0]
+        edited = deepcopy(data["alternatives"]["items"][0])
+        # The page puts the shared feasibility block back before it reuses a preview as a plan.
+        edited["preview"]["result"].setdefault("feasibility", (data["alternatives"].get("shared") or {}).get("feasibility"))
         data["dashboard"] = _panel_payload(preference, edited["preview"]["result"], edited["activity_id"])
         data["dashboard"].update(baseVersion=edited["preview"]["result"]["plan"]["plan_version"], activityId=edited["activity_id"])
     if scenario == "suggestion_one":
@@ -122,7 +124,8 @@ def test_real_page_controllers_review_confirm_and_persist_without_network(review
 
 
 def _panel_payload(preference, base, activity_id):
-    return {"alternatives": list_swap_alternatives(preference, base, activity_id, limit=10),
+    # The page receives the endpoint shape: the feasibility block is sent once (share_alternative_feasibility).
+    return {"alternatives": share_alternative_feasibility(list_swap_alternatives(preference, base, activity_id, limit=10)),
             "impact": remove_planned_activity(preference, base, activity_id),
             "suggestion": what_if_skip_planned_activity(preference, base, activity_id)}
 
@@ -181,7 +184,8 @@ def test_operational_source_uses_real_review_routes_even_if_global_selector_chan
     activity_id = base["plan"]["selected_activities"][0]["activity_id"]
     data = {"preference": payload, "options": options, "mobile": mobile,
             "scenario": "real_source", "activityId": activity_id,
-            "alternatives": list_swap_alternatives(preference, base, activity_id, source="real", term_id="HK1_2026_2027", limit=10),
+            "alternatives": share_alternative_feasibility(
+                list_swap_alternatives(preference, base, activity_id, source="real", term_id="HK1_2026_2027", limit=10)),
             "impact": remove_planned_activity(preference, base, activity_id, source="real", term_id="HK1_2026_2027"),
             "suggestion": what_if_skip_planned_activity(preference, base, activity_id, source="real", term_id="HK1_2026_2027")}
     _run_panel_controllers(data)
