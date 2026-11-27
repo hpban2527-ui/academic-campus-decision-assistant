@@ -11247,7 +11247,8 @@
       planInputsDirty = true;
       setPlanButtonLabel('Cập nhật kế hoạch');
       const notice = document.getElementById('planStaleNotice');
-      if (notice) notice.classList.remove('hidden');
+      if (notice) notice.classList.add('hidden');
+      if (typeof renderSchedulePlanConflictNotice === 'function') renderSchedulePlanConflictNotice();
     }
 
     function setPlanButtonLabel(label) {
@@ -12679,7 +12680,8 @@
       const isDev = currentViewMode === 'dev';
 
       const stale = document.getElementById('planStaleNotice');
-      if (stale) stale.classList.toggle('hidden', !planInputsDirty);
+      if (stale) stale.classList.add('hidden');
+      if (typeof renderSchedulePlanConflictNotice === 'function') renderSchedulePlanConflictNotice();
 
       updatePlanConfirmationBadge();
       renderPlanPersonalizationCard(data, titles);
